@@ -1,0 +1,230 @@
+--> 872280-nir-out0.spec
+# BFI1\ vers=93.338219
+# BFI1\ vers\tDataType=N
+# BFI\ lds=142.443859
+# BFI\ lds\tDataType=N
+# CALU=323.18
+# CALU\tDataType=N
+# CAN1=0.740516
+# CAN1\tDataType=N
+# CECU=417.6
+# CECU\tDataType=N
+# COR6=41.54
+# COR6\tDataType=N
+# Clay=576.51
+# Clay\tDataType=N
+# Dummy\ report=false
+# Dummy\ report\tDataType=B
+# Format=NIR
+# Format\tDataType=S
+# GLV0=39.9
+# GLV0\tDataType=N
+# GLV1=113.12
+# GLV1\tDataType=N
+# GLV2=153.02
+# GLV2\tDataType=N
+# Insert\ Timestamp=2000-01-01 00\:00\:00
+# Insert\ Timestamp\tDataType=S
+# Instrument=unknown
+# Instrument\tDataType=S
+# K-Exch=5.58
+# K-Exch\tDataType=N
+# KALU=5.58
+# KALU\tDataType=N
+# LUT2=576.51
+# LUT2\tDataType=N
+# MAGU=73.01
+# MAGU\tDataType=N
+# MANU=0.19
+# MANU\tDataType=N
+# N-total=3.92
+# N-total\tDataType=N
+# NATU=2.95
+# NATU\tDataType=N
+# NTT6=3.92
+# NTT6\tDataType=N
+# Nr\ prakt=251769
+# Nr\ prakt\tDataType=S
+# PHC3=-999.0
+# PHC3\tDataType=N
+# Parent\ ID=282
+# Parent\ ID\tDataType=U
+# ProdID=07
+# ProdID\tDataType=S
+# STT6=0.64
+# STT6\tDataType=N
+# Sample\ ID=872280
+# Sample\ ID\tDataType=S
+# Source=872280-nir.spec
+# Source\tDataType=S
+# jaar=2008.0
+# jaar\tDataType=N
+# mnd=10b
+# mnd\tDataType=S
+waveno,amplitude
+1.0,9.0
+2.0,6.0
+3.0,5.0
+4.0,2.0
+5.0,2.0
+6.0,3.0
+7.0,2.0
+8.0,3.0
+9.0,4.0
+10.0,5.0
+
+--> 872280-nir-out1.spec
+# BFI1\ vers=93.338219
+# BFI1\ vers\tDataType=N
+# BFI\ lds=142.443859
+# BFI\ lds\tDataType=N
+# CALU=323.18
+# CALU\tDataType=N
+# CAN1=0.740516
+# CAN1\tDataType=N
+# CECU=417.6
+# CECU\tDataType=N
+# COR6=41.54
+# COR6\tDataType=N
+# Clay=576.51
+# Clay\tDataType=N
+# Dummy\ report=false
+# Dummy\ report\tDataType=B
+# Format=NIR
+# Format\tDataType=S
+# GLV0=39.9
+# GLV0\tDataType=N
+# GLV1=113.12
+# GLV1\tDataType=N
+# GLV2=153.02
+# GLV2\tDataType=N
+# Insert\ Timestamp=2000-01-01 00\:00\:00
+# Insert\ Timestamp\tDataType=S
+# Instrument=unknown
+# Instrument\tDataType=S
+# K-Exch=5.58
+# K-Exch\tDataType=N
+# KALU=5.58
+# KALU\tDataType=N
+# LUT2=576.51
+# LUT2\tDataType=N
+# MAGU=73.01
+# MAGU\tDataType=N
+# MANU=0.19
+# MANU\tDataType=N
+# N-total=3.92
+# N-total\tDataType=N
+# NATU=2.95
+# NATU\tDataType=N
+# NTT6=3.92
+# NTT6\tDataType=N
+# Nr\ prakt=251769
+# Nr\ prakt\tDataType=S
+# PHC3=-999.0
+# PHC3\tDataType=N
+# Parent\ ID=282
+# Parent\ ID\tDataType=U
+# ProdID=07
+# ProdID\tDataType=S
+# STT6=0.64
+# STT6\tDataType=N
+# Sample\ ID=872280
+# Sample\ ID\tDataType=S
+# Source=872280-nir.spec
+# Source\tDataType=S
+# jaar=2008.0
+# jaar\tDataType=N
+# mnd=10b
+# mnd\tDataType=S
+waveno,amplitude
+1.0,19.0
+2.0,18.0
+3.0,13.0
+4.0,11.0
+5.0,16.0
+6.0,4.0
+7.0,4.0
+8.0,4.0
+9.0,5.0
+10.0,6.0
+11.0,8.0
+12.0,5.0
+13.0,5.0
+14.0,6.0
+15.0,7.0
+16.0,8.0
+17.0,9.0
+18.0,10.0
+19.0,11.0
+20.0,10.0
+
+--> 872280-nir-out2.spec
+# BFI1\ vers=93.338219
+# BFI1\ vers\tDataType=N
+# BFI\ lds=142.443859
+# BFI\ lds\tDataType=N
+# CALU=323.18
+# CALU\tDataType=N
+# CAN1=0.740516
+# CAN1\tDataType=N
+# CECU=417.6
+# CECU\tDataType=N
+# COR6=41.54
+# COR6\tDataType=N
+# Clay=576.51
+# Clay\tDataType=N
+# Dummy\ report=false
+# Dummy\ report\tDataType=B
+# Format=NIR
+# Format\tDataType=S
+# GLV0=39.9
+# GLV0\tDataType=N
+# GLV1=113.12
+# GLV1\tDataType=N
+# GLV2=153.02
+# GLV2\tDataType=N
+# Insert\ Timestamp=2000-01-01 00\:00\:00
+# Insert\ Timestamp\tDataType=S
+# Instrument=unknown
+# Instrument\tDataType=S
+# K-Exch=5.58
+# K-Exch\tDataType=N
+# KALU=5.58
+# KALU\tDataType=N
+# LUT2=576.51
+# LUT2\tDataType=N
+# MAGU=73.01
+# MAGU\tDataType=N
+# MANU=0.19
+# MANU\tDataType=N
+# N-total=3.92
+# N-total\tDataType=N
+# NATU=2.95
+# NATU\tDataType=N
+# NTT6=3.92
+# NTT6\tDataType=N
+# Nr\ prakt=251769
+# Nr\ prakt\tDataType=S
+# PHC3=-999.0
+# PHC3\tDataType=N
+# Parent\ ID=282
+# Parent\ ID\tDataType=U
+# ProdID=07
+# ProdID\tDataType=S
+# STT6=0.64
+# STT6\tDataType=N
+# Sample\ ID=872280
+# Sample\ ID\tDataType=S
+# Source=872280-nir.spec
+# Source\tDataType=S
+# jaar=2008.0
+# jaar\tDataType=N
+# mnd=10b
+# mnd\tDataType=S
+waveno,amplitude
+1.0,4.0
+2.0,1.0
+3.0,1.0
+4.0,1.0
+5.0,2.0
+

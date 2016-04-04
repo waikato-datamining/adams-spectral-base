@@ -1,0 +1,141 @@
+--> diagonal-out0.spec
+# Format=NIR
+# Format\tDataType=S
+# Insert\ Timestamp=2000-01-01 00\:00\:00
+# Insert\ Timestamp\tDataType=U
+# Instrument=unknown
+# Instrument\tDataType=U
+# Parent\ ID=282
+# Parent\ ID\tDataType=U
+# Sample\ ID=872280
+# Sample\ ID\tDataType=S
+# Source=diagonal.spec
+# Source\tDataType=U
+waveno,amplitude
+1.0,1.0
+2.0,2.0
+3.0,3.0
+4.0,4.0
+5.0,5.0
+6.0,6.0
+7.0,7.0
+8.0,8.0
+9.0,9.0
+10.0,10.0
+11.0,11.0
+12.0,12.0
+13.0,13.0
+14.0,14.0
+15.0,15.0
+16.0,16.0
+17.0,17.0
+18.0,18.0
+19.0,19.0
+20.0,20.0
+
+--> diagonal-out1.spec
+# Format=NIR
+# Format\tDataType=S
+# Insert\ Timestamp=2000-01-01 00\:00\:00
+# Insert\ Timestamp\tDataType=U
+# Instrument=unknown
+# Instrument\tDataType=U
+# Parent\ ID=282
+# Parent\ ID\tDataType=U
+# Sample\ ID=872280
+# Sample\ ID\tDataType=S
+# Source=diagonal.spec
+# Source\tDataType=U
+waveno,amplitude
+1.0,0.0
+2.0,0.2
+3.0,0.6
+4.0,1.2
+5.0,2.0
+6.0,3.0
+7.0,4.2000003
+8.0,5.6
+9.0,7.2000003
+10.0,9.0
+11.0,9.900001
+12.0,9.6
+13.0,9.099999
+14.0,8.400001
+15.0,7.5
+16.0,6.4
+17.0,5.1000004
+18.0,3.6000001
+19.0,1.9
+20.0,0.0
+
+--> flat-out2.spec
+# Format=NIR
+# Format\tDataType=S
+# Insert\ Timestamp=2000-01-01 00\:00\:00
+# Insert\ Timestamp\tDataType=U
+# Instrument=unknown
+# Instrument\tDataType=U
+# Parent\ ID=282
+# Parent\ ID\tDataType=U
+# Sample\ ID=872280
+# Sample\ ID\tDataType=S
+# Source=flat.spec
+# Source\tDataType=U
+waveno,amplitude
+1.0,0.0
+2.0,0.1
+3.0,0.2
+4.0,0.3
+5.0,0.4
+6.0,0.5
+7.0,0.6
+8.0,0.7
+9.0,0.8
+10.0,0.90000004
+11.0,0.90000004
+12.0,0.8
+13.0,0.7
+14.0,0.6
+15.0,0.5
+16.0,0.4
+17.0,0.3
+18.0,0.2
+19.0,0.1
+20.0,0.0
+
+--> flat2-out3.spec
+# Format=NIR
+# Format\tDataType=S
+# Insert\ Timestamp=2000-01-01 00\:00\:00
+# Insert\ Timestamp\tDataType=U
+# Instrument=unknown
+# Instrument\tDataType=U
+# Parent\ ID=282
+# Parent\ ID\tDataType=U
+# Sample\ ID=872280
+# Sample\ ID\tDataType=S
+# Source=flat2.spec
+# Source\tDataType=U
+waveno,amplitude
+1.0,0.0
+2.0,0.1
+3.0,0.2
+4.0,0.3
+5.0,0.4
+6.0,0.5
+7.0,0.6
+8.0,0.7
+9.0,0.8
+10.0,0.90000004
+11.0,1.0
+12.0,0.90000004
+13.0,0.8
+14.0,0.7
+15.0,0.6
+16.0,0.5
+17.0,0.4
+18.0,0.3
+19.0,0.2
+20.0,0.1
+21.0,0.0
+

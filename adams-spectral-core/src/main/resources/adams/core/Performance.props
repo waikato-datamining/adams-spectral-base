@@ -1,0 +1,7 @@
+# Properties file with performance tuning parameters.
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision: 11831 $
+
+# The maximum number of spectra to cache.
+maxNumSpectrumsCached=100

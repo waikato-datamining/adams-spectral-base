@@ -1,0 +1,106 @@
+--> simple2-out0.spec
+# Format=NIR
+# Format\tDataType=S
+# Instrument=unknown
+# Instrument\tDataType=U
+# Parent\ ID=-1
+# Sample\ ID=1234
+# Sample\ ID\tDataType=S
+# Source=simple2.spec
+# Source\tDataType=U
+waveno,amplitude
+1.0,0.81
+2.0,0.82
+3.0,0.82
+4.0,0.81
+5.0,0.79
+6.0,0.78
+7.0,0.77
+8.0,0.76
+9.0,0.77
+10.0,0.78
+
+--> simple2-out1.spec
+# Format=NIR-MIR-XRF
+# Format\tDataType=S
+# Instrument=unknown
+# Instrument\tDataType=U
+# Parent\ ID=-1
+# Sample\ ID=1234
+# Sample\ ID\tDataType=S
+# Source=simple2.spec
+# Source\tDataType=U
+waveno,amplitude
+1.0,0.81
+2.0,0.82
+3.0,0.82
+4.0,0.81
+5.0,0.79
+6.0,0.78
+7.0,0.77
+8.0,0.76
+9.0,0.77
+10.0,0.78
+11.0,0.91
+12.0,0.92
+13.0,0.92
+14.0,0.91
+15.0,0.89
+16.0,0.88
+17.0,0.87
+18.0,0.86
+19.0,0.87
+20.0,0.88
+21.0,0.61
+22.0,0.62
+23.0,0.62
+24.0,0.61
+25.0,0.49
+26.0,0.48
+27.0,0.47
+28.0,0.46
+29.0,0.47
+30.0,0.48
+
+--> simple2-out2.spec
+# Format=NIR-MIR-XRF
+# Format\tDataType=S
+# Instrument=unknown
+# Instrument\tDataType=U
+# Parent\ ID=-1
+# Sample\ ID=1234
+# Sample\ ID\tDataType=S
+# Source=simple2.spec
+# Source\tDataType=U
+waveno,amplitude
+1.0,0.81
+2.0,0.82
+3.0,0.82
+4.0,0.81
+5.0,0.79
+6.0,0.78
+7.0,0.77
+8.0,0.76
+9.0,0.77
+10.0,0.78
+12.0,0.91
+14.0,0.92
+16.0,0.92
+18.0,0.91
+20.0,0.89
+22.0,0.88
+24.0,0.87
+26.0,0.86
+28.0,0.87
+30.0,0.88
+40.0,0.61
+50.0,0.62
+60.0,0.62
+70.0,0.61
+80.0,0.49
+90.0,0.48
+100.0,0.47
+110.0,0.46
+120.0,0.47
+130.0,0.48
+

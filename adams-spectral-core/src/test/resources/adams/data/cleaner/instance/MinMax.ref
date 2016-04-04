@@ -1,0 +1,88 @@
+--> clay-out0.arff
+1: passed
+2: passed
+3: passed
+4: passed
+5: passed
+6: passed
+7: passed
+8: passed
+9: passed
+10: passed
+11: passed
+12: passed
+13: passed
+14: passed
+15: passed
+16: passed
+17: passed
+18: passed
+19: passed
+20: passed
+
+--> clay-out1.arff
+1: Value of 'Clay' below minimum: 96.33<100.0
+2: passed
+3: passed
+4: passed
+5: passed
+6: Value of 'Clay' below minimum: 26.19<100.0
+7: passed
+8: passed
+9: passed
+10: passed
+11: passed
+12: passed
+13: passed
+14: passed
+15: passed
+16: passed
+17: passed
+18: passed
+19: passed
+20: passed
+
+--> clay-out2.arff
+1: passed
+2: passed
+3: passed
+4: passed
+5: passed
+6: passed
+7: passed
+8: Value of 'Clay' over maximum: 229.42>200.0
+9: passed
+10: passed
+11: passed
+12: passed
+13: passed
+14: passed
+15: Value of 'Clay' over maximum: 301.09>200.0
+16: Value of 'Clay' over maximum: 270.78>200.0
+17: passed
+18: passed
+19: passed
+20: Value of 'Clay' over maximum: 220.78>200.0
+
+--> clay-out3.arff
+1: Value of 'Clay' below minimum: 96.33<100.0
+2: passed
+3: passed
+4: passed
+5: passed
+6: Value of 'Clay' below minimum: 26.19<100.0
+7: passed
+8: Value of 'Clay' over maximum: 229.42>200.0
+9: passed
+10: passed
+11: passed
+12: passed
+13: passed
+14: passed
+15: Value of 'Clay' over maximum: 301.09>200.0
+16: Value of 'Clay' over maximum: 270.78>200.0
+17: passed
+18: passed
+19: passed
+20: Value of 'Clay' over maximum: 220.78>200.0
+

@@ -1,0 +1,12 @@
+# Configurations for various table classes and other related classes.
+#
+# Author: FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision: 1881 $
+
+# Debugging
+adams.db.SampleDataT.Debug=false
+adams.db.SpectrumT.Debug=false
+
+# Enabled
+adams.db.SampleDataT.Enabled=true
+adams.db.SpectrumT.Enabled=true

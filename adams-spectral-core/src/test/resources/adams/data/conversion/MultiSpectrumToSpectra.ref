@@ -1,0 +1,196 @@
+--> out-0.txt
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=2
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=3
+# Sample\ ID\tDataType=S
+
+
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=2
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=3
+# Sample\ ID\tDataType=S
+
+
+
+--> out-1.txt
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=2
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=3
+# Sample\ ID\tDataType=S
+
+
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=2
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=3
+# Sample\ ID\tDataType=S
+
+
+
+--> out-2.txt
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=2
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=3
+# Sample\ ID\tDataType=S
+
+
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+
+# A=1.0
+# AB=2.0
+# AB\tDataType=N
+# A\tDataType=N
+# B=bbbb
+# BB=BBBB
+# BB\tDataType=S
+# B\tDataType=S
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+# A=1.0
+# AB=2.0
+# AB\tDataType=N
+# A\tDataType=N
+# B=bbbb
+# BB=BBBB
+# BB\tDataType=S
+# B\tDataType=S
+# Parent\ ID=-1
+# Sample\ ID=2
+# Sample\ ID\tDataType=S
+
+
+# A=1.0
+# AB=2.0
+# AB\tDataType=N
+# A\tDataType=N
+# B=bbbb
+# BB=BBBB
+# BB\tDataType=S
+# B\tDataType=S
+# Parent\ ID=-1
+# Sample\ ID=3
+# Sample\ ID\tDataType=S
+
+
+
+--> out-3.txt
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=2
+# Sample\ ID\tDataType=S
+
+
+# Parent\ ID=-1
+# Sample\ ID=3
+# Sample\ ID\tDataType=S
+
+
+
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+
+# Multi-A=1.0
+# Multi-AB=2.0
+# Multi-AB\tDataType=N
+# Multi-A\tDataType=N
+# Parent\ ID=-1
+# Sample\ ID=1
+# Sample\ ID\tDataType=S
+
+
+# Multi-A=1.0
+# Multi-AB=2.0
+# Multi-AB\tDataType=N
+# Multi-A\tDataType=N
+# Parent\ ID=-1
+# Sample\ ID=2
+# Sample\ ID\tDataType=S
+
+
+# Multi-A=1.0
+# Multi-AB=2.0
+# Multi-AB\tDataType=N
+# Multi-A\tDataType=N
+# Parent\ ID=-1
+# Sample\ ID=3
+# Sample\ ID\tDataType=S
+
+
+

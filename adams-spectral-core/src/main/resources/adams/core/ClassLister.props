@@ -1,0 +1,80 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision: 10634 $
+
+# the spectrum readers
+adams.data.io.input.AbstractSpectrumReader=\
+  adams.data.io.input
+
+# the spectrum writers
+adams.data.io.output.AbstractSpectrumWriter=\
+  adams.data.io.output
+
+# the sample data readers
+adams.data.io.input.SampleDataReader=\
+  adams.data.io.input
+
+# the sample data writers
+adams.data.io.output.SampleDataWriter=\
+  adams.data.io.output
+
+# the spectrum cleaners
+adams.data.cleaner.spectrum.AbstractCleaner=\
+  adams.data.cleaner.spectrum
+
+# the instance cleaners
+adams.data.cleaner.instance.AbstractCleaner=\
+  adams.data.cleaner.instance
+
+# the evaluators
+adams.data.evaluator.instance.AbstractEvaluator=\
+  adams.data.evaluator.instance
+
+# the plot updaters for the SpectrumDisplay
+adams.flow.sink.spectrumdisplay.AbstractPlotUpdater=\
+  adams.flow.sink.spectrumdisplay
+
+# the filters
+adams.data.filter.AbstractFilter=\
+  adams.data.spectrumfilter
+
+# the amplitude transformers
+adams.data.spectrumfilter.amplitudetransform.AbstractAmplitudeTransformer=\
+  adams.data.spectrumfilter.amplitudetransform
+
+# the multi-spectrum filters
+adams.data.multifilter.AbstractMultiSpectrumFilter=\
+  adams.data.multifilter
+
+# report filters for multi-spectrum
+adams.data.multireportfilter.AbstractMultiSpectrumReportFilter=\
+  adams.data.multireportfilter
+
+# feature generators
+adams.data.spectrum.AbstractSpectrumFeatureGenerator=\
+  adams.data.spectrum
+
+# the post-processors
+adams.data.postprocessor.instances.AbstractPostProcessor=\
+  adams.data.postprocessor.instances
+
+# baseline correction schemes
+adams.data.baseline.AbstractBaselineCorrection=\
+  adams.data.spectrumbaseline
+
+# the outlier detector schemes
+adams.data.outlier.AbstractOutlierDetector=\
+  adams.data.spectrumoutlier
+
+# filters for the reports
+adams.data.report.AbstractReportFilter=\
+  adams.data.sampledata
+
+# smoothing algorithms
+adams.data.smoothing.AbstractSmoother=\
+  adams.data.spectrumsmoothing

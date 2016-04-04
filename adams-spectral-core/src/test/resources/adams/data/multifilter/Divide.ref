@@ -1,0 +1,22 @@
+--> simple2-out0.spec
+# Format=DIV
+# Format\tDataType=S
+# Instrument=unknown
+# Instrument\tDataType=U
+# Parent\ ID=-1
+# Sample\ ID=1234
+# Sample\ ID\tDataType=S
+# Source=simple2.spec
+# Source\tDataType=U
+waveno,amplitude
+1.0,1.1234568
+2.0,1.1219512
+3.0,1.1219512
+4.0,1.1234568
+5.0,1.1265823
+6.0,1.1282052
+7.0,1.1298702
+8.0,1.1315789
+9.0,1.1298702
+10.0,1.1282052
+

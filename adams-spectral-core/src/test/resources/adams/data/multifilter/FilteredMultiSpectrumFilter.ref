@@ -1,0 +1,22 @@
+--> simple2-out0.spec
+# Format=ATAN2
+# Format\tDataType=S
+# Instrument=unknown
+# Instrument\tDataType=U
+# Parent\ ID=-1
+# Sample\ ID=1234
+# Sample\ ID\tDataType=S
+# Source=simple2.spec
+# Source\tDataType=U
+waveno,amplitude
+1.0,0.84347236
+2.0,0.8428063
+3.0,0.8428063
+4.0,0.84347236
+5.0,0.8448518
+6.0,0.84556645
+7.0,0.8462984
+8.0,0.84704834
+9.0,0.8462984
+10.0,0.84556645
+

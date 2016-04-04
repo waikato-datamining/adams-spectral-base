@@ -1,0 +1,32 @@
+Field,Type,Value
+"Parent ID",N,1
+"BFI lds",N,60.197115
+"BFI1 vers",N,49.610303
+CALU,N,118.48
+CAN1,N,12.069088
+CECU,N,98.04
+Clay,N,96.33
+COR6,N,9.13
+"Dummy report",B,false
+Format,S,NIR
+GLV0,N,10.63
+GLV1,N,24.69
+GLV2,N,35.32
+"Insert Timestamp",S,"2009-11-27 20:15:27"
+Instrument,S,unknown
+jaar,N,2007.0
+K-Exch,N,2.86
+KALU,N,2.86
+LUT2,N,96.33
+MAGU,N,7.86
+MANU,N,0.02
+mnd,S,40a
+N-total,N,0.86
+NATU,N,0.79
+"Nr prakt",S,202803
+NTT6,N,0.86
+PHC3,N,-999.0
+ProdID,S,07
+"Sample ID",S,871553
+Source,S,/home/fracpete/temp/knir/xrf/Batch1/NIR1.CSV
+STT6,N,0.34

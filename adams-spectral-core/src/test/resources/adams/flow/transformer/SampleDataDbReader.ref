@@ -1,0 +1,99 @@
+--> 871563.csv
+Field,Type,Value
+"Parent ID",S,3
+"BFI lds",N,7.14839
+"BFI1 vers",N,5.891867
+CALU,N,115.75
+CAN1,N,0.403301
+CECU,N,125.77
+Clay,N,164.76
+COR6,N,9.25
+"Dummy report",B,false
+GLV0,N,16.26
+GLV1,N,31.88
+GLV2,N,48.14
+"Insert Timestamp",S,"2009-11-27 20:15:27"
+Instrument,S,unknown
+jaar,N,2007
+K-Exch,N,3.85
+KALU,N,3.85
+LUT2,N,164.76
+MAGU,N,8.52
+MANU,N,0.03
+mnd,S,40a
+N-total,N,1.09
+NATU,N,0.51
+"Nr prakt",S,202848
+NTT6,N,1.09
+PHC3,N,-999
+ProdID,S,7
+"Sample ID",S,871563
+Source,S,3.spec
+STT6,N,0.18
+
+--> 871653.csv
+Field,Type,Value
+"Parent ID",S,27
+"BFI lds",N,262.464328
+"BFI1 vers",N,201.066415
+CALU,N,223.15
+CAN1,N,5.661405
+CECU,N,261.81
+Clay,N,154.06
+COR6,N,36.3
+"Dummy report",B,false
+GLV0,N,20.55
+GLV1,N,70.31
+GLV2,N,90.86
+"Insert Timestamp",S,"2009-11-27 20:15:27"
+Instrument,S,unknown
+jaar,N,2007
+K-Exch,N,9.71
+KALU,N,9.71
+LUT2,N,154.06
+MAGU,N,28.33
+MANU,N,0.02
+mnd,S,42b
+N-total,N,2.99
+NATU,N,0.93
+"Nr prakt",S,204162
+NTT6,N,2.99
+PHC3,N,-999
+ProdID,S,7
+"Sample ID",S,871653
+Source,S,27.spec
+STT6,N,0.52
+
+--> 871738.csv
+Field,Type,Value
+"Parent ID",S,40
+"BFI lds",N,158.521147
+"BFI1 vers",N,113.032473
+CALU,N,316.6
+CAN1,N,3.766567
+CECU,N,297.63
+Clay,N,218.12
+COR6,N,42.36
+"Dummy report",B,false
+GLV0,N,20.4
+GLV1,N,98.09
+GLV2,N,118.49
+"Insert Timestamp",S,"2009-11-27 20:15:27"
+Instrument,S,unknown
+jaar,N,2007
+K-Exch,N,7.57
+KALU,N,7.57
+LUT2,N,218.12
+MAGU,N,20.31
+MANU,N,0.04
+mnd,S,45a
+N-total,N,4.55
+NATU,N,2.42
+"Nr prakt",S,207352
+NTT6,N,4.55
+PHC3,N,-999
+ProdID,S,7
+"Sample ID",S,871738
+Source,S,40.spec
+STT6,N,0.76
+
