@@ -15,7 +15,7 @@
 
 /*
  * SpectrumDisplay.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -220,7 +220,7 @@ public class SpectrumDisplay
       }
 
       if (cont != null)
-	m_PlotUpdater.update(((SpectrumExplorer) getPanel()).getSpectrumPanel(), cont);
+	m_PlotUpdater.update(m_Panel.getSpectrumPanel(), cont);
     }
 
     @Override
