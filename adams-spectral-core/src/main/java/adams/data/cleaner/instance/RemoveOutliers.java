@@ -41,7 +41,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.CrossValidationFoldGenerator;
 import weka.classifiers.CrossValidationHelper;
 import weka.classifiers.Evaluation;
-import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.functions.LinearRegressionJ;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -72,7 +72,7 @@ import java.util.logging.Level;
  * 
  * <pre>-classifier &lt;weka.classifiers.Classifier&gt; (property: classifier)
  * &nbsp;&nbsp;&nbsp;The classifier to use for generating the actual vs predicted data.
- * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.LinearRegression -S 0 -R 1.0E-8
+ * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.LinearRegressionJ -S 0 -R 1.0E-8
  * </pre>
  * 
  * <pre>-seed &lt;long&gt; (property: seed)
@@ -153,7 +153,7 @@ public class RemoveOutliers
 
     m_OptionManager.add(
       "classifier", "classifier",
-      new LinearRegression());
+      new LinearRegressionJ());
 
     m_OptionManager.add(
       "seed", "seed",

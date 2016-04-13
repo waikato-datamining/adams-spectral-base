@@ -25,7 +25,7 @@ import adams.core.Utils;
 import adams.core.option.OptionUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.functions.LinearRegressionJ;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -62,7 +62,7 @@ import java.util.Random;
  * 
  * <pre>-classifier &lt;weka.classifiers.Classifier&gt; [-classifier ...] (property: classifiers)
  * &nbsp;&nbsp;&nbsp;The classifiers to use in the ensemble.
- * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.LinearRegression -S 0 -R 1.0E-8
+ * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.LinearRegressionJ -S 0 -R 1.0E-8
  * </pre>
  * 
  * <pre>-seed &lt;long&gt; (property: seed)
@@ -133,7 +133,7 @@ public class EnsembleEvaluator
 
     m_OptionManager.add(
       "classifier", "classifiers",
-      new Classifier[]{new LinearRegression()});
+      new Classifier[]{new LinearRegressionJ()});
 
     m_OptionManager.add(
       "seed", "seed",

@@ -32,7 +32,7 @@ import adams.db.DatabaseConnection;
 import adams.db.SampleDataT;
 import adams.db.SpectrumConditionsMulti;
 import adams.db.SpectrumT;
-import weka.classifiers.functions.LinearRegression;
+import weka.classifiers.functions.LinearRegressionJ;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SelectedTag;
@@ -371,9 +371,9 @@ public class LRCoeff
 	max=spoint.getAmplitude();
       }
     }
-    LinearRegression lr=new LinearRegression();
+    LinearRegressionJ lr=new LinearRegressionJ();
     lr.setEliminateColinearAttributes(false);
-    lr.setAttributeSelectionMethod(new SelectedTag(LinearRegression.SELECTION_NONE, LinearRegression.TAGS_SELECTION));
+    lr.setAttributeSelectionMethod(new SelectedTag(LinearRegressionJ.SELECTION_NONE, LinearRegressionJ.TAGS_SELECTION));
 
     try {
       lr.buildClassifier(header);
