@@ -6,11 +6,13 @@
 # Lists the keys that contain classname mappings.
 # This is used to ensure a minimal backwards compatibility, in case classes
 # get renamed.
-Rename=
+Rename=\
+  Rename-transformer_filter
 
 # general format for classname mappings ("rename"):
 # <key>=<old classname>-<new classname>
 #Rename-transformer_reportvalue=adams.flow.transformer.ReportValue-adams.flow.transformer.GetReportValue
+Rename-transformer_filter=knir.flow.transformer.Filter-adams.flow.transformer.SpectrumFilter
 
 # Lists the keys that contain partial classname renaming.
 PartialRename=\
@@ -18,6 +20,10 @@ PartialRename=\
   Rename-adams_input,\
   Rename-knir_output,\
   Rename-adams_output,\
+  Rename-knir_data_baseline,\
+  Rename-knir_data_filter,\
+  Rename-knir_data_outlier,\
+  Rename-knir_data_smoothing,\
   Rename-knir_toplevel
 
 # general format for partial classname renaming (no regular expression, but case-sensitive):
@@ -27,14 +33,20 @@ Rename-knir_input=knir.data.input.\tadams.data.io.input.
 Rename-adams_input=adams.data.input.\tadams.data.io.input.
 Rename-knir_output=knir.data.output.\tadams.data.io.output.
 Rename-adams_output=adams.data.output.\tadams.data.io.output.
+Rename-knir_data_baseline=knir.data.baseline.\tadams.data.spectrumbaseline.
+Rename-knir_data_filter=knir.data.filter.\tadams.data.spectrumfilter.
+Rename-knir_data_outlier=knir.data.outlier.\tadams.data.spectrumoutlier.
+Rename-knir_data_smoothing=knir.data.smoothing.\tadams.data.spectrumsmoothing.
 Rename-knir_toplevel=knir.\tadams.
 
 # List the keys that contain renaming of options (ie "-blah" into "-bloerk")
-RenameOption=
+RenameOption=\
+  RenameOption-simpleinstancegenerator
   
 # general format for renaming options
 # <key>=<classname>#<old>#<new>
 #RenameOption-source_callablesource_global=adams.flow.source.CallableSource#global#callable
+RenameOption-simpleinstancegenerator=adams.data.instances.SimpleInstanceGenerator#target#field
 
 # List the keys that contain renaming of properties (ie "blahProp" into "bloerkProp")
 RenameProperty=
