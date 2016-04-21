@@ -387,7 +387,7 @@ public class OpusSpectrumReader
    * @return Text Block offset
    */
   protected int getTextOffset(byte[] buf) {
-    return getBlockOffset(buf, (byte) -1, (byte) -1, (byte) 0x68, (byte) 0x40);
+    return getBlockOffset(buf, (byte) -1, (byte) -1, (byte) 0x68, (byte) 0x40);  // h@
   }
 
   /**
@@ -402,6 +402,9 @@ public class OpusSpectrumReader
       return -1;
 
     int offsetNum = getBlockOffsetReverse(buf, offset, (byte) 0x4E, (byte) 0x50, (byte) 0x54, (byte) 0x00);    // NPT
+    if (offsetNum == -1)
+      return -1;
+
     int result = getInt(buf, offsetNum + 8);
 
     return result;
