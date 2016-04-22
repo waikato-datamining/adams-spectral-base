@@ -23,16 +23,20 @@ package adams.data.io.input;
 import adams.core.IEEE754;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
+import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingLevel;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -97,6 +101,12 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: -1
  * </pre>
  * 
+ * <pre>-add-trace-to-report &lt;boolean&gt; (property: addTraceToReport)
+ * &nbsp;&nbsp;&nbsp;If enabled the trace of identified blocks etc gets added to the report,
+ * &nbsp;&nbsp;&nbsp;using prefix Trace..
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
@@ -110,6 +120,9 @@ public class OpusSpectrumReader
 
   public static int BLOCKS_OFFSET = 0x24;
 
+  /** the prefix for the trace values in the report. */
+  public static String PREFIX_TRACE = "Trace.";
+
   /** where to get sample id from. see param defs */
   protected String m_SampleID;
 
@@ -118,6 +131,12 @@ public class OpusSpectrumReader
 
   /** maximum to load. **/
   protected int m_Max;
+
+  /** trace of data that was retrieved from byte array. */
+  protected HashMap<String,Object> m_Trace;
+
+  /** whether to add the trace to the report. */
+  protected boolean m_AddTraceToReport;
 
   /**
    * Returns a string describing the object.
@@ -168,6 +187,10 @@ public class OpusSpectrumReader
     m_OptionManager.add(
       "max", "max",
       -1);
+
+    m_OptionManager.add(
+      "add-trace-to-report", "addTraceToReport",
+      false);
   }
 
   /**
@@ -258,6 +281,35 @@ public class OpusSpectrumReader
   }
 
   /**
+   * Returns whether to add the trace to the report.
+   *
+   * @return true if to add the trace
+   */
+  public boolean getAddTraceToReport() {
+    return m_AddTraceToReport;
+  }
+
+  /**
+   * Sets whether to add the trace to the report.
+   *
+   * @param value true if to add the trace
+   */
+  public void setAddTraceToReport(boolean value) {
+    m_AddTraceToReport = value;
+    reset();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return tip text for this property suitable for
+   * displaying in the GUI or for listing the options.
+   */
+  public String addTraceToReportTipText() {
+    return "If enabled the trace of identified blocks etc gets added to the report, using prefix " + PREFIX_TRACE + ".";
+  }
+
+  /**
    * Get int from 4bytes, LSByte first
    *
    * @param b      byte array
@@ -276,6 +328,10 @@ public class OpusSpectrumReader
    */
   protected double[] getNirArray(byte[] file_image) {
     int ndp = getABCount(file_image);
+    if (ndp == -1) {
+      getLogger().severe("Failed to determine number of data points!");
+      return new double[0];
+    }
     double[] ret = new double[ndp];
     int datastart = getABDataOffset(file_image); //findStart(file_image);
     if (datastart == -1)
@@ -304,11 +360,12 @@ public class OpusSpectrumReader
    * @return position of sequence, or -1 if not found
    */
   protected int getBlockOffset(byte[] buf, byte byte1, byte byte2, byte byte3, byte byte4) {
+    int result = -1;
     int offset = BLOCKS_OFFSET;
     boolean found = false;
     while (!found) {
       if (offset >= buf.length - 1) {
-	return -1;
+	break;
       }
       if (buf[offset] != byte1 && byte1 != -1) {
 	offset += 12;
@@ -328,7 +385,12 @@ public class OpusSpectrumReader
       }
       found = true;
     }
-    return offset + 4;
+    if (found)
+      result = offset + 4;
+
+    m_Trace.put("getBlockOffset:" + Utils.toHexArray(new byte[]{byte1, byte2, byte3, byte4}), result);
+
+    return result;
   }
 
   /**
@@ -346,8 +408,10 @@ public class OpusSpectrumReader
     int result = start;
     boolean found = false;
     while (!found) {
-      if (result <= 4)
-	return -1;
+      if (result <= 4) {
+	result = -1;
+	break;
+      }
 
       if (buf[result] != byte1) {
 	result--;
@@ -367,6 +431,9 @@ public class OpusSpectrumReader
       }
       found = true;
     }
+
+    m_Trace.put("getBlockOffsetReverse:" + Utils.toHexArray(new byte[]{byte1, byte2, byte3, byte4}), result);
+
     return result;
   }
 
@@ -377,7 +444,9 @@ public class OpusSpectrumReader
    * @return AB Block offset
    */
   protected int getABOffset(byte[] buf) {
-    return getBlockOffset(buf, (byte) 0x0f, (byte) 0x10, (byte) 0, (byte) -1);
+    int result = getBlockOffset(buf, (byte) 0x0f, (byte) 0x10, (byte) 0, (byte) -1);
+    m_Trace.put("getABOffset", result);
+    return result;
   }
 
   /**
@@ -387,7 +456,9 @@ public class OpusSpectrumReader
    * @return Text Block offset
    */
   protected int getTextOffset(byte[] buf) {
-    return getBlockOffset(buf, (byte) -1, (byte) -1, (byte) 0x68, (byte) 0x40);  // h@
+    int result = getBlockOffset(buf, (byte) -1, (byte) -1, (byte) 0x68, (byte) 0x40);  // h@
+    m_Trace.put("getBlockOffset", result);
+    return result;
   }
 
   /**
@@ -397,24 +468,38 @@ public class OpusSpectrumReader
    * @return number of spectral values
    */
   protected int getABCount(byte[] buf) {
+    int result = -1;
     int offset = getABDataOffset(buf);
-    if (offset == -1)
-      return -1;
-
-    int offsetNum = getBlockOffsetReverse(buf, offset, (byte) 0x4E, (byte) 0x50, (byte) 0x54, (byte) 0x00);    // NPT
-    if (offsetNum == -1)
-      return -1;
-
-    int result = getInt(buf, offsetNum + 8);
-
+    int offsetNum = -1;
+    if (offset != -1)
+      offsetNum = getBlockOffsetReverse(buf, offset, (byte) 0x4E, (byte) 0x50, (byte) 0x54, (byte) 0x00);    // NPT
+    if (offsetNum != -1)
+      result = getInt(buf, offsetNum + 8);
+    m_Trace.put("getABCount", result);
     return result;
   }
 
   protected double[] getWaveNumbers(byte[] buf) {
     int offset = getABDataOffset(buf);
+    if (offset == -1) {
+      getLogger().severe("Failed to determine ABDataOffset!");
+      return new double[0];
+    }
     int offsetFirst = getBlockOffsetReverse(buf, offset, (byte) 0x46, (byte) 0x58, (byte) 0x56, (byte) 0x00);  // FXV
+    if (offsetFirst == -1) {
+      getLogger().severe("Failed to determine offset for first data point (FXV)!");
+      return new double[0];
+    }
     int offsetLast = getBlockOffsetReverse(buf, offset, (byte) 0x4C, (byte) 0x58, (byte) 0x56, (byte) 0x00);   // LXV
+    if (offsetLast == -1) {
+      getLogger().severe("Failed to determine offset for last data point (LXV)!");
+      return new double[0];
+    }
     int offsetNum = getBlockOffsetReverse(buf, offset, (byte) 0x4E, (byte) 0x50, (byte) 0x54, (byte) 0x00);    // NPT
+    if (offsetNum == -1) {
+      getLogger().severe("Failed to determine offset for number of data points (NPT)!");
+      return new double[0];
+    }
     int newcount = getInt(buf, offsetNum + 8);
     double firstx = convert8ToDouble(buf, offsetFirst + 8);
     double lastx = convert8ToDouble(buf, offsetLast + 8);
@@ -434,12 +519,12 @@ public class OpusSpectrumReader
    * @return 		the text data pos
    */
   protected int getTextBlockOffset(byte[] buf) {
+    int result = -1;
     int offset = getTextOffset(buf);
-    if (offset == -1)
-      return -1;
-    else
-      return getInt(buf, offset + 4);
-
+    if (offset != -1)
+      result = getInt(buf, offset + 4);
+    m_Trace.put("getTextBlockOffset", result);
+    return result;
   }
 
   /**
@@ -449,11 +534,12 @@ public class OpusSpectrumReader
    * @return 		the text block size (in 4-byte words)
    */
   protected int getTextBlockSize(byte[] buf) {
+    int result = -1;
     int offset = getTextOffset(buf);
-    if (offset == -1)
-      return -1;
-    else
-      return getInt(buf, offset);
+    if (offset != -1)
+      result = getInt(buf, offset);
+    m_Trace.put("getTextBlockSize", result);
+    return result;
   }
 
   /**
@@ -463,12 +549,12 @@ public class OpusSpectrumReader
    * @return 		nir data pos
    */
   protected int getABDataOffset(byte[] buf) {
+    int result = -1;
     int offset = getABOffset(buf);
-    if (offset == -1)
-      return -1;
-    else
-      return getInt(buf, offset + 4);
-
+    if (offset != -1)
+      result = getInt(buf, offset + 4);
+    m_Trace.put("getABDataOffset", result);
+    return result;
   }
 
   /**
@@ -505,7 +591,7 @@ public class OpusSpectrumReader
     boolean		escaped;
     char		c;
 
-    result = new ArrayList<String>();
+    result = new ArrayList<>();
 
     current = new StringBuilder();
     escaped = false;
@@ -652,6 +738,7 @@ public class OpusSpectrumReader
   @Override
   protected void readData() {
     try {
+      m_Trace = new HashMap<>();
       byte[] buf = FileUtils.loadFromBinaryFile(m_Input);
       if (buf == null)
 	throw new IllegalStateException("Failed to read data from: " + m_Input);
@@ -693,6 +780,23 @@ public class OpusSpectrumReader
 	sp.add(new SpectrumPoint((float) wn[j], (float) nir[j]));
       }
       m_ReadData.add(sp);
+      // trace
+      List<String> keys = new ArrayList<>(m_Trace.keySet());
+      Collections.sort(keys);
+      for (String key: keys) {
+	Object value = m_Trace.get(key);
+	if (isLoggingEnabled()) {
+	  getLogger().info(key + "=" + value);
+	}
+	else if (m_AddTraceToReport) {
+	  boolean numeric = value instanceof Number;
+	  sd.addField(new Field(PREFIX_TRACE + key, (numeric ? DataType.NUMERIC : DataType.STRING)));
+	  if (numeric)
+	    sd.setNumericValue(key, ((Number) value).doubleValue());
+	  else
+	    sd.setStringValue(key, value.toString());
+	}
+      }
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to read '" + m_Input + "'!", e);
