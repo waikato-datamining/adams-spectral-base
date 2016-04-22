@@ -23,14 +23,11 @@ package adams.data.io.input;
 import adams.core.IEEE754;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
-import adams.core.io.PlaceholderFile;
-import adams.core.logging.LoggingLevel;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
-import adams.env.Environment;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
