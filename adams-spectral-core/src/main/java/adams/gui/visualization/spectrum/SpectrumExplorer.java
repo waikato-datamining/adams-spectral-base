@@ -623,7 +623,7 @@ public class SpectrumExplorer
       menuitem.addActionListener(e -> clearData());
       m_MenuItemClearData = menuitem;
 
-      // File/Load data from database
+      // File/Database
       menuitem = new JMenuItem("Database...");
       menu.add(menuitem);
       menuitem.setMnemonic('L');
@@ -633,7 +633,7 @@ public class SpectrumExplorer
 
       menu.addSeparator();
 
-      // File/Load from file
+      // File/Open
       menuitem = new JMenuItem("Open...");
       menu.add(menuitem);
       menuitem.setMnemonic('o');
