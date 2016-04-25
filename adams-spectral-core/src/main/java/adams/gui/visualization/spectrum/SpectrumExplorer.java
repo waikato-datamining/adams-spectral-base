@@ -44,6 +44,8 @@ import adams.gui.core.BaseTabbedPane;
 import adams.gui.core.BaseTable;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MenuBarProvider;
+import adams.gui.core.RecentFilesHandlerWithCommandline;
+import adams.gui.core.RecentFilesHandlerWithCommandline.Setup;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.core.Undo.UndoPoint;
@@ -52,6 +54,8 @@ import adams.gui.event.DataChangeEvent;
 import adams.gui.event.DataChangeListener;
 import adams.gui.event.FilterEvent;
 import adams.gui.event.FilterListener;
+import adams.gui.event.RecentItemEvent;
+import adams.gui.event.RecentItemListener;
 import adams.gui.event.UndoEvent;
 import adams.gui.goe.GenericObjectEditor;
 import adams.gui.goe.GenericObjectEditorDialog;
@@ -95,6 +99,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static adams.gui.flow.FlowEditorPanel.getPropertiesEditor;
+
 /**
  * A panel for exploring Spectrums, manipulating them with filters, etc.
  *
@@ -112,6 +118,9 @@ public class SpectrumExplorer
 
   /** for serialization. */
   private static final long serialVersionUID = 3953271131937711340L;
+
+  /** the file to store the recent files in. */
+  public final static String SESSION_FILE = "SpectrumExplorerSession.props";
 
   /** the panel for displaying. */
   protected SpectrumPanel m_PanelSpectrum;
@@ -203,6 +212,9 @@ public class SpectrumExplorer
   /** the dialog for selecting the color provider. */
   protected GenericObjectEditorDialog m_DialogColorProvider;
 
+  /** the recent files handler. */
+  protected RecentFilesHandlerWithCommandline<JMenu> m_RecentFilesHandler;
+
   /**
    * default constructor.
    */
@@ -223,6 +235,7 @@ public class SpectrumExplorer
     m_SpectrumFileChooser = new SpectrumFileChooser();
     m_SpectrumFileChooser.setMultiSelectionEnabled(true);
     m_CurrentFilter       = new PassThrough();
+    m_RecentFilesHandler  = null;
     m_DatabaseConnection  = DatabaseConnection.getSingleton();
     m_DatabaseConnection.addChangeListener(this);
   }
@@ -590,6 +603,7 @@ public class SpectrumExplorer
     JMenuBar		result;
     JMenu		menu;
     JMenuItem		menuitem;
+    JMenu		submenu;
 
     if (m_MenuBar == null) {
       result = new JMenuBar();
@@ -601,7 +615,7 @@ public class SpectrumExplorer
       menu.addChangeListener(e -> updateMenu());
 
       // File/Clear
-      menuitem = new JMenuItem("Clear data");
+      menuitem = new JMenuItem("Clear");
       menu.add(menuitem);
       menuitem.setMnemonic('C');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed N"));
@@ -610,20 +624,41 @@ public class SpectrumExplorer
       m_MenuItemClearData = menuitem;
 
       // File/Load data from database
-      menuitem = new JMenuItem("Load data from database");
+      menuitem = new JMenuItem("Database...");
       menu.add(menuitem);
       menuitem.setMnemonic('L');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
       menuitem.setIcon(GUIHelper.getIcon("open.gif"));
       menuitem.addActionListener(e ->loadData());
 
+      menu.addSeparator();
+
       // File/Load from file
-      menuitem = new JMenuItem("Load data from disk...");
+      menuitem = new JMenuItem("Open...");
       menu.add(menuitem);
       menuitem.setMnemonic('o');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl shift pressed O"));
       menuitem.setIcon(GUIHelper.getEmptyIcon());
       menuitem.addActionListener(e -> loadDataFromDisk());
+
+      // File/Recent files
+      submenu = new JMenu("Open recent");
+      menu.add(submenu);
+      m_RecentFilesHandler = new RecentFilesHandlerWithCommandline<JMenu>(
+	  SESSION_FILE, getPropertiesEditor().getInteger("MaxRecentFlows", 5), submenu);
+      m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<JMenu,Setup>() {
+	@Override
+	public void recentItemAdded(RecentItemEvent<JMenu, Setup> e) {
+	  // ignored
+	}
+	@Override
+	public void recentItemSelected(RecentItemEvent<JMenu, Setup> e) {
+	  AbstractDataContainerReader reader = (AbstractDataContainerReader) e.getItem().getHandler();
+	  reader.setInput(new PlaceholderFile(e.getItem().getFile()));
+	  getScriptingEngine().setDatabaseConnection(getDatabaseConnection());
+	  getScriptingEngine().add(SpectrumExplorer.this, AddDataFile.ACTION + " " + OptionUtils.getCommandLine(reader));
+	}
+      });
 
       // File/Send to
       menu.addSeparator();
@@ -848,6 +883,8 @@ public class SpectrumExplorer
       reader.setInput(files[0]);
       getScriptingEngine().setDatabaseConnection(getDatabaseConnection());
       getScriptingEngine().add(this,AddDataFile.ACTION + " " + OptionUtils.getCommandLine(reader));
+      if (m_RecentFilesHandler != null)
+	m_RecentFilesHandler.addRecentItem(new Setup(files[0], reader));
     }
     else {
       opts = new ArrayList<>();
@@ -856,6 +893,10 @@ public class SpectrumExplorer
 	opts.add(files[i].toString());
       getScriptingEngine().setDatabaseConnection(getDatabaseConnection());
       getScriptingEngine().add(this, AddDataFiles.ACTION + " " + OptionUtils.joinOptions(opts.toArray(new String[opts.size()])));
+      if (m_RecentFilesHandler != null) {
+	for (i = 0; i < files.length; i++)
+	  m_RecentFilesHandler.addRecentItem(new Setup(files[i], reader));
+      }
     }
   }
 
