@@ -14,13 +14,12 @@
  */
 
 /*
- * Scale.java
- * Copyright (C) 2008 University of Waikato, Hamilton, New Zealand
+ * StandardiseByInterpolation.java
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
 
-import adams.data.filter.AbstractFilter;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.data.spectrum.SpectrumUtils;
@@ -28,20 +27,50 @@ import adams.data.spectrum.SpectrumUtils;
 import java.util.List;
 
 /**
+ <!-- globalinfo-start -->
+ * Standardises spectrum to start-end with given step.
+ * <br><br>
+ <!-- globalinfo-end -->
+ *
+ <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-no-id-update &lt;boolean&gt; (property: dontUpdateID)
+ * &nbsp;&nbsp;&nbsp;If enabled, suppresses updating the ID of adams.data.id.IDHandler data containers.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-first &lt;double&gt; (property: first)
+ * &nbsp;&nbsp;&nbsp;Starting data point.
+ * &nbsp;&nbsp;&nbsp;default: 600.0
+ * </pre>
+ *
+ * <pre>-last &lt;double&gt; (property: last)
+ * &nbsp;&nbsp;&nbsp;The last data point.
+ * &nbsp;&nbsp;&nbsp;default: 4000.0
+ * </pre>
+ *
+ * <pre>-step &lt;double&gt; (property: step)
+ * &nbsp;&nbsp;&nbsp;Step size.
+ * &nbsp;&nbsp;&nbsp;default: 2.0
+ * </pre>
+ *
+ * <pre>-polynomial &lt;int&gt; (property: polynomial)
+ * &nbsp;&nbsp;&nbsp;The polynomial for interpolation.
+ * &nbsp;&nbsp;&nbsp;default: 2
+ * </pre>
+ *
+ <!-- options-end -->
+ *
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1286 $
+ * @version $Revision: 2419 $
  */
 public class StandardiseByInterpolation
-  extends AbstractFilter<Spectrum> {
-
-  /** for serialization. */
-
-  protected double m_First;
-
-  protected double m_Last;
-
-  protected double m_Step;
+  extends AbstractStandardiseFilter {
 
   protected int m_Polynomial;
 
@@ -61,20 +90,8 @@ public class StandardiseByInterpolation
     super.defineOptions();
 
     m_OptionManager.add(
-	    "first", "first",
-	    600.0);
-
-    m_OptionManager.add(
-	    "last", "last",
-	    4000.0);
-
-    m_OptionManager.add(
-	    "step", "step",
-	    2.0);
-
-    m_OptionManager.add(
-	    "polynomial", "polynomial",
-	    2);
+      "polynomial", "polynomial",
+      2, 2, null);
   }
 
 
@@ -84,8 +101,10 @@ public class StandardiseByInterpolation
    * @param value	polynomial
    */
   public void setPolynomial(int value) {
-    m_Polynomial= value;
-    reset();
+    if (getOptionManager().isValid("polynomial", value)) {
+      m_Polynomial = value;
+      reset();
+    }
   }
 
   /**
@@ -107,98 +126,10 @@ public class StandardiseByInterpolation
     return "The polynomial for interpolation.";
   }
 
-
-  /**
-   * Sets the start data point
-   *
-   * @param value	the maximum
-   */
-  public void setFirst(double value) {
-    m_First= value;
-    reset();
-  }
-
-  /**
-   * Returns the start data point
-   *
-   * @return		the minimum
-   */
-  public double getFirst() {
-    return m_First;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the gui
-   */
-  public String firstTipText() {
-    return "Starting data point.";
-  }
-
-  /**
-   * Sets the last data point
-   *
-   * @param value	the maximum
-   */
-  public void setLast(double value) {
-    m_Last = value;
-    reset();
-  }
-
-  /**
-   * Returns the last data point
-   *
-   * @return		the maximum
-   */
-  public double getLast() {
-    return m_Last;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the gui
-   */
-  public String lastTipText() {
-    return "The last datapoint.";
-  }
-  /**
-   * Sets the step
-   *
-   * @param value	the maximum
-   */
-  public void setStep(double value) {
-    m_Step = value;
-    reset();
-  }
-
-  /**
-   * Returns the step
-   *
-   * @return		the maximum
-   */
-  public double getStep() {
-    return m_Step;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the gui
-   */
-  public String stepTipText() {
-    return "Step size.";
-  }
-
-  protected List<SpectrumPoint> getClosestPoints(double waveno,List<SpectrumPoint> data, int numpoints){
-
+  protected List<SpectrumPoint> getClosestPoints(double waveno, List<SpectrumPoint> data, int numpoints){
     Spectrum sp=new Spectrum();
     int found=0;
-    int pos=SpectrumUtils.findClosestWaveNumber(data, (float)waveno);
+    int pos= SpectrumUtils.findClosestWaveNumber(data, (float)waveno);
     sp.add((SpectrumPoint)data.get(pos).getClone());
     int foundmin=pos,foundmax=pos;
     found++;
@@ -226,30 +157,6 @@ public class StandardiseByInterpolation
     return(sp.toList());
   }
 
-  protected double L(double x, List<SpectrumPoint> lsp,int m){
-    double num=1;
-    double den=1;
-    for (int k=0;k<lsp.size();k++){
-      if (k==m){
-	continue;
-      }
-      num*=x-(double)lsp.get(k).getWaveNumber();
-    }
-    for (int k=0;k<lsp.size();k++){
-      if (k==m){
-	continue;
-      }
-      den*=(double)lsp.get(m).getWaveNumber()-(double)lsp.get(k).getWaveNumber();
-    }
-    return(num/den);
-  }
-  protected double interp(double int_point,List<SpectrumPoint> lsp, int poly){
-    double res=0;
-    for (int L=0;L<=poly;L++){
-      res+=L(int_point,lsp,L)*lsp.get(L).getAmplitude();
-    }
-    return(res);
-  }
   /**
    * Performs the actual filtering.
    *
@@ -259,12 +166,6 @@ public class StandardiseByInterpolation
   protected Spectrum processData(Spectrum data) {
     Spectrum		result;
     List<SpectrumPoint>	list;
-    double		min;
-    double		max;
-    double		scale;
-    int			i;
-
-    SpectrumPoint	pointNew;
 
     if (m_Last < m_First)
       throw new IllegalStateException("last < first!");
@@ -283,9 +184,6 @@ public class StandardiseByInterpolation
 	break;
       }
     }
-
-
-
     return result;
   }
 }
