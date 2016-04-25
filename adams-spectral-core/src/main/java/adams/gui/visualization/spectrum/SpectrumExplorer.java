@@ -626,7 +626,7 @@ public class SpectrumExplorer
       // File/Database
       menuitem = new JMenuItem("Database...");
       menu.add(menuitem);
-      menuitem.setMnemonic('L');
+      menuitem.setMnemonic('D');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
       menuitem.setIcon(GUIHelper.getIcon("open.gif"));
       menuitem.addActionListener(e ->loadData());
@@ -636,7 +636,7 @@ public class SpectrumExplorer
       // File/Open
       menuitem = new JMenuItem("Open...");
       menu.add(menuitem);
-      menuitem.setMnemonic('o');
+      menuitem.setMnemonic('O');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl shift pressed O"));
       menuitem.setIcon(GUIHelper.getEmptyIcon());
       menuitem.addActionListener(e -> loadDataFromDisk());
