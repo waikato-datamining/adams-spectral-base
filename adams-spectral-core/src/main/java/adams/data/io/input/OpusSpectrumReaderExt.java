@@ -87,6 +87,11 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
+ * <pre>-spectrum-block-type &lt;java.lang.String&gt; (property: spectrumBlockType)
+ * &nbsp;&nbsp;&nbsp;The block type of the spectrum to extract, in hex notation; e.g.: 100f
+ * &nbsp;&nbsp;&nbsp;default: 100f
+ * </pre>
+ *
  * <pre>-operation &lt;java.lang.String&gt; (property: operation)
  * &nbsp;&nbsp;&nbsp;The command-line operation to get the sample ID from, e.g., 'MeasureSample'
  * &nbsp;&nbsp;&nbsp;.
@@ -121,6 +126,9 @@ import java.util.logging.Level;
  */
 public class OpusSpectrumReaderExt
   extends AbstractSpectrumReader {
+
+  /** the hex mask for the spectrum to extract. */
+  protected String m_SpectrumBlockType;
 
   /** the commandline in the log to use for extracting the sample ID. */
   protected String m_Operation;
@@ -176,6 +184,10 @@ public class OpusSpectrumReaderExt
     super.defineOptions();
 
     m_OptionManager.add(
+      "spectrum-block-type", "spectrumBlockType",
+      Integer.toHexString(OpusBlockHelper.BLOCKTYPE_MAIN_MASK));
+
+    m_OptionManager.add(
       "operation", "operation",
       OpusBlockHelper.OPERATION_MEASURESAMPLE);
 
@@ -194,6 +206,37 @@ public class OpusSpectrumReaderExt
     m_OptionManager.add(
       "add-log", "addLog",
       false);
+  }
+
+  /**
+   * Sets the block type of the spectrum to extract.
+   *
+   * @param value 	the block type (in hex)
+   */
+  public void setSpectrumBlockType(String value) {
+    m_SpectrumBlockType = value;
+    reset();
+  }
+
+  /**
+   * Returns the block type of the spectrum to extract.
+   *
+   * @return 		the block type (in hex)
+   */
+  public String getSpectrumBlockType() {
+    return m_SpectrumBlockType;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String spectrumBlockTypeTipText() {
+    return
+      "The block type of the spectrum to extract, in hex notation; e.g.: "
+	+ Integer.toHexString(OpusBlockHelper.BLOCKTYPE_MAIN_MASK);
   }
 
   /**
@@ -437,7 +480,7 @@ public class OpusSpectrumReaderExt
       // load spectrum?
       masked = data.get(i).getType() & OpusBlockHelper.BLOCKTYPE_SPEC_MASK;
       load = m_AllSpectra
-	|| (masked == OpusBlockHelper.BLOCKTYPE_MAIN_MASK);
+	|| Integer.toHexString(masked).equals(m_SpectrumBlockType);
 
       if (load) {
 	numPoints = dpf.get(i).getLong(OpusBlockHelper.NPT, 8).intValue();
