@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the RelabSpectrumReader data container. Run from the command line with: <br><br>
- * java knir.data.input.RelabSpectrumReaderTest
+ * java adams.data.io.input.RelabSpectrumReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the MinMax outlier detector. Run from the command line with: <br><br>
- * java knir.data.outlier.MinMaxTest
+ * java adams.data.spectrumoutlier.MinMaxTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

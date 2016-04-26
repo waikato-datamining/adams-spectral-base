@@ -30,7 +30,7 @@ import weka.filters.unsupervised.attribute.SegmentedSavitzkyGolay;
 
 /**
  * Tests the SegmentedSavitzkyGolayNumPoints discovery handler. Use the following to run from command-line:<br>
- * knir.core.discovery.SegmentedSavitzkyGolayNumPointsTest
+ * adams.core.discovery.SegmentedSavitzkyGolayNumPointsTest
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$

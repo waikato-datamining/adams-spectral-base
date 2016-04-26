@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the Average multi-spectrum filter. Run from the command line with: <br><br>
- * java knir.data.multifilter.AverageTest
+ * java adams.data.multifilter.AverageTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

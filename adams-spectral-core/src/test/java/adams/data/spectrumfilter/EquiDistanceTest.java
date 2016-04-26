@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the EquiDistance filter. Run from the command line with: <br><br>
- * java knir.data.filter.EquiDistanceTest
+ * java adams.data.spectrumfilter.EquiDistanceTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

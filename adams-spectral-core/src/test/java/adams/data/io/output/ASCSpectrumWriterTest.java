@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the ASCSpectrumWriter data container. Run from the command line with: <br><br>
- * java knir.data.output.ASCSpectrumWriterTest
+ * java adams.data.io.output.ASCSpectrumWriterTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the SimpleSampleDataReader data container. Run from the command line with: <br><br>
- * java knir.data.input.SimpleSampleDataReaderTest
+ * java adams.data.io.input.SimpleSampleDataReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

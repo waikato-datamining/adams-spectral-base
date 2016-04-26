@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the Multiply multi-spectrum filter. Run from the command line with: <br><br>
- * java knir.data.multifilter.MultiplyTest
+ * java adams.data.multifilter.MultiplyTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

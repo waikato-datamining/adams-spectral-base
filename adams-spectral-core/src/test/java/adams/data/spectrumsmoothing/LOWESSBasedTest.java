@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the LOWESSBased smoother. Run from the command line with: <br><br>
- * java knir.data.smoothing.LOWESSBasedTest
+ * java adams.data.spectrumsmoothing.LOWESSBasedTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

@@ -27,7 +27,7 @@ import adams.data.spectrum.Spectrum;
 
 /**
  * Test class for the Reverse filter. Run from the command line with: <br><br>
- * java knir.data.filter.ReverseTest
+ * java adams.data.spectrumfilter.ReverseTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

@@ -28,7 +28,7 @@ import adams.data.io.input.SimpleSpectrumReader;
 
 /**
  * Test class for the SpectrumCorrelation object comparison. Run from the command line with: <br><br>
- * java knir.data.compare.SpectrumCorrelationTest
+ * java adams.data.compare.SpectrumCorrelationTest
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision$

@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the PickByIndex multi-spectrum filter. Run from the command line with: <br><br>
- * java knir.data.multifilter.PickByIndexTest
+ * java adams.data.multifilter.PickByIndexTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

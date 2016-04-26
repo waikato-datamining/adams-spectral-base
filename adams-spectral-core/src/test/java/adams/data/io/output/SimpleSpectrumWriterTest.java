@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the SimpleSpectrumWriter data container. Run from the command line with: <br><br>
- * java knir.data.output.SimpleSpectrumWriterTest
+ * java adams.data.io.output.SimpleSpectrumWriterTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

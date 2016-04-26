@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the PassThrough filter. Run from the command line with: <br><br>
- * java knir.data.cleaner.spectrum.PassThroughTest
+ * java adams.data.cleaner.spectrum.PassThroughTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

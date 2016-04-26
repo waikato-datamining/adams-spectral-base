@@ -28,7 +28,7 @@ import adams.db.SpectrumConditionsMulti;
 
 /**
  * Test class for the InterPercentileRangeCleaner filter. Run from the command line with: <br><br>
- * java knir.data.cleaner.spectrum.InterPercentileRangeCleanerTest
+ * java adams.data.cleaner.spectrum.InterPercentileRangeCleanerTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

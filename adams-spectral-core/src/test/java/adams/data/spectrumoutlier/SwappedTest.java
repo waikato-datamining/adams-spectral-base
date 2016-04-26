@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the Swapped outlier detector. Run from the command line with: <br><br>
- * java knir.data.outlier.SwappedTest
+ * java adams.data.spectrumoutlier.SwappedTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

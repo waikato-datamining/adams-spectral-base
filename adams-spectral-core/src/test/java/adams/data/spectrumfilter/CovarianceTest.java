@@ -31,7 +31,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the Covariance filter. Run from the command line with: <br><br>
- * java knir.data.filter.CovarianceTest
+ * java adams.data.spectrumfilter.CovarianceTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

@@ -34,7 +34,6 @@ import junit.framework.TestSuite;
  * Test for SpectrumDiff actor.
  *
  * @author fracpete
- * @author knir.core.option.FlowJUnitTestProducer (code generator)
  * @version $Revision$
  */
 public class SpectrumDiffTest

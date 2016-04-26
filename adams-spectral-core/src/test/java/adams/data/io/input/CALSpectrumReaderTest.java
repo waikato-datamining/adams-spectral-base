@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the CALSpectrumReader data container. Run from the command line with: <br><br>
- * java knir.data.input.CALSpectrumReaderTest
+ * java adams.data.io.input.CALSpectrumReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

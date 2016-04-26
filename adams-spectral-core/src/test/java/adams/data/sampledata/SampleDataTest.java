@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the SampleData class. Run from the command line with: <br><br>
- * java knir.data.sampledata.SampleDataTest
+ * java adams.data.sampledata.SampleDataTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

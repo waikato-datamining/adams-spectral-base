@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the LOWESSBased baseline correction scheme. Run from the command line with: <br><br>
- * java knir.data.baseline.LOWESSBasedTest
+ * java adams.data.spectrumbaseline.LOWESSBasedTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

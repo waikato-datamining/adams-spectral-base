@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the CALSpectrumWriter data container writer. Run from the command line with: <br><br>
- * java knir.data.output.CALSpectrumWriterTest
+ * java adams.data.io.output.CALSpectrumWriterTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

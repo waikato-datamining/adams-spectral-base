@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the Atan2 multi-spectrum filter. Run from the command line with: <br><br>
- * java knir.data.multifilter.Atan2Test
+ * java adams.data.multifilter.Atan2Test
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

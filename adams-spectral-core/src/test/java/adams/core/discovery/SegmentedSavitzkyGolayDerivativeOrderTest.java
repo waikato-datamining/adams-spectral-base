@@ -30,7 +30,7 @@ import weka.filters.unsupervised.attribute.SegmentedSavitzkyGolay;
 
 /**
  * Tests the SegmentedSavitzkyGolayDerivativeOrder discovery handler. Use the following to run from command-line:<br>
- * knir.core.discovery.SegmentedSavitzkyGolayDerivativeOrderTest
+ * adams.core.discovery.SegmentedSavitzkyGolayDerivativeOrderTest
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$

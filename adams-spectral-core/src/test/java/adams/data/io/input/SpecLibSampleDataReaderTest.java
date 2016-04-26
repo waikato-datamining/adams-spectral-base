@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the SpecLibSampleDataReader data container. Run from the command line with: <br><br>
- * java knir.data.input.SpecLibSampleDataReaderTest
+ * java adams.data.io.input.SpecLibSampleDataReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

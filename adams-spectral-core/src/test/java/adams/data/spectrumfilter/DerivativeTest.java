@@ -27,7 +27,7 @@ import adams.data.spectrum.Spectrum;
 
 /**
  * Test class for the Derivative filter. Run from the command line with: <br><br>
- * java knir.data.filter.DerivativeTest
+ * java adams.data.spectrumfilter.DerivativeTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

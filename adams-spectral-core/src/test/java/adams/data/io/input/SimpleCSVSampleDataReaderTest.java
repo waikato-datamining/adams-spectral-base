@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the SimpleCSVSampleDataReader data container. Run from the command line with: <br><br>
- * java knir.data.input.SimpleCSVSampleDataReaderTest
+ * java adams.data.io.input.SimpleCSVSampleDataReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

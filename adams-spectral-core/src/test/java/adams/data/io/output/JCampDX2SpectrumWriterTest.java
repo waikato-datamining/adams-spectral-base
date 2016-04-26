@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the JCampDX2SpectrumWriter data container. Run from the command line with: <br><br>
- * java knir.data.output.JCampDX2SpectrumWriterTest
+ * java adams.data.io.output.JCampDX2SpectrumWriterTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

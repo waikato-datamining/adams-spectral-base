@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the ColumnWiseSpreadSheetSpectrumReader data container. Run from the command line with: <br><br>
- * java knir.data.input.ColumnWiseSpreadSheetSpectrumReaderTest
+ * java adams.data.io.input.ColumnWiseSpreadSheetSpectrumReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

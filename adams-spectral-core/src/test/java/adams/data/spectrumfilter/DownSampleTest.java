@@ -27,7 +27,7 @@ import adams.data.spectrum.Spectrum;
 
 /**
  * Test class for the DownSample filter. Run from the command line with: <br><br>
- * java knir.data.filter.DownSampleTest
+ * java adams.data.spectrumfilter.DownSampleTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

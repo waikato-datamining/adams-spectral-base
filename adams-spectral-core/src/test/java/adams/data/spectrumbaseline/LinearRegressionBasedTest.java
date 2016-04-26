@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the LinearRegressionBased baseline correction scheme. Run from the command line with: <br><br>
- * java knir.data.baseline.LinearRegressionBasedTest
+ * java adams.data.spectrumbaseline.LinearRegressionBasedTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the RowWiseSpreadSheetSpectrumReader spectrum reader. Run from the command line with: <br><br>
- * java knir.data.input.RowWiseSpreadSheetSpectrumReaderTest
+ * java adams.data.io.input.RowWiseSpreadSheetSpectrumReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2292 $

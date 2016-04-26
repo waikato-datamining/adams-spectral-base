@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the OpusSpectrumReader data container. Run from the command line with: <br><br>
- * java knir.data.input.OpusSpectrumReaderTest
+ * java adams.data.io.input.OpusSpectrumReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2250 $

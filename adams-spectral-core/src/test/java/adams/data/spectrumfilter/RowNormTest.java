@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the RowNorm filter. Run from the command line with: <br><br>
- * java knir.data.filter.RowNormTest
+ * java adams.data.spectrumfilter.RowNormTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

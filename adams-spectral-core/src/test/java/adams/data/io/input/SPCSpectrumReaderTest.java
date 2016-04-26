@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the SPCSpectrumReader data container. Run from the command line with: <br><br>
- * java knir.data.input.SPCSpectrumReaderTest
+ * java adams.data.io.input.SPCSpectrumReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

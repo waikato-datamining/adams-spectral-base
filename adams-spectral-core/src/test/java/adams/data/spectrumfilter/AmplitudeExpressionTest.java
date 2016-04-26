@@ -28,7 +28,7 @@ import adams.data.spectrum.Spectrum;
 
 /**
  * Test class for the AmplitudeExpression filter. Run from the command line with: <br><br>
- * java knir.data.filter.AmplitudeExpressionTest
+ * java adams.data.spectrumfilter.AmplitudeExpressionTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

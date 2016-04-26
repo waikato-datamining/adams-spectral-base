@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the SpecLibSpectrumReader data container. Run from the command line with: <br><br>
- * java knir.data.input.SpecLibSpectrumReaderTest
+ * java adams.data.io.input.SpecLibSpectrumReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

@@ -25,7 +25,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the MinMax filter. Run from the command line with: <br><br>
- * java knir.data.cleaner.instance.MinMaxTest
+ * java adams.data.cleaner.instance.MinMaxTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

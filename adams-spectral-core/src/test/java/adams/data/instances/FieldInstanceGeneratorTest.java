@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the FieldInstanceGenerator generator. Run from the command line with: <br><br>
- * java knir.data.instances.FieldInstanceGeneratorTest
+ * java adams.data.instances.FieldInstanceGeneratorTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $

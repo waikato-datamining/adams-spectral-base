@@ -29,7 +29,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the PickByReportValue multi-spectrum filter. Run from the command line with: <br><br>
- * java knir.data.multifilter.PickByReportValueTest
+ * java adams.data.multifilter.PickByReportValueTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

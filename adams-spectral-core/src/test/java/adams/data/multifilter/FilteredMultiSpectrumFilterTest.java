@@ -29,7 +29,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the FilteredMultiSpectrumFilter multi-spectrum filter. Run from the command line with: <br><br>
- * java knir.data.multifilter.FilteredMultiSpectrumFilterTest
+ * java adams.data.multifilter.FilteredMultiSpectrumFilterTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

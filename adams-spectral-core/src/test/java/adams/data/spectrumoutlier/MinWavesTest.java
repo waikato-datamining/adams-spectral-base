@@ -26,7 +26,7 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for the MinWaves outlier detector. Run from the command line with: <br><br>
- * java knir.data.outlier.MinWavesTest
+ * java adams.data.spectrumoutlier.MinWavesTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2242 $
