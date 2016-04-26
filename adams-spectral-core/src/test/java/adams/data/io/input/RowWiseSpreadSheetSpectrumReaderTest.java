@@ -15,11 +15,12 @@
 
 /**
  * RowWiseSpreadSheetSpectrumReaderTest.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.input;
 
 import adams.core.Range;
+import adams.core.base.BaseRegExp;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
 import adams.env.Environment;
@@ -75,7 +76,7 @@ public class RowWiseSpreadSheetSpectrumReaderTest
     result[0].setSampleIDColumn(new SpreadSheetColumnIndex("1"));
     reader = new CsvSpreadSheetReader();
     reader.setSeparator(",");
-    reader.setMissingValue("");
+    reader.setMissingValue(new BaseRegExp(""));
     reader.setNoHeader(true);
     reader.setTextColumns(new Range("1"));
     result[0].setReader(reader);
