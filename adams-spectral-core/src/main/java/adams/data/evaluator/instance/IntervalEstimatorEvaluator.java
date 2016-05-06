@@ -24,7 +24,7 @@ import adams.core.Utils;
 import adams.core.option.OptionUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.IntervalEstimator;
-import weka.classifiers.functions.GaussianProcesses;
+import weka.classifiers.functions.GaussianProcessesNoWeights;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -132,7 +132,7 @@ public class IntervalEstimatorEvaluator
 
     m_OptionManager.add(
 	"classifier", "classifier",
-	new GaussianProcesses());
+	new GaussianProcessesNoWeights());
 
     m_OptionManager.add(
 	"confidence-level", "confidenceLevel",
