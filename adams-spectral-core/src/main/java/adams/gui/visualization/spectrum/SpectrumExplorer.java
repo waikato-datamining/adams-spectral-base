@@ -644,7 +644,7 @@ public class SpectrumExplorer
       // File/Recent files
       submenu = new JMenu("Open recent");
       menu.add(submenu);
-      m_RecentFilesHandler = new RecentFilesHandlerWithCommandline<JMenu>(
+      m_RecentFilesHandler = new RecentFilesHandlerWithCommandline<>(
 	  SESSION_FILE, getPropertiesEditor().getInteger("MaxRecentFlows", 5), submenu);
       m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<JMenu,Setup>() {
 	@Override
@@ -932,10 +932,8 @@ public class SpectrumExplorer
 
 	UndoPoint point = m_Undo.undo();
 	List<SpectrumContainer> data = (List<SpectrumContainer>) point.getData();
-	getContainerManager().startUpdate();
 	getContainerManager().clear();
 	getContainerManager().addAll(data);
-	getContainerManager().finishUpdate();
 
 	return "Done!";
       };
@@ -966,10 +964,8 @@ public class SpectrumExplorer
 
 	UndoPoint point = m_Undo.redo();
 	List<SpectrumContainer> data = (List<SpectrumContainer>) point.getData();
-	getContainerManager().startUpdate();
 	getContainerManager().clear();
 	getContainerManager().addAll(data);
-	getContainerManager().finishUpdate();
 
 	return "Done!";
       };
