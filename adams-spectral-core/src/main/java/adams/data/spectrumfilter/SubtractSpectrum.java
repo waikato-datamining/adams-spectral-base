@@ -1,44 +1,41 @@
 /*
- * Scale.java
- * Copyright (C) 2008 University of Waikato, Hamilton, New Zealand
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * SubtractSpectrum.java
+ * Copyright (C) 2008-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
 
 import adams.data.filter.AbstractDatabaseConnectionFilter;
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.filter.PassThrough;
-import adams.db.AbstractDatabaseConnection;
-import adams.db.DatabaseConnection;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.db.AbstractDatabaseConnection;
+import adams.db.DatabaseConnection;
 import adams.db.SpectrumT;
 
 import java.util.List;
 
 /**
  <!-- globalinfo-start -->
- * Scales the amplitudes to a given maximum.
- * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <br><br>
- *
- * <pre>-D (property: debug)
- *         If set to true, scheme may output additional info to the console.
- * </pre>
- *
- * <pre>-min &lt;double&gt; (property: minAmplitude)
- *         The minimum amplitude to scale to.
- *         default: 0.0
- * </pre>
- *
- * <pre>-max &lt;double&gt; (property: maxAmplitude)
- *         The maximum amplitude to scale to.
- *         default: 100.0
- * </pre>
- *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -63,7 +60,7 @@ public class SubtractSpectrum
   private static final long serialVersionUID = 3414623712198778099L;
 
   /** the filter to run. */
-  protected AbstractFilter<Spectrum> m_Filter;
+  protected Filter<Spectrum> m_Filter;
   
   protected int m_id=69052;
 
@@ -91,7 +88,7 @@ public class SubtractSpectrum
    *
    * @param value 	the filter
    */
-  public void setFilter(AbstractFilter value) {
+  public void setFilter(Filter value) {
     m_Filter = value;
   }
 
@@ -100,7 +97,7 @@ public class SubtractSpectrum
    *
    * @return 		the filter
    */
-  public AbstractFilter getFilter() {
+  public Filter getFilter() {
     return m_Filter;
   }
 

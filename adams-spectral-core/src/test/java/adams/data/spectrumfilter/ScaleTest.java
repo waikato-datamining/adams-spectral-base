@@ -19,11 +19,11 @@
  */
 package adams.data.spectrumfilter;
 
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
+import adams.data.spectrum.Spectrum;
 import adams.env.Environment;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import adams.data.spectrum.Spectrum;
 
 /**
  * Test class for the Scale filter. Run from the command line with: <br><br>
@@ -49,7 +49,7 @@ public class ScaleTest
    *
    * @return		the filter
    */
-  public AbstractFilter<Spectrum> getFilter() {
+  public Filter<Spectrum> getFilter() {
     return new Scale();
   }
 
@@ -73,7 +73,7 @@ public class ScaleTest
    *
    * @return		the setups
    */
-  protected AbstractFilter[] getRegressionSetups() {
+  protected Filter[] getRegressionSetups() {
     Scale[]	result;
 
     result = new Scale[4];

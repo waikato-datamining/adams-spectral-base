@@ -15,12 +15,12 @@
 
 /**
  * CovarianceTest.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.spectrumfilter;
 
 import adams.core.base.BaseRegExp;
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
@@ -53,7 +53,7 @@ public class CovarianceTest
    *
    * @return		the filter
    */
-  public AbstractFilter<Spectrum> getFilter() {
+  public Filter<Spectrum> getFilter() {
     return new Covariance();
   }
 
@@ -75,7 +75,7 @@ public class CovarianceTest
    *
    * @return		the setups
    */
-  protected AbstractFilter[] getRegressionSetups() {
+  protected Filter[] getRegressionSetups() {
     Covariance[]		result;
     SpectrumConditionsMulti	cond;
 

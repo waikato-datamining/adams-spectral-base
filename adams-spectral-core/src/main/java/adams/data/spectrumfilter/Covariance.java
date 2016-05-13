@@ -21,7 +21,7 @@
 package adams.data.spectrumfilter;
 
 import adams.data.filter.AbstractDatabaseConnectionFilter;
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.filter.PassThrough;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -98,7 +98,7 @@ public class Covariance
   protected boolean m_Absolute;
 
   /** filter to apply to retrieved spectra. */
-  protected AbstractFilter<Spectrum> m_filter;
+  protected Filter<Spectrum> m_filter;
 
   /**
    * Returns a string describing the object.
@@ -153,7 +153,7 @@ public class Covariance
    *
    * @param filter	the filter to use
    */
-  public void setFilter(AbstractFilter<Spectrum> filter) {
+  public void setFilter(Filter<Spectrum> filter) {
     m_filter=filter;
     updateDatabaseConnection();
     reset();
@@ -164,7 +164,7 @@ public class Covariance
    *
    * @return	the filter in use
    */
-  public AbstractFilter<Spectrum> getFilter() {
+  public Filter<Spectrum> getFilter() {
     return(m_filter);
   }
 

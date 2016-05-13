@@ -40,7 +40,11 @@ adams.flow.sink.spectrumdisplay.AbstractPlotUpdater=\
   adams.flow.sink.spectrumdisplay
 
 # the filters
-adams.data.filter.AbstractFilter=\
+adams.data.filter.Filter=\
+  adams.data.spectrumfilter
+
+# batch filters
+adams.data.filter.BatchFilter=\
   adams.data.spectrumfilter
 
 # the amplitude transformers

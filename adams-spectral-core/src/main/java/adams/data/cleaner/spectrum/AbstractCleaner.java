@@ -15,7 +15,7 @@
 
 /*
  * AbstractCleaner.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.cleaner.spectrum;
@@ -26,9 +26,9 @@ import adams.core.option.AbstractOptionConsumer;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.ArrayConsumer;
 import adams.core.option.OptionUtils;
-import adams.data.filter.AbstractFilter;
-import adams.flow.core.Actor;
+import adams.data.filter.Filter;
 import adams.data.spectrum.Spectrum;
+import adams.flow.core.Actor;
 
 /**
  * Abstract base class for cleaners handling <code>Spectrum</code>
@@ -49,10 +49,10 @@ public abstract class AbstractCleaner
   private static final long serialVersionUID = 3610605513320220903L;
 
   /** the pre-filter to use. */
-  protected AbstractFilter m_PreFilter;
+  protected Filter m_PreFilter;
 
   /** the actual pre-filter to use. */
-  protected AbstractFilter m_ActualPreFilter;
+  protected Filter m_ActualPreFilter;
 
   /** the flow context. */
   protected transient Actor m_FlowContext;
@@ -82,7 +82,7 @@ public abstract class AbstractCleaner
    *
    * @param value	the filter
    */
-  public void setPreFilter(AbstractFilter value) {
+  public void setPreFilter(Filter value) {
     m_PreFilter = value;
     reset();
   }
@@ -92,7 +92,7 @@ public abstract class AbstractCleaner
    *
    * @return		the filter
    */
-  public AbstractFilter getPreFilter() {
+  public Filter getPreFilter() {
     return m_PreFilter;
   }
 

@@ -15,14 +15,14 @@
 
 /**
  * AbstractFilterTestCase.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.spectrumfilter;
 
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
+import adams.data.spectrum.Spectrum;
 import adams.test.AbstractTestHelper;
 import adams.test.SpectralTestHelper;
-import adams.data.spectrum.Spectrum;
 
 /**
  * Ancestor for filter test cases.
@@ -31,7 +31,7 @@ import adams.data.spectrum.Spectrum;
  * @version $Revision: 1286 $
  */
 public abstract class AbstractSpectrumFilterTestCase
-  extends adams.data.filter.AbstractFilterTestCase<AbstractFilter, Spectrum> {
+  extends adams.data.filter.AbstractFilterTestCase<Filter, Spectrum> {
 
   /**
    * Constructs the test case. Called by subclasses.

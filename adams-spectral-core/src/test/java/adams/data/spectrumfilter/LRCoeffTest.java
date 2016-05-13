@@ -15,12 +15,12 @@
 
 /**
  * LRCoeffTest.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.spectrumfilter;
 
 import adams.core.base.BaseRegExp;
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.instances.SimpleInstanceGenerator;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -54,7 +54,7 @@ public class LRCoeffTest
    *
    * @return		the filter
    */
-  public AbstractFilter<Spectrum> getFilter() {
+  public Filter<Spectrum> getFilter() {
     return new LRCoeff();
   }
 
@@ -77,7 +77,7 @@ public class LRCoeffTest
    *
    * @return		the setups
    */
-  protected AbstractFilter[] getRegressionSetups() {
+  protected Filter[] getRegressionSetups() {
     LRCoeff[]			result;
     SpectrumConditionsMulti	cond;
     SimpleInstanceGenerator 	generator;

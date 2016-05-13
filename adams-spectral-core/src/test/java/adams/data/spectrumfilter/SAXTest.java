@@ -15,15 +15,15 @@
 
 /**
  * SAXTest.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.spectrumfilter;
 
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
+import adams.data.spectrum.Spectrum;
 import adams.env.Environment;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import adams.data.spectrum.Spectrum;
 
 /**
  * Test class for the SAX filter. Run from the command line with: <br><br>
@@ -49,7 +49,7 @@ public class SAXTest
    *
    * @return		the filter
    */
-  public AbstractFilter<Spectrum> getFilter() {
+  public Filter<Spectrum> getFilter() {
     return new SAX();
   }
 
@@ -74,7 +74,7 @@ public class SAXTest
    * @return		the setups
    */
   @Override
-  protected AbstractFilter[] getRegressionSetups() {
+  protected Filter[] getRegressionSetups() {
     MultiFilter[]	result;
     RowNorm		row;
     SAX			sax;
@@ -85,7 +85,7 @@ public class SAXTest
     
     result[0] = new MultiFilter();
     sax       = new SAX();
-    result[0].setSubFilters(new AbstractFilter[]{
+    result[0].setSubFilters(new Filter[]{
 	row,
 	sax
     });
@@ -94,7 +94,7 @@ public class SAXTest
     sax       = new SAX();
     sax.setNumBins(20);
     sax.setNumWindows(20);
-    result[1].setSubFilters(new AbstractFilter[]{
+    result[1].setSubFilters(new Filter[]{
 	row,
 	sax
     });
@@ -103,7 +103,7 @@ public class SAXTest
     sax       = new SAX();
     sax.setNumBins(5);
     sax.setNumWindows(5);
-    result[2].setSubFilters(new AbstractFilter[]{
+    result[2].setSubFilters(new Filter[]{
 	row,
 	sax
     });

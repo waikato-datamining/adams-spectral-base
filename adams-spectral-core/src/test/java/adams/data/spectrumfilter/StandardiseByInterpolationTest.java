@@ -19,7 +19,7 @@
  */
 package adams.data.spectrumfilter;
 
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.spectrum.Spectrum;
 import adams.env.Environment;
 import junit.framework.Test;
@@ -49,7 +49,7 @@ public class StandardiseByInterpolationTest
    *
    * @return		the filter
    */
-  public AbstractFilter<Spectrum> getFilter() {
+  public Filter<Spectrum> getFilter() {
     return new StandardiseByInterpolation();
   }
 
@@ -72,7 +72,7 @@ public class StandardiseByInterpolationTest
    * @return		the setups
    */
   @Override
-  protected AbstractFilter[] getRegressionSetups() {
+  protected Filter[] getRegressionSetups() {
     StandardiseByInterpolation[]	result;
 
     result = new StandardiseByInterpolation[1];

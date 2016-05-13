@@ -25,7 +25,6 @@ import adams.core.StatusMessageHandler;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.OptionUtils;
-import adams.data.filter.AbstractFilter;
 import adams.data.filter.PassThrough;
 import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.spectrum.Spectrum;
@@ -180,7 +179,7 @@ public class SpectrumExplorer
   protected GenericObjectEditor m_GenericObjectEditorCorrelationStatistics;
 
   /** the current filter. */
-  protected AbstractFilter<Spectrum> m_CurrentFilter;
+  protected adams.data.filter.Filter<Spectrum> m_CurrentFilter;
 
   /** indicates whether the filtered data was overlayed over the original. */
   protected boolean m_FilterOverlayOriginalData;

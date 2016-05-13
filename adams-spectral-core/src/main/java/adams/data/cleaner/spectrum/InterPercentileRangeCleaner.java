@@ -21,7 +21,7 @@
 package adams.data.cleaner.spectrum;
 
 import adams.core.logging.LoggingObject;
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -634,7 +634,7 @@ public class InterPercentileRangeCleaner
    * @param value	the deserialized objects
    */
   public void setSerializationSetup(Object[] value) {
-    m_PreFilter     = (AbstractFilter) value[0];
+    m_PreFilter     = (Filter) value[0];
     m_AmplitudeIPRs = (Hashtable<Float,InterPercentileRange>) value[1];
     m_FieldIPRs     = (Hashtable<Field,InterPercentileRange>) value[2];
     m_SampleType    = (String) value[3];

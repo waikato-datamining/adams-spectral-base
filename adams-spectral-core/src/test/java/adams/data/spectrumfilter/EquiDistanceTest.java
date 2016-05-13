@@ -15,11 +15,11 @@
 
 /**
  * EquiDistanceTest.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.spectrumfilter;
 
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.env.Environment;
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -62,7 +62,7 @@ public class EquiDistanceTest
    *
    * @return		the setups
    */
-  protected AbstractFilter[] getRegressionSetups() {
+  protected Filter[] getRegressionSetups() {
     EquiDistance[]	result;
 
     result = new EquiDistance[3];

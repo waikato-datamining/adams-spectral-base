@@ -15,13 +15,14 @@
 
 /*
  * MultiFilter.java
- * Copyright (C) 2009-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
 
 import adams.data.container.DataContainer;
 import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumUtils;
 
@@ -147,18 +148,18 @@ public class MultiFilter
   protected Spectrum processDataParallel(Spectrum data) {
     Spectrum			result;
     int				i;
-    List<AbstractFilter>	filters;
+    List<Filter>		filters;
     List<DataContainer>		outputs;
     List<Spectrum>		outputsC;
 
     // filter the data
-    filters = new ArrayList<AbstractFilter>();
+    filters = new ArrayList<>();
     for (i = 0; i < m_Filters.length; i++)
       filters.add(m_Filters[i].shallowCopy(true));
     outputs = AbstractFilter.filter(filters, data);
 
     // merge outputs
-    outputsC = new ArrayList<Spectrum>();
+    outputsC = new ArrayList<>();
     for (i = 0; i < outputs.size(); i++)
       outputsC.add((Spectrum) outputs.get(i));
     result = SpectrumUtils.merge(outputsC);

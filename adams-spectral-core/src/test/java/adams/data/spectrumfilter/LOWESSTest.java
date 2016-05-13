@@ -15,15 +15,15 @@
 
 /**
  * LOWESSTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.spectrumfilter;
 
-import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
+import adams.data.spectrum.Spectrum;
 import adams.env.Environment;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import adams.data.spectrum.Spectrum;
 
 /**
  * Test class for the LOWESS filter. Run from the command line with: <br><br>
@@ -49,7 +49,7 @@ public class LOWESSTest
    *
    * @return		the filter
    */
-  public AbstractFilter<Spectrum> getFilter() {
+  public Filter<Spectrum> getFilter() {
     return new LOWESS();
   }
 
@@ -73,7 +73,7 @@ public class LOWESSTest
    * @return		the setups
    */
   @Override
-  protected AbstractFilter[] getRegressionSetups() {
+  protected Filter[] getRegressionSetups() {
     LOWESS[]	result;
 
     result = new LOWESS[2];
