@@ -1,0 +1,24 @@
+# Project: adams
+# Date: 2016-04-26 13:08:50
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Compares the spectra loaded with old and new Opus reader." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -name Info -short-title true -writer adams.data.io.output.NullWriter
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select Opus files"
+ adams.flow.control.Tee -name info
+  adams.flow.transformer.BaseName
+  adams.flow.sink.CallableSink -callable Info
+ adams.flow.control.Tee -name old
+  adams.flow.transformer.SpectrumFileReader -reader adams.data.io.input.OpusSpectrumReader
+  adams.flow.transformer.SetStorageValue -storage-name old
+ adams.flow.control.Tee -name new
+  adams.flow.transformer.SpectrumFileReader -reader adams.data.io.input.OpusSpectrumReaderExt
+  adams.flow.transformer.SetStorageValue -storage-name new
+ adams.flow.control.Trigger -name compare
+  adams.flow.source.StorageValuesArray -storage-name old -storage-name new
+  adams.flow.transformer.CompareObjects -compare "adams.data.compare.SpectrumCorrelation -minimum 0.99"
+  adams.flow.transformer.SetVariable -var-name result
+ adams.flow.control.Trigger -name display
+  adams.flow.source.CombineVariables -expression "--> @{result}"
+  adams.flow.sink.CallableSink -callable Info

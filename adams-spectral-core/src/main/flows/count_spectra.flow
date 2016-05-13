@@ -1,0 +1,21 @@
+# Project: adams
+# Date: 2016-04-26 13:08:42
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Counts the number of spectra loaded from Opus files with the new reader." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -name Info -short-title true -writer adams.data.io.output.NullWriter
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select Opus files"
+ adams.flow.control.Tee -name info
+  adams.flow.transformer.BaseName
+  adams.flow.sink.CallableSink -callable Info
+ adams.flow.control.Tee -name load
+  adams.flow.transformer.SetVariable -name "reset count" -var-name count -var-value 0
+  adams.flow.transformer.SpectrumFileReader -reader adams.data.io.input.OpusSpectrumReaderExt
+  adams.flow.transformer.IncVariable -var-name count
+  adams.flow.transformer.GetSampleDataValue -field Opus.BlockType.Data[S]
+  adams.flow.transformer.StringInsert -position first -value "--> "
+  adams.flow.sink.CallableSink -callable Info
+ adams.flow.control.Trigger -name "output count"
+  adams.flow.source.CombineVariables -expression "--> #@{count}"
+  adams.flow.sink.CallableSink -callable Info
