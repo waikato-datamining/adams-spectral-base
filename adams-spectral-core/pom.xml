@@ -5,8 +5,8 @@
 
   <parent>
     <groupId>nz.ac.waikato.cms.adams</groupId>
-    <artifactId>adams-spectral-base-pom</artifactId>
-    <version>16.5.0-SNAPSHOT</version>
+    <artifactId>adams-pom</artifactId>
+    <version>0.4.13-SNAPSHOT</version>
   </parent>
 
   <artifactId>adams-spectral-core</artifactId>
@@ -53,6 +53,10 @@
       <timezone>+12</timezone>
     </developer>
   </developers>
+
+  <properties>
+    <adams.version>0.4.13-SNAPSHOT</adams.version>
+  </properties>
 
   <dependencies>
     <dependency>
