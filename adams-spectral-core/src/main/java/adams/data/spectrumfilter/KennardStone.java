@@ -14,7 +14,7 @@
  */
 
 /*
- * KennardStoneFilter.java
+ * KennardStone.java
  * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
  */
 
@@ -34,7 +34,7 @@ import java.util.ArrayList;
  * Batch filter that applies the Kennard-stone algorithm to select a subset of spectra
  * Created by Michael on 5/19/2016.
  */
-public class KennardStoneFilter
+public class KennardStone
   extends AbstractBatchFilter {
 
   private static final long serialVersionUID = 8266258749271797113L;
