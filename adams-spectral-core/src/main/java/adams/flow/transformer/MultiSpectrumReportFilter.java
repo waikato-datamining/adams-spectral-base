@@ -15,7 +15,7 @@
 
 /*
  * MultiSpectrumReportFilter.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -98,6 +98,9 @@ public class MultiSpectrumReportFilter
   /** the filter to apply. */
   protected AbstractMultiSpectrumReportFilter m_Filter;
 
+  /** whether the database connection has been updated. */
+  protected boolean m_DatabaseConnectionUpdated;
+
   /**
    * Returns a string describing the object.
    *
@@ -118,6 +121,16 @@ public class MultiSpectrumReportFilter
     m_OptionManager.add(
 	    "filter", "filter",
 	    new adams.data.multireportfilter.PassThrough());
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_DatabaseConnectionUpdated = false;
   }
 
   /**
@@ -190,25 +203,6 @@ public class MultiSpectrumReportFilter
   }
 
   /**
-   * Initializes the item for flow execution.
-   *
-   * @return		null if everything is fine, otherwise error message
-   */
-  @Override
-  public String setUp() {
-    String	result;
-
-    result = super.setUp();
-
-    if (result == null) {
-      if (m_Filter instanceof DatabaseConnectionHandler)
-	((DatabaseConnectionHandler) m_Filter).setDatabaseConnection(getDatabaseConnection());
-    }
-
-    return result;
-  }
-
-  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
@@ -220,6 +214,12 @@ public class MultiSpectrumReportFilter
     MultiSpectrum	spec;
 
     result = null;
+
+    if (!m_DatabaseConnectionUpdated) {
+      m_DatabaseConnectionUpdated = true;
+      if (m_Filter instanceof DatabaseConnectionHandler)
+	((DatabaseConnectionHandler) m_Filter).setDatabaseConnection(getDatabaseConnection());
+    }
 
     multi = (MultiSpectrum) m_InputToken.getPayload();
     spec  = m_Filter.filter(multi);

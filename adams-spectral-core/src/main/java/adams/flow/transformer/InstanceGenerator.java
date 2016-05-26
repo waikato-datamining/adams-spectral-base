@@ -15,7 +15,7 @@
 
 /*
  * InstanceGenerator.java
- * Copyright (C) 2009-2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -92,6 +92,9 @@ public class InstanceGenerator
   /** the generator to use. */
   protected adams.data.instances.AbstractInstanceGenerator m_Generator;
 
+  /** whether the database connection has been updated. */
+  protected boolean m_DatabaseConnectionUpdated;
+
   /**
    * Returns a string describing the object.
    *
@@ -110,6 +113,16 @@ public class InstanceGenerator
     m_OptionManager.add(
 	    "generator", "generator",
 	    new adams.data.instances.SimpleInstanceGenerator());
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_DatabaseConnectionUpdated = false;
   }
 
   /**
@@ -178,29 +191,6 @@ public class InstanceGenerator
   }
 
   /**
-   * Initializes the item for flow execution. Also calls the reset() method
-   * first before anything else.
-   *
-   * @return		null if everything is fine, otherwise error message
-   */
-  public String setUp() {
-    String	result;
-
-    result = super.setUp();
-
-    if (result == null) {
-      m_Generator.setDatabaseConnection(
-	  ActorUtils.getDatabaseConnection(
-	      this,
-	      adams.flow.standalone.DatabaseConnection.class,
-	      adams.db.DatabaseConnection.getSingleton()));
-      result = m_Generator.checkSetup();
-    }
-
-    return result;
-  }
-
-  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
@@ -213,25 +203,37 @@ public class InstanceGenerator
 
     result = null;
 
-    if (m_InputToken.getPayload() instanceof Spectrum) {
-      spectrum = (Spectrum) m_InputToken.getPayload();
-    }
-    else {
-      if (m_InputToken.getPayload() instanceof SampleData) {
-	sd = (SampleData) m_InputToken.getPayload();
-      }
-      else {
-	sd = new SampleData();
-	sd.mergeWith((Report) m_InputToken.getPayload());
-      }
-      spectrum = new Spectrum();
-      spectrum.setDatabaseID(sd.getDatabaseID());
-      spectrum.setID(sd.getID());
-      spectrum.setReport(sd);
+    if (!m_DatabaseConnectionUpdated) {
+      m_DatabaseConnectionUpdated = true;
+      m_Generator.setDatabaseConnection(
+	  ActorUtils.getDatabaseConnection(
+	      this,
+	      adams.flow.standalone.DatabaseConnection.class,
+	      adams.db.DatabaseConnection.getSingleton()));
+      result = m_Generator.checkSetup();
     }
 
-    inst          = m_Generator.generate(spectrum);
-    m_OutputToken = new Token(inst);
+    if (result == null) {
+      if (m_InputToken.getPayload() instanceof Spectrum) {
+	spectrum = (Spectrum) m_InputToken.getPayload();
+      }
+      else {
+	if (m_InputToken.getPayload() instanceof SampleData) {
+	  sd = (SampleData) m_InputToken.getPayload();
+	}
+	else {
+	  sd = new SampleData();
+	  sd.mergeWith((Report) m_InputToken.getPayload());
+	}
+	spectrum = new Spectrum();
+	spectrum.setDatabaseID(sd.getDatabaseID());
+	spectrum.setID(sd.getID());
+	spectrum.setReport(sd);
+      }
+
+      inst = m_Generator.generate(spectrum);
+      m_OutputToken = new Token(inst);
+    }
 
     return result;
   }

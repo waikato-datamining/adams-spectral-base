@@ -15,7 +15,7 @@
 
 /*
  * MultiSpectrumFilter.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -123,6 +123,9 @@ public class MultiSpectrumFilter
   /** the regular expression for field names to transfer. */
   protected BaseRegExp m_TransferRegExp;
 
+  /** whether the database connection has been updated. */
+  protected boolean m_DatabaseConnectionUpdated;
+
   /**
    * Returns a string describing the object.
    *
@@ -155,6 +158,16 @@ public class MultiSpectrumFilter
     m_OptionManager.add(
 	    "transfer-regexp", "transferRegExp",
 	    new BaseRegExp(BaseRegExp.MATCH_ALL));
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_DatabaseConnectionUpdated = false;
   }
 
   /**
@@ -325,25 +338,6 @@ public class MultiSpectrumFilter
   }
 
   /**
-   * Initializes the item for flow execution.
-   *
-   * @return		null if everything is fine, otherwise error message
-   */
-  @Override
-  public String setUp() {
-    String	result;
-
-    result = super.setUp();
-
-    if (result == null) {
-      if (m_Filter instanceof DatabaseConnectionHandler)
-	((DatabaseConnectionHandler) m_Filter).setDatabaseConnection(getDatabaseConnection());
-    }
-
-    return result;
-  }
-
-  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
@@ -358,6 +352,12 @@ public class MultiSpectrumFilter
     AbstractField	newField;
 
     result = null;
+
+    if (!m_DatabaseConnectionUpdated) {
+      m_DatabaseConnectionUpdated = true;
+      if (m_Filter instanceof DatabaseConnectionHandler)
+	((DatabaseConnectionHandler) m_Filter).setDatabaseConnection(getDatabaseConnection());
+    }
 
     multi = (MultiSpectrum) m_InputToken.getPayload();
     sdm   = multi.getReport();

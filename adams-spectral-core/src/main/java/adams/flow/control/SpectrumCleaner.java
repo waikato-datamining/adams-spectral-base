@@ -151,6 +151,9 @@ public class SpectrumCleaner
   /** the output token. */
   protected transient Token m_OutputToken;
 
+  /** whether the database connection has been updated. */
+  protected boolean m_DatabaseConnectionUpdated;
+
   /**
    * Returns a string describing the object.
    *
@@ -192,6 +195,16 @@ public class SpectrumCleaner
 
     m_RejectedTokensActor     = new Null();
     m_RejectionMessagesActor  = new Null();
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_DatabaseConnectionUpdated = false;
   }
 
   /**
@@ -407,16 +420,6 @@ public class SpectrumCleaner
 	result = "Accepted input and actor for rejection messages are not compatible!";
     }
 
-    if (result == null) {
-      if (m_Cleaner instanceof DatabaseConnectionHandler)
-	((DatabaseConnectionHandler) m_Cleaner).setDatabaseConnection(
-	    ActorUtils.getDatabaseConnection(
-		  this,
-		  adams.flow.standalone.DatabaseConnection.class,
-		  adams.db.DatabaseConnection.getSingleton()));
-      m_Cleaner.setFlowContent(this);
-    }
-
     return result;
   }
 
@@ -461,6 +464,17 @@ public class SpectrumCleaner
     String	rejM;
 
     result = null;
+
+    if (!m_DatabaseConnectionUpdated) {
+      m_DatabaseConnectionUpdated = true;
+      if (m_Cleaner instanceof DatabaseConnectionHandler)
+	((DatabaseConnectionHandler) m_Cleaner).setDatabaseConnection(
+	    ActorUtils.getDatabaseConnection(
+		  this,
+		  adams.flow.standalone.DatabaseConnection.class,
+		  adams.db.DatabaseConnection.getSingleton()));
+      m_Cleaner.setFlowContent(this);
+    }
 
     msg = null;
     try {
