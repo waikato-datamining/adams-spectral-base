@@ -20,17 +20,22 @@
 
 package adams.flow.sink;
 
-import adams.flow.core.DataPlotUpdaterHandler;
-import adams.flow.core.Token;
-import adams.gui.core.BasePanel;
 import adams.data.conversion.MultiSpectrumToSpectra;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
+import adams.flow.core.DataPlotUpdaterHandler;
+import adams.flow.core.Token;
 import adams.flow.sink.spectrumdisplay.AbstractPlotUpdater;
 import adams.flow.sink.spectrumdisplay.SimplePlotUpdater;
+import adams.gui.core.BasePanel;
+import adams.gui.visualization.core.AbstractColorProvider;
+import adams.gui.visualization.core.DefaultColorProvider;
+import adams.gui.visualization.core.Paintlet;
+import adams.gui.visualization.spectrum.AbstractSpectrumPaintlet;
 import adams.gui.visualization.spectrum.SpectrumContainer;
 import adams.gui.visualization.spectrum.SpectrumContainerManager;
 import adams.gui.visualization.spectrum.SpectrumExplorer;
+import adams.gui.visualization.spectrum.SpectrumPaintlet;
 
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
@@ -46,8 +51,8 @@ import java.util.List;
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;knir.data.spectrum.Spectrum<br>
- * &nbsp;&nbsp;&nbsp;knir.data.spectrum.MultiSpectrum<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.spectrum.Spectrum<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.spectrum.MultiSpectrum<br>
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -56,92 +61,103 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- *
+ * 
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: SpectrumDisplay
  * </pre>
- *
+ * 
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- *
+ * 
  * <pre>-skip &lt;boolean&gt; (property: skip)
  * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
  * &nbsp;&nbsp;&nbsp;as it is.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
  * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
  * &nbsp;&nbsp;&nbsp; useful for critical actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-silent &lt;boolean&gt; (property: silent)
- * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console.
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing 
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-short-title &lt;boolean&gt; (property: shortTitle)
  * &nbsp;&nbsp;&nbsp;If enabled uses just the name for the title instead of the actor's full 
  * &nbsp;&nbsp;&nbsp;name.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-display-in-editor &lt;boolean&gt; (property: displayInEditor)
  * &nbsp;&nbsp;&nbsp;If enabled displays the panel in a tab in the flow editor rather than in 
  * &nbsp;&nbsp;&nbsp;a separate frame.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-width &lt;int&gt; (property: width)
  * &nbsp;&nbsp;&nbsp;The width of the dialog.
  * &nbsp;&nbsp;&nbsp;default: 1000
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
- *
+ * 
  * <pre>-height &lt;int&gt; (property: height)
  * &nbsp;&nbsp;&nbsp;The height of the dialog.
  * &nbsp;&nbsp;&nbsp;default: 600
  * &nbsp;&nbsp;&nbsp;minimum: -1
  * </pre>
- *
+ * 
  * <pre>-x &lt;int&gt; (property: x)
  * &nbsp;&nbsp;&nbsp;The X position of the dialog (&gt;=0: absolute, -1: left, -2: center, -3: right
  * &nbsp;&nbsp;&nbsp;).
  * &nbsp;&nbsp;&nbsp;default: -1
  * &nbsp;&nbsp;&nbsp;minimum: -3
  * </pre>
- *
+ * 
  * <pre>-y &lt;int&gt; (property: y)
  * &nbsp;&nbsp;&nbsp;The Y position of the dialog (&gt;=0: absolute, -1: top, -2: center, -3: bottom
  * &nbsp;&nbsp;&nbsp;).
  * &nbsp;&nbsp;&nbsp;default: -1
  * &nbsp;&nbsp;&nbsp;minimum: -3
  * </pre>
- *
+ * 
  * <pre>-writer &lt;adams.gui.print.JComponentWriter&gt; (property: writer)
  * &nbsp;&nbsp;&nbsp;The writer to use for generating the graphics output.
  * &nbsp;&nbsp;&nbsp;default: adams.gui.print.NullWriter
  * </pre>
- *
+ * 
+ * <pre>-color-provider &lt;adams.gui.visualization.core.AbstractColorProvider&gt; (property: colorProvider)
+ * &nbsp;&nbsp;&nbsp;The color provider in use for coloring the spectra.
+ * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.DefaultColorProvider
+ * </pre>
+ * 
+ * <pre>-paintlet &lt;adams.gui.visualization.spectrum.AbstractSpectrumPaintlet&gt; (property: paintlet)
+ * &nbsp;&nbsp;&nbsp;The paintlet to use for drawing the spectra.
+ * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.spectrum.SpectrumPaintlet
+ * </pre>
+ * 
  * <pre>-show-side-panel &lt;boolean&gt; (property: showSidePanel)
  * &nbsp;&nbsp;&nbsp;If enabled, the side panel with the list of loaded spectra gets displayed.
  * &nbsp;&nbsp;&nbsp;default: true
  * </pre>
- *
+ * 
  * <pre>-zoom-overview &lt;boolean&gt; (property: zoomOverview)
  * &nbsp;&nbsp;&nbsp;If enabled, a zoom overview panel gets displayed as well.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- *
+ * 
  * <pre>-plot-updater &lt;adams.flow.core.AbstractDataPlotUpdater&gt; (property: plotUpdater)
  * &nbsp;&nbsp;&nbsp;The updating strategy for the plot.
- * &nbsp;&nbsp;&nbsp;default: knir.flow.sink.spectrumdisplay.SimplePlotUpdater
+ * &nbsp;&nbsp;&nbsp;default: adams.flow.sink.spectrumdisplay.SimplePlotUpdater
  * </pre>
- *
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -255,6 +271,12 @@ public class SpectrumDisplay
   /** for serialization. */
   private static final long serialVersionUID = -4952322481934379763L;
 
+  /** the color provider to use. */
+  protected AbstractColorProvider m_ColorProvider;
+
+  /** the paintlet to use. */
+  protected AbstractSpectrumPaintlet m_Paintlet;
+
   /** whether to show the side panel or not. */
   protected boolean m_ShowSidePanel;
 
@@ -280,6 +302,14 @@ public class SpectrumDisplay
   @Override
   public void defineOptions() {
     super.defineOptions();
+
+    m_OptionManager.add(
+      "color-provider", "colorProvider",
+      new DefaultColorProvider());
+
+    m_OptionManager.add(
+      "paintlet", "paintlet",
+      new SpectrumPaintlet());
 
     m_OptionManager.add(
       "show-side-panel", "showSidePanel",
@@ -312,6 +342,64 @@ public class SpectrumDisplay
   @Override
   protected int getDefaultHeight() {
     return 600;
+  }
+
+  /**
+   * Sets the color provider to use.
+   *
+   * @param value 	the color provider
+   */
+  public void setColorProvider(AbstractColorProvider value) {
+    m_ColorProvider = value;
+    reset();
+  }
+
+  /**
+   * Returns the color provider in use.
+   *
+   * @return 		the color provider
+   */
+  public AbstractColorProvider getColorProvider() {
+    return m_ColorProvider;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String colorProviderTipText() {
+    return "The color provider in use for coloring the spectra.";
+  }
+
+  /**
+   * Sets the paintlet to use.
+   *
+   * @param value 	the paintlet
+   */
+  public void setPaintlet(AbstractSpectrumPaintlet value) {
+    m_Paintlet = value;
+    reset();
+  }
+
+  /**
+   * Returns the paintlet in use.
+   *
+   * @return 		the paintlet
+   */
+  public AbstractSpectrumPaintlet getPaintlet() {
+    return m_Paintlet;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String paintletTipText() {
+    return "The paintlet to use for drawing the spectra.";
   }
 
   /**
@@ -418,12 +506,17 @@ public class SpectrumDisplay
   @Override
   protected BasePanel newPanel() {
     SpectrumExplorer	result;
+    Paintlet 		paintlet;
 
     result = new SpectrumExplorer();
     result.getContainerManager().setReloadable(false);
     result.getContainerManager().setAllowRemoval(false);
     result.getSpectrumPanel().setSidePanelVisible(m_ShowSidePanel);
     result.setZoomOverviewPanelVisible(m_ZoomOverview);
+    result.getContainerManager().setColorProvider(m_ColorProvider.shallowCopy(true));
+    paintlet = m_Paintlet.shallowCopy(true);
+    paintlet.setPanel(result.getSpectrumPanel());
+    result.getSpectrumPanel().addPaintlet(paintlet);
 
     return result;
   }
@@ -431,7 +524,7 @@ public class SpectrumDisplay
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->knir.data.spectrum.Spectrum.class, knir.data.spectrum.MultiSpectrum.class<!-- flow-accepts-end -->
+   * @return		<!-- flow-accepts-start -->adams.data.spectrum.Spectrum.class, adams.data.spectrum.MultiSpectrum.class<!-- flow-accepts-end -->
    */
   @Override
   public Class[] accepts() {
