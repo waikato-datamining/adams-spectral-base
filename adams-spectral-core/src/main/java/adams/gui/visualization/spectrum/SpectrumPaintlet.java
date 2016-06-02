@@ -31,6 +31,7 @@ import adams.gui.visualization.container.AbstractContainerManager;
 import adams.gui.visualization.container.ColorContainer;
 import adams.gui.visualization.container.VisibilityContainer;
 import adams.gui.visualization.core.AxisPanel;
+import adams.gui.visualization.core.PaintletWithMarkers;
 import adams.gui.visualization.core.plot.Axis;
 
 import java.awt.Color;
@@ -83,7 +84,7 @@ import java.util.List;
  */
 public class SpectrumPaintlet
   extends AbstractSpectrumPaintlet
-  implements AntiAliasingSupporter {
+  implements AntiAliasingSupporter, PaintletWithMarkers {
 
   /** for serialization. */
   private static final long serialVersionUID = -6475036298238205843L;
