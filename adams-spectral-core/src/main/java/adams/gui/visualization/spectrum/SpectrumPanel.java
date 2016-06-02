@@ -15,7 +15,7 @@
 
 /*
  * SpectrumPanel.java
- * Copyright (C) 2008-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -336,6 +336,15 @@ public class SpectrumPanel
    */
   public boolean isZoomOverviewPanelVisible() {
     return m_PanelZoomOverview.isVisible();
+  }
+
+  /**
+   * Returns the zoom overview panel.
+   *
+   * @return		the panel
+   */
+  public SpectrumZoomOverviewPanel getZoomOverviewPanel() {
+    return m_PanelZoomOverview;
   }
 
   /**
