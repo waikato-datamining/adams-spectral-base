@@ -627,6 +627,8 @@ public class SpectrumExplorer
       menuitem.addActionListener(e -> clearData());
       m_MenuItemClearData = menuitem;
 
+      menu.addSeparator();
+
       // File/Database
       menuitem = new JMenuItem("Database...");
       menu.add(menuitem);
@@ -634,8 +636,6 @@ public class SpectrumExplorer
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed D"));
       menuitem.setIcon(GUIHelper.getIcon("database.gif"));
       menuitem.addActionListener(e ->loadData());
-
-      menu.addSeparator();
 
       // File/Open
       menuitem = new JMenuItem("Open...");
