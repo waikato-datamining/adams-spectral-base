@@ -56,7 +56,6 @@ import adams.gui.event.FilterListener;
 import adams.gui.event.RecentItemEvent;
 import adams.gui.event.RecentItemListener;
 import adams.gui.event.UndoEvent;
-import adams.gui.goe.GenericObjectEditor;
 import adams.gui.goe.GenericObjectEditorDialog;
 import adams.gui.menu.ConnectToDatabases;
 import adams.gui.scripting.AbstractScriptingEngine;
@@ -79,6 +78,7 @@ import adams.gui.visualization.container.ContainerListManager;
 import adams.gui.visualization.container.ContainerTable;
 import adams.gui.visualization.container.FilterDialog;
 import adams.gui.visualization.core.AbstractColorProvider;
+import adams.gui.visualization.core.Paintlet;
 import adams.gui.visualization.report.ReportContainer;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -90,6 +90,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import java.awt.BorderLayout;
 import java.awt.Dialog.ModalityType;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -175,8 +176,8 @@ public class SpectrumExplorer
   /** the color provider menu item. */
   protected JMenuItem m_MenuItemViewColorProvider;
 
-  /** the GenericObjectEditor for correlation statistics. */
-  protected GenericObjectEditor m_GenericObjectEditorCorrelationStatistics;
+  /** the paintlet  menu item. */
+  protected JMenuItem m_MenuItemViewPaintlet;
 
   /** the current filter. */
   protected adams.data.filter.Filter<Spectrum> m_CurrentFilter;
@@ -211,6 +212,9 @@ public class SpectrumExplorer
   /** the dialog for selecting the color provider. */
   protected GenericObjectEditorDialog m_DialogColorProvider;
 
+  /** the dialog for selecting the paintlet. */
+  protected GenericObjectEditorDialog m_DialogPaintlet;
+
   /** the recent files handler. */
   protected RecentFilesHandlerWithCommandline<JMenu> m_RecentFilesHandler;
 
@@ -231,6 +235,7 @@ public class SpectrumExplorer
     m_LoadDialog          = null;
     m_ScriptingDialog     = null;
     m_DialogColorProvider = null;
+    m_DialogPaintlet      = null;
     m_SpectrumFileChooser = new SpectrumFileChooser();
     m_SpectrumFileChooser.setMultiSelectionEnabled(true);
     m_CurrentFilter       = new PassThrough();
@@ -813,6 +818,13 @@ public class SpectrumExplorer
       menuitem.addActionListener(e -> selectColorProvider());
       m_MenuItemViewColorProvider = menuitem;
 
+      // View/Paintlet
+      menuitem = new JMenuItem("Paintlet...");
+      menu.add(menuitem);
+      menuitem.setMnemonic('P');
+      menuitem.addActionListener((ActionEvent e) -> selectPaintlet());
+      m_MenuItemViewPaintlet = menuitem;
+
       // update menu
       m_MenuBar = result;
       refreshScripts();
@@ -1053,6 +1065,37 @@ public class SpectrumExplorer
   }
 
   /**
+   * Lets the user select a new paintlet.
+   */
+  protected void selectPaintlet() {
+    Paintlet 	paintlet;
+    boolean	zoomVisible;
+
+    if (m_DialogPaintlet == null) {
+      if (getParentDialog() != null)
+	m_DialogPaintlet = new GenericObjectEditorDialog(getParentDialog(), ModalityType.DOCUMENT_MODAL);
+      else
+	m_DialogPaintlet = new GenericObjectEditorDialog(getParentFrame(), true);
+      m_DialogPaintlet.setTitle("Select paintlet");
+      m_DialogPaintlet.getGOEEditor().setClassType(AbstractSpectrumPaintlet.class);
+      m_DialogPaintlet.getGOEEditor().setCanChangeClassInDialog(true);
+      m_DialogPaintlet.setLocationRelativeTo(this);
+    }
+    
+    m_DialogPaintlet.setCurrent(getSpectrumPanel().getSpectrumPaintlet().shallowCopy());
+    m_DialogPaintlet.setVisible(true);
+    if (m_DialogPaintlet.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
+      return;
+    paintlet = (Paintlet) m_DialogPaintlet.getCurrent();
+    paintlet.setPanel(getSpectrumPanel());
+    getSpectrumPanel().removePaintlet(getSpectrumPanel().getSpectrumPaintlet());
+    getSpectrumPanel().addPaintlet(paintlet);
+    zoomVisible = getSpectrumPanel().isZoomOverviewPanelVisible();
+    getSpectrumPanel().getZoomOverviewPanel().setDataContainerPanel(getSpectrumPanel());
+    getSpectrumPanel().setZoomOverviewPanelVisible(zoomVisible);
+  }
+
+  /**
    * Returns the currently used database connection object, can be null.
    *
    * @return		the current object
@@ -1134,6 +1177,10 @@ public class SpectrumExplorer
     if (m_DialogColorProvider != null) {
       m_DialogColorProvider.dispose();
       m_DialogColorProvider = null;
+    }
+    if (m_DialogPaintlet != null) {
+      m_DialogPaintlet.dispose();
+      m_DialogPaintlet = null;
     }
   }
 }
