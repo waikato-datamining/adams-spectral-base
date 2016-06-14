@@ -1,0 +1,34 @@
+--> bolts-out0.arff
+evaluation #0
+LimitLower=-142.245941
+LimitUpper=193.887939
+
+evaluation #1
+LimitLower=-166.074844
+LimitUpper=195.24501
+
+evaluation #2
+LimitLower=-143.714508
+LimitUpper=189.333054
+
+evaluation #3
+LimitLower=-116.341728
+LimitUpper=240.537476
+
+evaluation #4
+LimitLower=-169.926224
+LimitUpper=189.925705
+
+evaluation #5
+LimitLower=-134.014984
+LimitUpper=221.747864
+
+evaluation #6
+LimitLower=-162.263306
+LimitUpper=190.307663
+
+evaluation #7
+LimitLower=-99.897995
+LimitUpper=251.79776
+
+

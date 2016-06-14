@@ -1,0 +1,52 @@
+--> bolts-out0.arff
+evaluation #0
+DEFAULT=1.461949
+
+evaluation #1
+DEFAULT=3.274131
+
+evaluation #2
+DEFAULT=0.945548
+
+evaluation #3
+DEFAULT=2.799392
+
+evaluation #4
+DEFAULT=2.462698
+
+evaluation #5
+DEFAULT=2.630918
+
+evaluation #6
+DEFAULT=1.759156
+
+evaluation #7
+DEFAULT=1.927228
+
+
+--> bolts-out1.arff
+evaluation #0
+DEFAULT=4.642941
+
+evaluation #1
+DEFAULT=11.601826
+
+evaluation #2
+DEFAULT=3.107288
+
+evaluation #3
+DEFAULT=10.505778
+
+evaluation #4
+DEFAULT=9.060828
+
+evaluation #5
+DEFAULT=8.720595
+
+evaluation #6
+DEFAULT=5.963177
+
+evaluation #7
+DEFAULT=5.748764
+
+
