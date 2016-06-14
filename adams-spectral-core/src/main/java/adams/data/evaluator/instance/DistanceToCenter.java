@@ -173,8 +173,10 @@ public class DistanceToCenter
    * @param value 	the number of neighbors
    */
   public void setNumNeighbors(int value) {
-    m_NumNeighbors = value;
-    reset();
+    if (getOptionManager().isValid("numNeighbors", value)) {
+      m_NumNeighbors = value;
+      reset();
+    }
   }
 
   /**
