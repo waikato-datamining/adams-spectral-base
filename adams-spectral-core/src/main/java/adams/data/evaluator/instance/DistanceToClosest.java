@@ -20,7 +20,6 @@
 
 package adams.data.evaluator.instance;
 
-import adams.core.option.OptionUtils;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.neighboursearch.LinearNNSearch;
@@ -67,21 +66,9 @@ import java.util.logging.Level;
  * @version $Revision$
  */
 public class DistanceToClosest
-  extends AbstractSerializableEvaluator {
+  extends AbstractNearestNeighborBasedEvaluator {
 
   private static final long serialVersionUID = 8219254664592725340L;
-
-  /** the nearest neighbor algorithm to use. */
-  protected NearestNeighbourSearch m_Search;
-
-  /** the actual nearest neighbor algorithm in use. */
-  protected NearestNeighbourSearch m_ActualSearch;
-
-  /** the training data. */
-  protected Instances m_TrainingData;
-
-  /** the header of the training data. */
-  protected Instances m_Header;
 
   /**
    * Returns a string describing the object.
@@ -95,55 +82,9 @@ public class DistanceToClosest
 	+ "instance in the training data and returns the distance to it.";
   }
 
-  /**
-   * Adds options to the internal list of options.
-   */
   @Override
-  public void defineOptions() {
-    super.defineOptions();
-
-    m_OptionManager.add(
-      "search", "search",
-      new LinearNNSearch());
-  }
-
-  /**
-   * Sets the nearest neighbor search algorithm.
-   *
-   * @param value 	the algorithm
-   */
-  public void setSearch(NearestNeighbourSearch value) {
-    m_Search = value;
-    reset();
-  }
-
-  /**
-   * Returns the nearest neighbor search algorithm.
-   *
-   * @return 		the algorithm
-   */
-  public NearestNeighbourSearch getSearch() {
-    return m_Search;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the explorer/experimenter gui
-   */
-  public String searchTipText() {
-    return "The nearest neighbor search to use.";
-  }
-
-  /**
-   * Returns the default value in case of missing evaluations.
-   *
-   * @return		the default value
-   */
-  @Override
-  protected float getDefaultMissingEvaluation() {
-    return Float.NaN;
+  protected NearestNeighbourSearch getDefaultSearch() {
+    return new LinearNNSearch();
   }
 
   /**
@@ -154,26 +95,10 @@ public class DistanceToClosest
    */
   @Override
   protected boolean performBuild(Instances data) {
-    if (data == null)
+    if (!initSearch(data))
       return false;
 
-    m_TrainingData = data;
-    m_ActualSearch = (NearestNeighbourSearch) OptionUtils.shallowCopy(m_Search);
-    if (m_ActualSearch == null) {
-      getLogger().severe("Failed to create copy of search algorithm!");
-      return false;
-    }
-
-    try {
-      m_ActualSearch.setInstances(data);
-      m_Header = new Instances(data, 0);
-      m_SerializableObjectHelper.saveSetup();
-    }
-    catch (Exception e) {
-      m_Header       = null;
-      m_ActualSearch = null;
-      getLogger().log(Level.SEVERE, "Failed to initialize search algorithm with training data!", e);
-    }
+    m_SerializableObjectHelper.saveSetup();
 
     return true;
   }
@@ -237,13 +162,5 @@ public class DistanceToClosest
     }
 
     return result;
-  }
-
-  /**
-   * Cleans up data structures, frees up memory.
-   */
-  @Override
-  public void cleanUp() {
-    m_TrainingData = null;
   }
 }
