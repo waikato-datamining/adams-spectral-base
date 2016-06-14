@@ -82,6 +82,11 @@ public class DistanceToClosest
 	+ "instance in the training data and returns the distance to it.";
   }
 
+  /**
+   * Returns the default search algorithm to use.
+   *
+   * @return		the default
+   */
   @Override
   protected NearestNeighbourSearch getDefaultSearch() {
     return new LinearNNSearch();
