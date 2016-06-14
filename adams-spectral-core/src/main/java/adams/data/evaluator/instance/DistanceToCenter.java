@@ -24,7 +24,6 @@ import adams.core.option.OptionUtils;
 import adams.data.statistics.StatUtils;
 import weka.core.DenseInstance;
 import weka.core.DistanceFunction;
-import weka.core.EuclideanDistance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.neighboursearch.LinearNNSearch;
@@ -34,8 +33,7 @@ import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
- * Uses the specified nearest neighbor search to determine a neighborhood. From this neighborhood the center is calculated (only using numeric attributes) and the distance to the center is returned.<br>
- * NB: normalization should be turned off in the search function.
+ * Uses the specified nearest neighbor search to determine a neighborhood. From this neighborhood the center is calculated (only using numeric attributes) and the distance to the center is returned.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -63,7 +61,7 @@ import java.util.logging.Level;
  * 
  * <pre>-search &lt;weka.core.neighboursearch.NearestNeighbourSearch&gt; (property: search)
  * &nbsp;&nbsp;&nbsp;The nearest neighbor search to use.
- * &nbsp;&nbsp;&nbsp;default: weka.core.neighboursearch.LinearNNSearch -A \"weka.core.EuclideanDistance -D -R first-last\"
+ * &nbsp;&nbsp;&nbsp;default: weka.core.neighboursearch.LinearNNSearch -A \"weka.core.EuclideanDistance -R first-last\"
  * </pre>
  * 
  * <pre>-num-neighbors &lt;int&gt; (property: numNeighbors)
@@ -95,8 +93,7 @@ public class DistanceToCenter
     return
       "Uses the specified nearest neighbor search to determine a neighborhood. "
         + "From this neighborhood the center is calculated (only using numeric "
-        + "attributes) and the distance to the center is returned.\n"
-        + "NB: normalization should be turned off in the search function.";
+        + "attributes) and the distance to the center is returned.";
   }
 
   /**
@@ -118,20 +115,7 @@ public class DistanceToCenter
    */
   @Override
   protected NearestNeighbourSearch getDefaultSearch() {
-    LinearNNSearch	result;
-    EuclideanDistance	dist;
-
-    result = new LinearNNSearch();
-    dist   = new EuclideanDistance();
-    dist.setDontNormalize(true);
-    try {
-      result.setDistanceFunction(dist);
-    }
-    catch (Exception e) {
-      getLogger().log(Level.SEVERE, "Failed to set distance function??", e);
-    }
-
-    return result;
+    return new LinearNNSearch();
   }
 
   /**
@@ -246,7 +230,8 @@ public class DistanceToCenter
       centerDataset.add(center);
       // calculate distance to center
       distance = (DistanceFunction) OptionUtils.shallowCopy(m_Search.getDistanceFunction());
-      distance.setInstances(centerDataset);
+      distance.setInstances(neighbors);
+      distance.update(center);
       distance.update(data);
       result = (float) distance.distance(center, data);
     }
