@@ -210,7 +210,7 @@ public class SpectrumContainerManager
     HashSet<String>	result;
     int			i;
 
-    result = new HashSet<String>();
+    result = new HashSet<>();
 
     for (i = 0; i < count(); i++)
       result.add(get(i).getID());
@@ -421,7 +421,7 @@ public class SpectrumContainerManager
     SpectrumContainer		cont;
     int				i;
 
-    result = new ArrayList<SpectrumContainer>();
+    result = new ArrayList<>();
 
     for (i = 0; i < count(); i++) {
       if (!isVisible(i))
@@ -444,8 +444,8 @@ public class SpectrumContainerManager
   @Override
   protected boolean isMatch(SpectrumContainer cont, String search, boolean regExp) {
     if (regExp)
-      return (cont.getID().matches(search));
+      return cont.getID().matches(search);
     else
-      return (cont.getID().indexOf(search) > -1);
+      return cont.getID().toLowerCase().contains(search);
   }
 }

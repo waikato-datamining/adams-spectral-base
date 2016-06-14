@@ -15,7 +15,7 @@
 
 /*
  * SelectedWaveNumberPaintlet.java
- * Copyright (C) 2008-2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -178,17 +178,15 @@ public class SelectedWaveNumberPaintlet
     if (point != null) {
       axisX = getPanel().getPlot().getAxis(Axis.BOTTOM);
       g.setColor(getColor());
-      synchronized(point) {
-	g.drawLine(
-	    axisX.valueToPos(point.getWaveNumber()),
-	    0,
-	    axisX.valueToPos(point.getWaveNumber()),
-	    getPanel().getHeight());
-	g.drawString(
-	    axisX.valueToDisplay(point.getWaveNumber()),
-	    axisX.valueToPos(point.getWaveNumber()) + 10,
-	    10);
-      }
+      g.drawLine(
+        axisX.valueToPos(point.getWaveNumber()),
+        0,
+        axisX.valueToPos(point.getWaveNumber()),
+        getPanel().getHeight());
+      g.drawString(
+        axisX.valueToDisplay(point.getWaveNumber()),
+        axisX.valueToPos(point.getWaveNumber()) + 10,
+        10);
     }
   }
 }
