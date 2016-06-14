@@ -21,8 +21,6 @@
 package adams.data.evaluator.instance;
 
 import adams.core.ClassLister;
-import adams.core.CleanUpHandler;
-import adams.core.ShallowCopySupporter;
 import adams.core.option.AbstractOptionConsumer;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.ArrayConsumer;
@@ -45,7 +43,7 @@ import java.util.HashMap;
  */
 public abstract class AbstractEvaluator
   extends AbstractOptionHandler
-  implements Comparable, CleanUpHandler, ShallowCopySupporter<AbstractEvaluator> {
+  implements Evaluator {
 
   /** for serialization. */
   private static final long serialVersionUID = -582592424411578426L;

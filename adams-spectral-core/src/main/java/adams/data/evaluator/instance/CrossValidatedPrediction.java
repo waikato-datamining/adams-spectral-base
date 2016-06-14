@@ -104,7 +104,7 @@ import java.util.logging.Level;
  */
 public class CrossValidatedPrediction
   extends AbstractNearestNeighborBasedEvaluator
-  implements Randomizable {
+  implements Randomizable, WekaClassifierBasedEvaluator {
 
   /** for serialization. */
   private static final long serialVersionUID = -6086808426732510366L;

@@ -15,7 +15,7 @@
 
 /**
  * IntervalEstimatorEvaluator.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.evaluator.instance;
@@ -82,7 +82,8 @@ import java.util.HashMap;
  * @version $Revision$
  */
 public class IntervalEstimatorEvaluator
-  extends AbstractSerializableEvaluator {
+  extends AbstractSerializableEvaluator
+  implements WekaClassifierBasedEvaluator {
 
   private static final long serialVersionUID = -4254958807591488789L;
 
