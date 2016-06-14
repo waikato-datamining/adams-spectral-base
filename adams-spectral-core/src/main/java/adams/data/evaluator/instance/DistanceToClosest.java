@@ -24,6 +24,8 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.neighboursearch.LinearNNSearch;
 import weka.core.neighboursearch.NearestNeighbourSearch;
+import weka.filters.AllFilter;
+import weka.filters.Filter;
 
 import java.util.logging.Level;
 
@@ -60,6 +62,11 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: weka.core.neighboursearch.LinearNNSearch -A \"weka.core.EuclideanDistance -R first-last\"
  * </pre>
  * 
+ * <pre>-filter &lt;weka.filters.Filter&gt; (property: filter)
+ * &nbsp;&nbsp;&nbsp;The filter to apply to the data.
+ * &nbsp;&nbsp;&nbsp;default: weka.filters.AllFilter
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -69,6 +76,15 @@ public class DistanceToClosest
   extends AbstractNearestNeighborBasedEvaluator {
 
   private static final long serialVersionUID = 8219254664592725340L;
+
+  /** the filter to use for filtering. */
+  protected Filter m_Filter;
+
+  /** the actual filter. */
+  protected Filter m_ActualFilter;
+
+  /** the raw training data. */
+  protected Instances m_RawTrainingData;
 
   /**
    * Returns a string describing the object.
@@ -83,6 +99,18 @@ public class DistanceToClosest
   }
 
   /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "filter", "filter",
+      new AllFilter());
+  }
+
+  /**
    * Returns the default search algorithm to use.
    *
    * @return		the default
@@ -93,6 +121,35 @@ public class DistanceToClosest
   }
 
   /**
+   * Sets the filter to use.
+   *
+   * @param value 	the filter
+   */
+  public void setFilter(Filter value) {
+    m_Filter = value;
+    reset();
+  }
+
+  /**
+   * Returns the filter to use.
+   *
+   * @return 		the filter
+   */
+  public Filter getFilter() {
+    return m_Filter;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the explorer/experimenter gui
+   */
+  public String filterTipText() {
+    return "The filter to apply to the data.";
+  }
+
+  /**
    * Builds the evaluator.
    *
    * @param data	the instance to check
@@ -100,21 +157,24 @@ public class DistanceToClosest
    */
   @Override
   protected boolean performBuild(Instances data) {
+    m_RawTrainingData = data;
+
+    try {
+      m_ActualFilter = Filter.makeCopy(m_Filter);
+      m_ActualFilter.setInputFormat(data);
+      data = Filter.useFilter(data, m_ActualFilter);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to create copy of filter!", e);
+      return false;
+    }
+
     if (!initSearch(data))
       return false;
 
     m_SerializableObjectHelper.saveSetup();
 
     return true;
-  }
-
-  /**
-   * Regenerates all the objects that are necessary for serialization.
-   */
-  @Override
-  public void initSerializationSetup() {
-    if (m_ActualSearch == null)
-      performBuild(m_TrainingData);
   }
 
   /**
@@ -127,6 +187,7 @@ public class DistanceToClosest
     return new Object[]{
       m_ActualSearch,
       m_Header,
+      m_ActualFilter,
     };
   }
 
@@ -140,6 +201,16 @@ public class DistanceToClosest
   public void setSerializationSetup(Object[] value) {
     m_ActualSearch = (NearestNeighbourSearch) value[0];
     m_Header       = (Instances) value[1];
+    m_ActualFilter = (Filter) value[2];
+  }
+
+  /**
+   * Regenerates all the objects that are necessary for serialization.
+   */
+  @Override
+  public void initSerializationSetup() {
+    if (m_ActualSearch == null)
+      performBuild(m_RawTrainingData);
   }
 
   /**
@@ -156,6 +227,11 @@ public class DistanceToClosest
     result = m_MissingEvaluation;
 
     try {
+      // filter instance
+      m_ActualFilter.input(data);
+      data = m_ActualFilter.output();
+
+      // get closest
       m_ActualSearch.kNearestNeighbours(data, 1);
       dist = m_ActualSearch.getDistances();
       if (dist.length > 0)
@@ -167,5 +243,12 @@ public class DistanceToClosest
     }
 
     return result;
+  }
+
+  @Override
+  public void cleanUp() {
+    m_RawTrainingData = null;
+
+    super.cleanUp();
   }
 }

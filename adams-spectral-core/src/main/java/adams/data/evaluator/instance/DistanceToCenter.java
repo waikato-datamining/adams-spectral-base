@@ -28,6 +28,8 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.neighboursearch.LinearNNSearch;
 import weka.core.neighboursearch.NearestNeighbourSearch;
+import weka.filters.AllFilter;
+import weka.filters.Filter;
 
 import java.util.logging.Level;
 
@@ -64,6 +66,11 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: weka.core.neighboursearch.LinearNNSearch -A \"weka.core.EuclideanDistance -R first-last\"
  * </pre>
  * 
+ * <pre>-filter &lt;weka.filters.Filter&gt; (property: filter)
+ * &nbsp;&nbsp;&nbsp;The filter to apply to the data.
+ * &nbsp;&nbsp;&nbsp;default: weka.filters.AllFilter
+ * </pre>
+ * 
  * <pre>-num-neighbors &lt;int&gt; (property: numNeighbors)
  * &nbsp;&nbsp;&nbsp;The number of neighbors to use in the neighborhood.
  * &nbsp;&nbsp;&nbsp;default: 100
@@ -80,8 +87,17 @@ public class DistanceToCenter
 
   private static final long serialVersionUID = 8219254664592725340L;
 
+  /** the filter to use for filtering. */
+  protected Filter m_Filter;
+
+  /** the actual filter. */
+  protected Filter m_ActualFilter;
+
   /** the number of neighbors to use. */
   protected int m_NumNeighbors;
+
+  /** the raw training data. */
+  protected Instances m_RawTrainingData;
 
   /**
    * Returns a string describing the object.
@@ -104,6 +120,10 @@ public class DistanceToCenter
     super.defineOptions();
 
     m_OptionManager.add(
+      "filter", "filter",
+      new AllFilter());
+
+    m_OptionManager.add(
       "num-neighbors", "numNeighbors",
       100, 1, null);
   }
@@ -116,6 +136,35 @@ public class DistanceToCenter
   @Override
   protected NearestNeighbourSearch getDefaultSearch() {
     return new LinearNNSearch();
+  }
+
+  /**
+   * Sets the filter to use.
+   *
+   * @param value 	the filter
+   */
+  public void setFilter(Filter value) {
+    m_Filter = value;
+    reset();
+  }
+
+  /**
+   * Returns the filter to use.
+   *
+   * @return 		the filter
+   */
+  public Filter getFilter() {
+    return m_Filter;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the explorer/experimenter gui
+   */
+  public String filterTipText() {
+    return "The filter to apply to the data.";
   }
 
   /**
@@ -155,21 +204,24 @@ public class DistanceToCenter
    */
   @Override
   protected boolean performBuild(Instances data) {
+    m_RawTrainingData = data;
+
+    try {
+      m_ActualFilter = Filter.makeCopy(m_Filter);
+      m_ActualFilter.setInputFormat(data);
+      data = Filter.useFilter(data, m_ActualFilter);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to create copy of filter!", e);
+      return false;
+    }
+
     if (!initSearch(data))
       return false;
 
     m_SerializableObjectHelper.saveSetup();
 
     return true;
-  }
-
-  /**
-   * Regenerates all the objects that are necessary for serialization.
-   */
-  @Override
-  public void initSerializationSetup() {
-    if (m_ActualSearch == null)
-      performBuild(m_TrainingData);
   }
 
   /**
@@ -182,6 +234,7 @@ public class DistanceToCenter
     return new Object[]{
       m_ActualSearch,
       m_Header,
+      m_ActualFilter,
     };
   }
 
@@ -195,6 +248,16 @@ public class DistanceToCenter
   public void setSerializationSetup(Object[] value) {
     m_ActualSearch = (NearestNeighbourSearch) value[0];
     m_Header       = (Instances) value[1];
+    m_ActualFilter = (Filter) value[2];
+  }
+
+  /**
+   * Regenerates all the objects that are necessary for serialization.
+   */
+  @Override
+  public void initSerializationSetup() {
+    if (m_ActualSearch == null)
+      performBuild(m_RawTrainingData);
   }
 
   /**
@@ -216,6 +279,10 @@ public class DistanceToCenter
     result = m_MissingEvaluation;
 
     try {
+      // filter instance
+      m_ActualFilter.input(data);
+      data = m_ActualFilter.output();
+
       // calculate center from neighborhood
       neighbors     = m_ActualSearch.kNearestNeighbours(data, m_NumNeighbors);
       centerDataset = new Instances(neighbors, 0);

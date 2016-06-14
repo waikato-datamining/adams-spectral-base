@@ -1,8 +1,8 @@
 # Project: adams
-# Date: 2016-06-14 21:03:12
+# Date: 2016-06-14 21:02:51
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Builds and uses an Instance evaluator." -flow-execution-listener adams.flow.execution.NullListener
+adams.flow.control.Flow -annotation "Builds and uses an Instance evaluator that pre-filters the data with a PLS filter." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.SetVariable -var-name evaluator_model -var-value ${EXAMPLE_FLOWS}/output/evaluator.model
  adams.flow.source.Start
  adams.flow.control.Trigger -name "load dataset"
@@ -16,12 +16,12 @@ adams.flow.control.Flow -annotation "Builds and uses an Instance evaluator." -fl
    adams.flow.transformer.SetStorageValue -storage-name test
  adams.flow.control.Trigger -name "train evaluator"
   adams.flow.source.StorageValue -storage-name train
-  adams.flow.transformer.Evaluator -evaluator "adams.data.evaluator.instance.DistanceToClosest -missing-evaluation NaN -serialization-file @{evaluator_model} -override-serialized-file true -search \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -filter weka.filters.AllFilter"
+  adams.flow.transformer.Evaluator -evaluator "adams.data.evaluator.instance.DistanceToCenter -missing-evaluation NaN -serialization-file @{evaluator_model} -search \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -filter \"weka.filters.supervised.attribute.PLSFilter -C 2 -M -A PLS1 -P center\" -num-neighbors 10"
   adams.flow.transformer.SetStorageValue -storage-name evaluator
  adams.flow.control.Trigger -name "use evaluator"
   adams.flow.standalone.SetVariable -var-name count -var-value 0
   adams.flow.source.StorageValue -storage-name test
   adams.flow.transformer.WekaInstanceBuffer -operation INSTANCES_TO_INSTANCE
   adams.flow.transformer.IncVariable -var-name count
-  adams.flow.transformer.Evaluator -evaluator "adams.data.evaluator.instance.DistanceToClosest -missing-evaluation NaN -serialization-file @{evaluator_model} -search \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -filter weka.filters.AllFilter"
+  adams.flow.transformer.Evaluator -evaluator "adams.data.evaluator.instance.DistanceToCenter -missing-evaluation NaN -serialization-file @{evaluator_model} -search \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\" -filter \"weka.filters.supervised.attribute.PLSFilter -C 2 -M -A PLS1 -P center\" -num-neighbors 10"
   adams.flow.sink.HistoryDisplay -entry-name-variable count
