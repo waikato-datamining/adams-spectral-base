@@ -1,0 +1,27 @@
+# Project: adams
+# Date: 2016-06-14 16:34:34
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.SetVariable -var-name evaluator_model -var-value ${EXAMPLE_FLOWS}/output/evaluator.model
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "load dataset"
+  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/bolts.arff
+  adams.flow.transformer.WekaFileReader -loader weka.core.converters.AArffLoader
+  adams.flow.transformer.WekaClassSelector
+  adams.flow.transformer.WekaRandomSplit -percentage 0.8
+  adams.flow.control.ContainerValuePicker -name train -value Train
+   adams.flow.transformer.SetStorageValue -storage-name train
+  adams.flow.control.ContainerValuePicker -name test -value Test
+   adams.flow.transformer.SetStorageValue -storage-name test
+ adams.flow.control.Trigger -name "train evaluator"
+  adams.flow.source.StorageValue -storage-name train
+  adams.flow.transformer.Evaluator -evaluator "adams.data.evaluator.instance.DistanceToClosest -missing-evaluation NaN -serialization-file @{evaluator_model} -override-serialized-file true -search \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\""
+  adams.flow.transformer.SetStorageValue -storage-name evaluator
+ adams.flow.control.Trigger -name "use evaluator"
+  adams.flow.standalone.SetVariable -var-name count -var-value 0
+  adams.flow.source.StorageValue -storage-name test
+  adams.flow.transformer.WekaInstanceBuffer -operation INSTANCES_TO_INSTANCE
+  adams.flow.transformer.IncVariable -var-name count
+  adams.flow.transformer.Evaluator -evaluator "adams.data.evaluator.instance.DistanceToClosest -missing-evaluation NaN -serialization-file @{evaluator_model} -search \"weka.core.neighboursearch.LinearNNSearch -A \\\"weka.core.EuclideanDistance -R first-last\\\"\""
+  adams.flow.sink.HistoryDisplay -entry-name-variable count
