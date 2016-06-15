@@ -27,6 +27,7 @@ import gnu.trove.list.array.TDoubleArrayList;
 import weka.classifiers.Classifier;
 import weka.classifiers.CrossValidationFoldGenerator;
 import weka.classifiers.functions.LinearRegression;
+import weka.core.AttributeStats;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.SelectedTag;
@@ -38,7 +39,17 @@ import java.util.logging.Level;
 /**
  <!-- globalinfo-start -->
  * Evaluator that (kind of) cross-validates the specified classifier on the neighborhood determined for the instance under evaluation.<br>
- * A classifier is built on each of the training sets that is generated for the cross-validation. Each classifier makes a prediction for the Instance that is currently being evaluated, recording the prediction. From the recorded predictions the statistic is computed and output as evaluation value.
+ * A classifier is built on each of the training sets that is generated for the cross-validation. Each classifier makes a prediction for the Instance that is currently being evaluated, recording the prediction. From the recorded predictions the statistic is computed and output as evaluation value.<br>
+ * <br>
+ * Statistics:<br>
+ * - STDEV<br>
+ *   standard deviation<br>
+ * - STDEV_NORMALIZED<br>
+ *   standard deviation of normalized predictions<br>
+ *   predNew = (pred - min) &#47; (maxClass - minClass)<br>
+ *   minClass&#47;maxClass the min&#47;max of the class value in the training set<br>
+ * - RANGE<br>
+ *   outputs range (max - min) of predictions<br>
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -92,7 +103,7 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: 1
  * </pre>
  * 
- * <pre>-statistic &lt;STDEV|RANGE&gt; (property: statistic)
+ * <pre>-statistic &lt;STDEV|STDEV_NORMALIZED|RANGE&gt; (property: statistic)
  * &nbsp;&nbsp;&nbsp;The statistic to use as evaluation output.
  * &nbsp;&nbsp;&nbsp;default: STDEV
  * </pre>
@@ -117,6 +128,7 @@ public class CrossValidatedPrediction
    */
   public enum StatisticType {
     STDEV,
+    STDEV_NORMALIZED,
     RANGE
   }
 
@@ -135,6 +147,9 @@ public class CrossValidatedPrediction
   /** the measure to output as evaluation. */
   protected StatisticType m_Statistic;
 
+  /** the attribute statistics of the class attribute. */
+  protected AttributeStats m_ClassStats;
+
   /**
    * Returns a string describing the object.
    *
@@ -149,7 +164,17 @@ public class CrossValidatedPrediction
 	+ "for the cross-validation. Each classifier makes a prediction for the "
         + "Instance that is currently being evaluated, recording the prediction. "
         + "From the recorded predictions the statistic is computed and output as "
-	+ "evaluation value.";
+	+ "evaluation value.\n"
+	+ "\n"
+	+ "Statistics:\n"
+	+ "- " + StatisticType.STDEV + "\n"
+	+ "  standard deviation\n"
+	+ "- " + StatisticType.STDEV_NORMALIZED + "\n"
+	+ "  standard deviation of normalized predictions\n"
+	+ "  predNew = (pred - min) / (maxClass - minClass)\n"
+	+ "  minClass/maxClass the min/max of the class value in the training set\n"
+	+ "- " + StatisticType.RANGE + "\n"
+	+ "  outputs range (max - min) of predictions\n";
   }
 
   /**
@@ -365,6 +390,7 @@ public class CrossValidatedPrediction
     return new Object[]{
       m_ActualSearch,
       m_Header,
+      m_ClassStats,
     };
   }
 
@@ -378,6 +404,7 @@ public class CrossValidatedPrediction
   public void setSerializationSetup(Object[] value) {
     m_ActualSearch = (NearestNeighbourSearch) value[0];
     m_Header       = (Instances) value[1];
+    m_ClassStats   = (AttributeStats) value[2];
   }
 
   /**
@@ -390,6 +417,8 @@ public class CrossValidatedPrediction
   protected boolean performBuild(Instances data) {
     if (!initSearch(data))
       return false;
+
+    m_ClassStats = data.attributeStats(data.classIndex());
 
     m_SerializableObjectHelper.saveSetup();
 
@@ -411,6 +440,9 @@ public class CrossValidatedPrediction
     WekaTrainTestSetContainer		cont;
     TDoubleArrayList			values;
     Classifier				cls;
+    int					i;
+    double				min;
+    double				max;
 
     result = m_MissingEvaluation;
 
@@ -429,12 +461,22 @@ public class CrossValidatedPrediction
 	cls.buildClassifier((Instances) cont.getValue(WekaTrainTestSetContainer.VALUE_TRAIN));
 	values.add(cls.classifyInstance(data));
       }
+
       switch (m_Statistic) {
 	case STDEV:
 	  result = (float) StatUtils.stddev(values.toArray(), true);
 	  break;
+	case STDEV_NORMALIZED:
+	  min = m_ClassStats.numericStats.min;
+	  max = m_ClassStats.numericStats.max;
+	  for (i = 0; i < values.size(); i++)
+	    values.set(i, (values.get(i) - min) / (max - min));
+	  result = (float) StatUtils.stddev(values.toArray(), true);
+	  break;
 	case RANGE:
-	  result = (float) (StatUtils.max(values.toArray()) - StatUtils.min(values.toArray()));
+	  min = StatUtils.min(values.toArray());
+	  max = StatUtils.max(values.toArray());
+	  result = (float) (max - min);
 	  break;
 	default:
 	  throw new IllegalStateException("Unhandled statistic: " + m_Statistic);
