@@ -46,7 +46,7 @@ import java.util.logging.Level;
  *   standard deviation<br>
  * - STDEV_NORMALIZED<br>
  *   standard deviation of normalized predictions<br>
- *   predNew = (pred - min) &#47; (maxClass - minClass)<br>
+ *   predNew = (pred - minClass) &#47; (maxClass - minClass)<br>
  *   minClass&#47;maxClass the min&#47;max of the class value in the training set<br>
  * - RANGE<br>
  *   outputs range (max - min) of predictions<br>
@@ -171,7 +171,7 @@ public class CrossValidatedPrediction
 	+ "  standard deviation\n"
 	+ "- " + StatisticType.STDEV_NORMALIZED + "\n"
 	+ "  standard deviation of normalized predictions\n"
-	+ "  predNew = (pred - min) / (maxClass - minClass)\n"
+	+ "  predNew = (pred - minClass) / (maxClass - minClass)\n"
 	+ "  minClass/maxClass the min/max of the class value in the training set\n"
 	+ "- " + StatisticType.RANGE + "\n"
 	+ "  outputs range (max - min) of predictions\n";
