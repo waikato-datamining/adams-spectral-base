@@ -19,6 +19,10 @@ adams.data.io.output.AbstractSpectrumWriter=\
 adams.data.io.input.SampleDataReader=\
   adams.data.io.input
 
+# the schemes for extracting the sample ID from a filename
+adams.data.io.input.sampleidextraction.SampleIDExtraction=\
+  adams.data.io.input.sampleidextraction
+
 # the sample data writers
 adams.data.io.output.SampleDataWriter=\
   adams.data.io.output

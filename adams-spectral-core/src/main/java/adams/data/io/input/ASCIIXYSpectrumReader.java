@@ -20,8 +20,9 @@
 
 package adams.data.io.input;
 
-import adams.core.base.BaseRegExp;
 import adams.core.io.FileUtils;
+import adams.data.io.input.sampleidextraction.Filename;
+import adams.data.io.input.sampleidextraction.SampleIDExtraction;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
@@ -96,7 +97,8 @@ import java.util.logging.Level;
  * @version $Revision: 2242 $
  */
 public class ASCIIXYSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractSpectrumReader
+  implements SpectrumReaderWithSampleIDExtraction {
 
   /** for serialization. */
   private static final long serialVersionUID = -2903357410192470809L;
@@ -104,11 +106,8 @@ public class ASCIIXYSpectrumReader
   /** the separator to use. */
   protected String m_Separator;
 
-  /** regexp to extract sample ID from file name. */
-  protected BaseRegExp m_RegExpSampleID;
-
-  /** the regexp group to use. */
-  protected int m_GroupSampleID;
+  /** scheme for extracting sample ID from file name. */
+  protected SampleIDExtraction m_SampleIDExtraction;
 
   /**
    * Returns a string describing the object.
@@ -132,12 +131,8 @@ public class ASCIIXYSpectrumReader
       ";");
 
     m_OptionManager.add(
-      "regexp-sample-id", "regExpSampleID",
-      new BaseRegExp("(.*)\\.txt"));
-
-    m_OptionManager.add(
-      "group-sample-id", "groupSampleID",
-      1, 1, null);
+      "sample-id-extraction", "sampleIDExtraction",
+      new Filename());
   }
 
   /**
@@ -191,24 +186,22 @@ public class ASCIIXYSpectrumReader
   }
 
   /**
-   * Sets the regular expression to use for extracting the sample ID from the
-   * file name (w/o path).
+   * Sets the scheme for extracting the sample ID from the filename.
    *
-   * @param value	the expression
+   * @param value	the extraction
    */
-  public void setRegExpSampleID(BaseRegExp value) {
-    m_RegExpSampleID = value;
+  public void setSampleIDExtraction(SampleIDExtraction value) {
+    m_SampleIDExtraction = value;
     reset();
   }
 
   /**
-   * Returns the regular expression in use to extract the sample ID from the
-   * file name (w/o path).
+   * Returns the scheme for extracting the sample ID from the filename.
    *
-   * @return 		the expression
+   * @return 		the extraction
    */
-  public BaseRegExp getRegExpSampleID() {
-    return m_RegExpSampleID;
+  public SampleIDExtraction getSampleIDExtraction() {
+    return m_SampleIDExtraction;
   }
 
   /**
@@ -217,43 +210,9 @@ public class ASCIIXYSpectrumReader
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String regExpSampleIDTipText() {
+  public String sampleIDExtractionTipText() {
     return
-      "The regular expression for extracting the sample ID from the file "
-	+ "name (w/o path).";
-  }
-
-  /**
-   * Sets the regular expression group that contains the sample ID from the
-   * file name (w/o path).
-   *
-   * @param value	the group
-   */
-  public void setGroupSampleID(int value) {
-    if (getOptionManager().isValid("groupSampleID", value)) {
-      m_GroupSampleID = value;
-      reset();
-    }
-  }
-
-  /**
-   * Returns the regular expression group that contains the sample ID from the
-   * file name (w/o path).
-   *
-   * @return 		the group
-   */
-  public int getGroupSampleID() {
-    return m_GroupSampleID;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public String groupSampleIDTipText() {
-    return "The regular expression group that contains the sample ID.";
+      "The scheme for extracting the sample ID from the filename.";
   }
 
   /**
@@ -269,7 +228,7 @@ public class ASCIIXYSpectrumReader
 
     try {
       sp = new Spectrum();
-      sp.setID(m_Input.getName().replaceFirst(m_RegExpSampleID.getValue(), "$" + m_GroupSampleID));
+      sp.setID(m_SampleIDExtraction.extract(m_Input, sp));
       m_ReadData.add(sp);
 
       // read data
