@@ -26,6 +26,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.functions.GPD;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.classifiers.meta.SpectrumClassifier;
+import weka.core.AttributeStats;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.unsupervised.attribute.SavitzkyGolay;
@@ -98,6 +99,11 @@ import weka.filters.unsupervised.attribute.SavitzkyGolay;
  * &nbsp;&nbsp;&nbsp;minimum: 3
  * </pre>
  * 
+ * <pre>-normalize &lt;boolean&gt; (property: normalize)
+ * &nbsp;&nbsp;&nbsp;If enabled, the predictions get normalized to the range of the class attribute.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -136,11 +142,17 @@ public class SavitzkyGolayRange
   /** the actual classifier in use for second derivative. */
   protected SpectrumClassifier m_ActualClassifierSecond;
 
+  /** whether to normalize the predictions to the class attribute range. */
+  protected boolean m_Normalize;
+
   /** the training data. */
   protected Instances m_TrainingData;
 
   /** the header of the training data. */
   protected Instances m_Header;
+
+  /** the class attribute stats. */
+  protected AttributeStats m_ClassStats;
 
   /**
    * Returns a string describing the object.
@@ -189,6 +201,10 @@ public class SavitzkyGolayRange
     m_OptionManager.add(
 	"window-size-second", "windowSizeSecond",
 	7, 3, null);
+
+    m_OptionManager.add(
+	"normalize", "normalize",
+	false);
   }
 
   /**
@@ -409,6 +425,35 @@ public class SavitzkyGolayRange
   }
 
   /**
+   * Sets whether to normalize the predictions to the class attribute range.
+   *
+   * @param value 	true if to normalize
+   */
+  public void setNormalize(boolean value) {
+    m_Normalize = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to normalize the predictions to the class attribute range.
+   *
+   * @return 		true if to normalize
+   */
+  public boolean getNormalize() {
+    return m_Normalize;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the explorer/experimenter gui
+   */
+  public String normalizeTipText() {
+    return "If enabled, the predictions get normalized to the range of the class attribute.";
+  }
+
+  /**
    * Returns the default value in case of missing evaluations.
    * 
    * @return		the default value
@@ -427,6 +472,10 @@ public class SavitzkyGolayRange
   @Override
   protected Float performEvaluate(Instance data) {
     double[]	preds;
+    double	min;
+    double	max;
+    int		i;
+    double	range;
 
     preds = new double[3];
     try {
@@ -434,14 +483,26 @@ public class SavitzkyGolayRange
       preds[1] = m_ActualClassifierFirst.classifyInstance(data);
       preds[2] = m_ActualClassifierSecond.classifyInstance(data);
       if (isLoggingEnabled())
-	getLogger().info(data + "\n--> " + Utils.arrayToString(preds));
+	getLogger().info(data + "\n--> predictions: " + Utils.arrayToString(preds));
+      if (m_Normalize) {
+	min = m_ClassStats.numericStats.min;
+	max = m_ClassStats.numericStats.max;
+	for (i = 0; i < preds.length; i++)
+	  preds[i] = (preds[i] - min) / (max - min);
+	if (isLoggingEnabled())
+	  getLogger().info("--> normalized: " + Utils.arrayToString(preds));
+      }
     }
     catch (Exception e) {
       Utils.handleException(this, "Failed to make prediction(s) for instance: " + data, e);
       return m_MissingEvaluation;
     }
 
-    return (float) (StatUtils.max(preds) - StatUtils.min(preds));
+    range = StatUtils.max(preds) - StatUtils.min(preds);
+    if (isLoggingEnabled())
+      getLogger().info("--> range: " + range);
+
+    return (float) range;
   }
 
   /**
@@ -514,7 +575,9 @@ public class SavitzkyGolayRange
       return false;
     }
 
-    m_Header = new Instances(data, 0);
+    m_Header     = new Instances(data, 0);
+    m_ClassStats = data.attributeStats(data.classIndex());
+
     m_SerializableObjectHelper.saveSetup();
 
     return true;
@@ -538,6 +601,7 @@ public class SavitzkyGolayRange
   public Object[] retrieveSerializationSetup() {
     return new Object[]{
       m_Header,
+      m_ClassStats,
       m_ActualClassifierNone,
       m_ActualClassifierFirst,
       m_ActualClassifierSecond,
@@ -553,9 +617,10 @@ public class SavitzkyGolayRange
   @Override
   public void setSerializationSetup(Object[] value) {
     m_Header                 = (Instances) value[0];
-    m_ActualClassifierNone   = (SpectrumClassifier) value[1];
-    m_ActualClassifierFirst  = (SpectrumClassifier) value[2];
-    m_ActualClassifierSecond = (SpectrumClassifier) value[3];
+    m_ClassStats             = (AttributeStats) value[1];
+    m_ActualClassifierNone   = (SpectrumClassifier) value[2];
+    m_ActualClassifierFirst  = (SpectrumClassifier) value[3];
+    m_ActualClassifierSecond = (SpectrumClassifier) value[4];
   }
 
   /**
