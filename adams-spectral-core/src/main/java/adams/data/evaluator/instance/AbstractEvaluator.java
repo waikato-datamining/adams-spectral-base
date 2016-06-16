@@ -174,6 +174,7 @@ public abstract class AbstractEvaluator
     preCheck(data);
 
     if (data.classIsMissing()) {
+      getLogger().warning("No class value, cannot evaluate!");
       result = new HashMap<>();
       result.put(DEFAULT_METRIC, m_MissingEvaluation);
     }
