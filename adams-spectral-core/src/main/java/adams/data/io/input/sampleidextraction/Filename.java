@@ -20,6 +20,7 @@
 
 package adams.data.io.input.sampleidextraction;
 
+import adams.core.io.FileUtils;
 import adams.data.spectrum.Spectrum;
 
 import java.io.File;
@@ -53,7 +54,7 @@ public class Filename
    */
   @Override
   public String globalInfo() {
-    return "Just uses the filename (without path) as sample ID.";
+    return "Just uses the filename (without path and extensions) as sample ID.";
   }
 
   /**
@@ -65,6 +66,6 @@ public class Filename
    */
   @Override
   protected String doExtract(File file, Spectrum spec) {
-    return file.getName();
+    return FileUtils.replaceExtension(file, "").getName();
   }
 }
