@@ -15,7 +15,7 @@
 
 /*
  * JCampDX2SpectrumReader.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -45,8 +45,6 @@ import java.util.logging.Level;
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <br><br>
- * 
  * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
@@ -73,6 +71,28 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: NIR
  * </pre>
  * 
+ * <pre>-keep-format &lt;boolean&gt; (property: keepFormat)
+ * &nbsp;&nbsp;&nbsp;If enabled the format obtained from the file is not replaced by the format 
+ * &nbsp;&nbsp;&nbsp;defined here.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-use-absolute-source &lt;boolean&gt; (property: useAbsoluteSource)
+ * &nbsp;&nbsp;&nbsp;If enabled the source report field stores the absolute file name rather 
+ * &nbsp;&nbsp;&nbsp;than just the name.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-mode &lt;STRICT|RELAXED&gt; (property: mode)
+ * &nbsp;&nbsp;&nbsp;The reader mode.
+ * &nbsp;&nbsp;&nbsp;default: STRICT
+ * </pre>
+ * 
+ * <pre>-validate &lt;boolean&gt; (property: validate)
+ * &nbsp;&nbsp;&nbsp;If enabled, the parser is validating the input.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
  * <pre>-add-raw-metadata &lt;boolean&gt; (property: addRawMetaData)
  * &nbsp;&nbsp;&nbsp;If enabled, the raw meta-data in the file is added to the report as well.
  * &nbsp;&nbsp;&nbsp;default: false
@@ -89,9 +109,26 @@ public class JCampDX2SpectrumReader
   /** for serialization. */
   private static final long serialVersionUID = 3095955240781741734L;
 
+  /**
+   * The enum for the reader mode.
+   *
+   * @author  fracpete (fracpete at waikato dot ac dot nz)
+   * @version $Revision: 2242 $
+   */
+  public enum ReaderMode {
+    STRICT,
+    RELAXED
+  }
+
   /** whether to add the raw meta-data. */
   protected boolean m_AddRawMetaData;
-  
+
+  /** the mode. */
+  protected ReaderMode m_Mode;
+
+  /** whether the reader validates. */
+  protected boolean m_Validate;
+
   /**
    * Returns a string describing the object.
    *
@@ -113,8 +150,74 @@ public class JCampDX2SpectrumReader
     super.defineOptions();
 
     m_OptionManager.add(
-	    "add-raw-metadata", "addRawMetaData",
-	    false);
+      "mode", "mode",
+      ReaderMode.STRICT);
+
+    m_OptionManager.add(
+      "validate", "validate",
+      false);
+
+    m_OptionManager.add(
+      "add-raw-metadata", "addRawMetaData",
+      false);
+  }
+
+  /**
+   * Sets the reader mode.
+   *
+   * @param value	the mode
+   */
+  public void setMode(ReaderMode value) {
+    m_Mode = value;
+    reset();
+  }
+
+  /**
+   * Returns the reader mode.
+   *
+   * @return		the mode
+   */
+  public ReaderMode getMode() {
+    return m_Mode;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modeTipText() {
+    return "The reader mode.";
+  }
+
+  /**
+   * Sets whether to use a validating parser.
+   *
+   * @param value	true if to validate
+   */
+  public void setValidate(boolean value) {
+    m_Validate = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use a validating parser.
+   *
+   * @return		true if to validate
+   */
+  public boolean getValidate() {
+    return m_Validate;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String validateTipText() {
+    return "If enabled, the parser is validating the input.";
   }
 
   /**
@@ -190,7 +293,7 @@ public class JCampDX2SpectrumReader
     
     // read DX data
     try {
-      spec = JCAMPReader.getInstance().createSpectrum(Utils.flatten(content, "\n"));
+      spec = JCAMPReader.getInstance(m_Validate, m_Mode.toString()).createSpectrum(Utils.flatten(content, "\n"));
       if (spec instanceof Spectrum1D) {
 	// spectrum
 	sp1d = (Spectrum1D) spec;
