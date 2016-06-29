@@ -887,7 +887,9 @@ public class SpectrumPanel
       dialog = new SpreadSheetDialog(getParentFrame(), false);
     dialog.setDefaultCloseOperation(SpreadSheetDialog.DISPOSE_ON_CLOSE);
     dialog.setTitle("Spectral data");
-    dialog.setSize(600, 600);
+    dialog.setSize(
+      GUIHelper.getInteger("DefaultSmallDialog.Width", 600),
+      GUIHelper.getInteger("DefaultSmallDialog.Width", 600));
     dialog.setLocationRelativeTo(this);
     dialog.setSpreadSheet(cont.getData().toSpreadSheet());
     dialog.setNumDecimals(getProperties().getInteger("SpreadSheetPanel.NumDecimals", 3));
