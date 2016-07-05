@@ -15,7 +15,7 @@
 
 /*
  * SetSampleDataValue.java
- * Copyright (C) 2010-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -27,7 +27,8 @@ import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.flow.core.Unknown;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -152,7 +153,7 @@ public class SetSampleDataValue
    */
   @Override
   public String valueTipText() {
-    return "The value to set in the sample data.";
+    return "The value to set in the sample data; variables get expanded.";
   }
 
   /**
@@ -162,9 +163,9 @@ public class SetSampleDataValue
    */
   @Override
   public Class[] accepts() {
-    Vector<Class>	result;
+    List<Class> result;
 
-    result = new Vector<Class>();
+    result = new ArrayList<>();
 
     result.add(Spectrum.class);
     result.add(SampleData.class);
