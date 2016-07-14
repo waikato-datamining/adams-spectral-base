@@ -15,7 +15,7 @@
 
 /*
  * ASCSpectrumReader.java
- * Copyright (C) 2009-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -23,6 +23,7 @@ package adams.data.io.input;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.management.LocaleHelper;
+import adams.core.management.LocaleSupporter;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
@@ -60,7 +61,8 @@ import java.util.logging.Level;
  * @version $Revision: 2242 $
  */
 public class ASCSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractSpectrumReader
+  implements LocaleSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -27209265703137172L;
