@@ -24,6 +24,7 @@ package adams.gui.menu;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.UserMode;
+import adams.gui.core.GUIHelper;
 
 /**
  * Displays the Spectrum Explorer.
@@ -59,7 +60,7 @@ public class SpectrumExplorer
    * Launches the functionality of the menu item.
    */
   public void launch() {
-    createChildFrame(new adams.gui.visualization.spectrum.SpectrumExplorer(), 1000, 600);
+    createChildFrame(new adams.gui.visualization.spectrum.SpectrumExplorer(), GUIHelper.getDefaultLargeDialogDimension());
   }
 
   /**

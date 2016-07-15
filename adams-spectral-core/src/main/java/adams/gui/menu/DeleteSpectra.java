@@ -24,6 +24,7 @@ package adams.gui.menu;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.UserMode;
+import adams.gui.core.GUIHelper;
 import adams.gui.tools.DeleteSpectrumPanel;
 
 /**
@@ -60,7 +61,7 @@ public class DeleteSpectra
    * Launches the functionality of the menu item.
    */
   public void launch() {
-    createChildFrame(new DeleteSpectrumPanel(), 600, 600);
+    createChildFrame(new DeleteSpectrumPanel(), GUIHelper.getDefaultDialogDimension());
   }
 
   /**
