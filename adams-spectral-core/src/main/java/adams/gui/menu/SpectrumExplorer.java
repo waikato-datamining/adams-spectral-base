@@ -60,7 +60,7 @@ public class SpectrumExplorer
    * Launches the functionality of the menu item.
    */
   public void launch() {
-    createChildFrame(new adams.gui.visualization.spectrum.SpectrumExplorer(), GUIHelper.getDefaultLargeDialogDimension());
+    createChildFrame(new adams.gui.visualization.spectrum.SpectrumExplorer(), GUIHelper.makeWider(GUIHelper.getDefaultLargeDialogDimension()));
   }
 
   /**
