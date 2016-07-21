@@ -61,6 +61,7 @@ import adams.gui.visualization.core.plot.TipTextCustomizer;
 import adams.gui.visualization.report.ReportContainer;
 import adams.gui.visualization.report.ReportFactory;
 import adams.gui.visualization.statistics.InformativeStatisticFactory;
+import com.github.fracpete.jclipboardhelper.ClipboardHelper;
 import gnu.trove.list.array.TIntArrayList;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -563,7 +564,7 @@ public class SpectrumPanel
 	  id.append("\n");
 	id.append(getContainerManager().get(indices[i]).getDisplayID());
       }
-      GUIHelper.copyToClipboard(id.toString());
+      ClipboardHelper.copyToClipboard(id.toString());
     });
     result.add(item);
 
