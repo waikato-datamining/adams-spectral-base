@@ -530,13 +530,13 @@ public class RonWeasley
   /**
    * Creates a new Job instance.
    *
-   * @param num		the number of chromosomes
+   * @param chromosome		the number of chromosomes
    * @param w		the initial weights
    * @return		the instance
    * @param data	the data to use
    */
-  protected RonWeasleyJob newJob(int num, int[] w, Instances data) {
-    return new RonWeasleyJob(this, num, w, data);
+  protected RonWeasleyJob newJob(int chromosome, int[] w, Instances data) {
+    return new RonWeasleyJob(this, chromosome, w, data);
   }
 
   /**
