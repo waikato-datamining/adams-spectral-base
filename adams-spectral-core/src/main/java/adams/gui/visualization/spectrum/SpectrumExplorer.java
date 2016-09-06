@@ -1194,5 +1194,7 @@ public class SpectrumExplorer
       m_DialogPaintlet.dispose();
       m_DialogPaintlet = null;
     }
+    if (m_Undo != null)
+      m_Undo.cleanUp();
   }
 }
