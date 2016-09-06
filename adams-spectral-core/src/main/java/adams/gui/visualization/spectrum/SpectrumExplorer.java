@@ -48,6 +48,7 @@ import adams.gui.core.RecentFilesHandlerWithCommandline.Setup;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.core.Undo.UndoPoint;
+import adams.gui.core.UndoHandlerWithQuickAccess;
 import adams.gui.core.UndoPanel;
 import adams.gui.event.DataChangeEvent;
 import adams.gui.event.DataChangeListener;
@@ -114,7 +115,8 @@ public class SpectrumExplorer
              DatabaseConnectionChangeListener, DatabaseConnectionHandler,
              DataChangeListener,
              ScriptingEngineHandler, CleanUpHandler,
-             FilterListener<Spectrum>, SendToActionSupporter {
+             FilterListener<Spectrum>, SendToActionSupporter,
+             UndoHandlerWithQuickAccess {
 
   /** for serialization. */
   private static final long serialVersionUID = 3953271131937711340L;
@@ -988,6 +990,16 @@ public class SpectrumExplorer
       }
     };
     worker.execute();
+  }
+
+  /**
+   * Adds an undo point with the given comment.
+   *
+   * @param comment	the comment for the undo point
+   */
+  public void addUndoPoint(String comment) {
+    if (isUndoSupported() && getUndo().isEnabled())
+      m_Undo.addUndo(getContainerManager().getAll(), comment, true);
   }
 
   /**
