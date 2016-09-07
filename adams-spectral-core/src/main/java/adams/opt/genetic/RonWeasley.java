@@ -18,7 +18,7 @@
  * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
  */
 
-package adams.genetic;
+package adams.opt.genetic;
 
 import adams.core.Properties;
 import adams.core.Utils;
