@@ -295,8 +295,8 @@ public class RonWeasley
 	m_Fitness = evaluateClassifier(newClassifier, newInstances, getFolds(), getSeed());
 
 	// process fitness
-	if (getOwner().setNewFitness(m_Fitness, newClassifier, m_Weights)) {
-	  generateOutput(m_Fitness, newInstances, newClassifier, m_Weights);
+	if (getOwner().setNewFitness(m_Fitness, newClassifier, m_Chromosome, m_Weights)) {
+	  generateOutput(m_Fitness, newInstances, newClassifier, m_Chromosome, m_Weights);
 	  // notify the listeners
 	  getOwner().notifyFitnessChangeListeners(getMeasure().adjust(m_Fitness), newClassifier, m_Weights);
 	}
