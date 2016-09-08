@@ -7,12 +7,16 @@
 # This is used to ensure a minimal backwards compatibility, in case classes
 # get renamed.
 Rename=\
-  Rename-transformer_filter
+  Rename-transformer_filter,\
+  Rename-SegmentedSavitzkyGolayDerivativeOrder,\
+  Rename-SegmentedSavitzkyGolayNumPoints
 
 # general format for classname mappings ("rename"):
 # <key>=<old classname>-<new classname>
 #Rename-transformer_reportvalue=adams.flow.transformer.ReportValue-adams.flow.transformer.GetReportValue
 Rename-transformer_filter=knir.flow.transformer.Filter-adams.flow.transformer.SpectrumFilter
+Rename-SegmentedSavitzkyGolayDerivativeOrder=adams.core.discovery.SegmentedSavitzkyGolayDerivativeOrder-adams.core.discovery.genetic.SegmentedSavitzkyGolayDerivativeOrder
+Rename-SegmentedSavitzkyGolayNumPoints=adams.core.discovery.SegmentedSavitzkyGolayNumPoints-adams.core.discovery.genetic.SegmentedSavitzkyGolayNumPoints
 
 # Lists the keys that contain partial classname renaming.
 PartialRename=\
