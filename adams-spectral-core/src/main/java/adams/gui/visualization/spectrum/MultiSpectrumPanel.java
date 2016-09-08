@@ -105,7 +105,7 @@ public class MultiSpectrumPanel
     setLayout(new BorderLayout());
 
     m_TabbedPane = new BaseTabbedPane();
-    m_TabbedPane.setCloseTabsWithMiddelMouseButton(true);
+    m_TabbedPane.setCloseTabsWithMiddleMouseButton(true);
     add(m_TabbedPane, BorderLayout.CENTER);
   }
 
