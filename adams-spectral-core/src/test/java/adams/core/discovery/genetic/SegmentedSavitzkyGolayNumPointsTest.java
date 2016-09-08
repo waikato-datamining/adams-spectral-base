@@ -14,12 +14,14 @@
  */
 
 /**
- * SegmentedSavitzkyGolayDerivativeOrderTest.java
+ * SegmentedSavitzkyGolayNumPointsTest.java
  * Copyright (C) 2015 University of Waikato, Hamilton, NZ
  */
 
-package adams.core.discovery;
+package adams.core.discovery.genetic;
 
+import adams.core.discovery.AbstractDiscoveryHandler;
+import adams.core.discovery.PropertyDiscovery;
 import adams.core.discovery.PropertyPath.PropertyContainer;
 import adams.env.Environment;
 import junit.framework.Test;
@@ -29,13 +31,13 @@ import weka.classifiers.meta.FilteredClassifier;
 import weka.filters.unsupervised.attribute.SegmentedSavitzkyGolay;
 
 /**
- * Tests the SegmentedSavitzkyGolayDerivativeOrder discovery handler. Use the following to run from command-line:<br>
- * adams.core.discovery.SegmentedSavitzkyGolayDerivativeOrderTest
+ * Tests the SegmentedSavitzkyGolayNumPoints discovery handler. Use the following to run from command-line:<br>
+ * adams.core.discovery.SegmentedSavitzkyGolayNumPointsTest
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
  */
-public class SegmentedSavitzkyGolayDerivativeOrderTest
+public class SegmentedSavitzkyGolayNumPointsTest
   extends AbstractGeneticDiscoveryHandlerTestCase {
 
   /**
@@ -43,7 +45,7 @@ public class SegmentedSavitzkyGolayDerivativeOrderTest
    *
    * @param name the name of the test
    */
-  public SegmentedSavitzkyGolayDerivativeOrderTest(String name) {
+  public SegmentedSavitzkyGolayNumPointsTest(String name) {
     super(name);
   }
 
@@ -55,7 +57,7 @@ public class SegmentedSavitzkyGolayDerivativeOrderTest
    */
   @Override
   protected AbstractGeneticDiscoveryHandler getPackUnpackHandler() {
-    return new SegmentedSavitzkyGolayDerivativeOrder();
+    return new SegmentedSavitzkyGolayNumPoints();
   }
 
   /**
@@ -67,7 +69,7 @@ public class SegmentedSavitzkyGolayDerivativeOrderTest
   @Override
   protected PropertyContainer getPackUnpackContainer() {
     AbstractGeneticDiscoveryHandler	handler;
-    PropertyDiscovery			discovery;
+    PropertyDiscovery discovery;
 
     handler = getPackUnpackHandler();
     discovery = getDiscovery();
@@ -100,8 +102,8 @@ public class SegmentedSavitzkyGolayDerivativeOrderTest
   @Override
   protected AbstractDiscoveryHandler[] getRegressionSetups() {
     return new AbstractDiscoveryHandler[] {
-      new SegmentedSavitzkyGolayDerivativeOrder(),
-      new SegmentedSavitzkyGolayDerivativeOrder(),
+      new SegmentedSavitzkyGolayNumPoints(),
+      new SegmentedSavitzkyGolayNumPoints(),
     };
   }
 
@@ -111,7 +113,7 @@ public class SegmentedSavitzkyGolayDerivativeOrderTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(SegmentedSavitzkyGolayDerivativeOrderTest.class);
+    return new TestSuite(SegmentedSavitzkyGolayNumPointsTest.class);
   }
 
   /**
