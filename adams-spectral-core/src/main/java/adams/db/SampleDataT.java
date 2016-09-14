@@ -294,8 +294,8 @@ public abstract class SampleDataT
    * @param cond	the conditions that the spectra must meet
    * @return		list of spectrum ids
    */
-  public List<String> getIDsOfReference(AbstractConditions cond) {
-    return getIDsOfReference(new String[]{"sp.SAMPLEID"}, cond);
+  public List<String> getIDs(AbstractConditions cond) {
+    return getIDs(new String[]{"sp.SAMPLEID"}, cond);
   }
 
   /**
@@ -310,8 +310,8 @@ public abstract class SampleDataT
    * @param cond	the conditions that the spectra must meet
    * @return		list of spectrum ids
    */
-  public List<String> getIDsOfReference(String[] columns, AbstractConditions cond) {
-    return (List<String>) getIDsOfReference(columns, cond, false);
+  public List<String> getIDs(String[] columns, AbstractConditions cond) {
+    return (List<String>) getIDs(columns, cond, false);
   }
 
   /**
@@ -321,8 +321,8 @@ public abstract class SampleDataT
    * @param conditions	the conditions that the conatiners must meet
    * @return		list of database IDs
    */
-  public List<Integer> getDBIDsOfReference(AbstractConditions conditions) {
-    return (List<Integer>) getIDsOfReference(new String[]{"sp.AUTO_ID"}, conditions, true);
+  public List<Integer> getDBIDs(AbstractConditions conditions) {
+    return (List<Integer>) getIDs(new String[]{"sp.AUTO_ID"}, conditions, true);
   }
 
   /**
@@ -337,7 +337,7 @@ public abstract class SampleDataT
    * @param cond	the conditions that the spectra must meet
    * @return		list of spectrum ids
    */
-  protected List getIDsOfReference(String[] columns, AbstractConditions cond, boolean dbids) {
+  protected List getIDs(String[] columns, AbstractConditions cond, boolean dbids) {
     List	 		result;
     String			sql;
     List<String>		where;

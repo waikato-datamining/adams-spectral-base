@@ -209,7 +209,7 @@ public class SpectrumIdSupplier
       else
 	column = "sp.AUTO_ID";
 
-      ids = SampleDataT.getSingleton(m_DatabaseConnection).getIDsOfReference(
+      ids = SampleDataT.getSingleton(m_DatabaseConnection).getIDs(
         new String[]{column}, m_Conditions);
     }
     else {

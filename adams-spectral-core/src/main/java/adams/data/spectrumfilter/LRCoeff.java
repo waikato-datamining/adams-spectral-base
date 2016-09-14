@@ -38,7 +38,6 @@ import weka.core.Instances;
 import weka.core.SelectedTag;
 
 import java.util.List;
-import java.util.Vector;
 import java.util.logging.Level;
 
 /**
@@ -350,7 +349,7 @@ public class LRCoeff
     double min=Double.POSITIVE_INFINITY;
     double max=Double.NEGATIVE_INFINITY;
     Instances header=null;
-    List<Integer> ids=SampleDataT.getSingleton(getDatabaseConnection()).getDBIDsOfReference(m_Conditions);
+    List<Integer> ids=SampleDataT.getSingleton(getDatabaseConnection()).getDBIDs(m_Conditions);
     for (Integer id:ids) {
       Spectrum sp=SpectrumT.getSingleton(getDatabaseConnection()).load(id);
       Instance inst  = m_Generator.generate(sp);

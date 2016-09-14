@@ -348,7 +348,7 @@ public class SelectSpectrumPanel
   protected void doRefresh() {
     List<String> 	ids;
 
-    ids = getSampleDataTable().getIDsOfReference(
+    ids = getSampleDataTable().getIDs(
       new String[]{"sp.AUTO_ID", "sp.SAMPLEID", "sp.FORMAT"}, m_Conditions);
     m_TableDataModel.removeTableModelListener(m_TableData);
     m_TableDataModel = new TableModel(ids);

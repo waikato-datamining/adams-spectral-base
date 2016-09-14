@@ -357,7 +357,7 @@ public class Covariance
     }
     double min=Double.POSITIVE_INFINITY;
     double max=Double.NEGATIVE_INFINITY;
-    List<Integer> ids=SampleDataT.getSingleton(getDatabaseConnection()).getDBIDsOfReference(m_Conditions);
+    List<Integer> ids=SampleDataT.getSingleton(getDatabaseConnection()).getDBIDs(m_Conditions);
     for (Integer id:ids) {
       Spectrum sp=SpectrumT.getSingleton(getDatabaseConnection()).load(id);
       Spectrum filtered=m_filter.filter(sp);

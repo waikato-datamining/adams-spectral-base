@@ -600,7 +600,7 @@ public class InterPercentileRangeCleaner
 
     collector = new DataCollector(
 			getDatabaseConnection(),
-			getSampleDataT().getDBIDsOfReference(m_Conditions),
+			getSampleDataT().getDBIDs(m_Conditions),
 			m_LowerPercentile,
 			m_UpperPercentile,
 			m_ChunkSize);
