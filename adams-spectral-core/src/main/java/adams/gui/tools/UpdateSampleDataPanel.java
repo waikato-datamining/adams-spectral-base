@@ -596,6 +596,8 @@ public class UpdateSampleDataPanel
     final String[]	sel;
     SwingWorker		worker;
 
+    fieldsToConditions();
+
     field = new Field(m_TextName.getText(), (DataType) m_ComboBoxType.getSelectedItem());
     value = m_TextValue.getText();
     sel   = m_Model.getSelectedItems();
