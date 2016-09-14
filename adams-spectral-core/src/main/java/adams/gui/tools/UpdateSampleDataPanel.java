@@ -559,6 +559,8 @@ public class UpdateSampleDataPanel
   protected void search() {
     SwingWorker		worker;
 
+    fieldsToConditions();
+
     worker = new SwingWorker() {
       protected List<String> ids;
       @Override
@@ -595,8 +597,6 @@ public class UpdateSampleDataPanel
     final String	value;
     final String[]	sel;
     SwingWorker		worker;
-
-    fieldsToConditions();
 
     field = new Field(m_TextName.getText(), (DataType) m_ComboBoxType.getSelectedItem());
     value = m_TextValue.getText();
