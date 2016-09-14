@@ -66,6 +66,8 @@ import java.util.List;
 public class UpdateSampleDataPanel
   extends BasePanel {
 
+  private static final long serialVersionUID = 1116436734033322299L;
+
   /**
    * Table model for displaying the database IDs, IDs, formats and selected
    * state of spectra.
