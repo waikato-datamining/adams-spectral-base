@@ -533,7 +533,6 @@ public class UpdateSampleDataPanel
    */
   protected void showConditions() {
     GenericObjectEditorDialog	dialog;
-    int				retVal;
 
     fieldsToConditions();
 
