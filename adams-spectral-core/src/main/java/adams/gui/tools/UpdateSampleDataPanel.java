@@ -37,12 +37,16 @@ import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTable;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MouseUtils;
+import adams.gui.core.SearchPanel;
+import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.core.SortableAndSearchableTableWithButtons;
+import adams.gui.event.SearchEvent;
 import adams.gui.goe.GenericObjectEditorDialog;
 import adams.gui.selection.SelectSpectrumPanel;
 import adams.gui.visualization.spectrum.SampleDataFactory;
 import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -341,8 +345,14 @@ public class UpdateSampleDataPanel
   /** the button for inverting the selection. */
   protected JButton m_ButtonSelectInvert;
 
+  /** the search panel for the IDs. */
+  protected SearchPanel m_SearchIDs;
+
   /** the sample data table. */
   protected SampleDataFactory.Table m_TableSampleData;
+
+  /** the search panel for the sample data. */
+  protected SearchPanel m_SearchSampleData;
 
   /** the text field for the field name. */
   protected JTextField m_TextName;
@@ -387,6 +397,7 @@ public class UpdateSampleDataPanel
     JPanel	panelAll;
     JPanel	panel;
     JPanel	panel2;
+    JPanel	panelTable;
     JLabel	label;
     BaseDate	bdate;
 
@@ -433,15 +444,17 @@ public class UpdateSampleDataPanel
     m_ButtonSearch.addActionListener((ActionEvent e) -> search());
     panel.add(m_ButtonSearch);
 
-    // 2. table and report
+    // 2. tables
     panel = new JPanel(new BorderLayout());
     panelAll.add(panel, BorderLayout.CENTER);
 
     m_SplitPane = new BaseSplitPane(BaseSplitPane.HORIZONTAL_SPLIT);
     m_SplitPane.setDividerLocation(0.5);
     m_SplitPane.setResizeWeight(0.5);
+    m_SplitPane.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
     panel.add(m_SplitPane, BorderLayout.CENTER);
 
+    // IDs
     m_Model = new TableModel();
     m_Model.addTableModelListener((TableModelEvent e) -> updateButtons());
     m_TableIDs = new SortableAndSearchableTableWithButtons(m_Model);
@@ -457,11 +470,34 @@ public class UpdateSampleDataPanel
     m_ButtonSelectInvert = new JButton("Invert");
     m_ButtonSelectInvert.addActionListener((ActionEvent e) -> m_Model.invertSelection());
     m_TableIDs.addToButtonsPanel(m_ButtonSelectInvert);
-    m_SplitPane.setLeftComponent(m_TableIDs);
 
+    m_SearchIDs = new SearchPanel(LayoutType.HORIZONTAL, true);
+    m_SearchIDs.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+    m_SearchIDs.addSearchListener((SearchEvent e) ->
+      m_TableIDs.search(e.getParameters().getSearchString(), e.getParameters().isRegExp()));
+
+    panelTable = new JPanel(new BorderLayout(5, 5));
+    panelTable.add(m_TableIDs, BorderLayout.CENTER);
+    panelTable.add(m_SearchIDs, BorderLayout.SOUTH);
+    m_SplitPane.setLeftComponent(panelTable);
+
+    // report
     m_TableSampleData = new SampleDataFactory.Table();
-    m_SplitPane.setRightComponent(new BaseScrollPane(m_TableSampleData));
+    panel2 = new JPanel(new BorderLayout());
+    panel2.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+    panel2.add(new BaseScrollPane(m_TableSampleData));
 
+    m_SearchSampleData = new SearchPanel(LayoutType.HORIZONTAL, true);
+    m_SearchSampleData.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+    m_SearchSampleData.addSearchListener((SearchEvent e) ->
+      m_TableSampleData.search(e.getParameters().getSearchString(), e.getParameters().isRegExp()));
+
+    panelTable = new JPanel(new BorderLayout(5, 5));
+    panelTable.add(panel2, BorderLayout.CENTER);
+    panelTable.add(m_SearchSampleData, BorderLayout.SOUTH);
+    m_SplitPane.setRightComponent(panelTable);
+
+    // field
     panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
     panel.add(panel2, BorderLayout.SOUTH);
 
