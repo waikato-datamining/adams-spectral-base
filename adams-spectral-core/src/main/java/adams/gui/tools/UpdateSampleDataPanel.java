@@ -41,15 +41,19 @@ import adams.gui.core.SortableAndSearchableTableWithButtons;
 import adams.gui.goe.GenericObjectEditorDialog;
 import adams.gui.selection.SelectSpectrumPanel;
 import adams.gui.visualization.spectrum.SampleDataFactory;
+import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableModelEvent;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.FlowLayout;
@@ -201,6 +205,7 @@ public class UpdateSampleDataPanel
       if (columnIndex != 0)
 	return;
       m_Selected[rowIndex] = (Boolean) aValue;
+      fireTableCellUpdated(rowIndex, columnIndex);
     }
 
     /**
@@ -268,7 +273,7 @@ public class UpdateSampleDataPanel
      *
      * @return		the selected items
      */
-    public String[] getSelectedItems() {
+    public String[] getSelectedSampleIDs() {
       List<String>	result;
       int		i;
 
@@ -280,6 +285,19 @@ public class UpdateSampleDataPanel
       }
 
       return result.toArray(new String[result.size()]);
+    }
+
+    /**
+     * Returns the sample ID at the specified location.
+     *
+     * @param row	the (actual, not visible) position of the spectrum
+     * @return		the sample ID, null if failed to retrieve
+     */
+    public String getSampleIdAt(int row) {
+      if ((row >= 0) && (row < m_Selected.length))
+	return m_SampleID[row];
+      else
+	return null;
     }
 
     /**
@@ -420,11 +438,16 @@ public class UpdateSampleDataPanel
     panelAll.add(panel, BorderLayout.CENTER);
 
     m_SplitPane = new BaseSplitPane(BaseSplitPane.HORIZONTAL_SPLIT);
+    m_SplitPane.setDividerLocation(0.5);
+    m_SplitPane.setResizeWeight(0.5);
     panel.add(m_SplitPane, BorderLayout.CENTER);
 
     m_Model = new TableModel();
+    m_Model.addTableModelListener((TableModelEvent e) -> updateButtons());
     m_TableIDs = new SortableAndSearchableTableWithButtons(m_Model);
     m_TableIDs.setAutoResizeMode(BaseTable.AUTO_RESIZE_OFF);
+    m_TableIDs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    m_TableIDs.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> showReport());
     m_ButtonSelectAll = new JButton("All");
     m_ButtonSelectAll.addActionListener((ActionEvent e) -> m_Model.selectAll());
     m_TableIDs.addToButtonsPanel(m_ButtonSelectAll);
@@ -437,7 +460,7 @@ public class UpdateSampleDataPanel
     m_SplitPane.setLeftComponent(m_TableIDs);
 
     m_TableSampleData = new SampleDataFactory.Table();
-    m_SplitPane.setRightComponent(m_TableSampleData);
+    m_SplitPane.setRightComponent(new BaseScrollPane(m_TableSampleData));
 
     panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
     panel.add(panel2, BorderLayout.SOUTH);
@@ -578,6 +601,7 @@ public class UpdateSampleDataPanel
       protected void done() {
 	super.done();
 	m_Model = new TableModel(ids);
+	m_Model.addTableModelListener((TableModelEvent e) -> updateButtons());
 	m_TableIDs.setModel(m_Model);
 	MouseUtils.setDefaultCursor(UpdateSampleDataPanel.this);
 	m_Searching = false;
@@ -602,7 +626,7 @@ public class UpdateSampleDataPanel
 
     field = new Field(m_TextName.getText(), (DataType) m_ComboBoxType.getSelectedItem());
     value = m_TextValue.getText();
-    sel   = m_Model.getSelectedItems();
+    sel   = m_Model.getSelectedSampleIDs();
 
     worker = new SwingWorker() {
       @Override
@@ -632,6 +656,28 @@ public class UpdateSampleDataPanel
   }
 
   /**
+   * Loads the associated report and displays it.
+   */
+  protected void showReport() {
+    SampleDataT 	sdt;
+    String		id;
+    SampleData		sd;
+
+    if (m_TableIDs.getSelectedRowCount() == 0) {
+      m_TableSampleData.setModel(SampleDataFactory.getModel(new SampleData()));
+      return;
+    }
+
+    id  = m_Model.getSampleIdAt(m_TableIDs.getActualRow(m_TableIDs.getSelectedRow()));
+    sdt = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
+    sd  = sdt.load(id);
+    if (sd != null)
+      m_TableSampleData.setModel(SampleDataFactory.getModel(sd));
+    else
+      m_TableSampleData.setModel(SampleDataFactory.getModel(new SampleData()));
+  }
+
+  /**
    * Updates the state of the buttons.
    */
   protected void updateButtons() {
@@ -639,7 +685,7 @@ public class UpdateSampleDataPanel
 
     selCount = m_Model.getSelectedCount();
 
-    m_ButtonApply.setEnabled(!m_Searching && (selCount > 0) && !m_TextName.getText().isEmpty() && m_TextValue.getText().isEmpty());
+    m_ButtonApply.setEnabled(!m_Searching && (selCount > 0) && !m_TextName.getText().isEmpty() && !m_TextValue.getText().isEmpty());
     m_ButtonConditions.setEnabled(!m_Searching);
     m_ButtonSearch.setEnabled(!m_Searching);
   }
