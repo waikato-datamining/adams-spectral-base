@@ -549,7 +549,7 @@ public class SpectrumT
 
       if (rs != null){
 	if (rs.next()) {
-	  result = rs.getInt("auto_id");
+	  result = rs.getInt(1);
 	  sp.setDatabaseID(result);
 
 	  // store report (never overwrites, just adds additional fields)
@@ -589,19 +589,6 @@ public class SpectrumT
     cm.addMapping("SAMPLEID", new ColumnType(Types.VARCHAR, 255)); // text id
     cm.addMapping("FORMAT",   new ColumnType(Types.VARCHAR, 20)); // format of data
     cm.addMapping("POINTS",   new ColumnType(Types.LONGVARCHAR, -1)); // for storing the points as string
-    return cm;
-  }
-
-  /**
-   * Return columns for this table (old format).
-   *
-   * @return database columns
-   */
-  protected ColumnMapping getColumnMappingOld() {
-    ColumnMapping cm = new ColumnMapping();
-    cm.addMapping("AUTO_ID",  new AutoIncrementType());  // auto increment ID
-    cm.addMapping("SAMPLEID", new ColumnType(Types.VARCHAR, 255)); // text id
-    cm.addMapping("FORMAT",   new ColumnType(Types.VARCHAR, 20)); // format of data
     return cm;
   }
 
