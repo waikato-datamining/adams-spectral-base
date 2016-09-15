@@ -21,8 +21,11 @@
 
 package adams.gui.tools;
 
+import adams.core.Properties;
 import adams.core.base.BaseDate;
 import adams.core.base.BaseDateTime;
+import adams.core.option.OptionUtils;
+import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
@@ -30,6 +33,7 @@ import adams.db.AbstractSpectrumConditions;
 import adams.db.DatabaseConnection;
 import adams.db.SampleDataT;
 import adams.db.SpectrumConditionsMulti;
+import adams.env.Environment;
 import adams.gui.core.BaseObjectTextField;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseSplitPane;
@@ -315,6 +319,12 @@ public class UpdateSampleDataPanel
     }
   }
 
+  /** the name of the session file. */
+  public final static String SESSION_FILENAME = "UpdateSampleDataSession.props";
+
+  /** the properties. */
+  protected static Properties m_Properties;
+
   /** the from date. */
   protected BaseObjectTextField<BaseDate> m_TextFrom;
 
@@ -383,10 +393,18 @@ public class UpdateSampleDataPanel
    */
   @Override
   protected void initialize() {
+    Properties	props;
+
     super.initialize();
 
-    m_Conditions = new SpectrumConditionsMulti();
-    m_Searching  = false;
+    props       = getProperties();
+    m_Searching = false;
+    try {
+      m_Conditions = (SpectrumConditionsMulti) OptionUtils.forCommandLine(SpectrumConditionsMulti.class, props.getProperty("Conditions", new SpectrumConditionsMulti().toCommandLine()));
+    }
+    catch (Exception e) {
+      m_Conditions = new SpectrumConditionsMulti();
+    }
   }
 
   /**
@@ -394,14 +412,18 @@ public class UpdateSampleDataPanel
    */
   @Override
   protected void initGUI() {
-    JPanel	panelAll;
-    JPanel	panel;
-    JPanel	panel2;
-    JPanel	panelTable;
-    JLabel	label;
-    BaseDate	bdate;
+    JPanel		panelAll;
+    JPanel		panel;
+    JPanel		panel2;
+    JPanel		panelTable;
+    JLabel		label;
+    BaseDate		bdate;
+    Properties		props;
+    AbstractField 	field;
 
     super.initGUI();
+
+    props = getProperties();
 
     setLayout(new BorderLayout());
 
@@ -415,7 +437,7 @@ public class UpdateSampleDataPanel
     bdate = new BaseDate(BaseDate.NOW);
 
     // from
-    m_TextFrom = new BaseObjectTextField<>(new BaseDate(bdate.dateValue()));
+    m_TextFrom = new BaseObjectTextField<>(new BaseDate(props.getDate("From", bdate.dateValue())));
     m_TextFrom.setColumns(10);
     label = new JLabel("From");
     label.setDisplayedMnemonic('F');
@@ -424,10 +446,9 @@ public class UpdateSampleDataPanel
     panel.add(m_TextFrom);
 
     // to
-    m_TextTo = new BaseObjectTextField<>(new BaseDate(bdate.dateValue()));
+    m_TextTo = new BaseObjectTextField<>(new BaseDate(props.getDate("To", bdate.dateValue())));
     m_TextTo.setColumns(10);
     label = new JLabel("To");
-    label.setDisplayedMnemonic('T');
     label.setLabelFor(m_TextTo);
     panel.add(label);
     panel.add(m_TextTo);
@@ -472,6 +493,7 @@ public class UpdateSampleDataPanel
     m_TableIDs.addToButtonsPanel(m_ButtonSelectInvert);
 
     m_SearchIDs = new SearchPanel(LayoutType.HORIZONTAL, true);
+    m_SearchIDs.setButtonCaption("Search");
     m_SearchIDs.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
     m_SearchIDs.addSearchListener((SearchEvent e) ->
       m_TableIDs.search(e.getParameters().getSearchString(), e.getParameters().isRegExp()));
@@ -488,6 +510,7 @@ public class UpdateSampleDataPanel
     panel2.add(new BaseScrollPane(m_TableSampleData));
 
     m_SearchSampleData = new SearchPanel(LayoutType.HORIZONTAL, true);
+    m_SearchSampleData.setButtonCaption("Search");
     m_SearchSampleData.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
     m_SearchSampleData.addSearchListener((SearchEvent e) ->
       m_TableSampleData.search(e.getParameters().getSearchString(), e.getParameters().isRegExp()));
@@ -498,10 +521,14 @@ public class UpdateSampleDataPanel
     m_SplitPane.setRightComponent(panelTable);
 
     // field
+    field = Field.parseField(props.getProperty("Field", ""));
+    if (field.getName().isEmpty())
+      field = new Field("", DataType.BOOLEAN);
     panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
     panel.add(panel2, BorderLayout.SOUTH);
 
     m_TextName = new JTextField(10);
+    m_TextName.setText(field.getName());
     m_TextName.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
@@ -523,10 +550,11 @@ public class UpdateSampleDataPanel
     panel2.add(m_TextName);
 
     m_ComboBoxType = new JComboBox<>(DataType.values());
-    m_ComboBoxType.setSelectedItem(DataType.BOOLEAN);
+    m_ComboBoxType.setSelectedItem(field.getDataType());
     panel2.add(m_ComboBoxType);
 
     m_TextValue = new JTextField(10);
+    m_TextValue.setText(props.getProperty("Value", ""));
     m_TextValue.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
@@ -652,6 +680,15 @@ public class UpdateSampleDataPanel
   }
 
   /**
+   * Returns the current values as field.
+   *
+   * @return		the field
+   */
+  protected Field getField() {
+    return new Field(m_TextName.getText(), (DataType) m_ComboBoxType.getSelectedItem());
+  }
+
+  /**
    * Updates the selected spectra.
    */
   protected void apply() {
@@ -660,13 +697,15 @@ public class UpdateSampleDataPanel
     final String[]	sel;
     SwingWorker		worker;
 
-    field = new Field(m_TextName.getText(), (DataType) m_ComboBoxType.getSelectedItem());
+    field = getField();
     value = m_TextValue.getText();
     sel   = m_Model.getSelectedSampleIDs();
 
     worker = new SwingWorker() {
+      protected boolean successful;
       @Override
       protected Object doInBackground() throws Exception {
+	successful = true;
 	MouseUtils.setWaitCursor(UpdateSampleDataPanel.this);
 	SampleDataT sdt = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
 	for (int i = 0; i < sel.length; i++) {
@@ -674,9 +713,11 @@ public class UpdateSampleDataPanel
 	  SampleData sd = sdt.load(sel[i]);
 	  if (sd != null) {
 	    sd.setValue(field, value);
-	    if (!sdt.store(sel[i], sd))
+	    if (!sdt.store(sel[i], sd)) {
+	      successful = false;
 	      GUIHelper.showErrorMessage(
 		UpdateSampleDataPanel.this, "Failed to store sample data for ID " + sel[i] + "!");
+	    }
 	  }
 	}
 	return null;
@@ -686,6 +727,8 @@ public class UpdateSampleDataPanel
 	super.done();
 	MouseUtils.setDefaultCursor(UpdateSampleDataPanel.this);
 	m_StatusBar.clearStatus();
+	if (successful)
+	  updateProperties();
       }
     };
     worker.execute();
@@ -724,5 +767,41 @@ public class UpdateSampleDataPanel
     m_ButtonApply.setEnabled(!m_Searching && (selCount > 0) && !m_TextName.getText().isEmpty() && !m_TextValue.getText().isEmpty());
     m_ButtonConditions.setEnabled(!m_Searching);
     m_ButtonSearch.setEnabled(!m_Searching);
+  }
+
+  /**
+   * Updates and stores the properties on disk.
+   *
+   * @return		if successfully saved
+   */
+  protected boolean updateProperties() {
+    Properties		props;
+
+    props = getProperties();
+    props.setDate("From", m_TextFrom.getObject().dateValue());
+    props.setDate("To", m_TextTo.getObject().dateValue());
+    props.setProperty("Conditions", m_Conditions.toCommandLine());
+    props.setProperty("Field", getField().toParseableString());
+    props.setProperty("Value", m_TextValue.getText());
+
+    return props.save(Environment.getInstance().createPropertiesFilename(SESSION_FILENAME));
+  }
+
+  /**
+   * Returns the session properties.
+   *
+   * @return		the properties
+   */
+  protected synchronized Properties getProperties() {
+    if (m_Properties == null) {
+      try {
+	m_Properties = Properties.read(SESSION_FILENAME);
+      }
+      catch (Exception e) {
+	m_Properties = new Properties();
+      }
+    }
+
+    return m_Properties;
   }
 }
