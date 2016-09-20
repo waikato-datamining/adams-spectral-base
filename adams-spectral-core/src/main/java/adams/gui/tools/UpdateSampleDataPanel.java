@@ -39,6 +39,7 @@ import adams.gui.core.BasePanel;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTable;
+import adams.gui.core.CheckableTableModel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MouseUtils;
 import adams.gui.core.SearchPanel;
@@ -88,192 +89,25 @@ public class UpdateSampleDataPanel
    * @version $Revision$
    */
   public static class TableModel
-    extends SelectSpectrumPanel.TableModel {
+    extends CheckableTableModel<SelectSpectrumPanel.TableModel> {
 
     /** for serialization. */
     private static final long serialVersionUID = 2776199413402687115L;
-
-    /** whether a spectrum got selected. */
-    protected boolean[] m_Selected;
 
     /**
      * default constructor.
      */
     public TableModel() {
-      this(new String[0]);
+      this(new SelectSpectrumPanel.TableModel());
     }
 
     /**
      * the constructor.
      *
-     * @param values	the IDs/Names/Instruments to display
+     * @param model	model to display
      */
-    public TableModel(List<String> values) {
-      this(values.toArray(new String[values.size()]));
-    }
-
-    /**
-     * the constructor.
-     *
-     * @param values	the IDs/Names/Instruments to display
-     */
-    public TableModel(String[] values) {
-      super(values);
-      m_Selected = new boolean[values.length];
-    }
-
-    /**
-     * Returns the number of columns in the table, i.e., 3.
-     *
-     * @return		the number of columns, always 3
-     */
-    public int getColumnCount() {
-      return 4;
-    }
-
-    /**
-     * Returns the name of the column.
-     *
-     * @param column 	the column to get the name for
-     * @return		the name of the column
-     */
-    public String getColumnName(int column) {
-      if (column == 0)
-	return "Update";
-      else if (column == 1)
-	return "Database ID";
-      else if (column == 2)
-	return "Sample ID";
-      else if (column == 3)
-	return "Format";
-      else
-	throw new IllegalArgumentException("Column " + column + " is invalid!");
-    }
-
-    /**
-     * Returns the class type of the column.
-     *
-     * @param columnIndex	the column to get the class for
-     * @return			the class for the column
-     */
-    public Class getColumnClass(int columnIndex) {
-      if (columnIndex == 0)
-	return Boolean.class;
-      else if (columnIndex == 1)
-	return Integer.class;
-      else if (columnIndex == 2)
-	return String.class;
-      else if (columnIndex == 3)
-	return String.class;
-      else
-	throw new IllegalArgumentException("Column " + columnIndex + " is invalid!");
-    }
-
-    /**
-     * Returns the ID at the given position.
-     *
-     * @param row	the row
-     * @param column	the column
-     * @return		the ID
-     */
-    public Object getValueAt(int row, int column) {
-      if (column == 0)
-	return m_Selected[row];
-      else if (column == 1)
-	return m_IDs[row];
-      else if (column == 2)
-	return m_SampleID[row];
-      else if (column == 3)
-	return m_Format[row];
-      else
-	throw new IllegalArgumentException("Column " + column + " is invalid!");
-    }
-
-    /**
-     * Returns whether the cell is editable.
-     *
-     * @param rowIndex		the row
-     * @param columnIndex	the column
-     * @return			true if editable
-     */
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-      return (columnIndex == 0);
-    }
-
-    /**
-     * Sets the value of the cell.
-     *
-     * @param aValue		the value to set
-     * @param rowIndex		the row
-     * @param columnIndex	the column
-     */
-    @Override
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-      if (columnIndex != 0)
-	return;
-      m_Selected[rowIndex] = (Boolean) aValue;
-      fireTableCellUpdated(rowIndex, columnIndex);
-    }
-
-    /**
-     * Returns whether the spectrum at the specified position is selected.
-     *
-     * @param row	the (actual, not visible) position of the spectrum
-     * @return		true if selected
-     */
-    public boolean getSelectedAt(int row) {
-      return ((row >= 0) && (row < m_Selected.length)) && m_Selected[row];
-    }
-
-    /**
-     * Marks all spectra as selected.
-     */
-    public void selectAll() {
-      select(true);
-    }
-
-    /**
-     * Marks all spectra as un-selected.
-     */
-    public void selectNone() {
-      select(false);
-    }
-
-    /**
-     * Marks all spectra with the specified select state.
-     */
-    protected void select(boolean select) {
-      for (int i = 0; i < m_Selected.length; i++)
-	m_Selected[i] = select;
-
-      fireTableDataChanged();
-    }
-
-    /**
-     * Inverts the selection state.
-     */
-    public void invertSelection() {
-      for (int i = 0; i < m_Selected.length; i++)
-	m_Selected[i] = !m_Selected[i];
-
-      fireTableDataChanged();
-    }
-
-    /**
-     * Returns how many spectra are currently selected.
-     *
-     * @return		the number of selected spectra
-     */
-    public int getSelectedCount() {
-      int	result;
-
-      result = 0;
-
-      for (boolean sel: m_Selected)
-        result += (sel) ? 1 : 0;
-
-      return result;
+    public TableModel(SelectSpectrumPanel.TableModel model) {
+      super(model, "Update");
     }
 
     /**
@@ -289,7 +123,7 @@ public class UpdateSampleDataPanel
 
       for (i = 0; i < getRowCount(); i++) {
 	if (getSelectedAt(i))
-	  result.add(m_SampleID[i]);
+	  result.add("" + getModel().getValueAt(i, 1));
       }
 
       return result.toArray(new String[result.size()]);
@@ -302,20 +136,10 @@ public class UpdateSampleDataPanel
      * @return		the sample ID, null if failed to retrieve
      */
     public String getSampleIdAt(int row) {
-      if ((row >= 0) && (row < m_Selected.length))
-	return m_SampleID[row];
+      if ((row >= 0) && (row < getRowCount()))
+	return "" + getModel().getValueAt(row, 1);
       else
 	return null;
-    }
-
-    /**
-     * Clears the internal model.
-     */
-    public void clear() {
-      super.clear();
-      m_Selected = new boolean[0];
-
-      fireTableDataChanged();
     }
   }
 
@@ -664,7 +488,7 @@ public class UpdateSampleDataPanel
       @Override
       protected void done() {
 	super.done();
-	m_Model = new TableModel(ids);
+	m_Model = new TableModel(new SelectSpectrumPanel.TableModel(ids));
 	m_Model.addTableModelListener((TableModelEvent e) -> updateButtons());
 	m_TableIDs.setModel(m_Model);
 	MouseUtils.setDefaultCursor(UpdateSampleDataPanel.this);
