@@ -20,9 +20,9 @@
 
 package adams.data.cleaner.instance;
 
+import adams.core.Performance;
 import adams.core.Randomizable;
 import adams.core.ThreadLimiter;
-import adams.core.management.ProcessUtils;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.flow.container.WekaTrainTestSetContainer;
@@ -165,7 +165,7 @@ public class RemoveOutliers
 
     m_OptionManager.add(
       "num-threads", "numThreads",
-      1, -1, null);
+      1);
 
     m_OptionManager.add(
       "detector", "detector",
@@ -288,7 +288,7 @@ public class RemoveOutliers
    * 			displaying in the GUI or for listing the options.
    */
   public String numThreadsTipText() {
-    return "The number of threads to use for cross-validation; -1 = number of CPUs/cores; 0 or 1 = sequential execution.";
+    return Performance.getNumThreadsHelp();
   }
 
   /**
@@ -365,14 +365,9 @@ public class RemoveOutliers
     WekaTrainTestSetContainer		cont;
     int					i;
 
-    if (m_NumThreads == -1)
-      numThreads = ProcessUtils.getAvailableProcessors();
-    else if (m_NumThreads > 1)
-      numThreads = Math.min(m_NumThreads, folds);
-    else
-      numThreads = 0;
+    numThreads = Performance.determineNumThreads(m_NumThreads);
 
-    if (numThreads == 0) {
+    if (numThreads == 1) {
       eval = new Evaluation(data);
       eval.setDiscardPredictions(false);
       eval.crossValidateModel(m_Classifier, data, folds, new Random(m_Seed));
@@ -386,7 +381,7 @@ public class RemoveOutliers
 	m_JobRunner = m_JobRunnerSetup.newInstance();
       if (m_JobRunner instanceof ThreadLimiter)
 	((ThreadLimiter) m_JobRunner).setNumThreads(m_NumThreads);
-      list = new JobList<WekaCrossValidationJob>();
+      list = new JobList<>();
       while (generator.hasNext()) {
 	cont = generator.next();
 	job = new WekaCrossValidationJob(
