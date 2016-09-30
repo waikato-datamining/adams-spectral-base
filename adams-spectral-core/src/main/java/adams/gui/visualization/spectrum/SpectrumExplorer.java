@@ -30,6 +30,8 @@ import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.data.spectrum.SpectrumUtils;
+import adams.data.spectrumanalysis.PCA;
+import adams.data.spectrumanalysis.PLS;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
 import adams.db.DatabaseConnectionHandler;
@@ -50,6 +52,7 @@ import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.core.Undo.UndoPoint;
 import adams.gui.core.UndoHandlerWithQuickAccess;
 import adams.gui.core.UndoPanel;
+import adams.gui.dialog.ApprovalDialog;
 import adams.gui.event.DataChangeEvent;
 import adams.gui.event.DataChangeListener;
 import adams.gui.event.FilterEvent;
@@ -81,6 +84,10 @@ import adams.gui.visualization.container.FilterDialog;
 import adams.gui.visualization.core.AbstractColorProvider;
 import adams.gui.visualization.core.Paintlet;
 import adams.gui.visualization.report.ReportContainer;
+import adams.gui.visualization.stats.scatterplot.AbstractScatterPlotOverlay;
+import adams.gui.visualization.stats.scatterplot.Coordinates;
+import adams.gui.visualization.stats.scatterplot.ScatterPlot;
+import adams.gui.visualization.stats.scatterplot.action.ViewDataClickAction;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -146,7 +153,13 @@ public class SpectrumExplorer
   protected JMenuItem m_MenuItemRedo;
 
   /** the filter menu item. */
-  protected JMenuItem m_MenuItemFilter;
+  protected JMenuItem m_MenuItemProcessFilter;
+
+  /** the pca menu item. */
+  protected JMenuItem m_MenuItemProcessPCA;
+
+  /** the pls menu item. */
+  protected JMenuItem m_MenuItemProcessPLS;
 
   /** the menu item for scripts. */
   protected JMenu m_MenuScripts;
@@ -184,11 +197,23 @@ public class SpectrumExplorer
   /** the current filter. */
   protected adams.data.filter.Filter<Spectrum> m_CurrentFilter;
 
+  /** the current PCA analysis. */
+  protected PCA m_CurrentPCA;
+
+  /** the current PLS analysis. */
+  protected PLS m_CurrentPLS;
+
   /** indicates whether the filtered data was overlayed over the original. */
   protected boolean m_FilterOverlayOriginalData;
 
   /** the filter dialog. */
   protected FilterDialog m_DialogFilter;
+
+  /** the PCA dialog. */
+  protected GenericObjectEditorDialog m_DialogPCA;
+
+  /** the PLS dialog. */
+  protected GenericObjectEditorDialog m_DialogPLS;
 
   /** the dialog for loading data. */
   protected SelectSpectrumDialog m_LoadDialog;
@@ -241,6 +266,10 @@ public class SpectrumExplorer
     m_SpectrumFileChooser = new SpectrumFileChooser();
     m_SpectrumFileChooser.setMultiSelectionEnabled(true);
     m_CurrentFilter       = new PassThrough();
+    m_CurrentPCA          = new PCA();
+    m_CurrentPLS          = new PLS();
+    m_DialogPCA           = null;
+    m_DialogPLS           = null;
     m_RecentFilesHandler  = null;
     m_DatabaseConnection  = DatabaseConnection.getSingleton();
     m_DatabaseConnection.addChangeListener(this);
@@ -502,7 +531,9 @@ public class SpectrumExplorer
       m_MenuItemRedo.setText("Redo");
       m_MenuItemRedo.setToolTipText(null);
     }
-    m_MenuItemFilter.setEnabled(dataLoaded);
+    m_MenuItemProcessFilter.setEnabled(dataLoaded);
+    m_MenuItemProcessPCA.setEnabled(dataLoaded);
+    m_MenuItemProcessPLS.setEnabled(dataLoaded);
 
     m_MenuItemStartRecording.setEnabled(!getScriptingEngine().isRecording());
     m_MenuItemStopRecording.setEnabled(getScriptingEngine().isRecording());
@@ -731,7 +762,23 @@ public class SpectrumExplorer
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed F"));
       menuitem.setIcon(GUIHelper.getIcon("run.gif"));
       menuitem.addActionListener(e -> filter());
-      m_MenuItemFilter = menuitem;
+      m_MenuItemProcessFilter = menuitem;
+
+      // Process/PCA
+      menuitem = new JMenuItem("PCA...");
+      menu.add(menuitem);
+      menuitem.setMnemonic('P');
+      menuitem.setIcon(GUIHelper.getIcon("scatterplot.gif"));
+      menuitem.addActionListener(e -> pca());
+      m_MenuItemProcessPCA = menuitem;
+
+      // Process/PLS
+      menuitem = new JMenuItem("PLS...");
+      menu.add(menuitem);
+      menuitem.setMnemonic('L');
+      menuitem.setIcon(GUIHelper.getIcon("scatterplot.gif"));
+      menuitem.addActionListener(e -> pls());
+      m_MenuItemProcessPLS = menuitem;
 
       // Scripts
       menu = new JMenu("Scripts");
@@ -1037,6 +1084,158 @@ public class SpectrumExplorer
   }
 
   /**
+   * Performs PCA on the visible spectra.
+   */
+  public void pca() {
+    SwingWorker		worker;
+
+    if (m_DialogPCA == null) {
+      if (getParentDialog() != null)
+	m_DialogPCA = new GenericObjectEditorDialog(getParentDialog(), ModalityType.DOCUMENT_MODAL);
+      else
+	m_DialogPCA = new GenericObjectEditorDialog(getParentFrame(), true);
+      m_DialogPCA.setTitle("PCA");
+      m_DialogPCA.getGOEEditor().setCanChangeClassInDialog(false);
+      m_DialogPCA.getGOEEditor().setClassType(PCA.class);
+      m_DialogPCA.setCurrent(m_CurrentPCA);
+      m_DialogPCA.pack();
+      m_DialogPCA.setLocationRelativeTo(this);
+    }
+    m_DialogPCA.setCurrent(m_CurrentPCA);
+    m_DialogPCA.setVisible(true);
+    if (m_DialogPCA.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
+      return;
+    m_CurrentPCA = (PCA) m_DialogPCA.getCurrent();
+
+    worker = new SwingWorker() {
+      protected PCA m_PCA;
+      @Override
+      protected Object doInBackground() throws Exception {
+	m_PCA = (PCA) OptionUtils.shallowCopy(m_CurrentPCA);
+	List<Spectrum> list = new ArrayList<>();
+	for (SpectrumContainer cont: getContainerManager().getAllVisible())
+	  list.add(cont.getData());
+	String result = m_PCA.analyze(list);
+	if (result != null) {
+	  GUIHelper.showErrorMessage(SpectrumExplorer.this, result);
+	  m_PCA = null;
+	}
+	return null;
+      }
+      @Override
+      protected void done() {
+	super.done();
+	if (m_PCA != null) {
+	  ApprovalDialog dialog;
+	  if (getParentDialog() != null)
+	    dialog = new ApprovalDialog(getParentDialog(), ModalityType.MODELESS);
+	  else
+	    dialog = new ApprovalDialog(getParentFrame(), false);
+	  dialog.setDefaultCloseOperation(ApprovalDialog.DISPOSE_ON_CLOSE);
+	  dialog.setTitle("PCA");
+	  BaseTabbedPane tabbedPane = new BaseTabbedPane();
+	  // loadings
+	  ScatterPlot plot = new ScatterPlot();
+	  plot.setData(m_PCA.getLoadings());
+	  plot.setMouseClickAction(new ViewDataClickAction());
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.reset();
+	  tabbedPane.addTab("Loadings", plot);
+	  // scores
+	  plot = new ScatterPlot();
+	  plot.setData(m_PCA.getScores());
+	  plot.setMouseClickAction(new ViewDataClickAction());
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.reset();
+	  tabbedPane.addTab("Scores", plot);
+	  // display dialog
+	  dialog.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+	  dialog.setSize(GUIHelper.getDefaultLargeDialogDimension());
+	  dialog.setLocationRelativeTo(SpectrumExplorer.this);
+	  dialog.setVisible(true);
+	}
+      }
+    };
+    worker.execute();
+  }
+
+  /**
+   * Performs PLS on the visible spectra.
+   */
+  public void pls() {
+    SwingWorker		worker;
+
+    if (m_DialogPLS == null) {
+      if (getParentDialog() != null)
+	m_DialogPLS = new GenericObjectEditorDialog(getParentDialog(), ModalityType.DOCUMENT_MODAL);
+      else
+	m_DialogPLS = new GenericObjectEditorDialog(getParentFrame(), true);
+      m_DialogPLS.setTitle("PLS");
+      m_DialogPLS.getGOEEditor().setCanChangeClassInDialog(false);
+      m_DialogPLS.getGOEEditor().setClassType(PLS.class);
+      m_DialogPLS.setCurrent(m_CurrentPLS);
+      m_DialogPLS.pack();
+      m_DialogPLS.setLocationRelativeTo(this);
+    }
+    m_DialogPLS.setCurrent(m_CurrentPLS);
+    m_DialogPLS.setVisible(true);
+    if (m_DialogPLS.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
+      return;
+    m_CurrentPLS = (PLS) m_DialogPLS.getCurrent();
+
+    worker = new SwingWorker() {
+      protected PLS m_PLS;
+      @Override
+      protected Object doInBackground() throws Exception {
+	m_PLS = (PLS) OptionUtils.shallowCopy(m_CurrentPLS);
+	List<Spectrum> list = new ArrayList<>();
+	for (SpectrumContainer cont: getContainerManager().getAllVisible())
+	  list.add(cont.getData());
+	String result = m_PLS.analyze(list);
+	if (result != null) {
+	  GUIHelper.showErrorMessage(SpectrumExplorer.this, result);
+	  m_PLS = null;
+	}
+	return null;
+      }
+      @Override
+      protected void done() {
+	super.done();
+	if (m_PLS != null) {
+	  ApprovalDialog dialog;
+	  if (getParentDialog() != null)
+	    dialog = new ApprovalDialog(getParentDialog(), ModalityType.MODELESS);
+	  else
+	    dialog = new ApprovalDialog(getParentFrame(), false);
+	  dialog.setDefaultCloseOperation(ApprovalDialog.DISPOSE_ON_CLOSE);
+	  dialog.setTitle("PLS");
+	  BaseTabbedPane tabbedPane = new BaseTabbedPane();
+	  // loadings
+	  ScatterPlot plot = new ScatterPlot();
+	  plot.setData(m_PLS.getLoadings());
+	  plot.setMouseClickAction(new ViewDataClickAction());
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.reset();
+	  tabbedPane.addTab("Loadings", plot);
+	  // scores
+	  plot = new ScatterPlot();
+	  plot.setData(m_PLS.getScores());
+	  plot.setMouseClickAction(new ViewDataClickAction());
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.reset();
+	  tabbedPane.addTab("Scores", plot);
+	  // display dialog
+	  dialog.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+	  dialog.setSize(GUIHelper.getDefaultLargeDialogDimension());
+	  dialog.setLocationRelativeTo(SpectrumExplorer.this);
+	  dialog.setVisible(true);
+	}
+      }
+    };
+    worker.execute();
+  }
+
+  /**
    * Sets the zoom overview panel visible or not.
    *
    * @param value	if true then the panel is visible
@@ -1193,6 +1392,14 @@ public class SpectrumExplorer
     if (m_DialogPaintlet != null) {
       m_DialogPaintlet.dispose();
       m_DialogPaintlet = null;
+    }
+    if (m_DialogPCA != null) {
+      m_DialogPCA.dispose();
+      m_DialogPCA = null;
+    }
+    if (m_DialogPLS != null) {
+      m_DialogPLS.dispose();
+      m_DialogPLS = null;
     }
     if (m_Undo != null)
       m_Undo.cleanUp();
