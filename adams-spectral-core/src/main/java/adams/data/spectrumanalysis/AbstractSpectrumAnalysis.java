@@ -26,7 +26,7 @@ import adams.data.spectrum.Spectrum;
 import java.util.List;
 
 /**
- * TODO: What class does.
+ * Ancestor for spectrum-based data analysis schemes.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  * @version $Revision$
