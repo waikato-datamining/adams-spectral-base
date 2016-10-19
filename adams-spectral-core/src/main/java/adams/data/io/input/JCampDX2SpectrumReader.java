@@ -27,6 +27,11 @@ import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import org.jcamp.math.IArray1D;
+import org.jcamp.math.IArray2D;
+import org.jcamp.parser.ErrorHandlerAdapter;
+import org.jcamp.parser.JCAMPBlock;
+import org.jcamp.parser.JCAMPNTuplePage;
 import org.jcamp.parser.JCAMPReader;
 import org.jcamp.spectrum.Spectrum1D;
 import org.jcamp.spectrum.notes.Note;
@@ -276,39 +281,72 @@ public class JCampDX2SpectrumReader
   @Override
   protected void readData() {
     Spectrum			sp;
-    SpectrumPoint point;
-    SampleData sd;
+    SpectrumPoint 		point;
+    SampleData 			sd;
     List<String>		content;
+    JCAMPBlock 			block;
     String[]			parts;
     int				i;
     int				pos;
+    IArray2D			data;
     org.jcamp.spectrum.Spectrum	spec;
+    JCAMPNTuplePage		page;
     Spectrum1D			sp1d;
     Double			x;
     Double			y;
+    IArray1D			xArray;
+    IArray1D			yArray;
     Iterator			iter;
     Note			note;
 
     content = FileUtils.loadFromFile(m_Input);
     
-    // read DX data
     try {
-      spec = JCAMPReader.getInstance(m_Validate, m_Mode.toString()).createSpectrum(Utils.flatten(content, "\n"));
-      if (spec instanceof Spectrum1D) {
-	// spectrum
-	sp1d = (Spectrum1D) spec;
-	sp   = new Spectrum();
-	sp.setID("" + spec.getTitle());
-	m_ReadData.add(sp);
-	for (i = 0; i < sp1d.getXData().getLength(); i++) {
-	  x = sp1d.getXData().pointAt(i);
-	  y = sp1d.getYData().pointAt(i);
-	  point = new SpectrumPoint(x.floatValue(), y.floatValue());
-	  sp.add(point);
+      // read DX data
+      block = new JCAMPBlock(Utils.flatten(content, "\n"), new ErrorHandlerAdapter());
+      block.setValidating(m_Validate);
+
+      // spectrum
+      spec = JCAMPReader.getInstance(m_Validate, m_Mode.toString()).createSpectrum(block);
+      if (block.isNTupleBlock()) {
+	for (pos = 0; pos < block.getNTuple().getPages().length; pos++) {
+	  page   = block.getNTuple().getPages()[pos];
+	  data   = page.getXYData();
+	  xArray = data.getXArray();
+	  yArray = data.getYArray();
+	  sp     = new Spectrum();
+	  sp.setID("" + spec.getTitle() + ": " + (pos+1));
+	  sp.getReport().setNumericValue("Page", (pos+1));
+	  for (i = 0; i < xArray.getLength(); i++) {
+	    x     = xArray.pointAt(i);
+	    y     = yArray.pointAt(i);
+	    point = new SpectrumPoint(x.floatValue(), y.floatValue());
+	    sp.add(point);
+	  }
+	  m_ReadData.add(sp);
 	}
-	// report
+      }
+      else {
+	if (spec instanceof Spectrum1D) {
+	  sp1d = (Spectrum1D) spec;
+	  sp   = new Spectrum();
+	  sp.setID("" + spec.getTitle());
+	  m_ReadData.add(sp);
+	  for (i = 0; i < sp1d.getXData().getLength(); i++) {
+	    x     = sp1d.getXData().pointAt(i);
+	    y     = sp1d.getYData().pointAt(i);
+	    point = new SpectrumPoint(x.floatValue(), y.floatValue());
+	    sp.add(point);
+	  }
+	}
+	else {
+	  getLogger().severe("Expected " + Spectrum1D.class.getName() + ", but got " + spec.getClass().getName() + " instead, failed to read!");
+	}
+      }
+
+      // report
+      for (Spectrum spectrum: m_ReadData) {
 	sd = new SampleData();
-	sp.setReport(sd);
 	iter = spec.getNotes().iterator();
 	while (iter.hasNext()) {
 	  note = (Note) iter.next();
@@ -317,9 +355,7 @@ public class JCampDX2SpectrumReader
 	    sd.setStringValue(note.getDescriptor().toString(), note.getValue().toString());
 	  }
 	}
-      }
-      else {
-	getLogger().severe("Expected " + Spectrum1D.class.getName() + ", but got " + spec.getClass().getName() + " instead, failed to read!");
+	spectrum.getReport().mergeWith(sd);
       }
     }
     catch (Exception e) {
