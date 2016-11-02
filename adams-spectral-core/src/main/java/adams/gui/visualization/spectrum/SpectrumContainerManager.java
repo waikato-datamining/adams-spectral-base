@@ -24,7 +24,7 @@ import adams.data.spectrum.Spectrum;
 import adams.db.AbstractDatabaseConnection;
 import adams.gui.scripting.Invisible;
 import adams.gui.scripting.Visible;
-import adams.gui.visualization.container.AbstractSearchableContainerManager;
+import adams.gui.visualization.container.AbstractContainerManager;
 import adams.gui.visualization.container.ColorContainerManager;
 import adams.gui.visualization.container.DatabaseContainerManager;
 import adams.gui.visualization.container.NamedContainerManagerWithUniqueNames;
@@ -46,7 +46,7 @@ import java.util.List;
  * @version $Revision: 2242 $
  */
 public class SpectrumContainerManager
-  extends AbstractSearchableContainerManager<SpectrumContainer>
+  extends AbstractContainerManager<SpectrumContainer>
   implements VisibilityContainerManager<SpectrumContainer>, 
              ColorContainerManager, ReloadableContainerManager,
              DatabaseContainerManager<SpectrumContainer>, 

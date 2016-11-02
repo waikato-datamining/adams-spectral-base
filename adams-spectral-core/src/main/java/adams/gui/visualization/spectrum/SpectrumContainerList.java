@@ -20,7 +20,7 @@
 
 package adams.gui.visualization.spectrum;
 
-import adams.gui.visualization.container.AbstractSearchableContainerList;
+import adams.gui.visualization.container.AbstractContainerList;
 import adams.gui.visualization.container.ContainerTable;
 
 /**
@@ -30,7 +30,7 @@ import adams.gui.visualization.container.ContainerTable;
  * @version $Revision: 2001 $
  */
 public class SpectrumContainerList
-  extends AbstractSearchableContainerList<SpectrumContainerManager, SpectrumContainer> {
+  extends AbstractContainerList<SpectrumContainerManager, SpectrumContainer> {
 
   /** for serialization. */
   private static final long serialVersionUID = -1049275455980966385L;
