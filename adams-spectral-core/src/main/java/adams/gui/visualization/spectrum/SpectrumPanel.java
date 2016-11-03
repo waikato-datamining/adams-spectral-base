@@ -219,8 +219,6 @@ public class SpectrumPanel
 
     m_ToolTipMaxColumns = props.getInteger("Plot.ToolTip.MaxColumns", 80);
 
-    setAdjustToVisibleData(props.getBoolean("Plot.AdjustToVisibleData", false));
-
     m_SpectrumContainerList = new SpectrumContainerList();
     m_SpectrumContainerList.setManager(getContainerManager());
     m_SpectrumContainerList.setAllowSearch(props.getBoolean("ContainerList.AllowSearch", false));
@@ -275,6 +273,16 @@ public class SpectrumPanel
       System.err.println(getClass().getName() + " - Failed to set the color provider:");
       getContainerManager().setColorProvider(new DefaultColorProvider());
     }
+  }
+
+  /**
+   * Finishes up the initialization.
+   */
+  @Override
+  protected void finishInit() {
+    super.finishInit();
+
+    setAdjustToVisibleData(getProperties().getBoolean("Plot.AdjustToVisibleData", false));
   }
 
   /**
@@ -367,19 +375,21 @@ public class SpectrumPanel
     double 			maxY;
     int				i;
     int				n;
+    SpectrumContainerModel	model;
 
-    minX = Double.MAX_VALUE;
-    maxX = -Double.MAX_VALUE;
-    minY = Double.MAX_VALUE;
-    maxY = -Double.MAX_VALUE;
+    minX  = Double.MAX_VALUE;
+    maxX  = -Double.MAX_VALUE;
+    minY  = Double.MAX_VALUE;
+    maxY  = -Double.MAX_VALUE;
+    model = (SpectrumContainerModel) getContainerList().getContainerModel();
 
-    for (i = 0; i < getContainerManager().count(); i++) {
+    for (i = 0; i < model.getRowCount(); i++) {
       if (m_AdjustToVisibleData) {
-	if (!getContainerManager().isVisible(i))
+	if (!model.getContainerAt(i).isVisible())
 	  continue;
       }
 
-      points = getContainerManager().get(i).getData().toList();
+      points = model.getContainerAt(i).getData().toList();
 
       if (points.size() == 0)
 	continue;
@@ -421,15 +431,30 @@ public class SpectrumPanel
    */
   @Override
   public BasePopupMenu getContainerListPopupMenu(final ContainerTable<SpectrumContainerManager,SpectrumContainer> table, final int row) {
-    BasePopupMenu	result;
-    JMenuItem		item;
-    final int[] 	indices;
+    BasePopupMenu			result;
+    JMenuItem				item;
+    final int[] 			indices;
+    final SpectrumContainerModel	model;
+    final int				actRow;
+    final List<SpectrumContainer> 	visibleConts;
 
-    result   = new BasePopupMenu();
+    result = new BasePopupMenu();
+    model  = (SpectrumContainerModel) getContainerList().getContainerModel();
     if (table.getSelectedRows().length == 0)
       indices = new int[]{row};
     else
       indices = table.getSelectedRows();
+    for (int i = 0; i < indices.length; i++) {
+      SpectrumContainer cont = model.getContainerAt(indices[i]);
+      indices[i] = getContainerManager().indexOf(cont);
+    }
+    actRow = getContainerManager().indexOf(model.getContainerAt(row));
+
+    visibleConts = new ArrayList<>();
+    for (int i = 0; i < model.getRowCount(); i++) {
+      if (model.getContainerAt(i).isVisible())
+	visibleConts.add(model.getContainerAt(i));
+    }
 
     item = new JMenuItem("Toggle visibility");
     item.addActionListener((ActionEvent e) -> {
@@ -461,8 +486,8 @@ public class SpectrumPanel
     item = new JMenuItem("Show all");
     item.addActionListener((ActionEvent e) -> {
       TIntArrayList list = new TIntArrayList();
-      for (int i = 0; i < getContainerManager().count(); i++) {
-	if (!getContainerManager().get(i).isVisible())
+      for (int i = 0; i < indices.length; i++) {
+	if (!getContainerManager().get(indices[i]).isVisible())
 	  list.add(i);
       }
       if (list.size() > 0) {
@@ -479,8 +504,8 @@ public class SpectrumPanel
     item = new JMenuItem("Hide all");
     item.addActionListener((ActionEvent e) -> {
       TIntArrayList list = new TIntArrayList();
-      for (int i = 0; i < getContainerManager().count(); i++) {
-	if (getContainerManager().get(i).isVisible())
+      for (int i = 0; i < indices.length; i++) {
+	if (getContainerManager().get(indices[i]).isVisible())
 	  list.add(i);
       }
       if (list.size() > 0) {
@@ -510,8 +535,8 @@ public class SpectrumPanel
 	color);
       if (c == null)
 	return;
-      for (int i: indices)
-	getContainerManager().get(i).setColor(c);
+      for (int index : indices)
+	getContainerManager().get(index).setColor(c);
     });
     result.add(item);
 
@@ -535,19 +560,21 @@ public class SpectrumPanel
 	getScriptingEngine().add(
 	  SpectrumPanel.this,
 	  fixAction(SetData.ACTION) + " "
-	    + (row + 1) + " "
-	    + getContainerManager().get(row).getData().getDatabaseID());
+	    + (actRow + 1) + " "
+	    + getContainerManager().get(actRow).getData().getDatabaseID());
       });
       result.add(item);
 
       item = new JMenuItem("Reload all");
       item.addActionListener((ActionEvent e) -> {
-	for (int i = 0; i < getContainerManager().count(); i++) {
+	for (int i = 0; i < model.getRowCount(); i++) {
+	  SpectrumContainer cont = model.getContainerAt(i);
+	  int actIndex = getContainerManager().indexOf(cont);
 	  getScriptingEngine().add(
 	    SpectrumPanel.this,
 	    fixAction(SetData.ACTION) + " "
-	      + (i+1) + " "
-	      + getContainerManager().get(i).getData().getDatabaseID());
+	      + (actIndex+1) + " "
+	      + getContainerManager().get(actIndex).getData().getDatabaseID());
 	}
       });
       result.add(item);
@@ -571,33 +598,23 @@ public class SpectrumPanel
     item = new JMenuItem("Information");
     item.addActionListener((ActionEvent e) -> {
       List<InformativeStatistic> stats = new ArrayList<>();
-      for (int i = 0; i < indices.length; i++)
-	stats.add(getContainerManager().get(indices[i]).getData().toStatistic());
+      for (SpectrumContainer cont: visibleConts)
+	stats.add(cont.getData().toStatistic());
       showStatistics(stats);
     });
     result.add(item);
 
     item = new JMenuItem("Spectral data");
     item.setEnabled(indices.length == 1);
-    item.addActionListener((ActionEvent e) -> showSpectralData(getContainerManager().get(row)));
+    item.addActionListener((ActionEvent e) -> showSpectralData(getContainerManager().get(actRow)));
     result.add(item);
 
     item = new JMenuItem("Sample data");
-    item.addActionListener((ActionEvent e) -> {
-      List<SpectrumContainer> data = new ArrayList<>();
-      for (int i = 0; i < indices.length; i++)
-	data.add(getContainerManager().get(indices[i]));
-      showSampleData(data);
-    });
+    item.addActionListener((ActionEvent e) -> showSampleData(visibleConts));
     result.add(item);
 
     item = new JMenuItem("Notes");
-    item.addActionListener((ActionEvent e) -> {
-      List<SpectrumContainer> data = new ArrayList<>();
-      for (int i = 0; i < indices.length; i++)
-	data.add(getContainerManager().get(indices[i]));
-      showNotes(data);
-    });
+    item.addActionListener((ActionEvent e) -> showNotes(visibleConts));
     result.add(item);
 
     return result;
@@ -611,7 +628,16 @@ public class SpectrumPanel
    */
   @Override
   public void customizePopupMenu(MouseEvent e, JPopupMenu menu) {
-    JMenuItem	item;
+    JMenuItem				item;
+    final SpectrumContainerModel	model;
+    final List<SpectrumContainer> 	visibleConts;
+
+    model        = (SpectrumContainerModel) getContainerList().getContainerModel();
+    visibleConts = new ArrayList<>();
+    for (int i = 0; i < model.getRowCount(); i++) {
+      if (model.getContainerAt(i).isVisible())
+	visibleConts.add(model.getContainerAt(i));
+    }
 
     menu.addSeparator();
 
@@ -651,20 +677,20 @@ public class SpectrumPanel
     item = new JMenuItem("Spectrum statistics", GUIHelper.getIcon("statistics.png"));
     item.addActionListener((ActionEvent ae) -> {
       List<InformativeStatistic> stats = new ArrayList<>();
-      for (int i = 0; i < getContainerManager().count(); i++) {
-        if (getContainerManager().isVisible(i))
-          stats.add(getContainerManager().get(i).getData().toStatistic());
+      for (int i = 0; i < model.getRowCount(); i++) {
+        if (model.getContainerAt(i).isVisible())
+          stats.add(model.getContainerAt(i).getData().toStatistic());
       }
       showStatistics(stats);
     });
     menu.add(item);
 
     item = new JMenuItem("Spectrum histogram", GUIHelper.getIcon("histogram.png"));
-    item.addActionListener((ActionEvent ae) -> showHistogram(getContainerManager().getAllVisible()));
+    item.addActionListener((ActionEvent ae) -> showHistogram(visibleConts));
     menu.add(item);
 
     item = new JMenuItem("Spectrum notes", GUIHelper.getEmptyIcon());
-    item.addActionListener((ActionEvent ae) -> showNotes(getContainerManager().getAllVisible()));
+    item.addActionListener((ActionEvent ae) -> showNotes(visibleConts));
     menu.add(item);
 
     item = new JMenuItem("Goto wave number...", GUIHelper.getEmptyIcon());
@@ -695,6 +721,7 @@ public class SpectrumPanel
     String[] 				ext;
     List<Spectrum> 			data;
     String 				prefix;
+    SpectrumContainerModel		model;
 
     if (m_ExportDialog == null) {
       if (getParentDialog() != null)
@@ -706,6 +733,8 @@ public class SpectrumPanel
     m_ExportDialog.setVisible(true);
     if (m_ExportDialog.getOption() != SpectrumExportDialog.APPROVE_OPTION)
       return;
+
+    model = (SpectrumContainerModel) getContainerList().getContainerModel();
 
     // write data
     writer = m_ExportDialog.getExport();
@@ -719,8 +748,10 @@ public class SpectrumPanel
       filename = m_ExportDialog.getDirectory().getAbsolutePath() + File.separator + filename + "." + ext[0];
       writer.setOutput(new PlaceholderFile(filename));
       data = new ArrayList<>();
-      for (i = 0; i < getContainerManager().countVisible(); i++) {
-	cont = getContainerManager().getVisible(i);
+      for (i = 0; i < model.getRowCount(); i++) {
+	if (!model.getContainerAt(i).isVisible())
+	  continue;
+	cont = model.getContainerAt(i);
 	data.add(cont.getData());
       }
       if (!writer.write(data))
@@ -728,8 +759,10 @@ public class SpectrumPanel
     }
     else {
       prefix = m_ExportDialog.getDirectory().getAbsolutePath();
-      for (i = 0; i < getContainerManager().countVisible(); i++) {
-	cont = getContainerManager().getVisible(i);
+      for (i = 0; i < model.getRowCount(); i++) {
+	if (!model.getContainerAt(i).isVisible())
+	  continue;
+	cont = model.getContainerAt(i);
 	filename = prefix + File.separator + FileUtils.createFilename(cont.getDisplayID(), "") + "." + ext[0];
 	writer.setOutput(new PlaceholderFile(filename));
 	if (!writer.write(cont.getData())) {
@@ -751,6 +784,7 @@ public class SpectrumPanel
     SpectrumContainer 			cont;
     AbstractFileSaver			saver;
     File				file;
+    SpectrumContainerModel		model;
 
     if (m_ExportDatasetDialog == null) {
       if (getParentDialog() != null)
@@ -763,10 +797,13 @@ public class SpectrumPanel
     if (m_ExportDatasetDialog.getOption() != SpectrumExportDialog.APPROVE_OPTION)
       return;
 
+    model     = (SpectrumContainerModel) getContainerList().getContainerModel();
     generator = m_ExportDatasetDialog.getGenerator();
     data      = null;
-    for (i = 0; i < getContainerManager().countVisible(); i++) {
-      cont = getContainerManager().getVisible(i);
+    for (i = 0; i < model.getRowCount(); i++) {
+      if (!model.getContainerAt(i).isVisible())
+	continue;
+      cont = model.getContainerAt(i);
       inst = generator.generate(cont.getData());
       if (data == null)
 	data = new Instances(inst.dataset(), 0);
@@ -974,6 +1011,15 @@ public class SpectrumPanel
    */
   protected String fixAction(String action) {
     return action;
+  }
+
+  /**
+   * Returns the container list.
+   *
+   * @return		the list
+   */
+  public SpectrumContainerList getContainerList() {
+    return m_SpectrumContainerList;
   }
 
   /**

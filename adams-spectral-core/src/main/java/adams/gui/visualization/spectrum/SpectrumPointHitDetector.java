@@ -23,7 +23,6 @@ package adams.gui.visualization.spectrum;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.data.spectrum.SpectrumUtils;
-import adams.gui.visualization.container.VisibilityContainer;
 import adams.gui.visualization.core.AxisPanel;
 import adams.gui.visualization.core.plot.AbstractDistanceBasedHitDetector;
 import adams.gui.visualization.core.plot.Axis;
@@ -103,20 +102,22 @@ public class SpectrumPointHitDetector
     int[]			indices;
     int				index;
     double			dist;
-    List<SpectrumPoint> points;
+    List<SpectrumPoint> 	points;
+    SpectrumContainerModel	model;
 
-    result     = new Vector<SpectrumPoint>();
+    result     = new Vector<>();
     axisBottom = m_Owner.getPlot().getAxis(Axis.BOTTOM);
     axisLeft   = m_Owner.getPlot().getAxis(Axis.LEFT);
     amplitude  = (float) axisLeft.posToValue((int) e.getY());
     waveno     = (float) axisBottom.posToValue((int) e.getX());
+    model      = (SpectrumContainerModel) m_Owner.getContainerList().getContainerModel();
 
-    for (i = 0; i < m_Owner.getContainerManager().count(); i++) {
-      if (!((VisibilityContainer) m_Owner.getContainerManager().get(i)).isVisible())
+    for (i = 0; i < model.getRowCount(); i++) {
+      if (!model.getContainerAt(i).isVisible())
 	continue;
 
       // check for hit
-      s       = m_Owner.getContainerManager().get(i).getData();
+      s       = model.getContainerAt(i).getData();
       points  = s.toList();
       indices = SpectrumUtils.findEnclosingWaveNumbers(points, waveno);
 
