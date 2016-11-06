@@ -460,8 +460,9 @@ public class SpectrumPanel
     item.addActionListener((ActionEvent e) -> {
       TIntArrayList visible = new TIntArrayList();
       TIntArrayList invisible = new TIntArrayList();
-      for (int index: indices) {
-	if (getContainerManager().get(index).isVisible())
+      for (int i = 0; i < model.getRowCount(); i++) {
+	int index = getContainerManager().indexOf(model.getContainerAt(i));
+	if (model.getContainerAt(i).isVisible())
 	  invisible.add(index);
 	else
 	  visible.add(index);
@@ -486,9 +487,10 @@ public class SpectrumPanel
     item = new JMenuItem("Show all");
     item.addActionListener((ActionEvent e) -> {
       TIntArrayList list = new TIntArrayList();
-      for (int i = 0; i < indices.length; i++) {
-	if (!getContainerManager().get(indices[i]).isVisible())
-	  list.add(i);
+      for (int i = 0; i < model.getRowCount(); i++) {
+	int index = getContainerManager().indexOf(model.getContainerAt(i));
+	if (!model.getContainerAt(i).isVisible())
+	  list.add(index);
       }
       if (list.size() > 0) {
 	Range range = new Range();
@@ -504,9 +506,10 @@ public class SpectrumPanel
     item = new JMenuItem("Hide all");
     item.addActionListener((ActionEvent e) -> {
       TIntArrayList list = new TIntArrayList();
-      for (int i = 0; i < indices.length; i++) {
-	if (getContainerManager().get(indices[i]).isVisible())
-	  list.add(i);
+      for (int i = 0; i < model.getRowCount(); i++) {
+	int index = getContainerManager().indexOf(model.getContainerAt(i));
+	if (model.getContainerAt(i).isVisible())
+	  list.add(index);
       }
       if (list.size() > 0) {
 	Range range = new Range();
