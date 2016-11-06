@@ -460,12 +460,11 @@ public class SpectrumPanel
     item.addActionListener((ActionEvent e) -> {
       TIntArrayList visible = new TIntArrayList();
       TIntArrayList invisible = new TIntArrayList();
-      for (int i = 0; i < model.getRowCount(); i++) {
-	int index = getContainerManager().indexOf(model.getContainerAt(i));
-	if (model.getContainerAt(i).isVisible())
-	  invisible.add(index);
+      for (int i = 0; i < indices.length; i++) {
+	if (getContainerManager().isVisible(indices[i]))
+	  invisible.add(indices[i]);
 	else
-	  visible.add(index);
+	  visible.add(indices[i]);
       }
       Range range = new Range();
       range.setMax(getContainerManager().count());
