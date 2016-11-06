@@ -381,7 +381,7 @@ public class SpectrumPanel
     maxX  = -Double.MAX_VALUE;
     minY  = Double.MAX_VALUE;
     maxY  = -Double.MAX_VALUE;
-    model = (SpectrumContainerModel) getContainerList().getContainerModel();
+    model = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
 
     for (i = 0; i < model.getRowCount(); i++) {
       if (m_AdjustToVisibleData) {
@@ -439,7 +439,7 @@ public class SpectrumPanel
     final List<SpectrumContainer> 	visibleConts;
 
     result = new BasePopupMenu();
-    model  = (SpectrumContainerModel) getContainerList().getContainerModel();
+    model  = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
     if (table.getSelectedRows().length == 0)
       indices = new int[]{row};
     else
@@ -635,7 +635,7 @@ public class SpectrumPanel
     final SpectrumContainerModel	model;
     final List<SpectrumContainer> 	visibleConts;
 
-    model        = (SpectrumContainerModel) getContainerList().getContainerModel();
+    model        = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
     visibleConts = new ArrayList<>();
     for (int i = 0; i < model.getRowCount(); i++) {
       if (model.getContainerAt(i).isVisible())
@@ -737,7 +737,7 @@ public class SpectrumPanel
     if (m_ExportDialog.getOption() != SpectrumExportDialog.APPROVE_OPTION)
       return;
 
-    model = (SpectrumContainerModel) getContainerList().getContainerModel();
+    model = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
 
     // write data
     writer = m_ExportDialog.getExport();
@@ -800,7 +800,7 @@ public class SpectrumPanel
     if (m_ExportDatasetDialog.getOption() != SpectrumExportDialog.APPROVE_OPTION)
       return;
 
-    model     = (SpectrumContainerModel) getContainerList().getContainerModel();
+    model     = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
     generator = m_ExportDatasetDialog.getGenerator();
     data      = null;
     for (i = 0; i < model.getRowCount(); i++) {
@@ -1014,15 +1014,6 @@ public class SpectrumPanel
    */
   protected String fixAction(String action) {
     return action;
-  }
-
-  /**
-   * Returns the container list.
-   *
-   * @return		the list
-   */
-  public SpectrumContainerList getContainerList() {
-    return m_SpectrumContainerList;
   }
 
   /**
