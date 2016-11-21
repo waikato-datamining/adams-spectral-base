@@ -126,7 +126,7 @@ public class RangeBasedSavitzkyGolay
   @Override
   public String globalInfo() {
     return
-      "Configures a " + PartitionedMultiFilter.class.getName() + ", using "
+      "Configures a " + PartitionedMultiFilter2.class.getName() + ", using "
 	+ "the supplied ranges and the number of points to configure the "
 	+ SavitzkyGolay2.class.getName() + " filter to apply to that subset.";
   }
@@ -312,7 +312,7 @@ public class RangeBasedSavitzkyGolay
   @Override
   protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
     SpectrumFilter		spec;
-    PartitionedMultiFilter	part;
+    PartitionedMultiFilter2 part;
     Instances			filtered;
     Map<String,Integer> 	indexMap;
     List<Integer>		indices;
@@ -339,7 +339,7 @@ public class RangeBasedSavitzkyGolay
     }
 
     // partitioned filter
-    part = new PartitionedMultiFilter();
+    part = new PartitionedMultiFilter2();
     part.setRemoveUnused(m_RemoveUnused);
     savGols = new ArrayList<>();
     ranges  = new ArrayList<>();

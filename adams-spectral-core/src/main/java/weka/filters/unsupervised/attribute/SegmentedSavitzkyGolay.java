@@ -146,7 +146,7 @@ public class SegmentedSavitzkyGolay
   protected boolean m_RemoveUnused = false;
 
   /** the filter used internally. */
-  protected PartitionedMultiFilter m_Filter = null;
+  protected PartitionedMultiFilter2 m_Filter = null;
 
   /** the filtered data from the first pass. */
   protected Instances m_FirstPassData = null;
@@ -160,7 +160,7 @@ public class SegmentedSavitzkyGolay
   @Override
   public String globalInfo() {
     return
-      "Configures a " + PartitionedMultiFilter.class.getName() + ", using "
+      "Configures a " + PartitionedMultiFilter2.class.getName() + ", using "
 	+ "the supplied number of splits and the number of points to configure the "
 	+ SavitzkyGolay2.class.getName() + " filter to apply to the subsets.";
   }
@@ -515,7 +515,7 @@ public class SegmentedSavitzkyGolay
    */
   @Override
   protected Instances determineOutputFormat(Instances inputFormat) throws Exception {
-    PartitionedMultiFilter	part;
+    PartitionedMultiFilter2 part;
     TIntArrayList 		indices;
     int 			i;
     int				n;
@@ -548,7 +548,7 @@ public class SegmentedSavitzkyGolay
     }
 
     // partitioned filter
-    part = new PartitionedMultiFilter();
+    part = new PartitionedMultiFilter2();
     part.setRemoveUnused(m_RemoveUnused);
     filters     = new ArrayList<>();
     ranges      = new ArrayList<>();
