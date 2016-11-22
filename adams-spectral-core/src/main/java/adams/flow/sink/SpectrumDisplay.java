@@ -30,7 +30,6 @@ import adams.flow.sink.spectrumdisplay.SimplePlotUpdater;
 import adams.gui.core.BasePanel;
 import adams.gui.visualization.core.AbstractColorProvider;
 import adams.gui.visualization.core.DefaultColorProvider;
-import adams.gui.visualization.core.Paintlet;
 import adams.gui.visualization.spectrum.AbstractSpectrumPaintlet;
 import adams.gui.visualization.spectrum.SpectrumContainer;
 import adams.gui.visualization.spectrum.SpectrumContainerManager;
@@ -193,6 +192,7 @@ public class SpectrumDisplay
       m_Panel.getContainerManager().setReloadable(false);
       m_Panel.getContainerManager().setAllowRemoval(false);
       m_Panel.getSpectrumPanel().setSidePanelVisible(m_ShowSidePanel);
+      m_Panel.getSpectrumPanel().setDataPaintlet(m_Paintlet.shallowCopy(true));
       m_Panel.setZoomOverviewPanelVisible(m_ZoomOverview);
       add(m_Panel, BorderLayout.CENTER);
     }
@@ -506,7 +506,6 @@ public class SpectrumDisplay
   @Override
   protected BasePanel newPanel() {
     SpectrumExplorer	result;
-    Paintlet 		paintlet;
 
     result = new SpectrumExplorer();
     result.getContainerManager().setReloadable(false);
@@ -514,9 +513,7 @@ public class SpectrumDisplay
     result.getSpectrumPanel().setSidePanelVisible(m_ShowSidePanel);
     result.setZoomOverviewPanelVisible(m_ZoomOverview);
     result.getContainerManager().setColorProvider(m_ColorProvider.shallowCopy(true));
-    paintlet = m_Paintlet.shallowCopy(true);
-    paintlet.setPanel(result.getSpectrumPanel());
-    result.getSpectrumPanel().addPaintlet(paintlet);
+    result.getSpectrumPanel().setDataPaintlet(m_Paintlet.shallowCopy(true));
 
     return result;
   }

@@ -21,13 +21,14 @@
 package adams.gui.visualization.spectrum;
 
 import adams.core.Properties;
-import adams.core.Range;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.OptionUtils;
 import adams.data.instances.AbstractSpectrumInstanceGenerator;
 import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.io.output.MetaFileWriter;
+import adams.data.report.DataType;
+import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
@@ -36,39 +37,33 @@ import adams.data.statistics.InformativeStatistic;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
 import adams.event.DatabaseConnectionChangeEvent;
+import adams.gui.core.AntiAliasingSupporter;
 import adams.gui.core.BasePopupMenu;
+import adams.gui.core.ColorHelper;
 import adams.gui.core.GUIHelper;
 import adams.gui.dialog.SpreadSheetDialog;
 import adams.gui.event.PaintListener;
 import adams.gui.scripting.AbstractScriptingEngine;
-import adams.gui.scripting.Invisible;
-import adams.gui.scripting.SetData;
 import adams.gui.scripting.SpectralScriptingEngine;
-import adams.gui.scripting.Visible;
-import adams.gui.sendto.SendToActionUtils;
-import adams.gui.visualization.container.ContainerListPopupMenuSupplier;
 import adams.gui.visualization.container.ContainerTable;
-import adams.gui.visualization.container.DataContainerPanelWithSidePanel;
+import adams.gui.visualization.container.DataContainerPanelWithContainerList;
 import adams.gui.visualization.container.NotesFactory;
 import adams.gui.visualization.core.AbstractColorProvider;
 import adams.gui.visualization.core.CoordinatesPaintlet;
 import adams.gui.visualization.core.CoordinatesPaintlet.Coordinates;
 import adams.gui.visualization.core.DefaultColorProvider;
+import adams.gui.visualization.core.Paintlet;
 import adams.gui.visualization.core.PlotPanel;
-import adams.gui.visualization.core.PopupMenuCustomizer;
 import adams.gui.visualization.core.plot.Axis;
 import adams.gui.visualization.core.plot.TipTextCustomizer;
 import adams.gui.visualization.report.ReportContainer;
 import adams.gui.visualization.report.ReportFactory;
 import adams.gui.visualization.statistics.InformativeStatisticFactory;
-import com.github.fracpete.jclipboardhelper.ClipboardHelper;
-import gnu.trove.list.array.TIntArrayList;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.AbstractFileSaver;
 import weka.core.converters.ConverterUtils.DataSink;
 
-import javax.swing.JColorChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -94,9 +89,8 @@ import java.util.List;
  * @version $Revision: 2289 $
  */
 public class SpectrumPanel
-  extends DataContainerPanelWithSidePanel<Spectrum, SpectrumContainerManager>
-  implements PaintListener, ContainerListPopupMenuSupplier<SpectrumContainerManager,SpectrumContainer>,
-             TipTextCustomizer, PopupMenuCustomizer {
+  extends DataContainerPanelWithContainerList<Spectrum, SpectrumContainerManager, SpectrumContainer>
+  implements PaintListener, TipTextCustomizer {
 
   /** for serialization. */
   private static final long serialVersionUID = -9059718549932104312L;
@@ -108,16 +102,10 @@ public class SpectrumPanel
   protected CoordinatesPaintlet m_CoordinatesPaintlet;
 
   /** paintlet for drawing the spectrum. */
-  protected SpectrumPaintlet m_SpectrumPaintlet;
+  protected AbstractSpectrumPaintlet m_SpectrumPaintlet;
 
   /** paintlet for drawing the selected wave number. */
   protected SelectedWaveNumberPaintlet m_SelectedWaveNumberPaintlet;
-
-  /** the panel listing the spectra. */
-  protected SpectrumContainerList m_SpectrumContainerList;
-
-  /** whether to use store or active tables. */
-  protected boolean m_UseStore;
 
   /** for detecting hits. */
   protected SpectrumPointHitDetector m_SpectrumPointHitDetector;
@@ -161,7 +149,6 @@ public class SpectrumPanel
     super.initialize();
 
     m_AdjustToVisibleData = true;
-    m_UseStore            = false;
     m_HistogramSetup      = null;
   }
 
@@ -191,7 +178,7 @@ public class SpectrumPanel
    * @return		the paintlet
    */
   @Override
-  public SpectrumPaintlet getContainerPaintlet() {
+  public AbstractSpectrumPaintlet getContainerPaintlet() {
     return m_SpectrumPaintlet;
   }
 
@@ -219,20 +206,6 @@ public class SpectrumPanel
 
     m_ToolTipMaxColumns = props.getInteger("Plot.ToolTip.MaxColumns", 80);
 
-    m_SpectrumContainerList = new SpectrumContainerList();
-    m_SpectrumContainerList.setManager(getContainerManager());
-    m_SpectrumContainerList.setAllowSearch(props.getBoolean("ContainerList.AllowSearch", false));
-    m_SpectrumContainerList.setPopupMenuSupplier(this);
-    m_SpectrumContainerList.setDisplayDatabaseID(true);
-    m_SpectrumContainerList.addTableModelListener((TableModelEvent e) -> {
-      final ContainerTable table = m_SpectrumContainerList.getTable();
-      if ((table.getRowCount() > 0) && (table.getSelectedRowCount() == 0))
-	SwingUtilities.invokeLater(() -> table.getSelectionModel().addSelectionInterval(0, 0));
-    });
-
-    m_SidePanel.setLayout(new BorderLayout(0, 0));
-    m_SidePanel.add(m_SpectrumContainerList);
-
     panel = new JPanel();
     panel.setMinimumSize(new Dimension(1, props.getInteger("Axis.Bottom.Width", 0)));
     panel.setPreferredSize(new Dimension(1, props.getInteger("Axis.Bottom.Width", 0)));
@@ -242,7 +215,7 @@ public class SpectrumPanel
     m_SpectrumPaintlet = new SpectrumPaintlet();
     m_SpectrumPaintlet.setStrokeThickness(props.getDouble("Plot.StrokeThickness", 1.0).floatValue());
     m_SpectrumPaintlet.setPanel(this);
-    m_SpectrumPaintlet.setAntiAliasingEnabled(props.getBoolean("Plot.AntiAliasing", true));
+    ((SpectrumPaintlet) m_SpectrumPaintlet).setAntiAliasingEnabled(props.getBoolean("Plot.AntiAliasing", true));
 
     m_SelectedWaveNumberPaintlet = new SelectedWaveNumberPaintlet();
     m_SelectedWaveNumberPaintlet.setPanel(this);
@@ -286,12 +259,26 @@ public class SpectrumPanel
   }
 
   /**
-   * Returns the paintlet for painting the spectrum.
+   * Returns the container list.
    *
-   * @return		the paintlet
+   * @return		the list
    */
-  public SpectrumPaintlet getSpectrumPaintlet() {
-    return m_SpectrumPaintlet;
+  @Override
+  protected SpectrumContainerList createContainerList() {
+    SpectrumContainerList 	result;
+
+    result = new SpectrumContainerList();
+    result.setManager(getContainerManager());
+    result.setAllowSearch(getProperties().getBoolean("ContainerList.AllowSearch", false));
+    result.setPopupMenuSupplier(this);
+    result.setDisplayDatabaseID(true);
+    result.addTableModelListener((TableModelEvent e) -> {
+      final ContainerTable table = result.getTable();
+      if ((table.getRowCount() > 0) && (table.getSelectedRowCount() == 0))
+	SwingUtilities.invokeLater(() -> table.getSelectionModel().addSelectionInterval(0, 0));
+    });
+
+    return result;
   }
 
   /**
@@ -381,7 +368,7 @@ public class SpectrumPanel
     maxX  = -Double.MAX_VALUE;
     minY  = Double.MAX_VALUE;
     maxY  = -Double.MAX_VALUE;
-    model = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
+    model = (SpectrumContainerModel) getContainerList().getContainerModel();
 
     for (i = 0; i < model.getRowCount(); i++) {
       if (m_AdjustToVisibleData) {
@@ -438,164 +425,12 @@ public class SpectrumPanel
     final int				actRow;
     final List<SpectrumContainer> 	visibleConts;
 
-    result = new BasePopupMenu();
-    model  = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
-    if (table.getSelectedRows().length == 0)
-      indices = new int[]{row};
-    else
-      indices = table.getSelectedRows();
-    for (int i = 0; i < indices.length; i++) {
-      SpectrumContainer cont = model.getContainerAt(indices[i]);
-      indices[i] = getContainerManager().indexOf(cont);
-    }
-    actRow = getContainerManager().indexOf(model.getContainerAt(row));
+    result = super.getContainerListPopupMenu(table, row);
 
-    visibleConts = new ArrayList<>();
-    for (int i = 0; i < model.getRowCount(); i++) {
-      if (model.getContainerAt(i).isVisible())
-	visibleConts.add(model.getContainerAt(i));
-    }
-
-    item = new JMenuItem("Toggle visibility");
-    item.addActionListener((ActionEvent e) -> {
-      TIntArrayList visible = new TIntArrayList();
-      TIntArrayList invisible = new TIntArrayList();
-      for (int i = 0; i < indices.length; i++) {
-	if (getContainerManager().isVisible(indices[i]))
-	  invisible.add(indices[i]);
-	else
-	  visible.add(indices[i]);
-      }
-      Range range = new Range();
-      range.setMax(getContainerManager().count());
-      if (invisible.size() > 0) {
-	range.setIndices(invisible.toArray());
-	getScriptingEngine().add(
-	  SpectrumPanel.this,
-	  fixAction(Invisible.ACTION) + " " + range.getRange());
-      }
-      if (visible.size() > 0) {
-	range.setIndices(visible.toArray());
-	getScriptingEngine().add(
-	  SpectrumPanel.this,
-	  fixAction(Visible.ACTION) + " " + range.getRange());
-      }
-    });
-    result.add(item);
-
-    item = new JMenuItem("Show all");
-    item.addActionListener((ActionEvent e) -> {
-      TIntArrayList list = new TIntArrayList();
-      for (int i = 0; i < model.getRowCount(); i++) {
-	int index = getContainerManager().indexOf(model.getContainerAt(i));
-	if (!model.getContainerAt(i).isVisible())
-	  list.add(index);
-      }
-      if (list.size() > 0) {
-	Range range = new Range();
-	range.setMax(getContainerManager().count());
-	range.setIndices(list.toArray());
-	getScriptingEngine().add(
-	  SpectrumPanel.this,
-	  fixAction(Visible.ACTION) + " " + range.getRange());
-      }
-    });
-    result.add(item);
-
-    item = new JMenuItem("Hide all");
-    item.addActionListener((ActionEvent e) -> {
-      TIntArrayList list = new TIntArrayList();
-      for (int i = 0; i < model.getRowCount(); i++) {
-	int index = getContainerManager().indexOf(model.getContainerAt(i));
-	if (model.getContainerAt(i).isVisible())
-	  list.add(index);
-      }
-      if (list.size() > 0) {
-	Range range = new Range();
-	range.setMax(getContainerManager().count());
-	range.setIndices(list.toArray());
-	getScriptingEngine().add(
-	  SpectrumPanel.this,
-	  fixAction(Invisible.ACTION) + " " + range.getRange());
-      }
-    });
-    result.add(item);
-
-    item = new JMenuItem("Choose color...");
-    item.addActionListener((ActionEvent e) -> {
-      String msg = "Choose color";
-      SpectrumContainer cont;
-      Color color = Color.BLUE;
-      if (indices.length == 1) {
-	cont = getContainerManager().get(indices[0]);
-	msg += " for " + cont.getData().getID();
-	color = cont.getColor();
-      }
-      Color c = JColorChooser.showDialog(
-	table,
-	msg,
-	color);
-      if (c == null)
-	return;
-      for (int index : indices)
-	getContainerManager().get(index).setColor(c);
-    });
-    result.add(item);
-
-    if (getContainerManager().getAllowRemoval()) {
-      result.addSeparator();
-
-      item = new JMenuItem("Remove");
-      item.addActionListener((ActionEvent e) -> m_SpectrumContainerList.getTable().removeContainers(indices));
-      result.add(item);
-
-      item = new JMenuItem("Remove all");
-      item.addActionListener((ActionEvent e) -> m_SpectrumContainerList.getTable().removeAllContainers());
-      result.add(item);
-    }
-
-    if (getContainerManager().isReloadable()) {
-      result.addSeparator();
-
-      item = new JMenuItem("Reload");
-      item.addActionListener((ActionEvent e) -> {
-	getScriptingEngine().add(
-	  SpectrumPanel.this,
-	  fixAction(SetData.ACTION) + " "
-	    + (actRow + 1) + " "
-	    + getContainerManager().get(actRow).getData().getDatabaseID());
-      });
-      result.add(item);
-
-      item = new JMenuItem("Reload all");
-      item.addActionListener((ActionEvent e) -> {
-	for (int i = 0; i < model.getRowCount(); i++) {
-	  SpectrumContainer cont = model.getContainerAt(i);
-	  int actIndex = getContainerManager().indexOf(cont);
-	  getScriptingEngine().add(
-	    SpectrumPanel.this,
-	    fixAction(SetData.ACTION) + " "
-	      + (actIndex+1) + " "
-	      + getContainerManager().get(actIndex).getData().getDatabaseID());
-	}
-      });
-      result.add(item);
-    }
-
-    result.addSeparator();
-
-    item = new JMenuItem("Copy ID" + (indices.length > 1 ? "s" : ""));
-    item.setEnabled(indices.length > 0);
-    item.addActionListener((ActionEvent e) -> {
-      StringBuilder id = new StringBuilder();
-      for (int i = 0; i < indices.length; i++) {
-	if (id.length() > 0)
-	  id.append("\n");
-	id.append(getContainerManager().get(indices[i]).getDisplayID());
-      }
-      ClipboardHelper.copyToClipboard(id.toString());
-    });
-    result.add(item);
+    model        = (SpectrumContainerModel) getContainerList().getContainerModel();
+    actRow       = getContainerManager().indexOf(model.getContainerAt(row));
+    indices      = getSelectedContainerIndices(table, row);
+    visibleConts = getTableModelContainers(true);
 
     item = new JMenuItem("Information");
     item.addActionListener((ActionEvent e) -> {
@@ -615,10 +450,6 @@ public class SpectrumPanel
     item.addActionListener((ActionEvent e) -> showSampleData(visibleConts));
     result.add(item);
 
-    item = new JMenuItem("Notes");
-    item.addActionListener((ActionEvent e) -> showNotes(visibleConts));
-    result.add(item);
-
     return result;
   }
 
@@ -631,39 +462,11 @@ public class SpectrumPanel
   @Override
   public void customizePopupMenu(MouseEvent e, JPopupMenu menu) {
     JMenuItem				item;
-    final SpectrumContainerModel	model;
     final List<SpectrumContainer> 	visibleConts;
 
-    model        = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
-    visibleConts = new ArrayList<>();
-    for (int i = 0; i < model.getRowCount(); i++) {
-      if (model.getContainerAt(i).isVisible())
-	visibleConts.add(model.getContainerAt(i));
-    }
+    super.customizePopupMenu(e, menu);
 
-    menu.addSeparator();
-
-    item = new JMenuItem();
-    item.setIcon(GUIHelper.getEmptyIcon());
-    if (!getSpectrumPaintlet().isMarkersDisabled())
-      item.setText("Disable markers");
-    else
-      item.setText("Enable markers");
-    item.addActionListener((ActionEvent ae) -> {
-      getSpectrumPaintlet().setMarkersDisabled(
-        !getSpectrumPaintlet().isMarkersDisabled());
-      repaint();
-    });
-    menu.add(item);
-
-    item = new JMenuItem();
-    item.setIcon(GUIHelper.getEmptyIcon());
-    if (isSidePanelVisible())
-      item.setText("Hide side panel");
-    else
-      item.setText("Show side panel");
-    item.addActionListener((ActionEvent ae) -> setSidePanelVisible(!isSidePanelVisible()));
-    menu.add(item);
+    visibleConts = getTableModelContainers(true);
 
     item = new JMenuItem();
     item.setIcon(GUIHelper.getEmptyIcon());
@@ -674,25 +477,17 @@ public class SpectrumPanel
     item.addActionListener((ActionEvent ae) -> setAdjustToVisibleData(!getAdjustToVisibleData()));
     menu.add(item);
 
-    menu.addSeparator();
-
     item = new JMenuItem("Spectrum statistics", GUIHelper.getIcon("statistics.png"));
     item.addActionListener((ActionEvent ae) -> {
       List<InformativeStatistic> stats = new ArrayList<>();
-      for (int i = 0; i < model.getRowCount(); i++) {
-        if (model.getContainerAt(i).isVisible())
-          stats.add(model.getContainerAt(i).getData().toStatistic());
-      }
+      for (SpectrumContainer cont: visibleConts)
+	stats.add(cont.getData().toStatistic());
       showStatistics(stats);
     });
     menu.add(item);
 
     item = new JMenuItem("Spectrum histogram", GUIHelper.getIcon("histogram.png"));
     item.addActionListener((ActionEvent ae) -> showHistogram(visibleConts));
-    menu.add(item);
-
-    item = new JMenuItem("Spectrum notes", GUIHelper.getEmptyIcon());
-    item.addActionListener((ActionEvent ae) -> showNotes(visibleConts));
     menu.add(item);
 
     item = new JMenuItem("Goto wave number...", GUIHelper.getEmptyIcon());
@@ -708,8 +503,28 @@ public class SpectrumPanel
     item = new JMenuItem("Export visible spectra...", GUIHelper.getIcon("arff.png"));
     item.addActionListener((ActionEvent ae) -> exportVisibleSpectra());
     menu.add(item);
+  }
 
-    SendToActionUtils.addSendToSubmenu(this, menu);
+  /**
+   * Returns the paintlet used for painting the data.
+   *
+   * @return		the paintlet
+   */
+  @Override
+  public Paintlet getDataPaintlet() {
+    return m_SpectrumPaintlet;
+  }
+
+  /**
+   * Sets the paintlet to use for painting the data.
+   *
+   * @param value	the paintlet
+   */
+  public void setDataPaintlet(Paintlet value) {
+    removePaintlet(m_SpectrumPaintlet);
+    m_SpectrumPaintlet = (AbstractSpectrumPaintlet) value;
+    m_SpectrumPaintlet.setPanel(this);
+    addPaintlet(m_SpectrumPaintlet);
   }
 
   /**
@@ -718,12 +533,9 @@ public class SpectrumPanel
   protected void saveVisibleSpectra() {
     AbstractDataContainerWriter 	writer;
     String 				filename;
-    int					i;
-    SpectrumContainer 			cont;
     String[] 				ext;
     List<Spectrum> 			data;
     String 				prefix;
-    SpectrumContainerModel		model;
 
     if (m_ExportDialog == null) {
       if (getParentDialog() != null)
@@ -735,8 +547,6 @@ public class SpectrumPanel
     m_ExportDialog.setVisible(true);
     if (m_ExportDialog.getOption() != SpectrumExportDialog.APPROVE_OPTION)
       return;
-
-    model = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
 
     // write data
     writer = m_ExportDialog.getExport();
@@ -750,25 +560,18 @@ public class SpectrumPanel
       filename = m_ExportDialog.getDirectory().getAbsolutePath() + File.separator + filename + "." + ext[0];
       writer.setOutput(new PlaceholderFile(filename));
       data = new ArrayList<>();
-      for (i = 0; i < model.getRowCount(); i++) {
-	if (!model.getContainerAt(i).isVisible())
-	  continue;
-	cont = model.getContainerAt(i);
-	data.add(cont.getData());
-      }
+      for (SpectrumContainer c: getTableModelContainers(true))
+	data.add(c.getData());
       if (!writer.write(data))
 	GUIHelper.showErrorMessage(this, "Failed to write spectra to '" + filename + "'!");
     }
     else {
       prefix = m_ExportDialog.getDirectory().getAbsolutePath();
-      for (i = 0; i < model.getRowCount(); i++) {
-	if (!model.getContainerAt(i).isVisible())
-	  continue;
-	cont = model.getContainerAt(i);
-	filename = prefix + File.separator + FileUtils.createFilename(cont.getDisplayID(), "") + "." + ext[0];
+      for (SpectrumContainer c: getTableModelContainers(true)) {
+	filename = prefix + File.separator + FileUtils.createFilename(c.getDisplayID(), "") + "." + ext[0];
 	writer.setOutput(new PlaceholderFile(filename));
-	if (!writer.write(cont.getData())) {
-	  GUIHelper.showErrorMessage(this, "Failed to write spectrum #" + (i+1) + " to '" + filename + "'!");
+	if (!writer.write(c.getData())) {
+	  GUIHelper.showErrorMessage(this, "Failed to write spectrum #" + c + " to '" + filename + "'!");
 	  break;
 	}
       }
@@ -781,12 +584,9 @@ public class SpectrumPanel
   protected void exportVisibleSpectra() {
     Instances				data;
     Instance 				inst;
-    int					i;
     AbstractSpectrumInstanceGenerator	generator;
-    SpectrumContainer 			cont;
     AbstractFileSaver			saver;
     File				file;
-    SpectrumContainerModel		model;
 
     if (m_ExportDatasetDialog == null) {
       if (getParentDialog() != null)
@@ -799,13 +599,9 @@ public class SpectrumPanel
     if (m_ExportDatasetDialog.getOption() != SpectrumExportDialog.APPROVE_OPTION)
       return;
 
-    model     = (SpectrumContainerModel) getSpectrumContainerList().getContainerModel();
     generator = m_ExportDatasetDialog.getGenerator();
     data      = null;
-    for (i = 0; i < model.getRowCount(); i++) {
-      if (!model.getContainerAt(i).isVisible())
-	continue;
-      cont = model.getContainerAt(i);
+    for (SpectrumContainer cont: getTableModelContainers(true)) {
       inst = generator.generate(cont.getData());
       if (data == null)
 	data = new Instances(inst.dataset(), 0);
@@ -873,6 +669,37 @@ public class SpectrumPanel
     dialog.setData(data);
     dialog.setLocationRelativeTo(this);
     dialog.setVisible(true);
+  }
+
+  /**
+   * Returns true if storing the color in the report of container's data object
+   * is supported.
+   *
+   * @return		true if supported
+   */
+  @Override
+  protected boolean supportsStoreColorInReport() {
+    return true;
+  }
+
+  /**
+   * Stores the color of the container in the report of container's
+   * data object.
+   *
+   * @param indices	the indices of the containers of the container manager
+   * @param name	the field name to use
+   */
+  @Override
+  protected void storeColorInReport(int[] indices, String name) {
+    Field 		field;
+    SpectrumContainer	cont;
+
+    field = new Field(name, DataType.STRING);
+    for (int index: indices) {
+      cont = getContainerManager().get(index);
+      cont.getData().getReport().addField(field);
+      cont.getData().getReport().setValue(field, ColorHelper.toHex(cont.getColor()));
+    }
   }
 
   /**
@@ -1004,24 +831,12 @@ public class SpectrumPanel
   }
 
   /**
-   * Allows changing the action, if required in derived classes.
-   * <br><br>
-   * The default implementation simply returns the input.
-   *
-   * @param action	the action to fix
-   * @return		the fixed action
-   */
-  protected String fixAction(String action) {
-    return action;
-  }
-
-  /**
    * Returns the indices of the selected spectra.
    *
    * @return		the indices
    */
   public int[] getSelectedIndices() {
-    return m_SpectrumContainerList.getTable().getSelectedRows();
+    return m_ContainerList.getTable().getSelectedRows();
   }
 
   /**
@@ -1030,46 +845,13 @@ public class SpectrumPanel
    * @return		the spectra
    */
   public Spectrum[] getSelectedSpectra() {
-    Spectrum[]			result;
-    int[]			indices;
-    int				i;
-    SpectrumContainerManager	manager;
+    List<Spectrum>		result;
 
-    indices = getSelectedIndices();
-    result  = new Spectrum[indices.length];
-    manager = getContainerManager();
+    result = new ArrayList<>();
+    for (int index: getSelectedIndices())
+      result.add(getContainerManager().get(index).getData());
 
-    for (i = 0; i < indices.length; i++)
-      result[i] = manager.get(i).getData();
-
-    return result;
-  }
-
-  /**
-   * Sets whether to use active or store tables.
-   *
-   * @param value	if true then store tables are used
-   */
-  public void setUseStore(boolean value) {
-    m_UseStore = value;
-  }
-
-  /**
-   * Returns whether to use active or store tables.
-   *
-   * @return		true if store tables are used
-   */
-  public boolean getUseStore() {
-    return m_UseStore;
-  }
-
-  /**
-   * Returns the panel listing the spectrums.
-   *
-   * @return		the panel
-   */
-  public SpectrumContainerList getSpectrumContainerList() {
-    return m_SpectrumContainerList;
+    return result.toArray(new Spectrum[result.size()]);
   }
 
   /**
@@ -1078,8 +860,10 @@ public class SpectrumPanel
    * @param value	if true then anti-aliasing is used
    */
   public void setAntiAliasingEnabled(boolean value) {
-    m_SpectrumPaintlet.setAntiAliasingEnabled(value);
-    m_PanelZoomOverview.getContainerPaintlet().setAntiAliasingEnabled(value);
+    if (m_SpectrumPaintlet instanceof AntiAliasingSupporter)
+      ((AntiAliasingSupporter) m_SpectrumPaintlet).setAntiAliasingEnabled(value);
+    if (m_PanelZoomOverview.getContainerPaintlet() instanceof AntiAliasingSupporter)
+      ((AntiAliasingSupporter) m_PanelZoomOverview.getContainerPaintlet()).setAntiAliasingEnabled(value);
   }
 
   /**
@@ -1088,7 +872,8 @@ public class SpectrumPanel
    * @return		true if anti-aliasing is used
    */
   public boolean isAntiAliasingEnabled() {
-    return m_SpectrumPaintlet.isAntiAliasingEnabled();
+    return (m_SpectrumPaintlet instanceof AntiAliasingSupporter)
+      && ((AntiAliasingSupporter) m_SpectrumPaintlet).isAntiAliasingEnabled();
   }
 
   /**
@@ -1128,7 +913,7 @@ public class SpectrumPanel
    */
   @Override
   public void cleanUp() {
-    m_SpectrumContainerList.cleanUp();
+    m_ContainerList.cleanUp();
 
     if (m_SpectrumPointHitDetector != null) {
       m_SpectrumPointHitDetector.cleanUp();

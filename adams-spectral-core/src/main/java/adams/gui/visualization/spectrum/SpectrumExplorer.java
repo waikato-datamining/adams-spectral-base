@@ -40,6 +40,7 @@ import adams.event.DatabaseConnectionChangeEvent.EventType;
 import adams.event.DatabaseConnectionChangeListener;
 import adams.flow.control.Flow;
 import adams.gui.chooser.SpectrumFileChooser;
+import adams.gui.core.AntiAliasingSupporter;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTabbedPane;
 import adams.gui.core.BaseTable;
@@ -295,7 +296,7 @@ public class SpectrumExplorer
     panelData = new JPanel(new BorderLayout());
     m_TabbedPane.addTab("Data", panelData);
     m_TabbedPane.addChangeListener(e -> {
-      ContainerTable dtable = getSpectrumPanel().getSpectrumContainerList().getTable();
+      ContainerTable dtable = getSpectrumPanel().getContainerList().getTable();
       // data
       if (m_TabbedPane.getSelectedIndex() == 0) {
 	BaseTable rtable = m_Reports.getReportContainerList().getTable();
@@ -537,6 +538,8 @@ public class SpectrumExplorer
 
     m_MenuItemStartRecording.setEnabled(!getScriptingEngine().isRecording());
     m_MenuItemStopRecording.setEnabled(getScriptingEngine().isRecording());
+    m_MenuItemViewAntiAliasing.setEnabled(getSpectrumPanel().getDataPaintlet() instanceof AntiAliasingSupporter);
+    m_MenuItemViewAntiAliasing.setSelected(getSpectrumPanel().isAntiAliasingEnabled());
   }
 
   /**
@@ -1265,10 +1268,10 @@ public class SpectrumExplorer
       m_DialogColorProvider.setTitle("Select color provider");
       m_DialogColorProvider.getGOEEditor().setClassType(AbstractColorProvider.class);
       m_DialogColorProvider.getGOEEditor().setCanChangeClassInDialog(true);
-      m_DialogColorProvider.setLocationRelativeTo(this);
     }
     
     m_DialogColorProvider.setCurrent(getContainerManager().getColorProvider().shallowCopy());
+    m_DialogColorProvider.setLocationRelativeTo(m_DialogColorProvider.getParent());
     m_DialogColorProvider.setVisible(true);
     if (m_DialogColorProvider.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
       return;
@@ -1290,17 +1293,17 @@ public class SpectrumExplorer
       m_DialogPaintlet.setTitle("Select paintlet");
       m_DialogPaintlet.getGOEEditor().setClassType(AbstractSpectrumPaintlet.class);
       m_DialogPaintlet.getGOEEditor().setCanChangeClassInDialog(true);
-      m_DialogPaintlet.setLocationRelativeTo(this);
     }
     
-    m_DialogPaintlet.setCurrent(getSpectrumPanel().getSpectrumPaintlet().shallowCopy());
+    m_DialogPaintlet.setCurrent(getSpectrumPanel().getDataPaintlet().shallowCopy());
+    m_DialogPaintlet.setLocationRelativeTo(m_DialogPaintlet.getParent());
     m_DialogPaintlet.setVisible(true);
     if (m_DialogPaintlet.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
       return;
     paintlet = (Paintlet) m_DialogPaintlet.getCurrent();
-    paintlet.setPanel(getSpectrumPanel());
-    getSpectrumPanel().removePaintlet(getSpectrumPanel().getSpectrumPaintlet());
-    getSpectrumPanel().addPaintlet(paintlet);
+    if (paintlet instanceof AntiAliasingSupporter)
+      ((AntiAliasingSupporter) paintlet).setAntiAliasingEnabled(getSpectrumPanel().isAntiAliasingEnabled());
+    getSpectrumPanel().setDataPaintlet(paintlet);
     zoomVisible = getSpectrumPanel().isZoomOverviewPanelVisible();
     getSpectrumPanel().getZoomOverviewPanel().setDataContainerPanel(getSpectrumPanel());
     getSpectrumPanel().setZoomOverviewPanelVisible(zoomVisible);

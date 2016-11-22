@@ -29,7 +29,7 @@ import adams.gui.visualization.container.AbstractDataContainerZoomOverviewPanel;
  * @version $Revision: 1279 $
  */
 public class SpectrumZoomOverviewPanel
-  extends AbstractDataContainerZoomOverviewPanel<SpectrumPanel, SpectrumPaintlet, SpectrumZoomOverviewPaintlet, Spectrum, SpectrumContainerManager> {
+  extends AbstractDataContainerZoomOverviewPanel<SpectrumPanel, AbstractSpectrumPaintlet, SpectrumZoomOverviewPaintlet, Spectrum, SpectrumContainerManager> {
 
   /** for serialization. */
   private static final long serialVersionUID = -5141649373267221710L;

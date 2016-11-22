@@ -110,7 +110,7 @@ public class SpectrumPointHitDetector
     axisLeft   = m_Owner.getPlot().getAxis(Axis.LEFT);
     amplitude  = (float) axisLeft.posToValue((int) e.getY());
     waveno     = (float) axisBottom.posToValue((int) e.getX());
-    model      = (SpectrumContainerModel) m_Owner.getSpectrumContainerList().getContainerModel();
+    model      = (SpectrumContainerModel) m_Owner.getContainerList().getContainerModel();
 
     for (i = 0; i < model.getRowCount(); i++) {
       if (!model.getContainerAt(i).isVisible())
