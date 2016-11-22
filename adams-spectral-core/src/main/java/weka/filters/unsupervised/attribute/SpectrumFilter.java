@@ -540,7 +540,9 @@ public class SpectrumFilter
 	    if (n == transformed.classIndex())
 	      continue;
 	    att = transformed.attribute(n);
-	    if (att.isString())
+            if (transformed.isMissing(n))
+              values[index] = Utils.missingValue();
+	    else if (att.isString())
 	      values[index] = header.attribute(index).addStringValue(transformed.stringValue(n));
 	    else if (att.isRelationValued())
 	      values[index] = header.attribute(index).addRelation(transformed.relationalValue(n));
