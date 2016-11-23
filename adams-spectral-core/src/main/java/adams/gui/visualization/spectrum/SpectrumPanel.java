@@ -38,7 +38,6 @@ import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
 import adams.event.DatabaseConnectionChangeEvent;
 import adams.gui.core.AntiAliasingSupporter;
-import adams.gui.core.BasePopupMenu;
 import adams.gui.core.ColorHelper;
 import adams.gui.core.GUIHelper;
 import adams.gui.dialog.SpreadSheetDialog;
@@ -47,7 +46,6 @@ import adams.gui.scripting.AbstractScriptingEngine;
 import adams.gui.scripting.SpectralScriptingEngine;
 import adams.gui.visualization.container.ContainerTable;
 import adams.gui.visualization.container.DataContainerPanelWithContainerList;
-import adams.gui.visualization.container.NotesFactory;
 import adams.gui.visualization.core.AbstractColorProvider;
 import adams.gui.visualization.core.CoordinatesPaintlet;
 import adams.gui.visualization.core.CoordinatesPaintlet.Coordinates;
@@ -64,9 +62,7 @@ import weka.core.Instances;
 import weka.core.converters.AbstractFileSaver;
 import weka.core.converters.ConverterUtils.DataSink;
 
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import java.awt.BorderLayout;
@@ -75,7 +71,6 @@ import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
@@ -410,102 +405,6 @@ public class SpectrumPanel
   }
 
   /**
-   * Returns a popup menu for the table of the spectrum list.
-   *
-   * @param table	the affected table
-   * @param row	the row the mouse is currently over
-   * @return		the popup menu
-   */
-  @Override
-  public BasePopupMenu getContainerListPopupMenu(final ContainerTable<SpectrumContainerManager,SpectrumContainer> table, final int row) {
-    BasePopupMenu			result;
-    JMenuItem				item;
-    final int[] 			indices;
-    final SpectrumContainerModel	model;
-    final int				actRow;
-    final List<SpectrumContainer> 	visibleConts;
-
-    result = super.getContainerListPopupMenu(table, row);
-
-    model        = (SpectrumContainerModel) getContainerList().getContainerModel();
-    actRow       = getContainerManager().indexOf(model.getContainerAt(row));
-    indices      = getSelectedContainerIndices(table, row);
-    visibleConts = getTableModelContainers(true);
-
-    item = new JMenuItem("Information");
-    item.addActionListener((ActionEvent e) -> {
-      List<InformativeStatistic> stats = new ArrayList<>();
-      for (SpectrumContainer cont: visibleConts)
-	stats.add(cont.getData().toStatistic());
-      showStatistics(stats);
-    });
-    result.add(item);
-
-    item = new JMenuItem("Spectral data");
-    item.setEnabled(indices.length == 1);
-    item.addActionListener((ActionEvent e) -> showSpectralData(getContainerManager().get(actRow)));
-    result.add(item);
-
-    item = new JMenuItem("Sample data");
-    item.addActionListener((ActionEvent e) -> showSampleData(visibleConts));
-    result.add(item);
-
-    return result;
-  }
-
-  /**
-   * Optional customizing of the menu that is about to be popped up.
-   *
-   * @param e		the mous event
-   * @param menu	the menu to customize
-   */
-  @Override
-  public void customizePopupMenu(MouseEvent e, JPopupMenu menu) {
-    JMenuItem				item;
-    final List<SpectrumContainer> 	visibleConts;
-
-    super.customizePopupMenu(e, menu);
-
-    visibleConts = getTableModelContainers(true);
-
-    item = new JMenuItem();
-    item.setIcon(GUIHelper.getEmptyIcon());
-    if (getAdjustToVisibleData())
-      item.setText("Adjust to loaded data");
-    else
-      item.setText("Adjust to visible data");
-    item.addActionListener((ActionEvent ae) -> setAdjustToVisibleData(!getAdjustToVisibleData()));
-    menu.add(item);
-
-    item = new JMenuItem("Spectrum statistics", GUIHelper.getIcon("statistics.png"));
-    item.addActionListener((ActionEvent ae) -> {
-      List<InformativeStatistic> stats = new ArrayList<>();
-      for (SpectrumContainer cont: visibleConts)
-	stats.add(cont.getData().toStatistic());
-      showStatistics(stats);
-    });
-    menu.add(item);
-
-    item = new JMenuItem("Spectrum histogram", GUIHelper.getIcon("histogram.png"));
-    item.addActionListener((ActionEvent ae) -> showHistogram(visibleConts));
-    menu.add(item);
-
-    item = new JMenuItem("Goto wave number...", GUIHelper.getEmptyIcon());
-    item.addActionListener((ActionEvent ae) -> selectWaveNumber());
-    menu.add(item);
-
-    menu.addSeparator();
-
-    item = new JMenuItem("Save visible spectra...", GUIHelper.getIcon("save.gif"));
-    item.addActionListener((ActionEvent ae) -> saveVisibleSpectra());
-    menu.add(item);
-
-    item = new JMenuItem("Export visible spectra...", GUIHelper.getIcon("arff.png"));
-    item.addActionListener((ActionEvent ae) -> exportVisibleSpectra());
-    menu.add(item);
-  }
-
-  /**
    * Returns the paintlet used for painting the data.
    *
    * @return		the paintlet
@@ -530,7 +429,7 @@ public class SpectrumPanel
   /**
    * Saves the visible spectra to a directory.
    */
-  protected void saveVisibleSpectra() {
+  public void saveVisibleSpectra() {
     AbstractDataContainerWriter 	writer;
     String 				filename;
     String[] 				ext;
@@ -581,7 +480,7 @@ public class SpectrumPanel
   /**
    * Exports the visible spectra to an ARFF file.
    */
-  protected void exportVisibleSpectra() {
+  public void exportVisibleSpectra() {
     Instances				data;
     Instance 				inst;
     AbstractSpectrumInstanceGenerator	generator;
@@ -655,30 +554,13 @@ public class SpectrumPanel
   }
 
   /**
-   * Displays the notes for the given chromatograms.
-   *
-   * @param data	the chromatograms to display
-   */
-  protected void showNotes(List<SpectrumContainer> data) {
-    NotesFactory.Dialog		dialog;
-
-    if (getParentDialog() != null)
-      dialog = NotesFactory.getDialog(getParentDialog(), ModalityType.MODELESS);
-    else
-      dialog = NotesFactory.getDialog(getParentFrame(), false);
-    dialog.setData(data);
-    dialog.setLocationRelativeTo(this);
-    dialog.setVisible(true);
-  }
-
-  /**
    * Returns true if storing the color in the report of container's data object
    * is supported.
    *
    * @return		true if supported
    */
   @Override
-  protected boolean supportsStoreColorInReport() {
+  public boolean supportsStoreColorInReport() {
     return true;
   }
 
@@ -690,7 +572,7 @@ public class SpectrumPanel
    * @param name	the field name to use
    */
   @Override
-  protected void storeColorInReport(int[] indices, String name) {
+  public void storeColorInReport(int[] indices, String name) {
     Field 		field;
     SpectrumContainer	cont;
 
@@ -707,7 +589,7 @@ public class SpectrumPanel
    *
    * @param stats	the statistics to display
    */
-  protected void showStatistics(List<InformativeStatistic> stats) {
+  public void showStatistics(List<InformativeStatistic> stats) {
     InformativeStatisticFactory.Dialog	dialog;
 
     if (getParentDialog() != null)
@@ -724,7 +606,7 @@ public class SpectrumPanel
    *
    * @param data	the spectrums to display
    */
-  protected void showHistogram(List<SpectrumContainer> data) {
+  public void showHistogram(List<SpectrumContainer> data) {
     HistogramFactory.Dialog	dialog;
     int				i;
     Spectrum			sp;
@@ -759,7 +641,7 @@ public class SpectrumPanel
    *
    * @param cont	the container to display the raw data for
    */
-  protected void showSpectralData(SpectrumContainer cont) {
+  public void showSpectralData(SpectrumContainer cont) {
     SpreadSheetDialog	dialog;
 
     if (getParentDialog() != null)
@@ -782,7 +664,7 @@ public class SpectrumPanel
    *
    * @param data	the spectrums to display the sample data for
    */
-  protected void showSampleData(List<SpectrumContainer> data) {
+  public void showSampleData(List<SpectrumContainer> data) {
     ReportFactory.Dialog	dialog;
     List<ReportContainer>	conts;
     ReportContainer		rc;
@@ -809,13 +691,16 @@ public class SpectrumPanel
   /**
    * Selects the spectrum point based on the wave number.
    */
-  protected void selectWaveNumber() {
+  public void selectWaveNumber() {
     String 	retVal;
     float	value;
 
     retVal = GUIHelper.showInputDialog(this, "Please input a wave number");
-    if (retVal == null)
+    if (retVal == null) {
+      getSelectedWaveNumberPaintlet().setEnabled(false);
+      update();
       return;
+    }
 
     try {
       value = Float.parseFloat(retVal);
@@ -828,6 +713,8 @@ public class SpectrumPanel
     }
 
     getSelectedWaveNumberPaintlet().setPoint(new SpectrumPoint(value, 0));
+    getSelectedWaveNumberPaintlet().setEnabled(true);
+    update();
   }
 
   /**

@@ -90,3 +90,11 @@ adams.data.smoothing.AbstractSmoother=\
 # the paintlets for visualizing spectra
 adams.gui.visualization.spectrum.AbstractSpectrumPaintlet=\
   adams.gui.visualization.spectrum
+
+# The actions for the container list popup menu of data container panels
+adams.gui.visualization.container.datacontainerpanel.containerlistpopup.AbstractContainerListPopupCustomizer=\
+  adams.gui.visualization.spectrum.containerlistpopup
+
+# The actions for the plot popup menu of data container panels
+adams.gui.visualization.container.datacontainerpanel.plotpopup.AbstractPlotPopupCustomizer=\
+  adams.gui.visualization.spectrum.plotpopup
