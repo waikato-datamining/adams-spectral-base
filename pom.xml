@@ -45,7 +45,7 @@
   </properties>
 
   <modules>
-    <module>adams-spectral-core</module>
+    <module>adams-spectral-2dim</module>
   </modules>
 
   <build>

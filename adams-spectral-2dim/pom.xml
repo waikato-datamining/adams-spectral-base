@@ -9,11 +9,11 @@
     <version>16.11.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>adams-spectral-core</artifactId>
+  <artifactId>adams-spectral-2dim</artifactId>
   <packaging>jar</packaging>
 
-  <name>adams-spectral-core</name>
-  <description>Core components for spectral data.</description>
+  <name>adams-spectral-2dim</name>
+  <description>Core components for 2-dimensional spectral data.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>
     <name>University of Waikato, Hamilton, NZ</name>

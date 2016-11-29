@@ -11,70 +11,70 @@
 # Author: FracPete (fracpete at waikato dot ac dot nz)
 # Version: $Revision: 8917 $
 
-adams-spectral-core.SpectrumIdSupplier1=\
+adams-spectral-2dim.SpectrumIdSupplier1=\
   IF (PARENT IS adams.flow.control.Flow OR PARENT IS adams.flow.control.Trigger) AND ISFIRST \
   THEN adams.flow.source.SpectrumIdSupplier
 
-adams-spectral-core.SpectrumIdSupplier2=\
+adams-spectral-2dim.SpectrumIdSupplier2=\
   IF (PARENT IS adams.flow.control.Flow OR PARENT IS adams.flow.control.Trigger) AND AFTER STANDALONE \
   THEN adams.flow.source.SpectrumIdSupplier
 
-adams-spectral-core.SpectrumDbReader=\
+adams-spectral-2dim.SpectrumDbReader=\
   IF AFTER adams.flow.source.SpectrumIdSupplier \
   THEN adams.flow.transformer.SpectrumDbReader
 
-adams-spectral-core.SampleDataDbReader=\
+adams-spectral-2dim.SampleDataDbReader=\
   IF AFTER adams.flow.source.SpectrumIdSupplier \
   THEN adams.flow.transformer.SampleDataDbReader
 
-adams-spectral-core.Filter=\
+adams-spectral-2dim.Filter=\
   IF AFTER adams.flow.transformer.SpectrumDbReader \
   THEN adams.flow.transformer.Filter
 
-adams-spectral-core.InstanceGenerator=\
+adams-spectral-2dim.InstanceGenerator=\
   IF AFTER adams.flow.transformer.Filter \
   THEN adams.flow.transformer.InstanceGenerator
 
-adams-spectral-core.WekaInstanceDumper=\
+adams-spectral-2dim.WekaInstanceDumper=\
   IF AFTER adams.flow.transformer.InstanceGenerator \
   THEN adams.flow.transformer.WekaInstanceDumper
 
-adams-spectral-core.SpectrumFileReader1a=\
+adams-spectral-2dim.SpectrumFileReader1a=\
   IF AFTER adams.flow.source.DirectoryLister \
   THEN adams.flow.transformer.SpectrumFileReader
 
-adams-spectral-core.SpectrumFileReader1b=\
+adams-spectral-2dim.SpectrumFileReader1b=\
   IF AFTER adams.flow.source.FileSystemSearch \
   THEN adams.flow.transformer.SpectrumFileReader
 
-adams-spectral-core.SpectrumFileReader2=\
+adams-spectral-2dim.SpectrumFileReader2=\
   IF AFTER adams.flow.source.FileSupplier \
   THEN adams.flow.transformer.SpectrumFileReader
 
-adams-spectral-core.SpectrumFileReader3=\
+adams-spectral-2dim.SpectrumFileReader3=\
   IF AFTER adams.flow.source.SelectFile \
   THEN adams.flow.transformer.SpectrumFileReader
 
-adams-spectral-core.SpectrumFileReader4=\
+adams-spectral-2dim.SpectrumFileReader4=\
   IF PRECEDING GENERATES java.lang.String \
   THEN adams.flow.transformer.SpectrumFileReader
 
-adams-spectral-core.SampleDataFileReader1a=\
+adams-spectral-2dim.SampleDataFileReader1a=\
   IF AFTER adams.flow.source.DirectoryLister \
   THEN adams.flow.transformer.SampleDataFileReader
 
-adams-spectral-core.SampleDataFileReader1b=\
+adams-spectral-2dim.SampleDataFileReader1b=\
   IF AFTER adams.flow.source.FileSystemSearch \
   THEN adams.flow.transformer.SampleDataFileReader
 
-adams-spectral-core.SampleDataFileReader2=\
+adams-spectral-2dim.SampleDataFileReader2=\
   IF AFTER adams.flow.source.FileSupplier \
   THEN adams.flow.transformer.SampleDataFileReader
 
-adams-spectral-core.SampleDataFileReader3=\
+adams-spectral-2dim.SampleDataFileReader3=\
   IF AFTER adams.flow.source.SelectFile \
   THEN adams.flow.transformer.SampleDataFileReader
 
-adams-spectral-core.SampleDataFileReader4=\
+adams-spectral-2dim.SampleDataFileReader4=\
   IF PRECEDING GENERATES java.lang.String \
   THEN adams.flow.transformer.SampleDataFileReader

@@ -4,7 +4,7 @@
 # Version: $Revision: 8465 $
 
 # The name of the module
-Name=adams-spectral-core
+Name=adams-spectral-2dim
 
 # The version of the module
 Version=${project.version}
@@ -13,7 +13,7 @@ Version=${project.version}
 BuildTimestamp=${timestamp}
 
 # A short description of the module
-Description=Core components for spectral data.
+Description=Core components for 2-dimensional spectral data.
 
 # The author of the module
 Author=Peter Reutemann and Dale Fletcher
