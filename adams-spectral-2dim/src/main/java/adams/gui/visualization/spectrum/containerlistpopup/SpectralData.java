@@ -92,7 +92,7 @@ public class SpectralData
 
     model   = (SpectrumContainerModel) panel.getContainerList().getContainerModel();
     actRow  = panel.getContainerManager().indexOf(model.getContainerAt(row));
-    indices = panel.getSelectedContainerIndices(table, row);
+    indices = panel.getActualSelectedContainerIndices(table, row);
     item    = new JMenuItem("Spectral data");
     item.setEnabled(indices.length == 1);
     item.addActionListener((ActionEvent e) -> ((SpectrumPanel) panel).showSpectralData(panel.getContainerManager().get(actRow)));
