@@ -20,6 +20,7 @@
 
 package adams.data.io.input;
 
+import adams.core.io.FileUtils;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
@@ -101,6 +102,51 @@ public abstract class AbstractJCampSpectrumReader
   /** JCamp field: Time. */
   public final static String FIELD_TIME = "Time";
 
+  /** whether to use the filename as ID. */
+  protected boolean m_UseFilenameAsID;
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "use-filename-as-id", "useFilenameAsID",
+      false);
+  }
+
+  /**
+   * Sets whether to use the filename as ID.
+   *
+   * @param value 	true if to use filename
+   */
+  public void setUseFilenameAsID(boolean value) {
+    m_UseFilenameAsID = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use the filename as ID.
+   *
+   * @return 		true if to use filename
+   */
+  public boolean getUseFilenameAsID() {
+    return m_UseFilenameAsID;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useFilenameAsIDTipText() {
+    return
+      "If enabled, the filename gets used as ID.";
+  }
+
   /**
    * Initializes the sample data.
    *
@@ -167,7 +213,9 @@ public abstract class AbstractJCampSpectrumReader
       m_ReadData.add(sp);
       sd       = new SampleData();
       sp.setReport(sd);
-      if ((spectrum.getDate().length() > 0) && (spectrum.getTime().length() > 0))
+      if (m_UseFilenameAsID)
+	sp.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
+      else if ((spectrum.getDate().length() > 0) && (spectrum.getTime().length() > 0))
 	sp.setID(spectrum.getDate() + " " + spectrum.getTime());
       else
 	sp.setID(spectrum.getOrigin() + " - " + spectrum.getTitle());

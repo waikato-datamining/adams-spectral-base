@@ -134,6 +134,9 @@ public class JCampDX2SpectrumReader
   /** whether the reader validates. */
   protected boolean m_Validate;
 
+  /** whether to use the filename as ID. */
+  protected boolean m_UseFilenameAsID;
+
   /**
    * Returns a string describing the object.
    *
@@ -164,6 +167,10 @@ public class JCampDX2SpectrumReader
 
     m_OptionManager.add(
       "add-raw-metadata", "addRawMetaData",
+      false);
+
+    m_OptionManager.add(
+      "use-filename-as-id", "useFilenameAsID",
       false);
   }
 
@@ -255,6 +262,36 @@ public class JCampDX2SpectrumReader
   }
 
   /**
+   * Sets whether to use the filename as ID.
+   *
+   * @param value 	true if to use filename
+   */
+  public void setUseFilenameAsID(boolean value) {
+    m_UseFilenameAsID = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use the filename as ID.
+   *
+   * @return 		true if to use filename
+   */
+  public boolean getUseFilenameAsID() {
+    return m_UseFilenameAsID;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useFilenameAsIDTipText() {
+    return
+      "If enabled, the filename gets used as ID.";
+  }
+
+  /**
    * Returns a string describing the format (used in the file chooser).
    *
    * @return 			a description suitable for displaying in the
@@ -315,7 +352,10 @@ public class JCampDX2SpectrumReader
 	  xArray = data.getXArray();
 	  yArray = data.getYArray();
 	  sp     = new Spectrum();
-	  sp.setID("" + spec.getTitle() + ": " + (pos+1));
+          if (m_UseFilenameAsID)
+            sp.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
+          else
+            sp.setID("" + spec.getTitle() + ": " + (pos+1));
 	  sp.getReport().setNumericValue("Page", (pos+1));
 	  for (i = 0; i < xArray.getLength(); i++) {
 	    x     = xArray.pointAt(i);
@@ -330,7 +370,10 @@ public class JCampDX2SpectrumReader
 	if (spec instanceof Spectrum1D) {
 	  sp1d = (Spectrum1D) spec;
 	  sp   = new Spectrum();
-	  sp.setID("" + spec.getTitle());
+          if (m_UseFilenameAsID)
+            sp.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
+          else
+	    sp.setID("" + spec.getTitle());
 	  m_ReadData.add(sp);
 	  for (i = 0; i < sp1d.getXData().getLength(); i++) {
 	    x     = sp1d.getXData().pointAt(i);
