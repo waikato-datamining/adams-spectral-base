@@ -3,7 +3,7 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Batch filters an array of spectra" -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.source.FileSupplier -output-array true -file ${EXAMPLE_FLOWS}/data/141009_001-01_0-6.0 -file ${EXAMPLE_FLOWS}/data/141009_001-01_0-6.0
+ adams.flow.source.FileSupplier -output-array true -file ${FLOWS}/data/141009_001-01_0-6.0 -file ${FLOWS}/data/141009_001-01_0-6.0
  adams.flow.control.ArrayProcess
   adams.flow.transformer.SpectrumFileReader -reader adams.data.io.input.OpusSpectrumReaderExt
  adams.flow.transformer.SpectrumFilter -filter adams.data.filter.PassThrough

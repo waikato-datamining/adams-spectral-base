@@ -3,10 +3,10 @@
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Builds and uses an Instance evaluator." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.standalone.SetVariable -var-name evaluator_model -var-value ${EXAMPLE_FLOWS}/output/evaluator.model
+ adams.flow.standalone.SetVariable -var-name evaluator_model -var-value ${FLOWS}/output/evaluator.model
  adams.flow.source.Start
  adams.flow.control.Trigger -name "load dataset"
-  adams.flow.source.FileSupplier -file ${EXAMPLE_FLOWS}/data/bolts.arff
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/bolts.arff
   adams.flow.transformer.WekaFileReader -loader weka.core.converters.AArffLoader
   adams.flow.transformer.WekaClassSelector
   adams.flow.transformer.WekaRandomSplit -percentage 0.8
