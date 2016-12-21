@@ -11,6 +11,7 @@
 
   <artifactId>adams-spectral-2dim</artifactId>
   <packaging>jar</packaging>
+  <version>16.12.1-SNAPSHOT</version>
 
   <name>adams-spectral-2dim</name>
   <description>Core components for 2-dimensional spectral data.</description>
