@@ -11,7 +11,7 @@
 
   <artifactId>adams-spectral-base-pom</artifactId>
   <packaging>pom</packaging>
-  <version>16.12.0</version>
+  <version>16.12.1-SNAPSHOT</version>
 
   <name>adams-spectral-base-pom</name>
   <description>The project object model for all adams-spectral modules.</description>
@@ -22,9 +22,9 @@
   </organization>
 
   <scm>
-    <connection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/tags/adams-spectral-base-pom-16.12.0</connection>
-    <developerConnection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/tags/adams-spectral-base-pom-16.12.0</developerConnection>
-    <url>https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/tags/adams-spectral-base-pom-16.12.0</url>
+    <connection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/trunk</connection>
+    <developerConnection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/trunk</developerConnection>
+    <url>https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/trunk</url>
   </scm>
 
   <distributionManagement>
