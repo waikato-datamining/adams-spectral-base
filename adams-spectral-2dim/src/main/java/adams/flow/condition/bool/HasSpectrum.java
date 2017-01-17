@@ -22,6 +22,7 @@ package adams.flow.condition.bool;
 
 import adams.core.QuickInfoHelper;
 import adams.data.id.IDHandler;
+import adams.data.sampledata.SampleData;
 import adams.db.SpectrumT;
 import adams.flow.core.Actor;
 import adams.flow.core.Token;
@@ -46,6 +47,11 @@ import adams.flow.core.Unknown;
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
  * 
+ * <pre>-format &lt;java.lang.String&gt; (property: format)
+ * &nbsp;&nbsp;&nbsp;The data format string.
+ * &nbsp;&nbsp;&nbsp;default: NIR
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -59,6 +65,14 @@ public class HasSpectrum
   /** the ID of the spectrum. */
   protected String m_ID;
 
+  /** the form of this data. */
+  protected String m_Format;
+
+  /**
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
+   */
   @Override
   public String globalInfo() {
     return
@@ -77,6 +91,10 @@ public class HasSpectrum
     m_OptionManager.add(
       "id", "ID",
       "");
+
+    m_OptionManager.add(
+      "format", "format",
+      getDefaultFormat());
   }
   
   /**
@@ -109,13 +127,60 @@ public class HasSpectrum
   }
 
   /**
+   * Returns the default format of the spectra.
+   *
+   * @return		the default
+   */
+  protected String getDefaultFormat() {
+    return SampleData.DEFAULT_FORMAT;
+  }
+
+  /**
+   * Sets the format string of the data (always converted to upper case).
+   * Use null to set default format.
+   *
+   * @param value 	the format
+   */
+  public void setFormat(String value) {
+    if (value == null)
+      m_Format = SampleData.DEFAULT_FORMAT;
+    else
+      m_Format = value.toUpperCase();
+    reset();
+  }
+
+  /**
+   * Returns the format string of the data.
+   *
+   * @return 		the format
+   */
+  public String getFormat() {
+    return m_Format;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String formatTipText() {
+    return "The data format string.";
+  }
+
+  /**
    * Returns the quick info string to be displayed in the flow editor.
    *
    * @return		the info or null if no info to be displayed
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "ID", (m_ID.isEmpty() ? "-from token-" : m_ID), "ID: ");
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "ID", (m_ID.isEmpty() ? "-from token-" : m_ID), "ID: ");
+    result += QuickInfoHelper.toString(this, "format", (m_Format.isEmpty() ? "-default-" : m_Format), ", format: ");
+
+    return result;
   }
 
   /**
@@ -139,6 +204,7 @@ public class HasSpectrum
   protected boolean doEvaluate(Actor owner, Token token) {
     boolean	result;
     String	id;
+    String	format;
 
     result = false;
 
@@ -151,8 +217,12 @@ public class HasSpectrum
 	id = ((IDHandler) token.getPayload()).getID();
     }
 
+    format = m_Format;
+    if (format.isEmpty())
+      format = SampleData.DEFAULT_FORMAT;
+
     if (id != null)
-      result = SpectrumT.getSingleton(getDatabaseConnection()).exists(id);
+      result = SpectrumT.getSingleton(getDatabaseConnection()).exists(id, format);
     else
       getLogger().warning("Neither ID specified nor ID obtained from token: " + token);
 
