@@ -20,6 +20,7 @@
 
 package weka.core.converters;
 
+import adams.core.base.BaseRegExp;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.data.instances.SimpleInstanceGenerator;
@@ -30,11 +31,16 @@ import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.OptionHandler;
 import weka.core.RevisionUtils;
+import weka.core.Utils;
+import weka.core.WekaOptionUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
@@ -45,9 +51,15 @@ import java.util.Vector;
  * @version $Revision$
  */
 public class CALSpectrumLoader
-  extends AbstractFileLoader {
+  extends AbstractFileLoader
+  implements OptionHandler {
 
   private static final long serialVersionUID = 3251733079008628734L;
+
+  public static final String REF_REGEXP = "ref-regexp";
+
+  /** the references to load. */
+  protected BaseRegExp m_RefRegExp = getDefaultRefRegExp();
 
   /**
    * Returns a string describing the object.
@@ -55,7 +67,8 @@ public class CALSpectrumLoader
    * @return 			a description suitable for displaying in the gui
    */
   public String globalInfo() {
-    return new CALSpectrumReader().globalInfo();
+    return new CALSpectrumReader().globalInfo() + "\n"
+      + "NB: reference names are always turned into lower-case.";
   }
 
   /**
@@ -86,6 +99,81 @@ public class CALSpectrumLoader
   @Override
   public String getFileDescription() {
     return new CALSpectrumReader().getFormatDescription();
+  }
+
+  /**
+   * Returns the default regexp for the references.
+   *
+   * @return		the default
+   */
+  protected BaseRegExp getDefaultRefRegExp() {
+    return new BaseRegExp(BaseRegExp.MATCH_ALL);
+  }
+
+  /**
+   * Returns an enumeration describing the available options.
+   *
+   * @return an enumeration of all the available options.
+   */
+  @Override
+  public Enumeration listOptions() {
+    Vector result = new Vector();
+    WekaOptionUtils.addOption(result, refRegExpTipText(), getDefaultRefRegExp().getValue(), REF_REGEXP);
+    return WekaOptionUtils.toEnumeration(result);
+  }
+
+  /**
+   * Sets the OptionHandler's options using the given list. All options
+   * will be set (or reset) during this call (i.e. incremental setting
+   * of options is not possible).
+   *
+   * @param options the list of options as an array of strings
+   * @throws Exception if an option is not supported
+   */
+  @Override
+  public void setOptions(String[] options) throws Exception {
+    setRefRegExp((BaseRegExp) WekaOptionUtils.parse(options, REF_REGEXP, getDefaultRefRegExp()));
+    Utils.checkForRemainingOptions(options);
+  }
+
+  /**
+   * Gets the current option settings for the OptionHandler.
+   *
+   * @return the list of current option settings as an array of strings
+   */
+  @Override
+  public String[] getOptions() {
+    List<String> result = new ArrayList<>();
+    WekaOptionUtils.add(result, REF_REGEXP, getRefRegExp());
+    return WekaOptionUtils.toArray(result);
+  }
+
+  /**
+   * Sets the regexp to use for matching the reference names to include in the dataset.
+   *
+   * @param value	the expression
+   */
+  public void setRefRegExp(BaseRegExp value) {
+    m_RefRegExp = value;
+  }
+
+  /**
+   * Returns the regexp to use for matching the reference names to include in the dataset.
+   *
+   * @return		the expression
+   */
+  public BaseRegExp getRefRegExp() {
+    return m_RefRegExp;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String refRegExpTipText() {
+    return "The regular expression that reference names must match to be included in the dataset.";
   }
 
   /**
@@ -132,7 +220,7 @@ public class CALSpectrumLoader
     List<Spectrum>		spectra;
     FossHelper 			fh;
     Vector<String> 		refs;
-    Field[]			fields;
+    List<Field>			fields;
     int				i;
     SimpleInstanceGenerator	generator;
     Instance			inst;
@@ -149,17 +237,22 @@ public class CALSpectrumLoader
 
     fh   = new FossHelper(FileUtils.loadFromBinaryFile(file.getAbsoluteFile()));
     refs = fh.getReferenceNames();
-    fields = new Field[refs.size() - 1];
-    for (i = 0; i < refs.size() - 1; i++)
-      fields[i] = new Field(refs.get(i).toLowerCase(), DataType.NUMERIC);
+    fields = new ArrayList<>();
+    for (i = 0; i < refs.size() - 1; i++) {
+      if (m_RefRegExp.isMatch(refs.get(i).toLowerCase()))
+	fields.add(new Field(refs.get(i).toLowerCase(), DataType.NUMERIC));
+    }
     generator = new SimpleInstanceGenerator();
     generator.setAddSampleID(true);
-    generator.setAdditionalFields(fields);
     generator.setNoAdditionalFieldsPrefix(true);
-    if (refs.size() > 0)
-      generator.setField(new Field(refs.get(refs.size() - 1).toLowerCase(), DataType.NUMERIC));
-    else
+    if (fields.size() > 0) {
+      generator.setField(fields.get(fields.size() - 1));
+      fields.remove(fields.size() - 1);
+    }
+    else {
       generator.setField(new Field("dummyclass", DataType.NUMERIC));
+    }
+    generator.setAdditionalFields(fields.toArray(new Field[fields.size()]));
     result = null;
     for (Spectrum sp: spectra) {
       inst = generator.generate(sp);
