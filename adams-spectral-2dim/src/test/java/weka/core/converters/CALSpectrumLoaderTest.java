@@ -21,6 +21,7 @@
 package weka.core.converters;
 
 import adams.core.Utils;
+import adams.core.base.BaseRegExp;
 import adams.env.Environment;
 import adams.test.AbstractTestHelper;
 import adams.test.AdamsTestCase;
@@ -64,6 +65,7 @@ public class CALSpectrumLoaderTest
     arff = new TmpFile("CALK10.arff");
     try {
       CALSpectrumLoader loader = new CALSpectrumLoader();
+      loader.setRefRegExp(new BaseRegExp("ref_1"));
       loader.setFile(data.getAbsoluteFile());
       Instances inst = loader.getDataSet();
       DataSink.write(arff.getAbsolutePath(), inst);
