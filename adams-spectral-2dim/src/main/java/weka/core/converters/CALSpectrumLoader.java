@@ -29,6 +29,7 @@ import adams.data.io.input.foss.FossHelper;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
+import adams.env.Environment;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.OptionHandler;
@@ -238,7 +239,7 @@ public class CALSpectrumLoader
     fh   = new FossHelper(FileUtils.loadFromBinaryFile(file.getAbsoluteFile()));
     refs = fh.getReferenceNames();
     fields = new ArrayList<>();
-    for (i = 0; i < refs.size() - 1; i++) {
+    for (i = 0; i < refs.size(); i++) {
       if (m_RefRegExp.isMatch(refs.get(i).toLowerCase()))
 	fields.add(new Field(refs.get(i).toLowerCase(), DataType.NUMERIC));
     }
@@ -294,6 +295,7 @@ public class CALSpectrumLoader
    * @param args should contain the name of an input file.
    */
   public static void main(String[] args) {
+    Environment.setEnvironmentClass(Environment.class);
     runFileLoader(new CALSpectrumLoader(), args);
   }
 }
