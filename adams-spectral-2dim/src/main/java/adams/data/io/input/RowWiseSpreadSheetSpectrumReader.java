@@ -15,7 +15,7 @@
 
 /**
  * RowWiseSpreadSheetSpectrumReader.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -31,6 +31,7 @@ import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
 import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,8 +152,10 @@ public class RowWiseSpreadSheetSpectrumReader
   @Override
   public String globalInfo() {
     return
-	"Reads spectra from rows in a spreadsheet obtained with the "
-	+ "specified spreadsheet reader.";
+      "Reads spectra from rows in a spreadsheet obtained with the "
+	+ "specified spreadsheet reader.\n"
+	+ "Sample ID and sample data columns get removed automatically from the "
+	+ "range of wave columns.";
   }
 
   /**
@@ -395,19 +398,17 @@ public class RowWiseSpreadSheetSpectrumReader
    * Indentifies the wave numbers.
    *
    * @param sheet	the spreadsheet to analyze
+   * @param cols	the columns
    * @return		the wave numbers
    */
-  protected TFloatArrayList identifyWaveNumbers(SpreadSheet sheet) {
+  protected TFloatArrayList identifyWaveNumbers(SpreadSheet sheet, int[] cols) {
     TFloatArrayList	result;
-    int[]		cols;
     String		name;
     String		group;
     int			i;
     int			col;
 
     result = new TFloatArrayList();
-
-    cols = m_WaveColumns.getIntIndices();
 
     for (i = 0; i < cols.length; i++) {
       col = cols[i];
@@ -434,15 +435,14 @@ public class RowWiseSpreadSheetSpectrumReader
    * Returns the sample data fields.
    *
    * @param sheet	the sheet to analyze
+   * @param cols	the columns
    * @return		the fields
    */
-  protected List<Field> identifySampleData(SpreadSheet sheet) {
+  protected List<Field> identifySampleData(SpreadSheet sheet, int[] cols) {
     List<Field>		result;
-    int[]		cols;
     Field		field;
 
     result = new ArrayList<>();
-    cols   = m_SampleDataColumns.getIntIndices();
 
     for (int col: cols) {
       if (sheet.isNumeric(col))
@@ -461,6 +461,7 @@ public class RowWiseSpreadSheetSpectrumReader
   @Override
   protected void readData() {
     SpreadSheet 	sheet;
+    TIntArrayList	cols;
     TFloatArrayList	waveNo;
     int[]		waveCols;
     List<Field> 	sdFields;
@@ -480,15 +481,21 @@ public class RowWiseSpreadSheetSpectrumReader
     m_SampleIDColumn.setData(sheet);
     idCol = m_SampleIDColumn.getIntIndex();
 
-    // wave numbers
-    m_WaveColumns.setData(sheet);
-    waveCols = m_WaveColumns.getIntIndices();
-    waveNo   = identifyWaveNumbers(sheet);
-
     // sample data
     m_SampleDataColumns.setData(sheet);
-    sdCols   = m_SampleDataColumns.getIntIndices();
-    sdFields = identifySampleData(sheet);
+    cols     = new TIntArrayList(m_SampleDataColumns.getIntIndices());
+    cols.remove(idCol);
+    sdCols   = cols.toArray();
+    sdFields = identifySampleData(sheet, sdCols);
+
+    // wave numbers
+    m_WaveColumns.setData(sheet);
+    cols = new TIntArrayList(m_WaveColumns.getIntIndices());
+    cols.remove(idCol);
+    for (int col: sdCols)
+      cols.remove(col);
+    waveCols = cols.toArray();
+    waveNo   = identifyWaveNumbers(sheet, waveCols);
 
     for (Row row: sheet.rows()) {
       sp = new Spectrum();
