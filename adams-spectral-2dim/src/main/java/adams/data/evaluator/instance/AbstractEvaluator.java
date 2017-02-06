@@ -15,7 +15,7 @@
 
 /*
  * AbstractEvaluator.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.evaluator.instance;
@@ -174,7 +174,7 @@ public abstract class AbstractEvaluator
     preCheck(data);
 
     if (data.classIsMissing()) {
-      getLogger().warning("No class value, cannot evaluate!");
+      getLogger().warning("No class value, cannot evaluate ('" + data.classAttribute().name() + "')!");
       result = new HashMap<>();
       result.put(DEFAULT_METRIC, m_MissingEvaluation);
     }
