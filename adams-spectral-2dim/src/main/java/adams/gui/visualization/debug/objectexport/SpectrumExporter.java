@@ -20,11 +20,11 @@
 
 package adams.gui.visualization.debug.objectexport;
 
-import adams.core.ClassLocator;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
 import adams.data.io.output.SimpleSpectrumWriter;
 import adams.data.spectrum.Spectrum;
+import nz.ac.waikato.cms.locator.ClassLocator;
 
 import java.io.File;
 

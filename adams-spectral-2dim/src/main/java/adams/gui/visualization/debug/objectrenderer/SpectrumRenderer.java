@@ -20,10 +20,10 @@
 
 package adams.gui.visualization.debug.objectrenderer;
 
-import adams.core.ClassLocator;
 import adams.data.spectrum.Spectrum;
 import adams.gui.visualization.spectrum.SpectrumContainer;
 import adams.gui.visualization.spectrum.SpectrumPanel;
+import nz.ac.waikato.cms.locator.ClassLocator;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
