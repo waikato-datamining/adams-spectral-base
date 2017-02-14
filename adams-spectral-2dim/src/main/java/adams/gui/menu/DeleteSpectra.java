@@ -41,6 +41,13 @@ public class DeleteSpectra
 
   /**
    * Initializes the menu item.
+   */
+  public DeleteSpectra() {
+    this(null);
+  }
+
+  /**
+   * Initializes the menu item.
    *
    * @param owner	the owning application
    */

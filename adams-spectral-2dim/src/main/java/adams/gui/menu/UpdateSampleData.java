@@ -25,7 +25,6 @@ import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
 import adams.gui.application.UserMode;
 import adams.gui.core.GUIHelper;
-import adams.gui.tools.DeleteSpectrumPanel;
 import adams.gui.tools.UpdateSampleDataPanel;
 
 /**
@@ -39,6 +38,13 @@ public class UpdateSampleData
 
   /** for serialization. */
   private static final long serialVersionUID = 7464423632324133713L;
+
+  /**
+   * Initializes the menu item.
+   */
+  public UpdateSampleData() {
+    this(null);
+  }
 
   /**
    * Initializes the menu item.
