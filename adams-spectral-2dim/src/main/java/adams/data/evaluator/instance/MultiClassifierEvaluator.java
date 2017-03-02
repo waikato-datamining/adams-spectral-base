@@ -15,7 +15,7 @@
 
 /**
  * MultiClassifierEvaluator.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.evaluator.instance;
 
@@ -33,8 +33,48 @@ import java.util.Random;
 import java.util.logging.Level;
 
 /**
- * A multi-classifier based evaluator. Compares predictions of the
- * specified models.
+ <!-- globalinfo-start -->
+ * Multi-classifier based evaluator. Generates predictions for each of the classifiers on an incoming instance. Outputs info on the range of the predictions, and uses base classifier MAE to normalise the RESULT_SCORE
+ * <br><br>
+ <!-- globalinfo-end -->
+ *
+ <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-missing-evaluation &lt;float&gt; (property: missingEvaluation)
+ * &nbsp;&nbsp;&nbsp;The value to use as replacement for missing evaluations.
+ * &nbsp;&nbsp;&nbsp;default: -999999.0
+ * </pre>
+ * 
+ * <pre>-serialization-file &lt;adams.core.io.PlaceholderFile&gt; (property: serializationFile)
+ * &nbsp;&nbsp;&nbsp;The file to serialize the generated internal model to.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ * 
+ * <pre>-override-serialized-file &lt;boolean&gt; (property: overrideSerializedFile)
+ * &nbsp;&nbsp;&nbsp;If set to true, then any serialized file will be ignored and the setup for 
+ * &nbsp;&nbsp;&nbsp;serialization will be regenerated.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-classifier &lt;weka.classifiers.Classifier&gt; [-classifier ...] (property: classifiers)
+ * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.PLSClassifier -filter \"weka.filters.supervised.attribute.PLSFilter -C 20 -M -A PLS1 -P center\" -S 1
+ * </pre>
+ * 
+ * <pre>-base &lt;weka.classifiers.Classifier&gt; (property: base)
+ * &nbsp;&nbsp;&nbsp;The base classifier to be used.
+ * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.PLSClassifier -filter \"weka.filters.supervised.attribute.PLSFilter -C 20 -M -A PLS1 -P center\" -S 1
+ * </pre>
+ * 
+ * <pre>-seed &lt;long&gt; (property: seed)
+ * &nbsp;&nbsp;&nbsp;The seed value to use for cross-validation
+ * &nbsp;&nbsp;&nbsp;default: 1
+ * </pre>
+ * 
+ <!-- options-end -->
  *
  * @author dale
  * @version $Revision: 7 $
@@ -210,15 +250,13 @@ public class MultiClassifierEvaluator
 
   /**
    * Performs the actual evaluation, allowing return of multiple evaluation metrics.
-   * <br><br>
-   * Default implementation returns null.
    *
    * @param data	the instance to check
    * @return		evaluation metrics, {@link #m_MissingEvaluation} in case
    * 			the class value is missing
    */
   protected HashMap<String,Float> performMultiEvaluate(Instance data) {
-    HashMap<String,Float> result = new HashMap<String,Float>();
+    HashMap<String,Float> result = new HashMap<>();
     try{
       double min = Double.MAX_VALUE;
       double max = Double.NEGATIVE_INFINITY;
