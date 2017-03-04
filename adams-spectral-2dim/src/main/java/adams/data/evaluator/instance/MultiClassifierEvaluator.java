@@ -61,6 +61,7 @@ import java.util.logging.Level;
  * </pre>
  * 
  * <pre>-classifier &lt;weka.classifiers.Classifier&gt; [-classifier ...] (property: classifiers)
+ * &nbsp;&nbsp;&nbsp;The classifiers to be used.
  * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.PLSClassifier -filter \"weka.filters.supervised.attribute.PLSFilter -C 20 -M -A PLS1 -P center\" -S 1
  * </pre>
  * 
@@ -72,6 +73,12 @@ import java.util.logging.Level;
  * <pre>-seed &lt;long&gt; (property: seed)
  * &nbsp;&nbsp;&nbsp;The seed value to use for cross-validation
  * &nbsp;&nbsp;&nbsp;default: 1
+ * </pre>
+ * 
+ * <pre>-folds &lt;int&gt; (property: folds)
+ * &nbsp;&nbsp;&nbsp;The number of folds to use
+ * &nbsp;&nbsp;&nbsp;default: 10
+ * &nbsp;&nbsp;&nbsp;minimum: 2
  * </pre>
  * 
  <!-- options-end -->
@@ -94,6 +101,9 @@ public class MultiClassifierEvaluator
 
   /** the seed value. */
   protected long m_Seed;
+
+  /** the number of folds. */
+  protected int m_Folds;
 
   /** Instances for training bags. */
   protected Instances m_TrainingData;
@@ -132,6 +142,10 @@ public class MultiClassifierEvaluator
     m_OptionManager.add(
       "seed", "seed",
       1L);
+
+    m_OptionManager.add(
+      "folds", "folds",
+      10, 2, null);
   }
 
   /**
@@ -169,7 +183,7 @@ public class MultiClassifierEvaluator
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String classifierTipText() {
+  public String classifiersTipText() {
     return "The classifiers to be used.";
   }
 
@@ -232,6 +246,37 @@ public class MultiClassifierEvaluator
   }
 
   /**
+   * Sets the number of folds to use (>= 2).
+   *
+   * @param value	the folds
+   */
+  public void setFolds(int value) {
+    if (getOptionManager().isValid("folds", value)) {
+      m_Folds = value;
+      reset();
+    }
+  }
+
+  /**
+   * Returns the number of folds in use.
+   *
+   * @return  		the folds
+   */
+  public int getFolds() {
+    return m_Folds;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String foldsTipText() {
+    return "The number of folds to use";
+  }
+
+  /**
    * Set training data.
    *
    * @param value	the data
@@ -256,28 +301,35 @@ public class MultiClassifierEvaluator
    * 			the class value is missing
    */
   protected HashMap<String,Float> performMultiEvaluate(Instance data) {
-    HashMap<String,Float> result = new HashMap<>();
-    try{
-      double min = Double.MAX_VALUE;
-      double max = Double.NEGATIVE_INFINITY;
+    HashMap<String,Float> 	result;
+    double 			min;
+    double 			max;
+    double 			res;
+    double 			mae;
+
+    result = new HashMap<>();
+
+    try {
+      min = Double.MAX_VALUE;
+      max = Double.NEGATIVE_INFINITY;
       for (Classifier c: m_Classifiers) {
-	double res = c.classifyInstance(data);
+	res = c.classifyInstance(data);
 	min = Math.min(min, res);
 	max = Math.max(max, res);
       }
-      double mae = EvaluationHelper.getValue(m_CrossvalidationResults, EvaluationStatistic.MEAN_ABSOLUTE_ERROR, -1);
+      mae = EvaluationHelper.getValue(m_CrossvalidationResults, EvaluationStatistic.MEAN_ABSOLUTE_ERROR, -1);
       result.put("MAE", (float)mae);
       result.put("MIN", (float)min);
       result.put("MAX", (float)max);
       result.put("RESULT", (float)(max-min));
       result.put("RESULT_SCORE", (float)((max-min)/mae));
-      return(result);
-
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to evaluate: " + data, e);
-      return null;
+      result = null;
     }
+
+    return result;
   }
 
   /**
@@ -288,22 +340,29 @@ public class MultiClassifierEvaluator
    */
   @Override
   protected Float performEvaluate(Instance data) {
+    float	result;
+    double 	min;
+    double 	max;
+    double 	res;
+    double 	mae;
+
     try {
-      double min = Double.MAX_VALUE;
-      double max = Double.MIN_VALUE;
+      min = Double.MAX_VALUE;
+      max = Double.MIN_VALUE;
       for (Classifier c: m_Classifiers) {
-	double res = c.classifyInstance(data);
+	res = c.classifyInstance(data);
 	min = Math.min(min, res);
 	max = Math.max(max, res);
       }
-      double mae = EvaluationHelper.getValue(m_CrossvalidationResults, EvaluationStatistic.MEAN_ABSOLUTE_ERROR, -1);
-      return (float) (Math.abs(max - min) / mae);
-
+      mae = EvaluationHelper.getValue(m_CrossvalidationResults, EvaluationStatistic.MEAN_ABSOLUTE_ERROR, -1);
+      result = (float) (Math.abs(max - min) / mae);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to evaluate: " + data, e);
-      return Float.NaN;
+      result = Float.NaN;
     }
+
+    return result;
   }
 
   /**
@@ -354,9 +413,9 @@ public class MultiClassifierEvaluator
 
     try {
       m_CrossvalidationResults = new Evaluation(data);
-      m_CrossvalidationResults.crossValidateModel(m_Base, data, 10, new Random(m_Seed));
+      m_CrossvalidationResults.crossValidateModel(m_Base, data, m_Folds, new Random(m_Seed));
 
-      m_Header = new Instances(m_TrainingData,0);
+      m_Header = new Instances(m_TrainingData, 0);
 
       for (Classifier c: m_Classifiers)
 	c.buildClassifier(data);
