@@ -97,7 +97,7 @@ public class DistanceToCenter
   protected int m_NumNeighbors;
 
   /** the raw training data. */
-  protected Instances m_RawTrainingData;
+  protected transient Instances m_RawTrainingData;
 
   /**
    * Returns a string describing the object.

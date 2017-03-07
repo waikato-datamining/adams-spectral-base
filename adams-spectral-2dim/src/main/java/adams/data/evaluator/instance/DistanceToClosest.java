@@ -84,7 +84,7 @@ public class DistanceToClosest
   protected Filter m_ActualFilter;
 
   /** the raw training data. */
-  protected Instances m_RawTrainingData;
+  protected transient Instances m_RawTrainingData;
 
   /**
    * Returns a string describing the object.
