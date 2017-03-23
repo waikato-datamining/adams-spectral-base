@@ -15,7 +15,7 @@
 
 /*
  * SpectrumPanel.java
- * Copyright (C) 2008-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -46,7 +46,7 @@ import adams.gui.scripting.AbstractScriptingEngine;
 import adams.gui.scripting.SpectralScriptingEngine;
 import adams.gui.visualization.container.ContainerTable;
 import adams.gui.visualization.container.DataContainerPanelWithContainerList;
-import adams.gui.visualization.core.AbstractColorProvider;
+import adams.gui.visualization.core.ColorProvider;
 import adams.gui.visualization.core.CoordinatesPaintlet;
 import adams.gui.visualization.core.CoordinatesPaintlet.Coordinates;
 import adams.gui.visualization.core.DefaultColorProvider;
@@ -233,8 +233,8 @@ public class SpectrumPanel
 
     try {
       getContainerManager().setColorProvider(
-	  (AbstractColorProvider) OptionUtils.forAnyCommandLine(
-	      AbstractColorProvider.class,
+	  (ColorProvider) OptionUtils.forAnyCommandLine(
+	      ColorProvider.class,
 	      props.getProperty("Plot.ColorProvider", DefaultColorProvider.class.getName())));
     }
     catch (Exception e) {

@@ -15,7 +15,7 @@
 
 /*
  * SpectrumDisplay.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -28,7 +28,7 @@ import adams.flow.core.Token;
 import adams.flow.sink.spectrumdisplay.AbstractPlotUpdater;
 import adams.flow.sink.spectrumdisplay.SimplePlotUpdater;
 import adams.gui.core.BasePanel;
-import adams.gui.visualization.core.AbstractColorProvider;
+import adams.gui.visualization.core.ColorProvider;
 import adams.gui.visualization.core.DefaultColorProvider;
 import adams.gui.visualization.spectrum.AbstractSpectrumPaintlet;
 import adams.gui.visualization.spectrum.SpectrumContainer;
@@ -132,7 +132,7 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: adams.gui.print.NullWriter
  * </pre>
  * 
- * <pre>-color-provider &lt;adams.gui.visualization.core.AbstractColorProvider&gt; (property: colorProvider)
+ * <pre>-color-provider &lt;adams.gui.visualization.core.ColorProvider&gt; (property: colorProvider)
  * &nbsp;&nbsp;&nbsp;The color provider in use for coloring the spectra.
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.DefaultColorProvider
  * </pre>
@@ -272,7 +272,7 @@ public class SpectrumDisplay
   private static final long serialVersionUID = -4952322481934379763L;
 
   /** the color provider to use. */
-  protected AbstractColorProvider m_ColorProvider;
+  protected ColorProvider m_ColorProvider;
 
   /** the paintlet to use. */
   protected AbstractSpectrumPaintlet m_Paintlet;
@@ -349,7 +349,7 @@ public class SpectrumDisplay
    *
    * @param value 	the color provider
    */
-  public void setColorProvider(AbstractColorProvider value) {
+  public void setColorProvider(ColorProvider value) {
     m_ColorProvider = value;
     reset();
   }
@@ -359,7 +359,7 @@ public class SpectrumDisplay
    *
    * @return 		the color provider
    */
-  public AbstractColorProvider getColorProvider() {
+  public ColorProvider getColorProvider() {
     return m_ColorProvider;
   }
 
