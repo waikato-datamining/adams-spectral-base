@@ -1,0 +1,34 @@
+--> dumpfile.txt
+Name,Type,Value
+jaar,N,2007
+CECU,N,98.04
+MANU,N,0.02
+KALU,N,2.86
+ProdID,S,07
+Format,S,NIR
+STT6,N,0.34
+NATU,N,0.79
+"Dummy report",B,false
+"Nr prakt",S,202803
+COR6,N,9.13
+CAN1,N,12.069088
+PHC3,N,-999
+Instrument,S,unknown
+NTT6,N,0.86
+Source,S,871553-nir.spec
+mnd,S,40a
+"Parent ID",U,1
+N-total,N,0.86
+"BFI1 vers",N,49.610303
+MAGU,N,7.86
+"BFI lds",N,60.197115
+GLV2,N,35.32
+GLV1,N,24.69
+"Sample ID",S,871553
+"Insert Timestamp",S,"2009-11-27 20:15:27"
+GLV0,N,10.63
+LUT2,N,96.33
+K-Exch,N,2.86
+CALU,N,118.48
+
+
