@@ -36,7 +36,7 @@ import adams.multiprocess.JobList;
 import adams.multiprocess.JobRunner;
 import adams.multiprocess.LocalJobRunner;
 import adams.multiprocess.WekaCrossValidationJob;
-import weka.classifiers.AggregateableEvaluation;
+import weka.classifiers.AggregateableEvaluationExt;
 import weka.classifiers.Classifier;
 import weka.classifiers.CrossValidationFoldGenerator;
 import weka.classifiers.CrossValidationHelper;
@@ -358,7 +358,7 @@ public class RemoveOutliers
     String 				msg;
     int 				numThreads;
     Evaluation				eval;
-    AggregateableEvaluation		evalAgg;
+    AggregateableEvaluationExt 		evalAgg;
     CrossValidationFoldGenerator	generator;
     JobList<WekaCrossValidationJob>	list;
     WekaCrossValidationJob 		job;
@@ -397,7 +397,7 @@ public class RemoveOutliers
       m_JobRunner.stop();
       // aggregate data
       msg     = null;
-      evalAgg = new AggregateableEvaluation(data);
+      evalAgg = new AggregateableEvaluationExt(data);
       for (i = 0; i < m_JobRunner.getJobs().size(); i++) {
 	job = (WekaCrossValidationJob) m_JobRunner.getJobs().get(i);
 	if (job.getEvaluation() == null) {
