@@ -15,19 +15,19 @@
 
 /**
  * DeleteSpectrum.java
- * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
-import adams.db.AbstractDatabaseConnection;
-import adams.db.DataProvider;
-import adams.flow.core.ActorUtils;
-import adams.flow.core.Token;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
+import adams.db.AbstractDatabaseConnection;
+import adams.db.DataProvider;
 import adams.db.DatabaseConnection;
 import adams.db.SpectrumT;
+import adams.flow.core.ActorUtils;
+import adams.flow.core.Token;
 
 /**
  <!-- globalinfo-start -->
@@ -201,7 +201,7 @@ public class DeleteSpectrum
   protected AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
 	  this,
-	  adams.flow.standalone.DatabaseConnection.class,
+	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  getDefaultDatabaseConnection());
   }
 

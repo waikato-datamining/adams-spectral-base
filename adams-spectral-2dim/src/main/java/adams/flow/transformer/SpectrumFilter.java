@@ -15,13 +15,13 @@
 
 /*
  * SpectrumFilter.java
- * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import adams.flow.core.ActorUtils;
 import adams.data.spectrum.Spectrum;
+import adams.flow.core.ActorUtils;
 
 /**
  <!-- globalinfo-start -->
@@ -103,7 +103,7 @@ public class SpectrumFilter
   protected adams.db.AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
 	  this,
-	  adams.flow.standalone.DatabaseConnection.class,
+	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  adams.db.DatabaseConnection.getSingleton());
   }
 }

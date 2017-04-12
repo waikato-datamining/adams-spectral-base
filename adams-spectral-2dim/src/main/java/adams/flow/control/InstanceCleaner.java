@@ -15,7 +15,7 @@
 
 /*
  * InstanceCleaner.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.control;
@@ -471,7 +471,7 @@ public class InstanceCleaner
 	((DatabaseConnectionHandler) m_Cleaner).setDatabaseConnection(
 	    ActorUtils.getDatabaseConnection(
 		  this,
-		  adams.flow.standalone.DatabaseConnection.class,
+		  adams.flow.standalone.DatabaseConnectionProvider.class,
 		  adams.db.DatabaseConnection.getSingleton()));
     }
 

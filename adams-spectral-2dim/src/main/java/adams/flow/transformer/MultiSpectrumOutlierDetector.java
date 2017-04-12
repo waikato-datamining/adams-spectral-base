@@ -15,14 +15,17 @@
 
 /*
  * MultiSpectrumOutlierDetector.java
- * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
+import adams.data.multifilter.AbstractMultiSpectrumFilter;
 import adams.data.outlier.AbstractOutlierDetector;
 import adams.data.outlier.PassThrough;
+import adams.data.spectrum.MultiSpectrum;
+import adams.data.spectrum.Spectrum;
 import adams.db.DatabaseConnectionHandler;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
@@ -30,9 +33,6 @@ import adams.flow.provenance.ActorType;
 import adams.flow.provenance.Provenance;
 import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
-import adams.data.multifilter.AbstractMultiSpectrumFilter;
-import adams.data.spectrum.MultiSpectrum;
-import adams.data.spectrum.Spectrum;
 
 import java.util.List;
 
@@ -300,7 +300,7 @@ public class MultiSpectrumOutlierDetector
   protected adams.db.AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
 	  this,
-	  adams.flow.standalone.DatabaseConnection.class,
+	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  adams.db.DatabaseConnection.getSingleton());
   }
 

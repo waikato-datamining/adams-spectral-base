@@ -15,18 +15,18 @@
 
 /*
  * SpectrumDbWriter.java
- * Copyright (C) 2009-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.Constants;
+import adams.data.spectrum.Spectrum;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DataProvider;
-import adams.flow.core.ActorUtils;
-import adams.data.spectrum.Spectrum;
 import adams.db.DatabaseConnection;
 import adams.db.SpectrumT;
+import adams.flow.core.ActorUtils;
 
 /**
  <!-- globalinfo-start -->
@@ -163,7 +163,7 @@ public class SpectrumDbWriter
   protected AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
 	  this,
-	  adams.flow.standalone.DatabaseConnection.class,
+	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  getDefaultDatabaseConnection());
   }
 

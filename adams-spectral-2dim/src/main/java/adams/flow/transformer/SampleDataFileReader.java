@@ -15,17 +15,17 @@
 
 /*
  * SampleDataFileReader.java
- * Copyright (C) 2009-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.data.io.input.AbstractReportReader;
-import adams.db.AbstractDatabaseConnection;
-import adams.flow.core.ActorUtils;
 import adams.data.io.input.SimpleSampleDataReader;
 import adams.data.sampledata.SampleData;
+import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
+import adams.flow.core.ActorUtils;
 
 /**
  <!-- globalinfo-start -->
@@ -131,7 +131,7 @@ public class SampleDataFileReader
   protected AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
 	  this,
-	  adams.flow.standalone.DatabaseConnection.class,
+	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  getDefaultDatabaseConnection());
   }
 

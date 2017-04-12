@@ -15,7 +15,7 @@
 
 /*
  * SampleDataDbReportDbWriter.java
- * Copyright (C) 2009-2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -127,7 +127,7 @@ public class SampleDataDbWriter
   protected AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
 	  this,
-	  adams.flow.standalone.DatabaseConnection.class,
+	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  getDefaultDatabaseConnection());
   }
 

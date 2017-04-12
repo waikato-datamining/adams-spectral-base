@@ -15,7 +15,7 @@
 
 /**
  * UpdateDatabaseID.java
- * Copyright (C) 2015-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer.report;
 
@@ -136,7 +136,7 @@ public class UpdateDatabaseID
   protected AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
       m_Owner,
-      adams.flow.standalone.DatabaseConnection.class,
+      adams.flow.standalone.DatabaseConnectionProvider.class,
       getDefaultDatabaseConnection());
   }
 

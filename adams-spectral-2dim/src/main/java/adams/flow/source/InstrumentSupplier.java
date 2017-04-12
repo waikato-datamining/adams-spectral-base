@@ -15,13 +15,13 @@
 
 /**
  * InstrumentSupplier.java
- * Copyright (C) 2009-2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.source;
 
 import adams.db.InstrumentProvider;
-import adams.flow.core.ActorUtils;
 import adams.db.SampleDataT;
+import adams.flow.core.ActorUtils;
 
 /**
  <!-- globalinfo-start -->
@@ -107,7 +107,7 @@ public class InstrumentSupplier
   protected adams.db.AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
 	  this,
-	  adams.flow.standalone.DatabaseConnection.class,
+	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  adams.db.DatabaseConnection.getSingleton());
   }
 }
