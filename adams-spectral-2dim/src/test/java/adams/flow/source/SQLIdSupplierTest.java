@@ -20,6 +20,7 @@
 
 package adams.flow.source;
 
+import adams.db.JdbcUrl;
 import adams.db.SQLStatement;
 import adams.env.Environment;
 import adams.flow.AbstractSpectrumFlowTest;
@@ -78,7 +79,7 @@ public class SQLIdSupplierTest
    */
   public Actor getActor() {
     DatabaseConnection dbcon = new DatabaseConnection();
-    dbcon.setURL(getDatabaseURL());
+    dbcon.setURL(new JdbcUrl(getDatabaseURL()));
     dbcon.setUser(getDatabaseUser());
     dbcon.setPassword(getDatabasePassword());
 

@@ -20,17 +20,18 @@
 
 package adams.flow.sink;
 
+import adams.data.io.input.SimpleCSVSampleDataReader;
+import adams.db.JdbcUrl;
 import adams.env.Environment;
+import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
 import adams.flow.core.Actor;
 import adams.flow.source.FileSupplier;
+import adams.flow.standalone.DatabaseConnection;
+import adams.flow.transformer.SampleDataFileReader;
 import adams.test.TmpFile;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import adams.data.io.input.SimpleCSVSampleDataReader;
-import adams.flow.AbstractFlowTest;
-import adams.flow.standalone.DatabaseConnection;
-import adams.flow.transformer.SampleDataFileReader;
 
 /**
  * Tests the SampleDataDisplay actor.
@@ -82,7 +83,7 @@ public class SampleDataDisplayTest
   @Override
   public Actor getActor() {
     DatabaseConnection dbcon = new DatabaseConnection();
-    dbcon.setURL(getDatabaseURL());
+    dbcon.setURL(new JdbcUrl(getDatabaseURL()));
     dbcon.setUser(getDatabaseUser());
     dbcon.setPassword(getDatabasePassword());
 

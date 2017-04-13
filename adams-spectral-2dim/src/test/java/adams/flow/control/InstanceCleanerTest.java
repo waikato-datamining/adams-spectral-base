@@ -21,6 +21,7 @@
 package adams.flow.control;
 
 import adams.data.cleaner.instance.MinMax;
+import adams.db.JdbcUrl;
 import adams.env.Environment;
 import adams.flow.AbstractSpectrumFlowTest;
 import adams.flow.core.Actor;
@@ -91,7 +92,7 @@ public class InstanceCleanerTest
   @Override
   public Actor getActor() {
     DatabaseConnection dbcon = new DatabaseConnection();
-    dbcon.setURL(getDatabaseURL());
+    dbcon.setURL(new JdbcUrl(getDatabaseURL()));
     dbcon.setUser(getDatabaseUser());
     dbcon.setPassword(getDatabasePassword());
 

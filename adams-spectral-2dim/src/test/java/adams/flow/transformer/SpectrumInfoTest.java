@@ -21,6 +21,7 @@
 package adams.flow.transformer;
 
 import adams.core.option.AbstractArgumentOption;
+import adams.db.JdbcUrl;
 import adams.env.Environment;
 import adams.flow.AbstractSpectrumFlowTest;
 import adams.flow.control.Flow;
@@ -87,7 +88,7 @@ public class SpectrumInfoTest
 
       // Flow.DatabaseConnection
       DatabaseConnection dbcon = new DatabaseConnection();
-      dbcon.setURL(getDatabaseURL());
+      dbcon.setURL(new JdbcUrl(getDatabaseURL()));
       dbcon.setUser(getDatabaseUser());
       dbcon.setPassword(getDatabasePassword());
       actors1[1] = dbcon;

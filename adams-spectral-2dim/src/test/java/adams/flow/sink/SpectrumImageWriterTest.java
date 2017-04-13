@@ -21,18 +21,19 @@
 package adams.flow.sink;
 
 import adams.core.io.PlaceholderFile;
+import adams.data.io.input.SimpleSpectrumReader;
+import adams.db.JdbcUrl;
 import adams.env.Environment;
+import adams.flow.AbstractFlowTest;
 import adams.flow.control.Flow;
 import adams.flow.core.Actor;
 import adams.flow.source.FileSupplier;
+import adams.flow.standalone.DatabaseConnection;
+import adams.flow.transformer.SpectrumFileReader;
 import adams.gui.print.PNGWriter;
 import adams.test.TmpFile;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import adams.data.io.input.SimpleSpectrumReader;
-import adams.flow.AbstractFlowTest;
-import adams.flow.standalone.DatabaseConnection;
-import adams.flow.transformer.SpectrumFileReader;
 
 /**
  * Tests the SpectrumImageWriter actor.
@@ -85,7 +86,7 @@ public class SpectrumImageWriterTest
   @Override
   public Actor getActor() {
     DatabaseConnection dbcon = new DatabaseConnection();
-    dbcon.setURL(getDatabaseURL());
+    dbcon.setURL(new JdbcUrl(getDatabaseURL()));
     dbcon.setUser(getDatabaseUser());
     dbcon.setPassword(getDatabasePassword());
 

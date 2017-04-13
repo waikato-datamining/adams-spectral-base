@@ -21,6 +21,7 @@
 package adams.flow.source;
 
 import adams.core.base.BaseRegExp;
+import adams.db.JdbcUrl;
 import adams.db.SpectrumConditionsMulti;
 import adams.env.Environment;
 import adams.flow.AbstractSpectrumFlowTest;
@@ -70,7 +71,7 @@ public class SpectrumIdSupplierTest
    */
   public Actor getActor() {
     DatabaseConnection dbcon = new DatabaseConnection();
-    dbcon.setURL(getDatabaseURL());
+    dbcon.setURL(new JdbcUrl(getDatabaseURL()));
     dbcon.setUser(getDatabaseUser());
     dbcon.setPassword(getDatabasePassword());
 

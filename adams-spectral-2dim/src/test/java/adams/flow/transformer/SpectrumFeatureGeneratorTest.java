@@ -21,6 +21,7 @@
 package adams.flow.transformer;
 
 import adams.core.option.AbstractArgumentOption;
+import adams.db.JdbcUrl;
 import adams.env.Environment;
 import adams.flow.AbstractSpectrumFlowTest;
 import adams.flow.control.Flow;
@@ -109,7 +110,7 @@ public class SpectrumFeatureGeneratorTest
 
       // Flow.DatabaseConnection
       adams.flow.standalone.DatabaseConnection databaseconnection2 = new adams.flow.standalone.DatabaseConnection();
-      databaseconnection2.setURL(getDatabaseURL());
+      databaseconnection2.setURL(new JdbcUrl(getDatabaseURL()));
       databaseconnection2.setUser(getDatabaseUser());
       databaseconnection2.setPassword(getDatabasePassword());
 

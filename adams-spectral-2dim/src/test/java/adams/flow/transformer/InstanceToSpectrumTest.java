@@ -20,6 +20,7 @@
 
 package adams.flow.transformer;
 
+import adams.db.JdbcUrl;
 import adams.env.Environment;
 import adams.flow.AbstractSpectrumFlowTest;
 import adams.flow.control.Flow;
@@ -86,7 +87,7 @@ public class InstanceToSpectrumTest
   @Override
   public Actor getActor() {
     DatabaseConnection dbcon = new DatabaseConnection();
-    dbcon.setURL(getDatabaseURL());
+    dbcon.setURL(new JdbcUrl(getDatabaseURL()));
     dbcon.setUser(getDatabaseUser());
     dbcon.setPassword(getDatabasePassword());
 

@@ -24,6 +24,7 @@ import adams.core.base.BaseString;
 import adams.data.cleaner.spectrum.MinMax;
 import adams.data.report.DataType;
 import adams.data.report.Field;
+import adams.db.JdbcUrl;
 import adams.env.Environment;
 import adams.flow.AbstractSpectrumFlowTest;
 import adams.flow.core.Actor;
@@ -94,7 +95,7 @@ public class SpectrumCleanerTest
    */
   public Actor getActor() {
     DatabaseConnection dbcon = new DatabaseConnection();
-    dbcon.setURL(getDatabaseURL());
+    dbcon.setURL(new JdbcUrl(getDatabaseURL()));
     dbcon.setUser(getDatabaseUser());
     dbcon.setPassword(getDatabasePassword());
 
