@@ -581,7 +581,8 @@ public class SpectrumDisplay
    */
   @Override
   public void updatePlot() {
-    m_PlotUpdater.update(((SpectrumExplorer) getPanel()).getSpectrumPanel());
+    if (getPanel() != null)
+      m_PlotUpdater.update(((SpectrumExplorer) getPanel()).getSpectrumPanel());
   }
 
   /**
