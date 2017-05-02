@@ -216,9 +216,10 @@ public class RonWeasley
      * @param num	the number of chromsomes
      * @param w		the initial weights
      * @param data	the data to use
+     * @param testData	the test data to use, null for cross-validation
      */
-    public RonWeasleyJob(RonWeasley g, int num, int[] w, Instances data) {
-      super(g, num, w, data);
+    public RonWeasleyJob(RonWeasley g, int num, int[] w, Instances data, Instances testData) {
+      super(g, num, w, data, testData);
     }
 
     /**
@@ -534,9 +535,11 @@ public class RonWeasley
    * @param w		the initial weights
    * @return		the instance
    * @param data	the data to use
+   * @param testData	the test data to use, null for cross-validation
    */
-  protected RonWeasleyJob newJob(int chromosome, int[] w, Instances data) {
-    return new RonWeasleyJob(this, chromosome, w, data);
+  @Override
+  protected RonWeasleyJob newJob(int chromosome, int[] w, Instances data, Instances testData) {
+    return new RonWeasleyJob(this, chromosome, w, data, testData);
   }
 
   /**
