@@ -9,11 +9,11 @@
     <version>17.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>adams-spectral-handheld</artifactId>
+  <artifactId>adams-spectral-2dim-handheld</artifactId>
   <packaging>jar</packaging>
   <version>17.5.0-SNAPSHOT</version>
 
-  <name>adams-spectral-handheld</name>
+  <name>adams-spectral-2dim-handheld</name>
   <description>Support for various handheld spectral scanners.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>

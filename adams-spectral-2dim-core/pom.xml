@@ -9,11 +9,11 @@
     <version>17.5.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>adams-spectral-2dim</artifactId>
+  <artifactId>adams-spectral-2dim-core</artifactId>
   <packaging>jar</packaging>
   <version>17.5.0-SNAPSHOT</version>
 
-  <name>adams-spectral-2dim</name>
+  <name>adams-spectral-2dim-core</name>
   <description>Core components for 2-dimensional spectral data.</description>
   <url>https://adams.cms.waikato.ac.nz/</url>
   <organization>

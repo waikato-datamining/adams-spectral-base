@@ -47,10 +47,10 @@
   </properties>
 
   <modules>
-    <module>adams-spectral-2dim</module>
+    <module>adams-spectral-2dim-core</module>
     <module>adams-spectral-2dim-rats</module>
     <module>adams-spectral-2dim-webservice</module>
-    <module>adams-spectral-handheld</module>
+    <module>adams-spectral-2dim-handheld</module>
   </modules>
 
   <build>
