@@ -48,6 +48,7 @@
 
   <modules>
     <module>adams-spectral-2dim</module>
+    <module>adams-spectral-handheld</module>
   </modules>
 
   <build>
