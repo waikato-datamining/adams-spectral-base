@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="SpectralPutServiceService"
+                  targetNamespace="http://put.spectral.webservice.adams.waikato.ac.nz/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://put.spectral.webservice.adams.waikato.ac.nz/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/">
+
+  <wsdl:documentation>WSDL for the Spectral web service (put).</wsdl:documentation>
+
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="unqualified"
+                elementFormDefault="unqualified"
+                targetNamespace="http://put.spectral.webservice.adams.waikato.ac.nz/">
+      <xsd:element name="putRequest" type="tns:putRequest" />
+      <xsd:element name="putResponse" type="tns:putResponse" />
+
+      <xsd:complexType name="putRequest">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string" />
+          <xsd:element name="format" type="xsd:string" />
+          <xsd:element name="spectrum" type="tns:Spectrum" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="putResponse">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string" />
+          <xsd:element name="format" type="xsd:string" />
+          <xsd:element name="success" type="xsd:boolean" />
+          <xsd:element name="message" type="xsd:string" minOccurs="0" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Spectrum">
+        <xsd:sequence>
+          <xsd:element name="waves" type="tns:Waves" />
+          <xsd:element name="props" type="tns:Properties" minOccurs="0" />
+        </xsd:sequence>
+        <xsd:attribute name="id" type="xsd:string" use="required" />
+        <xsd:attribute name="format" type="xsd:string" default="nir" />
+      </xsd:complexType>
+
+      <xsd:complexType name="Waves">
+        <xsd:sequence>
+          <xsd:element name="wave" type="tns:Wave" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Wave">
+        <xsd:attribute name="number" type="xsd:float" use="required" />
+        <xsd:attribute name="amplitude" type="xsd:float" use="required" />
+      </xsd:complexType>
+
+      <xsd:complexType name="Properties">
+        <xsd:sequence>
+          <xsd:element name="prop" type="tns:Property" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Property">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+        <xsd:attribute name="value" type="xsd:string" use="required" />
+        <xsd:attribute name="type" type="tns:DataType" use="required" />
+      </xsd:complexType>
+      
+      <xsd:simpleType name="DataType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="BOOLEAN"/>
+          <xsd:enumeration value="NUMERIC"/>
+          <xsd:enumeration value="STRING"/>
+          <xsd:enumeration value="UNKNOWN"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="putRequest">
+    <wsdl:part element="tns:putRequest" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="putResponse">
+    <wsdl:part element="tns:putResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:portType name="SpectralPutService">
+    <wsdl:operation name="put">
+      <wsdl:input message="tns:putRequest" name="putRequest" />
+      <wsdl:output message="tns:putResponse" name="putResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="SpectralPutServiceServiceSoapBinding" type="tns:SpectralPutService">
+    <soap:binding style="document"
+                  transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <wsdl:operation name="put">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="putRequest">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="putResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="SpectralPutServiceService">
+    <wsdl:port binding="tns:SpectralPutServiceServiceSoapBinding" name="SpectralPutServicePort">
+      <!-- embedded deployment -->
+      <soap:address location="http://localhost:9090/SpectralPutServicePort" />
+
+      <!-- standalone Tomcat deployment -->
+      <!--soap:address location="http://localhost:8080/wsdl_first-<cxf-version>/services/adviceServicePort"/-->
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="RatsSpectrumServiceService"
+                  targetNamespace="http://spectrum.rats.webservice.adams.waikato.ac.nz/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://spectrum.rats.webservice.adams.waikato.ac.nz/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/">
+
+  <wsdl:documentation>WSDL for the RATS Spectrum web service.</wsdl:documentation>
+
+  <wsdl:types>
+    <xsd:schema attributeFormDefault="unqualified"
+                elementFormDefault="unqualified"
+                targetNamespace="http://spectrum.rats.webservice.adams.waikato.ac.nz/">
+      <xsd:element name="uploadRequest" type="tns:uploadRequest" />
+      <xsd:element name="uploadResponse" type="tns:uploadResponse" />
+
+      <xsd:complexType name="uploadRequest">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string" />
+          <xsd:element name="format" type="xsd:string" />
+          <xsd:element name="spectrum" type="tns:Spectrum" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="uploadResponse">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:string" />
+          <xsd:element name="format" type="xsd:string" />
+          <xsd:element name="success" type="xsd:boolean" />
+          <xsd:element name="message" type="xsd:string" minOccurs="0" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Spectrum">
+        <xsd:sequence>
+          <xsd:element name="waves" type="tns:Waves" />
+          <xsd:element name="props" type="tns:Properties" minOccurs="0" />
+        </xsd:sequence>
+        <xsd:attribute name="id" type="xsd:string" use="required" />
+        <xsd:attribute name="format" type="xsd:string" default="nir" />
+      </xsd:complexType>
+
+      <xsd:complexType name="Waves">
+        <xsd:sequence>
+          <xsd:element name="wave" type="tns:Wave" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Wave">
+        <xsd:attribute name="number" type="xsd:float" use="required" />
+        <xsd:attribute name="amplitude" type="xsd:float" use="required" />
+      </xsd:complexType>
+
+      <xsd:complexType name="Properties">
+        <xsd:sequence>
+          <xsd:element name="prop" type="tns:Property" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="Property">
+        <xsd:attribute name="key" type="xsd:string" use="required" />
+        <xsd:attribute name="value" type="xsd:string" use="required" />
+        <xsd:attribute name="type" type="tns:DataType" use="required" />
+      </xsd:complexType>
+      
+      <xsd:simpleType name="DataType">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="BOOLEAN"/>
+          <xsd:enumeration value="NUMERIC"/>
+          <xsd:enumeration value="STRING"/>
+          <xsd:enumeration value="UNKNOWN"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="uploadRequest">
+    <wsdl:part element="tns:uploadRequest" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:message name="uploadResponse">
+    <wsdl:part element="tns:uploadResponse" name="parameters" />
+  </wsdl:message>
+
+  <wsdl:portType name="RatsSpectrumService">
+    <wsdl:operation name="upload">
+      <wsdl:input message="tns:uploadRequest" name="uploadRequest" />
+      <wsdl:output message="tns:uploadResponse" name="uploadResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="RatsSpectrumServiceServiceSoapBinding" type="tns:RatsSpectrumService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <wsdl:operation name="upload">
+      <soap:operation soapAction="" style="document" />
+
+      <wsdl:input name="uploadRequest">
+        <soap:body use="literal" />
+      </wsdl:input>
+
+      <wsdl:output name="uploadResponse">
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="RatsSpectrumServiceService">
+    <wsdl:port binding="tns:RatsSpectrumServiceServiceSoapBinding" name="RatsSpectrumServicePort">
+      <!-- embedded deployment -->
+      <soap:address location="http://localhost:9090/RatsSpectrumServicePort" />
+
+      <!-- standalone Tomcat deployment -->
+      <!--soap:address location="http://localhost:9090/wsdl_first-<cxf-version>/services/RatsSpectrumServicePort"/-->
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
