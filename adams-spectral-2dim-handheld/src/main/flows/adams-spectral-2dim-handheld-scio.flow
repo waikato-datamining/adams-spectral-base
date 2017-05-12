@@ -1,0 +1,19 @@
+# Project: adams
+# Date: 2017-05-12 16:45:50
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Loads an export file from the SCiO Lab and displays the content." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.GridView -width 1000 -height 800 -num-rows 3 -add-headers true -writer adams.gui.print.NullWriter
+  adams.flow.sink.SpectrumDisplay -name Spectrum -writer adams.gui.print.NullWriter -color-provider adams.gui.visualization.core.DefaultColorProvider -paintlet adams.gui.visualization.spectrum.SpectrumPaintlet -plot-updater adams.flow.sink.spectrumdisplay.SimplePlotUpdater
+  adams.flow.sink.SpectrumDisplay -name "WR Raw" -writer adams.gui.print.NullWriter -color-provider adams.gui.visualization.core.DefaultColorProvider -paintlet adams.gui.visualization.spectrum.SpectrumPaintlet -plot-updater adams.flow.sink.spectrumdisplay.SimplePlotUpdater
+  adams.flow.sink.SpectrumDisplay -name "Sample Raw" -writer adams.gui.print.NullWriter -color-provider adams.gui.visualization.core.DefaultColorProvider -paintlet adams.gui.visualization.spectrum.SpectrumPaintlet -plot-updater adams.flow.sink.spectrumdisplay.SimplePlotUpdater
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/scio.csv
+ adams.flow.control.Tee -name spectrum
+  adams.flow.transformer.SpectrumFileReader -reader adams.data.io.input.ScioLabExportSpectrumReader
+  adams.flow.sink.CallableSink -callable Spectrum
+ adams.flow.control.Tee -name "wr raw"
+  adams.flow.transformer.SpectrumFileReader -reader "adams.data.io.input.ScioLabExportSpectrumReader -type WR_RAW"
+  adams.flow.sink.CallableSink -callable "WR Raw"
+ adams.flow.control.Tee -name "sample raw"
+  adams.flow.transformer.SpectrumFileReader -reader "adams.data.io.input.ScioLabExportSpectrumReader -type SAMPLE_RAW"
+  adams.flow.sink.CallableSink -callable "Sample Raw"
