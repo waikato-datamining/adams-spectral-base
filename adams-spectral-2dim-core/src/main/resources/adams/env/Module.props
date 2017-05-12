@@ -4,7 +4,7 @@
 # Version: $Revision: 8465 $
 
 # The name of the module
-Name=adams-spectral-2dim
+Name=adams-spectral-2dim-core
 
 # The version of the module
 Version=${project.version}
@@ -24,7 +24,7 @@ Organization=University of Waikato, Hamilton, NZ
 # The logo of the module (leave empty for default; 48x48 pixel).
 # If the logo is provided without path, it is assumed to be located in the
 # adams/gui/images sub-directory of the module.
-Logo=spectral-2dim-module.png
+Logo=spectral-2dim-core-module.png
 
 # Whether this module is a meta-module and does not contain actual code etc.
 # (false|true)
