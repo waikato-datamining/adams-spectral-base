@@ -36,9 +36,54 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
+ * Reads the CSV export from the SCiO Lab web site.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ * 
+ * <pre>-input &lt;adams.core.io.PlaceholderFile&gt; (property: input)
+ * &nbsp;&nbsp;&nbsp;The file to read and turn into a container.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ * 
+ * <pre>-create-dummy-report &lt;boolean&gt; (property: createDummyReport)
+ * &nbsp;&nbsp;&nbsp;If true, then a dummy report is created if none present.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-instrument &lt;java.lang.String&gt; (property: instrument)
+ * &nbsp;&nbsp;&nbsp;The name of the instrument that generated the spectra (if not already present 
+ * &nbsp;&nbsp;&nbsp;in data).
+ * &nbsp;&nbsp;&nbsp;default: unknown
+ * </pre>
+ * 
+ * <pre>-format &lt;java.lang.String&gt; (property: format)
+ * &nbsp;&nbsp;&nbsp;The data format string.
+ * &nbsp;&nbsp;&nbsp;default: NIR
+ * </pre>
+ * 
+ * <pre>-keep-format &lt;boolean&gt; (property: keepFormat)
+ * &nbsp;&nbsp;&nbsp;If enabled the format obtained from the file is not replaced by the format 
+ * &nbsp;&nbsp;&nbsp;defined here.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-use-absolute-source &lt;boolean&gt; (property: useAbsoluteSource)
+ * &nbsp;&nbsp;&nbsp;If enabled the source report field stores the absolute file name rather 
+ * &nbsp;&nbsp;&nbsp;than just the name.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ * 
+ * <pre>-type &lt;SPECTRUM|WR_RAW|SAMPLE_RAW&gt; (property: type)
+ * &nbsp;&nbsp;&nbsp;The type of spectrum to read from the data.
+ * &nbsp;&nbsp;&nbsp;default: SPECTRUM
+ * </pre>
+ * 
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -56,6 +101,18 @@ public class ScioLabExportSpectrumReader
   public final static String PREFIX_SAMPLE_RAW = "sample_raw_";
 
   /**
+   * Determines the type of spectrum to load.
+   */
+  public enum SpectrumType {
+    SPECTRUM,
+    WR_RAW,
+    SAMPLE_RAW,
+  }
+
+  /** the type of spectrum to read. */
+  protected SpectrumType m_Type;
+
+  /**
    * Returns a string describing the object.
    *
    * @return 			a description suitable for displaying in the gui
@@ -63,6 +120,18 @@ public class ScioLabExportSpectrumReader
   @Override
   public String globalInfo() {
     return "Reads the CSV export from the SCiO Lab web site.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "type", "type",
+      SpectrumType.SPECTRUM);
   }
 
   /**
@@ -84,6 +153,35 @@ public class ScioLabExportSpectrumReader
   @Override
   public String[] getFormatExtensions() {
     return new String[]{"csv"};
+  }
+
+  /**
+   * Sets the type of spectrum to read.
+   *
+   * @param value	the type
+   */
+  public void setType(SpectrumType value) {
+    m_Type = value;
+    reset();
+  }
+
+  /**
+   * Returns the type of spectrum to read.
+   *
+   * @return 		the type
+   */
+  public SpectrumType getType() {
+    return m_Type;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String typeTipText() {
+    return "The type of spectrum to read from the data.";
   }
 
   /**
@@ -152,13 +250,19 @@ public class ScioLabExportSpectrumReader
 
       spectrum  = new Spectrum();
       spectrum.getReport().mergeWith(meta);
-      m_ReadData.add(spectrum);
       wrraw     = new Spectrum();
       wrraw.getReport().mergeWith(meta);
-      m_ReadData.add(wrraw);
       sampleraw = new Spectrum();
       sampleraw.getReport().mergeWith(meta);
-      m_ReadData.add(sampleraw);
+
+      if (m_Type == SpectrumType.SPECTRUM)
+	m_ReadData.add(spectrum);
+      else if (m_Type == SpectrumType.WR_RAW)
+	m_ReadData.add(wrraw);
+      else if (m_Type == SpectrumType.SAMPLE_RAW)
+	m_ReadData.add(sampleraw);
+      else
+        throw new IllegalStateException("Unhandled spectrum type!");
 
       sampleid = row.getCell(1).getContent().trim() + "/" + row.getCell(0).getContent().trim();
       spectrum.setID(sampleid + "/spectrum");
