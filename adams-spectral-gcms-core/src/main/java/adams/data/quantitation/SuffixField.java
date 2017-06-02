@@ -22,6 +22,7 @@ package adams.data.quantitation;
 
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
+import adams.data.report.Field;
 import adams.data.report.SuffixOnlyField;
 
 /**

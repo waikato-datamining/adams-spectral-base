@@ -23,9 +23,9 @@ package adams.data.chromatogram;
 import adams.core.CloneHandler;
 import adams.core.DateUtils;
 import adams.core.logging.LoggingObject;
-import adams.data.quantitation.Field;
 import adams.data.quantitation.QuantitationReport;
 import adams.data.report.DataType;
+import adams.data.report.Field;
 
 import java.util.Vector;
 

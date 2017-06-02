@@ -27,6 +27,7 @@ import adams.core.Properties;
 import adams.data.id.MutableIDHandler;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
+import adams.data.report.Field;
 import adams.data.report.Report;
 
 import java.util.Date;
