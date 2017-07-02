@@ -51,6 +51,7 @@
     <module>adams-spectral-2dim-rats</module>
     <module>adams-spectral-2dim-webservice</module>
     <module>adams-spectral-2dim-handheld</module>
+    <module>adams-spectral-3way-core</module>
     <module>adams-spectral-gcms-core</module>
   </modules>
 
