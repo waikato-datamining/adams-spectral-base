@@ -62,7 +62,7 @@ public class ThreeWayReport
   public final static String FORMAT = "Format";
 
   /** the default data type. */
-  public final static String DEFAULT_FORMAT = "NIR";
+  public final static String DEFAULT_FORMAT = "EEM";
 
   /** field name for the source. */
   public final static String SOURCE = "Source";
