@@ -20,6 +20,8 @@
 
 package adams.data.threeway;
 
+import adams.data.InterpolationUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -186,7 +188,7 @@ public class LevelOnePointUtils {
    */
   public static LevelOnePoint interpolate(double x, LevelOnePoint left, LevelOnePoint right) {
     LevelOnePoint 		result;
-    double 			xdiff;
+    double[]			weights;
     double			percLeft;
     double			percRight;
     Iterator<LevelTwoPoint>	iterLeft;
@@ -198,10 +200,10 @@ public class LevelOnePointUtils {
     double 			l2RightX;
 
     // interpolate GCpoint
-    xdiff = right.getX() - left.getX();
-    percLeft  = 1 - (x - left.getX()) / xdiff;
-    percRight = 1 - (right.getX() - x) / xdiff;
-    result    = new LevelOnePoint(x, Math.round(left.getY()*percLeft + right.getY()*percRight));
+    weights   = new double[2];
+    result    = new LevelOnePoint(x, InterpolationUtils.interpolate(x, left.getX(), left.getY(), right.getX(), right.getY(), weights));
+    percLeft  = weights[0];
+    percRight = weights[1];
 
     // interpolate MS data
     iterLeft  = left.toList().iterator();
