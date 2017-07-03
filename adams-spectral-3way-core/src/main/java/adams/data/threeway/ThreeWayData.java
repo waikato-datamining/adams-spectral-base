@@ -33,6 +33,7 @@ import adams.data.statistics.InformativeStatisticSupporter;
 import adams.data.statistics.ThreeWayDataStatistic;
 import adams.data.threewayreport.ThreeWayReport;
 
+import java.util.Date;
 import java.util.Iterator;
 
 /**
@@ -77,7 +78,7 @@ public class ThreeWayData
    * Initialise data.
    */
   public ThreeWayData() {
-    this(null);
+    this(new Date().toString());
   }
 
   /**
