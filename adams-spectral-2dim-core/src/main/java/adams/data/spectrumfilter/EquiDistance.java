@@ -15,11 +15,12 @@
 
 /*
  * EquiDistance.java
- * Copyright (C) 2009-2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
 
+import adams.data.InterpolationUtils;
 import adams.data.filter.AbstractEquiDistanceWithOffset;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
@@ -100,20 +101,9 @@ public class EquiDistance
    * @return		the interpolated SpectrumPoint
    */
   protected SpectrumPoint interpolate(float waveno, SpectrumPoint left, SpectrumPoint right) {
-    SpectrumPoint	result;
-    float		wavenodiff;
-    float		percLeft;
-    float		percRight;
-
-    wavenodiff = right.getWaveNumber() - left.getWaveNumber();
-    percLeft   = 1.0f - ((float) (waveno - left.getWaveNumber()) / wavenodiff);
-    percRight  = 1.0f - ((float) (right.getWaveNumber() - waveno) / wavenodiff);
-    result     = new SpectrumPoint(
-			waveno,
-			      (float) left.getAmplitude()*percLeft
-			    + (float) right.getAmplitude()*percRight);
-
-    return result;
+    return new SpectrumPoint(
+      waveno,
+      (float) InterpolationUtils.interpolate(waveno, left.getWaveNumber(), left.getAmplitude(), right.getWaveNumber(), right.getAmplitude()));
   }
 
   /**
