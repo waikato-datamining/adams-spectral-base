@@ -1,0 +1,16 @@
+# Configuration file listing the superclasses and the packages in which to
+# look for derived classes.
+#
+# Format:
+# class.name=package1,package2,...
+#
+# Author:  FracPete (fracpete at waikato dot ac dot nz)
+# Version: $Revision$
+
+# the heatmap readers
+adams.data.io.input.AbstractThreeWayDataReader=\
+  adams.data.io.input
+
+# the heatmap writers
+#adams.data.io.output.AbstractThreeWayDataWriter=\
+#  adams.data.io.output
