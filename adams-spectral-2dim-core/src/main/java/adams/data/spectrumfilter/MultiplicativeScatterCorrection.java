@@ -20,16 +20,22 @@
 
 package adams.data.spectrumfilter;
 
+import adams.core.base.BaseInterval;
 import adams.data.filter.AbstractFilter;
+import adams.data.filter.Filter;
+import adams.data.filter.PassThrough;
 import adams.data.filter.TrainableBatchFilter;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.data.statistics.StatUtils;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
 
 /**
  <!-- globalinfo-start -->
  * Performs Multiplicative Scatter Correction.<br>
- * Assumes that all spectra have the same wave numbers.
+ * Assumes that all spectra have the same wave numbers.<br>
+ * The 'pre-filter' gets only applied internally.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -44,6 +50,17 @@ import adams.data.statistics.StatUtils;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
+ * <pre>-pre-filter &lt;adams.data.filter.Filter&gt; (property: preFilter)
+ * &nbsp;&nbsp;&nbsp;The filter to apply to the data internally before calculating the average
+ * &nbsp;&nbsp;&nbsp;spectrum and the intercept&#47;slope.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.filter.PassThrough
+ * </pre>
+ *
+ * <pre>-range &lt;adams.core.base.BaseInterval&gt; [-range ...] (property: ranges)
+ * &nbsp;&nbsp;&nbsp;The ranges of wave numbers to use for calculating the intercept&#47;slope corrections.
+ * &nbsp;&nbsp;&nbsp;default: (-Infinity;+Infinity)
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -54,6 +71,12 @@ public class MultiplicativeScatterCorrection
   implements TrainableBatchFilter<Spectrum> {
 
   private static final long serialVersionUID = 4945613765460222457L;
+
+  /** the filter to apply to the spectra internally. */
+  protected Filter<Spectrum> m_PreFilter;
+
+  /** the ranges to calculate the intercept/slope for. */
+  protected BaseInterval[] m_Ranges;
 
   /** the average spectrum. */
   protected Spectrum m_Average;
@@ -67,7 +90,24 @@ public class MultiplicativeScatterCorrection
   public String globalInfo() {
     return
       "Performs Multiplicative Scatter Correction.\n"
-      + "Assumes that all spectra have the same wave numbers.";
+      + "Assumes that all spectra have the same wave numbers.\n"
+      + "The 'pre-filter' gets only applied internally.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "pre-filter", "preFilter",
+      new PassThrough());
+
+    m_OptionManager.add(
+      "range", "ranges",
+      new BaseInterval[]{new BaseInterval(BaseInterval.ALL)});
   }
 
   /**
@@ -77,6 +117,68 @@ public class MultiplicativeScatterCorrection
   public void reset() {
     super.reset();
     resetFilter();
+  }
+
+  /**
+   * Sets the prefilter to use.
+   *
+   * @param value 	the filter
+   */
+  public void setPreFilter(Filter<Spectrum> value) {
+    m_PreFilter = value;
+    reset();
+  }
+
+  /**
+   * Returns the prefilter to use.
+   *
+   * @return 		the filter
+   */
+  public Filter<Spectrum> getPreFilter() {
+    return m_PreFilter;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String preFilterTipText() {
+    return
+      "The filter to apply to the data internally before calculating the "
+	+ "average spectrum and the intercept/slope.";
+  }
+
+  /**
+   * Sets the wave number ranges.
+   *
+   * @param value 	the ranges
+   */
+  public void setRanges(BaseInterval[] value) {
+    m_Ranges = value;
+    reset();
+  }
+
+  /**
+   * Returns the wave number ranges.
+   *
+   * @return 		the ranges
+   */
+  public BaseInterval[] getRanges() {
+    return m_Ranges;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String rangesTipText() {
+    return
+      "The ranges of wave numbers to use for calculating the intercept/slope "
+	+ "corrections.";
   }
 
   /**
@@ -96,7 +198,9 @@ public class MultiplicativeScatterCorrection
   public void trainFilter(Spectrum[] data) {
     int			i;
     int			n;
+    int			numPoints;
     double[]		ampl;
+    Spectrum[]		filtered;
 
     if (data.length == 0)
       throw new IllegalStateException("No spectra provided for training!");
@@ -107,13 +211,23 @@ public class MultiplicativeScatterCorrection
     m_Average = new Spectrum();
     m_Average.setID("avg(" + data.length + " spectra)");
 
-    ampl = new double[data.length];
-    for (i = 0; i < data[0].size(); i++) {
-      for (n = 0; n < data.length; n++)
-        ampl[n] = data[n].toList().get(i).getAmplitude();
+    // pre-filter data
+    if (m_PreFilter instanceof PassThrough) {
+      filtered = data;
+    }
+    else {
+      filtered = new Spectrum[data.length];
+      for (i = 0; i < data.length; i++)
+        filtered[i] = (Spectrum) m_PreFilter.filter(data[i]);
+    }
+
+    ampl = new double[filtered.length];
+    for (i = 0; i < filtered[0].size(); i++) {
+      for (n = 0; n < filtered.length; n++)
+        ampl[n] = filtered[n].toList().get(i).getAmplitude();
       m_Average.add(
         new SpectrumPoint(
-          data[0].toList().get(i).getWaveNumber(),
+          filtered[0].toList().get(i).getWaveNumber(),
 	  (float) StatUtils.mean(ampl)));
     }
   }
@@ -156,12 +270,19 @@ public class MultiplicativeScatterCorrection
    */
   @Override
   protected void checkData(Spectrum data) {
+    Spectrum 		filtered;
+
     super.checkData(data);
 
-    if (data.size() != m_Average.size())
+    if (m_PreFilter instanceof PassThrough)
+      filtered = data;
+    else
+      filtered = (Spectrum) m_PreFilter.filter(data);
+
+    if (filtered.size() != m_Average.size())
       throw new IllegalStateException(
-        "Different number of wave numbers (avg vs input): "
-	  + m_Average.size() + " != " + data.size());
+        "Different number of wave numbers (avg vs filtered input): "
+	  + m_Average.size() + " != " + filtered.size());
   }
 
   /**
@@ -173,9 +294,12 @@ public class MultiplicativeScatterCorrection
   @Override
   protected Spectrum processData(Spectrum data) {
     Spectrum		result;
-    double[]		x;
-    double[]		y;
+    Spectrum		filtered;
+    TDoubleList 	x;
+    TDoubleList		y;
+    TDoubleList		wave;
     int			i;
+    int			n;
     double[]		lr;
     double		inter;
     double		slope;
@@ -186,25 +310,45 @@ public class MultiplicativeScatterCorrection
       return data;
     }
 
-    // perform linear regression
-    x = new double[m_Average.size()];
-    y = new double[m_Average.size()];
-    for (i = 0; i < m_Average.size(); i++) {
-      x[i] = data.toList().get(i).getAmplitude();
-      y[i] = m_Average.toList().get(i).getAmplitude();
-    }
-    lr    = StatUtils.linearRegression(x, y);
-    inter = lr[0];
-    slope = lr[1];
+    // pre-filter data
+    if (m_PreFilter instanceof PassThrough)
+      filtered = data;
+    else
+      filtered = (Spectrum) m_PreFilter.filter(data);
 
-    if (isLoggingEnabled())
-      getLogger().info(data.getID() + ": intercept=" + inter + ", slope=" + slope);
-
-    // correct spectrum
+    // create copy of spectrum
     result = (Spectrum) data.getClone();
-    for (i = 0; i < result.size(); i++) {
-      point = result.toList().get(i);
-      point.setAmplitude((float) ((point.getAmplitude() - inter) / slope));
+
+    // iterate ranges
+    x    = new TDoubleArrayList();
+    y    = new TDoubleArrayList();
+    wave = new TDoubleArrayList();
+    for (n = 0; n < m_Ranges.length; n++) {
+      x.clear();
+      y.clear();
+      wave.clear();
+      for (i = 0; i < m_Average.size(); i++) {
+        if (m_Ranges[n].isInside(filtered.toList().get(i).getWaveNumber())) {
+          wave.add(filtered.toList().get(i).getWaveNumber());
+	  x.add(filtered.toList().get(i).getAmplitude());
+	  y.add(m_Average.toList().get(i).getAmplitude());
+	}
+      }
+
+      // perform linear regression
+      lr    = StatUtils.linearRegression(x.toArray(), y.toArray());
+      inter = lr[0];
+      slope = lr[1];
+
+      if (isLoggingEnabled())
+	getLogger().info(data.getID() + "/" + m_Ranges[n] + ": intercept=" + inter + ", slope=" + slope);
+
+      // correct spectrum
+      for (i = 0; i < result.size(); i++) {
+	point = result.toList().get(i);
+        if (m_Ranges[n].isInside(point.getWaveNumber()))
+	  point.setAmplitude((float) ((point.getAmplitude() - inter) / slope));
+      }
     }
 
     return result;
