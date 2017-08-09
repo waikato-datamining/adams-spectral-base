@@ -55,6 +55,10 @@ adams.data.filter.BatchFilter=\
 adams.data.spectrumfilter.amplitudetransform.AbstractAmplitudeTransformer=\
   adams.data.spectrumfilter.amplitudetransform
 
+# the multiplicative scatter corrections
+adams.data.spectrumfilter.multiplicativescattercorrection.AbstractMultiplicativeScatterCorrection=\
+  adams.data.spectrumfilter.multiplicativescattercorrection
+
 # the multi-spectrum filters
 adams.data.multifilter.AbstractMultiSpectrumFilter=\
   adams.data.multifilter
