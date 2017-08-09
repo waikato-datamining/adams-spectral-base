@@ -15,7 +15,7 @@
 
 /**
  * AbstractAmplitudeTransformer.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.spectrumfilter.amplitudetransform;
@@ -32,6 +32,18 @@ import adams.data.spectrum.SpectrumPoint;
  */
 public abstract class AbstractAmplitudeTransformer
   extends AbstractOptionHandler {
+
+  private static final long serialVersionUID = 6930354949224477227L;
+
+  /**
+   * Hook method for initializing the transformer.
+   * <br>
+   * Default implementation does nothing.
+   *
+   * @param data	the spectrum to transform
+   */
+  protected void initialize(Spectrum data) {
+  }
 
   /**
    * Transform the spectrum point and returns a new object.
@@ -50,6 +62,8 @@ public abstract class AbstractAmplitudeTransformer
   public Spectrum transform(Spectrum data) {
     Spectrum	result;
     int		i;
+
+    initialize(data);
 
     result = data.getHeader();
     for (i = 0; i < data.size(); i++)
