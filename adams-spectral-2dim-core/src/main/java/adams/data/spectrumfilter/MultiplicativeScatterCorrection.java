@@ -72,6 +72,10 @@ public class MultiplicativeScatterCorrection
 
   private static final long serialVersionUID = 4945613765460222457L;
 
+  public static final String PREFIX_INTERCEPT = "Intercept.";
+
+  public static final String PREFIX_SLOPE = "Slope.";
+
   /** the filter to apply to the spectra internally. */
   protected Filter<Spectrum> m_PreFilter;
 
@@ -90,8 +94,11 @@ public class MultiplicativeScatterCorrection
   public String globalInfo() {
     return
       "Performs Multiplicative Scatter Correction.\n"
-      + "Assumes that all spectra have the same wave numbers.\n"
-      + "The 'pre-filter' gets only applied internally.";
+	+ "Assumes that all spectra have the same wave numbers.\n"
+	+ "The 'pre-filter' gets only applied internally.\n"
+	+ "Intercept and slope get stored in the report, for "
+	+ "each defined range (using prefixes " + PREFIX_INTERCEPT
+	+ " and " + PREFIX_SLOPE + ")";
   }
 
   /**
@@ -218,16 +225,16 @@ public class MultiplicativeScatterCorrection
     else {
       filtered = new Spectrum[data.length];
       for (i = 0; i < data.length; i++)
-        filtered[i] = (Spectrum) m_PreFilter.filter(data[i]);
+	filtered[i] = (Spectrum) m_PreFilter.filter(data[i]);
     }
 
     ampl = new double[filtered.length];
     for (i = 0; i < filtered[0].size(); i++) {
       for (n = 0; n < filtered.length; n++)
-        ampl[n] = filtered[n].toList().get(i).getAmplitude();
+	ampl[n] = filtered[n].toList().get(i).getAmplitude();
       m_Average.add(
-        new SpectrumPoint(
-          filtered[0].toList().get(i).getWaveNumber(),
+	new SpectrumPoint(
+	  filtered[0].toList().get(i).getWaveNumber(),
 	  (float) StatUtils.mean(ampl)));
     }
   }
@@ -281,7 +288,7 @@ public class MultiplicativeScatterCorrection
 
     if (filtered.size() != m_Average.size())
       throw new IllegalStateException(
-        "Different number of wave numbers (avg vs filtered input): "
+	"Different number of wave numbers (avg vs filtered input): "
 	  + m_Average.size() + " != " + filtered.size());
   }
 
@@ -328,8 +335,8 @@ public class MultiplicativeScatterCorrection
       y.clear();
       wave.clear();
       for (i = 0; i < m_Average.size(); i++) {
-        if (m_Ranges[n].isInside(filtered.toList().get(i).getWaveNumber())) {
-          wave.add(filtered.toList().get(i).getWaveNumber());
+	if (m_Ranges[n].isInside(filtered.toList().get(i).getWaveNumber())) {
+	  wave.add(filtered.toList().get(i).getWaveNumber());
 	  x.add(filtered.toList().get(i).getAmplitude());
 	  y.add(m_Average.toList().get(i).getAmplitude());
 	}
@@ -340,13 +347,17 @@ public class MultiplicativeScatterCorrection
       inter = lr[0];
       slope = lr[1];
 
+      // store in report
+      result.getReport().setNumericValue(PREFIX_INTERCEPT + m_Ranges[n], inter);
+      result.getReport().setNumericValue(PREFIX_SLOPE + m_Ranges[n], slope);
+
       if (isLoggingEnabled())
 	getLogger().info(data.getID() + "/" + m_Ranges[n] + ": intercept=" + inter + ", slope=" + slope);
 
       // correct spectrum
       for (i = 0; i < result.size(); i++) {
 	point = result.toList().get(i);
-        if (m_Ranges[n].isInside(point.getWaveNumber()))
+	if (m_Ranges[n].isInside(point.getWaveNumber()))
 	  point.setAmplitude((float) ((point.getAmplitude() - inter) / slope));
       }
     }
