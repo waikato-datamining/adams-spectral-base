@@ -158,8 +158,8 @@ public class RangeBased
       for (i = 0; i < average.size(); i++) {
 	if (m_Ranges[n].isInside(filtered.toList().get(i).getWaveNumber())) {
 	  wave.add(filtered.toList().get(i).getWaveNumber());
-	  x.add(filtered.toList().get(i).getAmplitude());
-	  y.add(average.toList().get(i).getAmplitude());
+	  y.add(filtered.toList().get(i).getAmplitude());
+	  x.add(average.toList().get(i).getAmplitude());
 	}
       }
 
