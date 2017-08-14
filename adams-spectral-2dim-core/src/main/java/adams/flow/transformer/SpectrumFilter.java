@@ -21,6 +21,7 @@
 package adams.flow.transformer;
 
 import adams.data.spectrum.Spectrum;
+import adams.flow.container.SpectrumFilterContainer;
 import adams.flow.core.ActorUtils;
 
 /**
@@ -83,6 +84,16 @@ public class SpectrumFilter
 
   /** for serialization. */
   private static final long serialVersionUID = -1295387099659902617L;
+
+  /**
+   * Returns the container class in use for the output.
+   *
+   * @return		the container class
+   */
+  @Override
+  protected Class getOutputContainerClass() {
+    return SpectrumFilterContainer.class;
+  }
 
   /**
    * Returns the data container class in use.

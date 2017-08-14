@@ -20,6 +20,7 @@
 
 package adams.data.spectrumfilter;
 
+import adams.core.AdditionalDataProvider;
 import adams.data.filter.AbstractFilter;
 import adams.data.filter.Filter;
 import adams.data.filter.PassThrough;
@@ -29,6 +30,9 @@ import adams.data.spectrum.SpectrumPoint;
 import adams.data.spectrumfilter.multiplicativescattercorrection.AbstractMultiplicativeScatterCorrection;
 import adams.data.spectrumfilter.multiplicativescattercorrection.RangeBased;
 import adams.data.statistics.StatUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  <!-- globalinfo-start -->
@@ -68,13 +72,15 @@ import adams.data.statistics.StatUtils;
  */
 public class MultiplicativeScatterCorrection
   extends AbstractFilter<Spectrum>
-  implements TrainableBatchFilter<Spectrum> {
+  implements TrainableBatchFilter<Spectrum>, AdditionalDataProvider {
 
   private static final long serialVersionUID = 4945613765460222457L;
 
   public static final String PREFIX_INTERCEPT = "Intercept.";
 
   public static final String PREFIX_SLOPE = "Slope.";
+
+  public static final String ADDITIONALDATA_AVERAGE = "Average";
 
   /** the filter to apply to the spectra internally. */
   protected Filter<Spectrum> m_PreFilter;
@@ -303,5 +309,20 @@ public class MultiplicativeScatterCorrection
     }
 
     return m_Correction.correct(m_Average, data);
+  }
+
+  /**
+   * Returns the additional data.
+   *
+   * @return		the additional data
+   */
+  public Map<String,Object> getAdditionalData() {
+    Map<String,Object>	result;
+
+    result = new HashMap<>();
+    if (m_Average != null)
+      result.put(ADDITIONALDATA_AVERAGE, m_Average);
+
+    return result;
   }
 }
