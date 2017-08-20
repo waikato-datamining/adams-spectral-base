@@ -294,7 +294,7 @@ public class SpectrumConditionsSingle
    * Automatically corrects values.
    */
   @Override
-  protected void update() {
+  public void update() {
     super.update();
 
     if (m_Field == null)

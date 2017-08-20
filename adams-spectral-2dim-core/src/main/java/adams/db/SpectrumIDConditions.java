@@ -156,7 +156,7 @@ public class SpectrumIDConditions
    * Automatically corrects values.
    */
   @Override
-  protected void update() {
+  public void update() {
     if (m_SampleIDRegExp == null)
       m_SampleIDRegExp = new BaseRegExp("");
 

@@ -383,7 +383,7 @@ public abstract class AbstractSpectrumConditions
    * Automatically corrects values.
    */
   @Override
-  protected void update() {
+  public void update() {
     if (m_Instrument == null)
       m_Instrument = new BaseRegExp();
 

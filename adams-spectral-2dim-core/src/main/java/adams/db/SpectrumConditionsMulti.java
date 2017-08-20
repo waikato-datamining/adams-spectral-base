@@ -293,7 +293,7 @@ public class SpectrumConditionsMulti
    * Automatically corrects values.
    */
   @Override
-  protected void update() {
+  public void update() {
     super.update();
     
     if (m_Fields == null)
