@@ -24,6 +24,7 @@ import adams.core.option.AbstractOptionHandler;
 import adams.data.filter.Filter;
 import adams.data.filter.PassThrough;
 import adams.data.spectrum.Spectrum;
+import adams.data.spectrumfilter.MultiplicativeScatterCorrection;
 
 /**
  * Ancestor for schemes that perform multiplicative scatter correction.
@@ -78,8 +79,8 @@ public abstract class AbstractMultiplicativeScatterCorrection
    */
   public String preFilterTipText() {
     return
-      "The filter to apply to the data internally before calculating the "
-	+ "average spectrum and the intercept/slope.";
+      "The filter to apply to the data internally; must be the same one that "
+        + "is applied in the outer " + MultiplicativeScatterCorrection.class.getName() + " filter";
   }
 
   /**
