@@ -15,7 +15,7 @@
 
 /*
  * SpectrumContainer.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -98,14 +98,17 @@ public class SpectrumContainer
    * @return		a short ID for the GUI
    */
   public String getDisplayID() {
+    String	result;
     SampleData  sd;
 
     sd = getData().getReport();
 
-    if ((sd != null) && sd.hasValue(SampleData.SAMPLE_ID) && sd.hasValue(SampleData.FORMAT))
-      return sd.getStringValue(SampleData.SAMPLE_ID) + "/" + sd.getStringValue(SampleData.FORMAT);
+    if ((sd != null) && sd.hasValue(SampleData.FORMAT))
+      result = getData().getID() + "/" + sd.getStringValue(SampleData.FORMAT);
     else
-      return getData().getID();
+      result = getData().getID();
+
+    return result;
   }
 
   /**
