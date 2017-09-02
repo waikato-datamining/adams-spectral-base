@@ -22,9 +22,10 @@
   </organization>
 
   <scm>
-    <connection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/trunk</connection>
-    <developerConnection>scm:svn:https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/trunk</developerConnection>
-    <url>https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/trunk</url>
+    <connection>scm:git:https://github.com/waikato/adams-spectral-base</connection>
+    <developerConnection>scm:git:https://github.com/waikato/adams-spectral-base</developerConnection>
+    <url>https://github.com/waikato/adams-spectral-base</url>
+    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
@@ -61,10 +62,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.5</version>
+          <version>2.5.1</version>
           <configuration>
-            <tagBase>https://svn.cms.waikato.ac.nz/svn/adams/spectral-base/tags</tagBase>
             <useReleaseProfile>false</useReleaseProfile>
+            <localCheckout>true</localCheckout>
+            <pushChanges>true</pushChanges>
+            <commitByProject>true</commitByProject>
           </configuration>
         </plugin>
       </plugins>
