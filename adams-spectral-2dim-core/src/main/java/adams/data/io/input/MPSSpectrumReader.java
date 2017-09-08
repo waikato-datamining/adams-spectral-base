@@ -176,6 +176,15 @@ public class MPSSpectrumReader
               getLogger().warning("Unparseable date: " + parts[1]);
 	      sd.setValue(field, parts[1]);
 	    }
+            field = new Field(parts[0], DataType.STRING);
+            sd.addField(field);
+            try {
+	      sd.setValue(field, df.format(dfMPS.parse(parts[1])));
+	    }
+	    catch (Exception e) {
+              getLogger().warning("Unparseable date: " + parts[1]);
+	      sd.setValue(field, parts[1]);
+	    }
 	  }
 	  else {
             if (Utils.isDouble(parts[1])) {

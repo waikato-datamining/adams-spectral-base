@@ -73,6 +73,8 @@
 # Sample\ ID\tDataType=S
 # Source=1-Cl-V.mps
 # Source\tDataType=S
+# TimeMeasured=2015-10-13 10\:06\:12
+# TimeMeasured\tDataType=S
 # TotalCounts=1.0958158E7
 # TotalCounts\tDataType=N
 # TrueTime=240.000267
