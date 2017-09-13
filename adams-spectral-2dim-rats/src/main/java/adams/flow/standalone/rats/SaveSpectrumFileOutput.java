@@ -24,10 +24,10 @@ import adams.core.Utils;
 import adams.core.io.AbstractFilenameGenerator;
 import adams.core.io.DefaultFilenameGenerator;
 import adams.core.io.PlaceholderFile;
-import adams.flow.standalone.rats.output.AbstractRatOutput;
 import adams.data.io.output.AbstractSpectrumWriter;
 import adams.data.io.output.SimpleSpectrumWriter;
 import adams.data.spectrum.Spectrum;
+import adams.flow.standalone.rats.output.AbstractRatOutput;
 
 /**
  <!-- globalinfo-start -->
@@ -212,7 +212,7 @@ public class SaveSpectrumFileOutput
     if (m_Input instanceof Spectrum)
       input = (Spectrum) m_Input;
     else
-      result = "Unhandled input class '" + Utils.classToString(m_Input.getClass()) + "', "
+      result = "Unhandled input class '" + Utils.classToString(m_Input) + "', "
 	  + "expected: " + Utils.classesToString(accepts());
 
     if (result == null) {

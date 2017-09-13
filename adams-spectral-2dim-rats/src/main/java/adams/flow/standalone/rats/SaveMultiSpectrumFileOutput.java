@@ -24,11 +24,11 @@ import adams.core.Utils;
 import adams.core.io.AbstractFilenameGenerator;
 import adams.core.io.DefaultFilenameGenerator;
 import adams.core.io.PlaceholderFile;
-import adams.flow.standalone.rats.output.AbstractRatOutput;
 import adams.data.io.output.AbstractSpectrumWriter;
 import adams.data.io.output.SimpleSpectrumWriter;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
+import adams.flow.standalone.rats.output.AbstractRatOutput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -217,7 +217,7 @@ public class SaveMultiSpectrumFileOutput
     if (m_Input instanceof MultiSpectrum)
       input = (MultiSpectrum) m_Input;
     else
-      result = "Unhandled input class '" + Utils.classToString(m_Input.getClass()) + "', "
+      result = "Unhandled input class '" + Utils.classToString(m_Input) + "', "
 	  + "expected: " + Utils.classesToString(accepts());
 
     if (result == null) {

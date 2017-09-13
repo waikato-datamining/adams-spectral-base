@@ -23,12 +23,12 @@ import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
-import adams.flow.control.StorageName;
-import adams.flow.control.StorageQueueHandler;
-import adams.flow.standalone.rats.output.AbstractRatOutput;
 import adams.data.io.input.AbstractSpectrumReader;
 import adams.data.io.input.SimpleSpectrumReader;
 import adams.data.spectrum.Spectrum;
+import adams.flow.control.StorageName;
+import adams.flow.control.StorageQueueHandler;
+import adams.flow.standalone.rats.output.AbstractRatOutput;
 
 import java.io.File;
 import java.util.List;
@@ -376,7 +376,7 @@ public class LoadSpectrumFileOutput
     else if (m_Input instanceof File)
       input = new PlaceholderFile((File) m_Input);
     else
-      result = "Unhandled input class '" + Utils.classToString(m_Input.getClass()) + "', "
+      result = "Unhandled input class '" + Utils.classToString(m_Input) + "', "
 	  + "expected: " + Utils.classesToString(accepts());
 
     if (result == null) {
