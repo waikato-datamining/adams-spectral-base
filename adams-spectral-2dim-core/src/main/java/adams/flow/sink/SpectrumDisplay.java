@@ -192,8 +192,9 @@ public class SpectrumDisplay
       m_Panel.getContainerManager().setReloadable(false);
       m_Panel.getContainerManager().setAllowRemoval(false);
       m_Panel.getSpectrumPanel().setSidePanelVisible(m_ShowSidePanel);
-      m_Panel.getSpectrumPanel().setDataPaintlet(m_Paintlet.shallowCopy(true));
       m_Panel.setZoomOverviewPanelVisible(m_ZoomOverview);
+      m_Panel.getContainerManager().setColorProvider(m_ColorProvider.shallowCopy(true));
+      m_Panel.getSpectrumPanel().setDataPaintlet(m_Paintlet.shallowCopy(true));
       add(m_Panel, BorderLayout.CENTER);
     }
 
