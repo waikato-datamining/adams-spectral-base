@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * ScioLabExportSpectrumReader.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
@@ -30,9 +30,12 @@ import adams.data.spectrum.SpectrumPoint;
 import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.parser.MathematicalExpression;
 
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  <!-- globalinfo-start -->
@@ -185,6 +188,32 @@ public class ScioLabExportSpectrumReader
   }
 
   /**
+   * Parses/collects the wave number strings (eg '2 + 740') and their float
+   * representation.
+   *
+   * @param wavenoStr	the string to parse
+   * @param wavenos	the wave numbers collected so far
+   * @return		the
+   */
+  protected float parseWaveNo(String wavenoStr, Map<String,Float> wavenos) {
+    float	result;
+
+    if (wavenos.containsKey(wavenoStr)) {
+      result = wavenos.get(wavenoStr);
+    }
+    else {
+      try {
+	result = (float) MathematicalExpression.evaluate(wavenoStr, new HashMap());
+      }
+      catch (Exception e) {
+        throw new IllegalStateException("Cannot evaluate wave number string '" + wavenoStr + "'!");
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Performs the actual reading.
    */
   @Override
@@ -208,6 +237,7 @@ public class ScioLabExportSpectrumReader
     Cell			cell;
     Field			field;
     String			sampleid;
+    Map<String,Float> 		wavenos;
 
     data = FileUtils.loadFromFile(m_Input.getAbsoluteFile());
 
@@ -240,6 +270,9 @@ public class ScioLabExportSpectrumReader
     }
     csvreader = new CsvSpreadSheetReader();
     sheet = csvreader.read(new StringReader(spectralData.toString()));
+
+    // wavenos
+    wavenos = new HashMap<>();
 
     for (n = 0; n < sheet.getRowCount(); n++) {
       row = sheet.getRow(n);
@@ -274,17 +307,17 @@ public class ScioLabExportSpectrumReader
 	cell = row.getCell(i);
 	if (col.startsWith(PREFIX_SPECTRUM)) {
 	  waveStr = col.substring(PREFIX_SPECTRUM.length());
-	  point   = new SpectrumPoint(Float.parseFloat(waveStr), cell.toDouble().floatValue());
+	  point   = new SpectrumPoint(parseWaveNo(waveStr, wavenos), cell.toDouble().floatValue());
 	  spectrum.add(point);
 	}
 	else if (col.startsWith(PREFIX_WR_RAW)) {
 	  waveStr = col.substring(PREFIX_WR_RAW.length());
-	  point   = new SpectrumPoint(Float.parseFloat(waveStr), cell.toDouble().floatValue());
+	  point   = new SpectrumPoint(parseWaveNo(waveStr, wavenos), cell.toDouble().floatValue());
 	  wrraw.add(point);
 	}
 	else if (col.startsWith(PREFIX_SAMPLE_RAW)) {
 	  waveStr = col.substring(PREFIX_SAMPLE_RAW.length());
-	  point   = new SpectrumPoint(Float.parseFloat(waveStr), cell.toDouble().floatValue());
+	  point   = new SpectrumPoint(parseWaveNo(waveStr, wavenos), cell.toDouble().floatValue());
 	  sampleraw.add(point);
 	}
 	else {
