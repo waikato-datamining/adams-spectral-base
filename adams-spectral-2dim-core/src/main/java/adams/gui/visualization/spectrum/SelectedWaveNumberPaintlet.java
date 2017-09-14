@@ -170,7 +170,7 @@ public class SelectedWaveNumberPaintlet
    * @param g		the graphics context to use for painting
    * @param moment	what {@link PaintMoment} is currently being painted
    */
-  public void performPaint(Graphics g, PaintMoment moment) {
+  protected void doPerformPaint(Graphics g, PaintMoment moment) {
     AxisPanel		axisX;
     SpectrumPoint	point;
 
