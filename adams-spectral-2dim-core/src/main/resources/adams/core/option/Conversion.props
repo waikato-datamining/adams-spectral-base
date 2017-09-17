@@ -3,57 +3,61 @@
 # Author: FracPete (fracpete at waikato dot ac dot nz)
 # Version: $Revision: 12515 $
 
+# TODO
+# Remove the "_TODO_" prefix. Only temporarily added to avoid clashes between
+# knir/adams modules.
+
 # Lists the keys that contain classname mappings.
 # This is used to ensure a minimal backwards compatibility, in case classes
 # get renamed.
-Rename=\
-  Rename-transformer_filter,\
-  Rename-SegmentedSavitzkyGolayDerivativeOrder,\
-  Rename-SegmentedSavitzkyGolayNumPoints
+_TODO_Rename=\
+  Rename-2dim-transformer_filter,\
+  Rename-2dim-SegmentedSavitzkyGolayDerivativeOrder,\
+  Rename-2dim-SegmentedSavitzkyGolayNumPoints
 
 # general format for classname mappings ("rename"):
 # <key>=<old classname>-<new classname>
 #Rename-transformer_reportvalue=adams.flow.transformer.ReportValue-adams.flow.transformer.GetReportValue
-Rename-transformer_filter=knir.flow.transformer.Filter-adams.flow.transformer.SpectrumFilter
-Rename-SegmentedSavitzkyGolayDerivativeOrder=adams.core.discovery.SegmentedSavitzkyGolayDerivativeOrder-adams.core.discovery.genetic.SegmentedSavitzkyGolayDerivativeOrder
-Rename-SegmentedSavitzkyGolayNumPoints=adams.core.discovery.SegmentedSavitzkyGolayNumPoints-adams.core.discovery.genetic.SegmentedSavitzkyGolayNumPoints
+Rename-2dim-transformer_filter=knir.flow.transformer.Filter-adams.flow.transformer.SpectrumFilter
+Rename-2dim-SegmentedSavitzkyGolayDerivativeOrder=adams.core.discovery.SegmentedSavitzkyGolayDerivativeOrder-adams.core.discovery.genetic.SegmentedSavitzkyGolayDerivativeOrder
+Rename-2dim-SegmentedSavitzkyGolayNumPoints=adams.core.discovery.SegmentedSavitzkyGolayNumPoints-adams.core.discovery.genetic.SegmentedSavitzkyGolayNumPoints
 
 # Lists the keys that contain partial classname renaming.
-PartialRename=\
-  Rename-knir_input,\
-  Rename-adams_input,\
-  Rename-knir_output,\
-  Rename-adams_output,\
-  Rename-knir_data_baseline,\
-  Rename-knir_data_filter,\
-  Rename-knir_data_outlier,\
-  Rename-knir_data_smoothing,\
-  Rename-knir_toplevel
+_TODO_PartialRename=\
+  Rename-2dim-knir_input,\
+  Rename-2dim-adams_input,\
+  Rename-2dim-knir_output,\
+  Rename-2dim-adams_output,\
+  Rename-2dim-knir_data_baseline,\
+  Rename-2dim-knir_data_filter,\
+  Rename-2dim-knir_data_outlier,\
+  Rename-2dim-knir_data_smoothing,\
+  Rename-2dim-knir_toplevel
 
 # general format for partial classname renaming (no regular expression, but case-sensitive):
 # <key>=<find>\t<replace>
 #Rename-singleton=.singleton.\t.standalone.
-Rename-knir_input=knir.data.input.\tadams.data.io.input.
-Rename-adams_input=adams.data.input.\tadams.data.io.input.
-Rename-knir_output=knir.data.output.\tadams.data.io.output.
-Rename-adams_output=adams.data.output.\tadams.data.io.output.
-Rename-knir_data_baseline=knir.data.baseline.\tadams.data.spectrumbaseline.
-Rename-knir_data_filter=knir.data.filter.\tadams.data.spectrumfilter.
-Rename-knir_data_outlier=knir.data.outlier.\tadams.data.spectrumoutlier.
-Rename-knir_data_smoothing=knir.data.smoothing.\tadams.data.spectrumsmoothing.
-Rename-knir_toplevel=knir.\tadams.
+Rename-2dim-knir_input=knir.data.input.\tadams.data.io.input.
+Rename-2dim-adams_input=adams.data.input.\tadams.data.io.input.
+Rename-2dim-knir_output=knir.data.output.\tadams.data.io.output.
+Rename-2dim-adams_output=adams.data.output.\tadams.data.io.output.
+Rename-2dim-knir_data_baseline=knir.data.baseline.\tadams.data.spectrumbaseline.
+Rename-2dim-knir_data_filter=knir.data.filter.\tadams.data.spectrumfilter.
+Rename-2dim-knir_data_outlier=knir.data.outlier.\tadams.data.spectrumoutlier.
+Rename-2dim-knir_data_smoothing=knir.data.smoothing.\tadams.data.spectrumsmoothing.
+Rename-2dim-knir_toplevel=knir.\tadams.
 
 # List the keys that contain renaming of options (ie "-blah" into "-bloerk")
-RenameOption=\
-  RenameOption-simpleinstancegenerator
+_TODO_RenameOption=\
+  RenameOption-2dim-simpleinstancegenerator
   
 # general format for renaming options
 # <key>=<classname>#<old>#<new>
 #RenameOption-source_callablesource_global=adams.flow.source.CallableSource#global#callable
-RenameOption-simpleinstancegenerator=adams.data.instances.SimpleInstanceGenerator#target#field
+RenameOption-2dim-simpleinstancegenerator=adams.data.instances.SimpleInstanceGenerator#target#field
 
 # List the keys that contain renaming of properties (ie "blahProp" into "bloerkProp")
-RenameProperty=
+_TODO_RenameProperty=
   
 # general format for renaming options
 # <key>=<classname>#<oldProp>#<newProp>
