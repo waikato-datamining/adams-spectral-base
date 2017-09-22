@@ -58,30 +58,114 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
-TODO
+The \textit{adams-spectral-2dim-core} module offers a comprehensive suite
+of tools and data processing of two-dimensional spectra, such as generted from
+near-infrared\cite{nir}, mid-infrared\cite{mir} and X-ray fluorescence\cite{xrf}
+instruments.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
 The following conversions are available:
 \begin{tight_itemize}
-  	\item \textit{TODO} -- TODO
+  \item \textit{MultiSpectrumToSpectra} -- turns a single multi-spectrum
+  into an array of regular spectra.
+  \item \textit{ReportToSampleData} -- converts a simple report into
+  a sample data object.
+  \item \textit{SpectraToMultiSpectrum} -- turns an array of spectra
+  into a single multi-spectrum.
+  \item \textit{SpectrumToSpreadSheet} -- turns a spectrum into a spreadsheet
+  with two columns: wave numbers and amplitudes.
+  \item \textit{SpreadSheetToSpectrum} -- generates a spectrum from a spreadsheet
+  with two columns containing the wave numbers and amplitudes.
+  \item \textit{WekaPredictionContainerToEvaluationContainer} -- turns the
+  prediction container into an evaluation container.
 \end{tight_itemize}
 The following sources are available:
 \begin{tight_itemize}
-  	\item \textit{TODO} -- TODO
+  \item \textit{InstrumentSupplier} -- returns all instrument names from the
+  database.
+  \item \textit{SpectrumIdSupplier} -- outputs database or sample IDs from spectra
+  stored in the database.
+  \item \textit{SQLSpectrumIdSupplier} -- outputs IDs (integer or string)
+  generated from a SQL query.
 \end{tight_itemize}
 The following transformers are available:
 \begin{tight_itemize}
-  	\item \textit{TODO} -- TODO
+  \item \textit{Cleaner} -- cleans a Weka dataset with a specific cleaner
+  and performs checks on single Instance objects.
+  \item \textit{DeleteSampleDataValue} -- removes the specified fields
+  from the sample data passing through.
+  \item \textit{DeleteSampleDataValueByExpression} -- deletes a specific
+  field from sample data if the boolean expression evaluates to true.
+  \item \textit{DeleteSpectrum} -- removes a spectrum, identified by
+  database or sample ID, from the database.
+  \item \textit{Evaluator} -- trains an evaluator on a Weka dataset and
+  applies the evaluator on single Weka Instance objects.
+  \item \textit{GetSampleDataValue} -- retrieves a single value from a
+  sample data object.
+  \item \textit{InstanceGenerator} -- turns a spectrum into a Weka Instance.
+  \item \textit{InstanceToSpectrum} -- turns a Weka Instance into a spectrum.
+  \item \textit{MultiSpectrumAdd} -- adds a spectrum obtained from storage or
+  callable actor to the multi-spectrum passing through.
+  \item \textit{MultiSpectrumFilter} -- applies a filter to a multi-spectrum.
+  \item \textit{MultiSpectrumOutlierDetector} -- applies outlier detectors
+  to multi-spectra.
+  \item \textit{MultiSpectrumRemove} -- removes spectra from a multi-spectrum
+  that match expressions on sample ID, type or format.
+  \item \textit{MultiSpectrumReportFilter} -- filters the reports of a
+  multi-spectrum.
+  \item \textit{PostProcessor} -- allows the post-processing of Weka Instances.
+  \item \textit{SampleDataDbReader} -- reads sample data from the database.
+  \item \textit{SampleDataDbWriter} -- writes sample data to the database.
+  \item \textit{SampleDataFileReader} -- loads sample data from disk.
+  \item \textit{SampleDataFileWriter} -- writes sample data to disk.
+  \item \textit{SetSampleDataValue} -- sets the value for the specified
+  sample data field.
+  \item \textit{SpectrumAppend} -- appens the incoming spectrum to the one
+  in storage (latter doesn't have to be present).
+  \item \textit{SpectrumDbReader} -- loads a spectrum from the database.
+  \item \textit{SpectrumDbWriter} -- writes a spectrum to the database.
+  \item \textit{SpectrumDiff} -- calculates the difference between the
+  two spectra received as array and outputs the difference as spectrum.
+  \item \textit{SpectrumFeatureGenerator} -- for generating features from
+  a spectrum.
+  \item \textit{SpectrumFileReader} -- loads a spectrum from disk.
+  \item \textit{SpectrumFileWriter} -- writes a spectrum to disk.
+  \item \textit{SpectrumFilter} -- applies a filter to the spectrum passing through.
+  \item \textit{SpectrumInfo} -- outputs information about a spectrum.
+  \item \textit{SpectrumMinMax} -- for keeping track of min/max amplitudes per
+  wave number (and outputs these).
 \end{tight_itemize}
 The following sinks are available:
 \begin{tight_itemize}
-  	\item \textit{TODO} -- TODO
+  \item \textit{SampleDataDisplay} -- displays one or more sample data reports.
+  \item \textit{SpectrumDisplay} -- displays one or more spectra.
+  \item \textit{SpectrumImageWriter} -- writes a spectrum as an image.
 \end{tight_itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Tools}
-TODO
+\chapter{Visualization}
+The \textit{Spectrum Explorer} (see Figure \ref{spectrum_explorer}) allows you
+to load spectra of various types from disk or database for visual inspection,
+as well as processing via filters. PCA and PLS analysis are possible as well.
+The spectra can be exported any time as well.
+Actions in the GUI can be recorded as scripts and the replayed easily.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=12.0cm]{images/spectrum_explorer.png}
+  \caption{Spectrum Explorer}
+  \label{spectrum_explorer}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Maintenance}
+The following maintenance tools are available:
+\begin{tight_itemize}
+  \item \textit{Delete spectra} -- allows removal of spectra from the database.
+  \item \textit{Update sample data} -- wizard for updating sample data values
+  in selected spectra.
+\end{tight_itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{bibliography}
