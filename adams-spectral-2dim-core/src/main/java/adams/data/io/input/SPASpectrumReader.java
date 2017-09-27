@@ -140,6 +140,17 @@ public class SPASpectrumReader
   }
 
   /**
+   * Reads a short (2bytes).
+   *
+   * @param data	the data to use
+   * @param offset	the offset
+   * @return		the short
+   */
+  protected int readShort(byte[] data, int offset) {
+    return LittleEndian.bytesToShort(new byte[]{data[offset+0], data[offset+1]});
+  }
+
+  /**
    * Reads an integer (4bytes).
    *
    * @param data	the data to use
@@ -170,16 +181,22 @@ public class SPASpectrumReader
     Spectrum		sp;
     String[]		comments;
     DateFormat		dfcomm;
+    DateFormat		dfcomm2;
     DateFormat 		dfreg;
     String		section;
     String		key;
     String		sval;
-    int			dataOff;
     int			numPoints;
     float		minWave;
     float		maxWave;
     float		ampl;
     int			i;
+    int			numBlocks;
+    int			offsetComments;
+    int 		offsetDataDesc;
+    int 		offsetData;
+    int			offsetBlock;
+    int			blockType;
     SpectrumPoint	point;
 
     sp = new Spectrum();
@@ -190,12 +207,52 @@ public class SPASpectrumReader
     // ID
     sp.setID(readString(data, 30));
 
+    // find offsets
+    numBlocks = readShort(data, 294);
+    if (isLoggingEnabled())
+      getLogger().info("# blocks: " + numBlocks);
+    offsetComments = -1;
+    offsetDataDesc = -1;
+    offsetData     = -1;
+    offsetBlock    = 304;
+    for (i = 0; i < numBlocks; i++) {
+      blockType = readShort(data, offsetBlock);
+      switch (blockType) {
+	case 27: // 1B00
+	  offsetComments = readShort(data, offsetBlock + 2);
+	  if (isLoggingEnabled())
+	    getLogger().info("offset comments: " + offsetComments);
+	  break;
+
+	case 3: // 0300
+	  offsetData = readShort(data, offsetBlock + 2);
+	  if (isLoggingEnabled())
+	    getLogger().info("offset data: " + offsetData);
+	  break;
+
+	case 2: // 0200
+	  offsetDataDesc = readShort(data, offsetBlock + 2);
+	  if (isLoggingEnabled())
+	    getLogger().info("offset data description: " + offsetDataDesc);
+	  break;
+      }
+      offsetBlock += 16;
+    }
+
+    if (offsetComments == -1)
+      throw new IllegalStateException("Failed to determine offset for comments!");
+    if (offsetData == -1)
+      throw new IllegalStateException("Failed to determine offset for data!");
+    if (offsetDataDesc == -1)
+      throw new IllegalStateException("Failed to determine offset for data description!");
+
     // comments
-    comments = readString(data, 896).split("\r\n");
+    comments = readString(data, offsetComments).split("\r\n");
     if (isLoggingEnabled())
       getLogger().info("Comments:\n" + Utils.flatten(comments, "\n"));
     section = "";
-    dfcomm  = new DateFormat("EEE MMM dd HH:mm:ss yyyy (z)");
+    dfcomm  = new DateFormat("EEE MMM dd HH:mm:ss yyyy");
+    dfcomm2 = new DateFormat("EEE MMM dd HH:mm:ss yyyy (z)");
     dfreg   = DateUtils.getTimestampFormatter();
     for (String comment: comments) {
       if (!comment.startsWith("\t")) {
@@ -204,35 +261,33 @@ public class SPASpectrumReader
       }
       comment = comment.trim();
       if (comment.contains(" on ")) {
-	key = comment.substring(0, comment.indexOf(" on ")).trim();
+	key  = comment.substring(0, comment.indexOf(" on ")).trim();
 	sval = comment.substring(comment.indexOf(" on ") + 4).trim();
-	sp.getReport().setStringValue((section.isEmpty() ? "" : (section + " - ") + key), dfreg.format(dfcomm.parse(sval)));
+	if (dfcomm.check(sval))
+	  sp.getReport().setStringValue((section.isEmpty() ? "" : (section + " - ") + key), dfreg.format(dfcomm.parse(sval)));
+	else if (dfcomm2.check(sval))
+	  sp.getReport().setStringValue((section.isEmpty() ? "" : (section + " - ") + key), dfreg.format(dfcomm2.parse(sval)));
       }
       else if (comment.contains(":")) {
-	key = comment.substring(0, comment.indexOf(":")).trim();
+	key  = comment.substring(0, comment.indexOf(":")).trim();
 	sval = comment.substring(comment.indexOf(":") + 1).trim();
 	sp.getReport().setStringValue((section.isEmpty() ? "" : (section + " - ") + key), sval);
       }
     }
 
-    // data offset
-    dataOff = readInt(data, 386);
-    if (isLoggingEnabled())
-      getLogger().info("Data offset: " + dataOff);
-
     // num points
-    numPoints = readInt(data, 564);
+    numPoints = readInt(data, offsetDataDesc + 4);
     if (isLoggingEnabled())
       getLogger().info("# points: " + numPoints);
 
     // min/max waveno
-    maxWave = readFloat(data, 576);
-    minWave = readFloat(data, 580);
+    maxWave = readFloat(data, offsetDataDesc + 16);
+    minWave = readFloat(data, offsetDataDesc + 20);
     if (isLoggingEnabled())
       getLogger().info("Wave numbers: " + minWave + " - " + maxWave);
 
     for (i = 0; i < numPoints; i++) {
-      ampl = readFloat(data, dataOff + i * 4);
+      ampl = readFloat(data, offsetData + i * 4);
       if (!Float.isNaN(ampl)) {
 	point = new SpectrumPoint(
 	  maxWave - (maxWave - minWave) * i / numPoints,
