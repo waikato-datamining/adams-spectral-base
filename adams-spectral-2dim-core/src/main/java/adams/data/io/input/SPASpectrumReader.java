@@ -29,55 +29,55 @@ import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
 /**
-<!-- globalinfo-start -->
-* Loads spectral data files in Nicolet SPA format.
-* <br><br>
-<!-- globalinfo-end -->
-*
-<!-- options-start -->
-* <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
-* &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
-* &nbsp;&nbsp;&nbsp;default: WARNING
-* </pre>
-*
-* <pre>-input &lt;adams.core.io.PlaceholderFile&gt; (property: input)
-* &nbsp;&nbsp;&nbsp;The file to read and turn into a container.
-* &nbsp;&nbsp;&nbsp;default: ${CWD}
-* </pre>
-*
-* <pre>-create-dummy-report &lt;boolean&gt; (property: createDummyReport)
-* &nbsp;&nbsp;&nbsp;If true, then a dummy report is created if none present.
-* &nbsp;&nbsp;&nbsp;default: false
-* </pre>
-*
-* <pre>-instrument &lt;java.lang.String&gt; (property: instrument)
-* &nbsp;&nbsp;&nbsp;The name of the instrument that generated the spectra (if not already present
-* &nbsp;&nbsp;&nbsp;in data).
-* &nbsp;&nbsp;&nbsp;default: unknown
-* </pre>
-*
-* <pre>-format &lt;java.lang.String&gt; (property: format)
-* &nbsp;&nbsp;&nbsp;The data format string.
-* &nbsp;&nbsp;&nbsp;default: NIR
-* </pre>
-*
-* <pre>-keep-format &lt;boolean&gt; (property: keepFormat)
-* &nbsp;&nbsp;&nbsp;If enabled the format obtained from the file is not replaced by the format
-* &nbsp;&nbsp;&nbsp;defined here.
-* &nbsp;&nbsp;&nbsp;default: false
-* </pre>
-*
-* <pre>-use-absolute-source &lt;boolean&gt; (property: useAbsoluteSource)
-* &nbsp;&nbsp;&nbsp;If enabled the source report field stores the absolute file name rather
-* &nbsp;&nbsp;&nbsp;than just the name.
-* &nbsp;&nbsp;&nbsp;default: false
-* </pre>
-*
-<!-- options-end -->
-*
-* @author  fracpete (fracpete at waikato dot ac dot nz)
-* @version $Revision: 2242 $
-*/
+ <!-- globalinfo-start -->
+ * Loads spectral data files in Nicolet SPA format.
+ * <br><br>
+ <!-- globalinfo-end -->
+ *
+ <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-input &lt;adams.core.io.PlaceholderFile&gt; (property: input)
+ * &nbsp;&nbsp;&nbsp;The file to read and turn into a container.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ *
+ * <pre>-create-dummy-report &lt;boolean&gt; (property: createDummyReport)
+ * &nbsp;&nbsp;&nbsp;If true, then a dummy report is created if none present.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-instrument &lt;java.lang.String&gt; (property: instrument)
+ * &nbsp;&nbsp;&nbsp;The name of the instrument that generated the spectra (if not already present
+ * &nbsp;&nbsp;&nbsp;in data).
+ * &nbsp;&nbsp;&nbsp;default: unknown
+ * </pre>
+ *
+ * <pre>-format &lt;java.lang.String&gt; (property: format)
+ * &nbsp;&nbsp;&nbsp;The data format string.
+ * &nbsp;&nbsp;&nbsp;default: NIR
+ * </pre>
+ *
+ * <pre>-keep-format &lt;boolean&gt; (property: keepFormat)
+ * &nbsp;&nbsp;&nbsp;If enabled the format obtained from the file is not replaced by the format
+ * &nbsp;&nbsp;&nbsp;defined here.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-use-absolute-source &lt;boolean&gt; (property: useAbsoluteSource)
+ * &nbsp;&nbsp;&nbsp;If enabled the source report field stores the absolute file name rather
+ * &nbsp;&nbsp;&nbsp;than just the name.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ <!-- options-end -->
+ *
+ * @author  fracpete (fracpete at waikato dot ac dot nz)
+ * @version $Revision: 2242 $
+ */
 public class SPASpectrumReader
   extends AbstractSpectrumReader {
 
@@ -130,7 +130,7 @@ public class SPASpectrumReader
     do {
       b = data[i];
       if (b == 0)
-        break;
+	break;
       result.append((char) b);
       i++;
     }
@@ -178,6 +178,7 @@ public class SPASpectrumReader
     int			numPoints;
     float		minWave;
     float		maxWave;
+    float		ampl;
     int			i;
     SpectrumPoint	point;
 
@@ -203,14 +204,14 @@ public class SPASpectrumReader
       }
       comment = comment.trim();
       if (comment.contains(" on ")) {
-        key = comment.substring(0, comment.indexOf(" on ")).trim();
-        sval = comment.substring(comment.indexOf(" on ") + 4).trim();
-        sp.getReport().setStringValue((section.isEmpty() ? "" : (section + " - ") + key), dfreg.format(dfcomm.parse(sval)));
+	key = comment.substring(0, comment.indexOf(" on ")).trim();
+	sval = comment.substring(comment.indexOf(" on ") + 4).trim();
+	sp.getReport().setStringValue((section.isEmpty() ? "" : (section + " - ") + key), dfreg.format(dfcomm.parse(sval)));
       }
       else if (comment.contains(":")) {
-        key = comment.substring(0, comment.indexOf(":")).trim();
-        sval = comment.substring(comment.indexOf(":") + 1).trim();
-        sp.getReport().setStringValue((section.isEmpty() ? "" : (section + " - ") + key), sval);
+	key = comment.substring(0, comment.indexOf(":")).trim();
+	sval = comment.substring(comment.indexOf(":") + 1).trim();
+	sp.getReport().setStringValue((section.isEmpty() ? "" : (section + " - ") + key), sval);
       }
     }
 
@@ -231,13 +232,17 @@ public class SPASpectrumReader
       getLogger().info("Wave numbers: " + minWave + " - " + maxWave);
 
     for (i = 0; i < numPoints; i++) {
-      point = new SpectrumPoint(
-	maxWave - (maxWave - minWave) * i / numPoints,
-	readFloat(data, dataOff + i * 4)
-      );
-      sp.add(point);
-      if (isLoggingEnabled())
-        getLogger().info(i + ": " + point);
+      ampl = readFloat(data, dataOff + i * 4);
+      if (!Float.isNaN(ampl)) {
+	point = new SpectrumPoint(
+	  maxWave - (maxWave - minWave) * i / numPoints,
+	  ampl
+	);
+
+	sp.add(point);
+	if (isLoggingEnabled())
+	  getLogger().info(i + ": " + point);
+      }
     }
 
     m_ReadData.add(sp);
