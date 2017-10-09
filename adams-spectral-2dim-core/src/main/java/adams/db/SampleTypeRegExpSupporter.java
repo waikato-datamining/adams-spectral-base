@@ -13,16 +13,16 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SampleTypeRegExpSupporter.java
- * Copyright (C) 2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.db;
 
 import adams.core.base.BaseRegExp;
 
 /**
- * Interface for condition classes that support regular exporessions for the
+ * Interface for condition classes that support regular expressions for the
  * sample type.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
