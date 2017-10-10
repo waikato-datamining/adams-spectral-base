@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumConditions.java
- * Copyright (C) 2010-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.db;
@@ -31,7 +31,7 @@ import adams.core.base.BaseRegExp;
  */
 public abstract class AbstractSpectrumConditions
   extends AbstractLimitedConditions
-  implements ReportConditions {
+  implements ReportConditions, SampleTypeRegExpSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 8972337431072505207L;
