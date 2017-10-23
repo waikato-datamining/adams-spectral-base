@@ -15,13 +15,15 @@
 
 /*
  * PostProcessor.java
- * Copyright (C) 2011-2012 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import adams.flow.core.Token;
+import adams.core.QuickInfoHelper;
 import adams.data.postprocessor.instances.AbstractPostProcessor;
+import adams.flow.container.PostProcessingContainer;
+import adams.flow.core.Token;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -29,7 +31,8 @@ import java.util.Hashtable;
 
 /**
  <!-- globalinfo-start -->
- * Post-processes the input Instances or, after the post-processor has been initialized with Instances, also input Instance objects.
+ * Post-processes the input Instances or, after the post-processor has been initialized with Instances, also input Instance objects.<br>
+ * The actual post-processor in use gets output when container output enabled.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -45,13 +48,9 @@ import java.util.Hashtable;
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
- * Valid options are: <br><br>
- *
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
  *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
@@ -59,24 +58,38 @@ import java.util.Hashtable;
  * &nbsp;&nbsp;&nbsp;default: PostProcessor
  * </pre>
  *
- * <pre>-annotation &lt;adams.core.base.BaseText&gt; (property: annotations)
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
- * <pre>-skip (property: skip)
+ * <pre>-skip &lt;boolean&gt; (property: skip)
  * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
  * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-stop-flow-on-error (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-post-processor &lt;knir.data.postprocessor.instances.AbstractPostProcessor&gt; (property: postProcessor)
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-post-processor &lt;adams.data.postprocessor.instances.AbstractPostProcessor&gt; (property: postProcessor)
  * &nbsp;&nbsp;&nbsp;The PostProcessor to use to process the Instances.
- * &nbsp;&nbsp;&nbsp;default: knir.data.postprocessor.instances.WekaFilter -filter weka.filters.AllFilter
+ * &nbsp;&nbsp;&nbsp;default: adams.data.postprocessor.instances.WekaFilter -filter weka.filters.AllFilter
+ * </pre>
+ *
+ * <pre>-output-container &lt;boolean&gt; (property: outputContainer)
+ * &nbsp;&nbsp;&nbsp;If enabled, a container gets output.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
  <!-- options-end -->
@@ -99,6 +112,9 @@ public class PostProcessor
   /** the postprocessor used for doing the actual work. */
   protected AbstractPostProcessor m_ActualPostProcessor;
 
+  /** whether to output a container. */
+  protected boolean m_OutputContainer;
+
   /**
    * Returns a string describing the object.
    *
@@ -108,7 +124,8 @@ public class PostProcessor
   public String globalInfo() {
     return
         "Post-processes the input Instances or, after the post-processor "
-      + "has been initialized with Instances, also input Instance objects.";
+      + "has been initialized with Instances, also input Instance objects.\n"
+      + "The actual post-processor in use gets output when container output enabled.";
   }
 
   /**
@@ -121,12 +138,16 @@ public class PostProcessor
     m_OptionManager.add(
 	"post-processor", "postProcessor",
 	new adams.data.postprocessor.instances.WekaFilter());
+
+    m_OptionManager.add(
+	"output-container", "outputContainer",
+	false);
   }
 
   /**
-   * Sets the cleaner to use.
+   * Sets the post-processor to use.
    *
-   * @param value	the cleanerr
+   * @param value	the post-processor
    */
   public void setPostProcessor(AbstractPostProcessor value) {
     m_PostProcessor = value;
@@ -134,9 +155,9 @@ public class PostProcessor
   }
 
   /**
-   * Returns the cleaner in use.
+   * Returns the post-processor in use.
    *
-   * @return		the cleaner
+   * @return		the post-processor
    */
   public AbstractPostProcessor getPostProcessor() {
     return m_PostProcessor;
@@ -153,20 +174,47 @@ public class PostProcessor
   }
 
   /**
+   * Sets whether to output a container.
+   *
+   * @param value	true if to output a container
+   */
+  public void setOutputContainer(boolean value) {
+    m_OutputContainer = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to output a container.
+   *
+   * @return		true if to output a container
+   */
+  public boolean getOutputContainer() {
+    return m_OutputContainer;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String outputContainerTipText() {
+    return "If enabled, a container gets output.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    String	variable;
+    String	result;
 
-    variable = getOptionManager().getVariableForProperty("postProcessor");
+    result  = QuickInfoHelper.toString(this, "postProcessor", m_PostProcessor);
+    result += QuickInfoHelper.toString(this, "outputContainer", (m_OutputContainer ? ", container" : ""));
 
-    if (variable != null)
-      return variable;
-    else
-      return m_PostProcessor.getClass().getName().replaceAll("knir\\.data\\.", "");
+    return result;
   }
 
   /**
@@ -236,7 +284,10 @@ public class PostProcessor
    * @return		<!-- flow-generates-start -->weka.core.Instances.class, weka.core.Instance.class<!-- flow-generates-end -->
    */
   public Class[] generates() {
-    return new Class[]{Instances.class, Instance.class};
+    if (m_OutputContainer)
+      return new Class[]{PostProcessingContainer.class};
+    else
+      return new Class[]{Instances.class, Instance.class};
   }
 
   /**
@@ -261,17 +312,23 @@ public class PostProcessor
       if (m_InputToken.getPayload() instanceof Instances) {
 	data          = (Instances) m_InputToken.getPayload();
 	processedData = m_ActualPostProcessor.postProcess(data);
-	m_OutputToken = new Token(processedData);
+	if (m_OutputContainer)
+	  m_OutputToken = new Token(new PostProcessingContainer(data, processedData, m_ActualPostProcessor));
+	else
+	  m_OutputToken = new Token(processedData);
       }
       else if (m_InputToken.getPayload() instanceof Instance) {
 	inst          = (Instance) m_InputToken.getPayload();
 	processedInst = m_ActualPostProcessor.postProcess(inst);
-	m_OutputToken = new Token(processedInst);
+	if (m_OutputContainer)
+	  m_OutputToken = new Token(new PostProcessingContainer(inst, processedInst, m_ActualPostProcessor));
+	else
+	  m_OutputToken = new Token(processedInst);
       }
     }
     catch (Exception e) {
       m_OutputToken = null;
-      result = handleException("Failed to postprocess: " + m_InputToken.getPayload(), e);
+      result = handleException("Failed to post-process: " + m_InputToken.getPayload(), e);
     }
 
     return result;
