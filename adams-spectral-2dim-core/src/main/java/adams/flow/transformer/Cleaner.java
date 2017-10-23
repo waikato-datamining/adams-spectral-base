@@ -391,6 +391,7 @@ public class Cleaner
       if (cleaned != null)
 	newCont.setValue(CleaningContainer.VALUE_INSTANCES, cleaned);
       newCont.setValue(CleaningContainer.VALUE_CHECKS, checks);
+      newCont.setValue(CleaningContainer.VALUE_CLEANER, m_ActualCleaner);
       m_OutputToken = new Token(newCont);
     }
     catch (Exception e) {

@@ -19,6 +19,7 @@
  */
 package adams.flow.container;
 
+import adams.data.cleaner.instance.AbstractCleaner;
 import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.SpreadSheet;
 import weka.core.Instance;
@@ -49,6 +50,9 @@ public class CleaningContainer
   /** the identifier for the checks. */
   public final static String VALUE_CHECKS = "Checks";
 
+  /** the identifier for the cleaner. */
+  public final static String VALUE_CLEANER = "Cleaner";
+
   /**
    * Default constructor.
    */
@@ -74,6 +78,7 @@ public class CleaningContainer
     addHelp(VALUE_INSTANCE, "data row; " + Instance.class.getName());
     addHelp(VALUE_INSTANCES, "dataset; " + Instances.class.getName());
     addHelp(VALUE_CHECKS, "checks; " + SpreadSheet.class.getName());
+    addHelp(VALUE_CLEANER, "cleaner; " + AbstractCleaner.class.getName());
   }
 
   /**
@@ -107,11 +112,12 @@ public class CleaningContainer
   public Iterator<String> names() {
     List<String>	result;
 
-    result = new ArrayList<String>();
+    result = new ArrayList<>();
 
     result.add(VALUE_INSTANCE);
     result.add(VALUE_INSTANCES);
     result.add(VALUE_CHECKS);
+    result.add(VALUE_CLEANER);
 
     return result.iterator();
   }
