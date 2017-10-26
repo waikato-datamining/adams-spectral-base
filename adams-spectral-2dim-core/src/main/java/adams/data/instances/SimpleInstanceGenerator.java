@@ -15,7 +15,7 @@
 
 /*
  * SimpleInstanceGenerator.java
- * Copyright (C) 2009-2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -39,21 +39,31 @@ import java.util.List;
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <br><br>
- *
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
  *
- * <pre>-add-db-id (property: addDatabaseID)
+ * <pre>-add-db-id &lt;boolean&gt; (property: addDatabaseID)
  * &nbsp;&nbsp;&nbsp;If set to true, then the database ID will be added to the output.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-add-sample-id (property: addSampleID)
+ * <pre>-tolerate-header-changes &lt;boolean&gt; (property: tolerateHeaderChanges)
+ * &nbsp;&nbsp;&nbsp;If set to true, then changes in the header get tolerated (and the header
+ * &nbsp;&nbsp;&nbsp;recreated) instead of causing an error.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-offline &lt;boolean&gt; (property: offline)
+ * &nbsp;&nbsp;&nbsp;If set to true, the generator operates in offline mode, ie does not access
+ * &nbsp;&nbsp;&nbsp;database.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-add-sample-id &lt;boolean&gt; (property: addSampleID)
  * &nbsp;&nbsp;&nbsp;If set to true, then the sample ID will be added to the output.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
  * <pre>-notes &lt;adams.core.base.BaseString&gt; [-notes ...] (property: notes)
@@ -62,32 +72,35 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
- * <pre>-load-sample-data (property: loadSampleData)
+ * <pre>-load-sample-data &lt;boolean&gt; (property: loadSampleData)
  * &nbsp;&nbsp;&nbsp;If set to true, then the sample data will be loaded if only dummy report
  * &nbsp;&nbsp;&nbsp;available, using the sample ID.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-store (property: useStoreTable)
- * &nbsp;&nbsp;&nbsp;If set to true, then the sample data will get read from the store table,
- * &nbsp;&nbsp;&nbsp;otherwise the active one.
- * </pre>
- *
- * <pre>-additional &lt;knir.data.sampledata.Field&gt; [-additional ...] (property: additionalFields)
+ * <pre>-additional &lt;adams.data.report.Field&gt; [-additional ...] (property: additionalFields)
  * &nbsp;&nbsp;&nbsp;The additional fields from the sample data to add to the output.
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
- * <pre>-no-additional-prefix (property: noAdditionalFieldsPrefix)
+ * <pre>-no-additional-prefix &lt;boolean&gt; (property: noAdditionalFieldsPrefix)
  * &nbsp;&nbsp;&nbsp;If enabled, the additional fields won't get a prefix for their name.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-field &lt;knir.data.sampledata.Field&gt; (property: field)
+ * <pre>-field &lt;adams.data.report.Field&gt; (property: field)
  * &nbsp;&nbsp;&nbsp;The field to act as class attribute.
- * &nbsp;&nbsp;&nbsp;default: AN1[U]
+ * &nbsp;&nbsp;&nbsp;default: ADN1[N]
  * </pre>
  *
- * <pre>-add-wave (property: addWaveNumber)
- * &nbsp;&nbsp;&nbsp;If set to true, the wave number will be added to the output data as well.
+ * <pre>-add-wave &lt;boolean&gt; (property: addWaveNumber)
+ * &nbsp;&nbsp;&nbsp;If enabled, the wave number will be added to the output data as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-wave-number-as-suffix &lt;boolean&gt; (property: waveNumberAsSuffix)
+ * &nbsp;&nbsp;&nbsp;If enabled, the wave number is used as suffix instead of the index.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
  <!-- options-end -->
@@ -103,6 +116,9 @@ public class SimpleInstanceGenerator
 
   /** whether to output the wave-number as well. */
   protected boolean m_AddWaveNumber;
+
+  /** whether to use the wave number as suffix. */
+  protected boolean m_WaveNumberAsSuffix;
 
   /**
    * Returns a string describing the object.
@@ -122,8 +138,12 @@ public class SimpleInstanceGenerator
     super.defineOptions();
 
     m_OptionManager.add(
-	    "add-wave", "addWaveNumber",
-	    false);
+      "add-wave", "addWaveNumber",
+      false);
+
+    m_OptionManager.add(
+      "wave-number-as-suffix", "waveNumberAsSuffix",
+      false);
   }
 
   /**
@@ -152,7 +172,36 @@ public class SimpleInstanceGenerator
    * 			displaying in the GUI or for listing the options.
    */
   public String addWaveNumberTipText() {
-    return "If set to true, the wave number will be added to the output data as well.";
+    return "If enabled, the wave number will be added to the output data as well.";
+  }
+
+  /**
+   * Sets whether the wave number is used as suffix instead of the index.
+   *
+   * @param value 	true if to use wave number
+   */
+  public void setWaveNumberAsSuffix(boolean value) {
+    m_WaveNumberAsSuffix = value;
+    reset();
+  }
+
+  /**
+   * Returns whether the wave number is used as suffix instead of the index.
+   *
+   * @return 		true if to use wave number
+   */
+  public boolean getWaveNumberAsSuffix() {
+    return m_WaveNumberAsSuffix;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String waveNumberAsSuffixTipText() {
+    return "If enabled, the wave number is used as suffix instead of the index.";
   }
 
   /**
@@ -188,17 +237,19 @@ public class SimpleInstanceGenerator
     ArrayList<Attribute>	atts;
     ArrayList<String>		attValues;
     int				i;
+    float			waveno;
 
-    atts = new ArrayList<Attribute>();
+    atts = new ArrayList<>();
 
     // spectrum
     for (i = 0; i < data.size(); i++) {
+      waveno = data.toList().get(i).getWaveNumber();
       if (m_AddWaveNumber) {
-	atts.add(new Attribute(ArffUtils.getWaveNumberName(i)));
-	atts.add(new Attribute(ArffUtils.getAmplitudeName(i)));
+	atts.add(new Attribute(m_WaveNumberAsSuffix ? ArffUtils.getWaveNumberName(waveno) : ArffUtils.getWaveNumberName(i)));
+	atts.add(new Attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(waveno) : ArffUtils.getAmplitudeName(i)));
       }
       else {
-	atts.add(new Attribute(ArffUtils.getAmplitudeName(i)));
+	atts.add(new Attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(waveno) : ArffUtils.getAmplitudeName(i)));
       }
     }
 
@@ -207,7 +258,7 @@ public class SimpleInstanceGenerator
       atts.add(new Attribute(ArffUtils.getFieldName(m_Field)));
     }
     else if (m_Field.getDataType() == DataType.BOOLEAN) {
-      attValues = new ArrayList<String>();
+      attValues = new ArrayList<>();
       attValues.add(LABEL_FALSE);
       attValues.add(LABEL_TRUE);
       atts.add(new Attribute(ArffUtils.getFieldName(m_Field), attValues));
@@ -233,6 +284,7 @@ public class SimpleInstanceGenerator
     List<SpectrumPoint>	points;
     int			index;
     SampleData		report;
+    float		waveno;
 
     values = new double[m_OutputHeader.numAttributes()];
     report = data.getReport();
@@ -240,11 +292,12 @@ public class SimpleInstanceGenerator
     // spectrum
     points = data.toList();
     for (i = 0; i < data.size(); i++) {
+      waveno = data.toList().get(i).getWaveNumber();
       if (m_AddWaveNumber) {
-	index         = m_OutputHeader.attribute(ArffUtils.getWaveNumberName(i)).index();
+	index         = m_OutputHeader.attribute(m_WaveNumberAsSuffix ? ArffUtils.getWaveNumberName(waveno) : ArffUtils.getWaveNumberName(i)).index();
 	values[index] = points.get(i).getWaveNumber();
       }
-      index         = m_OutputHeader.attribute(ArffUtils.getAmplitudeName(i)).index();
+      index         = m_OutputHeader.attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(waveno) : ArffUtils.getAmplitudeName(i)).index();
       values[index] = points.get(i).getAmplitude();
     }
 

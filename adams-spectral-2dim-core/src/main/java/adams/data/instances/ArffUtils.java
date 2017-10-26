@@ -15,7 +15,7 @@
 
 /*
  * ArffUtils.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -56,6 +56,17 @@ public class ArffUtils
   }
 
   /**
+   * Returns the name of an attribute for a wave number. Gets prefixed
+   * with "wave-number-".
+   *
+   * @param waveno	the wave number
+   * @return		the attribute name
+   */
+  public static String getWaveNumberName(float waveno) {
+    return "wave-number-" + waveno;
+  }
+
+  /**
    * Returns the name of an attribute for an amplitude. Gets prefixed
    * with "amplitude-".
    *
@@ -64,6 +75,17 @@ public class ArffUtils
    */
   public static String getAmplitudeName(int index) {
     return "amplitude-" + (index+1);
+  }
+
+  /**
+   * Returns the name of an attribute for an amplitude. Gets prefixed
+   * with "amplitude-".
+   *
+   * @param waveno	the wave number
+   * @return		the attribute name
+   */
+  public static String getAmplitudeName(float waveno) {
+    return "amplitude-" + waveno;
   }
 
   /**
@@ -81,7 +103,7 @@ public class ArffUtils
     int			i;
 
     // check names
-    atts = new Vector<String>();
+    atts = new Vector<>();
     if ((att = data.attribute(ArffUtils.getDBIDName())) != null)
       atts.add("" +(att.index() + 1));
     if ((att = data.attribute(ArffUtils.getIDName())) != null)
