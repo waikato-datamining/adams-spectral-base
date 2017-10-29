@@ -83,7 +83,7 @@ public class SimpleSpectralTransformService
    */
   protected adams.db.AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
-	  m_Owner.getOwner(),
+	  m_Owner.getFlowContext(),
 	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  adams.db.DatabaseConnection.getSingleton());
   }
@@ -96,7 +96,7 @@ public class SimpleSpectralTransformService
   public void setOwner(SpectralTransformServiceWS value) {
     m_Owner = value;
     
-    if ((m_Owner != null) && (m_Owner.getOwner() != null))
+    if ((m_Owner != null) && (m_Owner.getFlowContext() != null))
       m_DatabaseConnection = getDatabaseConnection();
     else
       m_DatabaseConnection = null;
@@ -131,7 +131,7 @@ public class SimpleSpectralTransformService
     result.setFormat(parameters.getFormat());
 
     helper   = new CallableActorHelper();
-    callable = helper.findCallableActor(m_Owner.getOwner().getRoot(), new CallableActorReference(parameters.getAction()));
+    callable = helper.findCallableActor(m_Owner.getFlowContext().getRoot(), new CallableActorReference(parameters.getAction()));
 
     // not found
     if (callable == null) {

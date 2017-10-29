@@ -75,7 +75,7 @@ public class SimpleRatsMultiSpectrumService
    */
   protected adams.db.AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
-	  m_Owner.getOwner(),
+	  m_Owner.getFlowContext(),
 	  adams.flow.standalone.DatabaseConnectionProvider.class,
 	  adams.db.DatabaseConnection.getSingleton());
   }
@@ -88,7 +88,7 @@ public class SimpleRatsMultiSpectrumService
   public void setOwner(RatsMultiSpectrumServiceWS value) {
     m_Owner = value;
     
-    if ((m_Owner != null) && (m_Owner.getOwner() != null))
+    if ((m_Owner != null) && (m_Owner.getFlowContext() != null))
       m_DatabaseConnection = getDatabaseConnection();
     else
       m_DatabaseConnection = null;

@@ -125,7 +125,7 @@ public class WSMultiSpectrumReception
    */
   public void setWebService(WebServiceProvider value) {
     m_WebService = value;
-    m_WebService.setOwner(getOwner());
+    m_WebService.setFlowContext(getOwner());
     if (m_WebService instanceof RatInputUser)
       ((RatInputUser) m_WebService).setRatInput(this);
     reset();
@@ -245,7 +245,7 @@ public class WSMultiSpectrumReception
     result = null;
     
     if (!m_WebService.isRunning()) {
-      m_WebService.setOwner(getOwner());
+      m_WebService.setFlowContext(getOwner());
       if (m_WebService instanceof RatInputUser)
 	((RatInputUser) m_WebService).setRatInput(this);
       result = m_WebService.start();
