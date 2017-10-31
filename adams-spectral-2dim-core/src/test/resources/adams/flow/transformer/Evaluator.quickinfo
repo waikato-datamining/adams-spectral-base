@@ -1,1 +1,1 @@
-evaluator: NullEvaluator
+evaluator: NullEvaluator, type: AUTO, model: ${CWD}, source: , storage: storage, reset: variable

@@ -15,11 +15,13 @@
 
 /*
  * Cleaner.java
- * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
+import adams.core.MessageCollection;
+import adams.core.QuickInfoHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.data.cleaner.CleanerDetails;
@@ -29,6 +31,11 @@ import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.flow.container.CleaningContainer;
+import adams.flow.control.StorageName;
+import adams.flow.core.AbstractModelLoader.ModelLoadingType;
+import adams.flow.core.CallableActorReference;
+import adams.flow.core.CleanerModelLoader;
+import adams.flow.core.ModelLoaderSupporter;
 import adams.flow.core.Token;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -37,74 +44,105 @@ import java.util.Hashtable;
 
 /**
  <!-- globalinfo-start -->
- * In case of Instances objects, 'unclean' Instance objects get removed. When receiving an Instance object, a note is attached
+ * In case of Instances objects, 'unclean' Instance objects get removed. When receiving an Instance object, a note is attached.<br>
+ * The following order is used to obtain the model (when using AUTO):<br>
+ * 1. model file present?<br>
+ * 2. source actor present?<br>
+ * 3. storage item present?<br>
+ * 4. The cleaner is instantiated from the provided definition.
  * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;knir.flow.container.CleaningContainer<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.container.CleaningContainer<br>
  * &nbsp;&nbsp;&nbsp;weka.core.Instance<br>
  * &nbsp;&nbsp;&nbsp;weka.core.Instances<br>
  * - generates:<br>
- * &nbsp;&nbsp;&nbsp;knir.flow.container.CleaningContainer<br>
+ * &nbsp;&nbsp;&nbsp;adams.flow.container.CleaningContainer<br>
  * <br><br>
  * Container information:<br>
- * - knir.flow.container.CleaningContainer: Instance, Instances, Checks<br>
- * - knir.flow.container.CleaningContainer: Instance, Instances, Checks
+ * - adams.flow.container.CleaningContainer: Instance, Instances, Checks, Cleaner
  * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
- * Valid options are: <br><br>
- * 
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to 
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: Cleaner
  * </pre>
- * 
- * <pre>-annotation &lt;adams.core.base.BaseText&gt; (property: annotations)
+ *
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
- * &nbsp;&nbsp;&nbsp;default: 
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
- * 
- * <pre>-skip (property: skip)
- * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ *
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
  * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
- * <pre>-stop-flow-on-error (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ *
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
- * <pre>-cleaner &lt;knir.data.cleaner.instance.AbstractCleaner&gt; (property: cleaner)
+ *
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-cleaner &lt;adams.data.cleaner.instance.AbstractCleaner&gt; (property: cleaner)
  * &nbsp;&nbsp;&nbsp;The Cleaner to use to clean Instances.
- * &nbsp;&nbsp;&nbsp;default: knir.data.cleaner.instance.IQRCleaner -pre-filter weka.filters.AllFilter
+ * &nbsp;&nbsp;&nbsp;default: adams.data.cleaner.instance.IQRCleaner -pre-filter weka.filters.AllFilter -filter \"weka.filters.unsupervised.attribute.InterquartileRange -R first-last -O 3.0 -E 6.0\"
  * </pre>
- * 
+ *
+ * <pre>-model-loading-type &lt;AUTO|FILE|SOURCE_ACTOR|STORAGE&gt; (property: modelLoadingType)
+ * &nbsp;&nbsp;&nbsp;Determines how to load the model, in case of AUTO, first the model file
+ * &nbsp;&nbsp;&nbsp;is checked, then the callable actor and then the storage.
+ * &nbsp;&nbsp;&nbsp;default: AUTO
+ * </pre>
+ *
+ * <pre>-model &lt;adams.core.io.PlaceholderFile&gt; (property: modelFile)
+ * &nbsp;&nbsp;&nbsp;The file to load the model from, ignored if pointing to a directory.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ *
+ * <pre>-model-actor &lt;adams.flow.core.CallableActorReference&gt; (property: modelActor)
+ * &nbsp;&nbsp;&nbsp;The callable actor (source) to obtain the model from, ignored if not present.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-model-storage &lt;adams.flow.control.StorageName&gt; (property: modelStorage)
+ * &nbsp;&nbsp;&nbsp;The storage item to obtain the model from, ignored if not present.
+ * &nbsp;&nbsp;&nbsp;default: storage
+ * </pre>
+ *
  * <pre>-cleaner-details-output &lt;adams.core.io.PlaceholderFile&gt; (property: cleanerDetailsOutput)
- * &nbsp;&nbsp;&nbsp;The file to save the cleaner details to after training, in case the cleaner 
- * &nbsp;&nbsp;&nbsp;implements the knir.data.cleaner.CleanerDetails interface; ignored if pointing 
+ * &nbsp;&nbsp;&nbsp;The file to save the cleaner details to after training, in case the cleaner
+ * &nbsp;&nbsp;&nbsp;implements the adams.data.cleaner.CleanerDetails interface; ignored if pointing
  * &nbsp;&nbsp;&nbsp;to a directory.
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  dale (dale at waikato dot ac dot nz)
  * @version $Revision: 2355 $
  */
 public class Cleaner
-  extends AbstractTransformer {
+  extends AbstractTransformer
+  implements ModelLoaderSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -7274476322706230890L;
@@ -117,9 +155,12 @@ public class Cleaner
 
   /** the cleaner used for training/evaluating. */
   protected AbstractCleaner m_ActualCleaner;
-  
+
   /** the file to save the cleaner details to. */
   protected PlaceholderFile m_CleanerDetailsOutput;
+
+  /** the model loader. */
+  protected CleanerModelLoader m_ModelLoader;
 
   /**
    * Returns a string describing the object.
@@ -130,7 +171,9 @@ public class Cleaner
   public String globalInfo() {
     return
         "In case of Instances objects, 'unclean' Instance objects get removed. "
-      + "When receiving an Instance object, a note is attached";
+      + "When receiving an Instance object, a note is attached.\n"
+      + m_ModelLoader.automaticOrderInfo() + "\n"
+      + "4. The cleaner is instantiated from the provided definition.";
   }
 
   /**
@@ -141,12 +184,36 @@ public class Cleaner
     super.defineOptions();
 
     m_OptionManager.add(
-	"cleaner", "cleaner",
-	new IQRCleaner());
+      "cleaner", "cleaner",
+      new IQRCleaner());
 
     m_OptionManager.add(
-	"cleaner-details-output", "cleanerDetailsOutput",
-	new PlaceholderFile());
+      "model-loading-type", "modelLoadingType",
+      ModelLoadingType.AUTO);
+
+    m_OptionManager.add(
+      "model", "modelFile",
+      new PlaceholderFile("."));
+
+    m_OptionManager.add(
+      "model-actor", "modelActor",
+      new CallableActorReference());
+
+    m_OptionManager.add(
+      "model-storage", "modelStorage",
+      new StorageName());
+
+    m_OptionManager.add(
+      "cleaner-details-output", "cleanerDetailsOutput",
+      new PlaceholderFile());
+  }
+
+  @Override
+  protected void initialize() {
+    super.initialize();
+
+    m_ModelLoader = new CleanerModelLoader();
+    m_ModelLoader.setFlowContext(this);
   }
 
   /**
@@ -179,6 +246,124 @@ public class Cleaner
   }
 
   /**
+   * Sets the loading type. In case of {@link ModelLoadingType#AUTO}, first
+   * file, then callable actor, then storage.
+   *
+   * @param value	the type
+   */
+  public void setModelLoadingType(ModelLoadingType value) {
+    m_ModelLoader.setModelLoadingType(value);
+    reset();
+  }
+
+  /**
+   * Returns the loading type. In case of {@link ModelLoadingType#AUTO}, first
+   * file, then callable actor, then storage.
+   *
+   * @return		the type
+   */
+  public ModelLoadingType getModelLoadingType() {
+    return m_ModelLoader.getModelLoadingType();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelLoadingTypeTipText() {
+    return m_ModelLoader.modelLoadingTypeTipText();
+  }
+
+  /**
+   * Sets the file to load the model from.
+   *
+   * @param value	the model file
+   */
+  public void setModelFile(PlaceholderFile value) {
+    m_ModelLoader.setModelFile(value);
+    reset();
+  }
+
+  /**
+   * Returns the file to load the model from.
+   *
+   * @return		the model file
+   */
+  public PlaceholderFile getModelFile() {
+    return m_ModelLoader.getModelFile();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelFileTipText() {
+    return m_ModelLoader.modelFileTipText();
+  }
+
+  /**
+   * Sets the filter source actor.
+   *
+   * @param value	the source
+   */
+  public void setModelActor(CallableActorReference value) {
+    m_ModelLoader.setModelActor(value);
+    reset();
+  }
+
+  /**
+   * Returns the filter source actor.
+   *
+   * @return		the source
+   */
+  public CallableActorReference getModelActor() {
+    return m_ModelLoader.getModelActor();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelActorTipText() {
+    return m_ModelLoader.modelActorTipText();
+  }
+
+  /**
+   * Sets the filter storage item.
+   *
+   * @param value	the storage item
+   */
+  public void setModelStorage(StorageName value) {
+    m_ModelLoader.setModelStorage(value);
+    reset();
+  }
+
+  /**
+   * Returns the filter storage item.
+   *
+   * @return		the storage item
+   */
+  public StorageName getModelStorage() {
+    return m_ModelLoader.getModelStorage();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelStorageTipText() {
+    return m_ModelLoader.modelStorageTipText();
+  }
+
+  /**
    * Sets the file for the cleaner details.
    *
    * @param value	the file
@@ -204,9 +389,9 @@ public class Cleaner
    * 			displaying in the GUI or for listing the options.
    */
   public String cleanerDetailsOutputTipText() {
-    return 
+    return
 	"The file to save the cleaner details to after training, in case "
-	+ "the cleaner implements the " + CleanerDetails.class.getName() 
+	+ "the cleaner implements the " + CleanerDetails.class.getName()
 	+ " interface; ignored if pointing to a directory.";
   }
 
@@ -218,20 +403,14 @@ public class Cleaner
   @Override
   public String getQuickInfo() {
     String	result;
-    String	variable;
 
-    variable = getOptionManager().getVariableForProperty("cleaner");
-    if (variable != null)
-      result = variable;
-    else
-      result = m_Cleaner.getClass().getName().replaceAll("knir\\.data\\.", "");
-    
-    variable = getOptionManager().getVariableForProperty("cleanerDetailsOutput");
-    if (variable != null)
-      result += ", details: " + variable;
-    else if (!m_CleanerDetailsOutput.isDirectory())
-      result = ", details: " + m_CleanerDetailsOutput;
-    
+    result  = QuickInfoHelper.toString(this, "cleaner", m_Cleaner, "cleaner: ");
+    result += QuickInfoHelper.toString(this, "modelLoadingType", getModelLoadingType(), ", type: ");
+    result += QuickInfoHelper.toString(this, "modelFile", getModelFile(), ", model: ");
+    result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
+    result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
+    result += QuickInfoHelper.toString(this, "cleanerDetailsOutput", m_CleanerDetailsOutput, ", details: ");
+
     return result;
   }
 
@@ -290,7 +469,7 @@ public class Cleaner
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->knir.flow.container.CleaningContainer.class, weka.core.Instance.class, weka.core.Instances.class<!-- flow-accepts-end -->
+   * @return		<!-- flow-accepts-start -->adams.flow.container.CleaningContainer.class, weka.core.Instance.class, weka.core.Instances.class<!-- flow-accepts-end -->
    */
   public Class[] accepts() {
     return new Class[]{CleaningContainer.class, Instance.class, Instances.class};
@@ -299,10 +478,33 @@ public class Cleaner
   /**
    * Returns the class of objects that it generates.
    *
-   * @return		<!-- flow-generates-start -->knir.flow.container.CleaningContainer.class<!-- flow-generates-end -->
+   * @return		<!-- flow-generates-start -->adams.flow.container.CleaningContainer.class<!-- flow-generates-end -->
    */
   public Class[] generates() {
     return new Class[]{CleaningContainer.class};
+  }
+
+  /**
+   * Configures the cleaner.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  protected String setUpCleaner() {
+    String		result;
+    MessageCollection	errors;
+
+    result = null;
+    errors = new MessageCollection();
+    m_ActualCleaner = m_ModelLoader.getModel(errors);
+    if ((m_ActualCleaner == null) && (getModelLoadingType() == ModelLoadingType.AUTO)) {
+      m_ActualCleaner = m_Cleaner.shallowCopy();
+      m_ActualCleaner.setFlowContent(this);
+    }
+    else {
+      result = errors.toString();
+    }
+
+    return result;
   }
 
   /**
@@ -324,79 +526,79 @@ public class Cleaner
 
     result = null;
 
-    if (m_ActualCleaner == null) {
-      m_ActualCleaner = m_Cleaner.shallowCopy();
-      m_ActualCleaner.setFlowContent(this);
-    }
+    if (m_ActualCleaner == null)
+      result = setUpCleaner();
 
-    try {
-      data    = null;
-      inst    = null;
-      cleaned = null;
-      check   = null;
-      checks  = new DefaultSpreadSheet();
-      checks.getHeaderRow().addCell("Cleaner").setContent("Cleaner");
-      checks.getHeaderRow().addCell("Check").setContent("Check");
+    if (result == null) {
+      try {
+	data = null;
+	inst = null;
+	cleaned = null;
+	check = null;
+	checks = new DefaultSpreadSheet();
+	checks.getHeaderRow().addCell("Cleaner").setContent("Cleaner");
+	checks.getHeaderRow().addCell("Check").setContent("Check");
 
-      // get data
-      if (m_InputToken.getPayload() instanceof CleaningContainer) {
-	cont = (CleaningContainer) m_InputToken.getPayload();
-	if (cont.hasValue(CleaningContainer.VALUE_INSTANCES))
-	  data = (Instances) cont.getValue(CleaningContainer.VALUE_INSTANCES);
-	if (cont.hasValue(CleaningContainer.VALUE_INSTANCE))
-	  inst = (Instance) cont.getValue(CleaningContainer.VALUE_INSTANCE);
-	if (cont.hasValue(CleaningContainer.VALUE_CHECKS))
-	  checks = (SpreadSheet) cont.getValue(CleaningContainer.VALUE_CHECKS);
-      }
-      else if (m_InputToken.getPayload() instanceof Instances) {
-	data = (Instances) m_InputToken.getPayload();
-      }
-      else if (m_InputToken.getPayload() instanceof Instance) {
-	inst = (Instance) m_InputToken.getPayload();
-      }
+	// get data
+	if (m_InputToken.getPayload() instanceof CleaningContainer) {
+	  cont = (CleaningContainer) m_InputToken.getPayload();
+	  if (cont.hasValue(CleaningContainer.VALUE_INSTANCES))
+	    data = (Instances) cont.getValue(CleaningContainer.VALUE_INSTANCES);
+	  if (cont.hasValue(CleaningContainer.VALUE_INSTANCE))
+	    inst = (Instance) cont.getValue(CleaningContainer.VALUE_INSTANCE);
+	  if (cont.hasValue(CleaningContainer.VALUE_CHECKS))
+	    checks = (SpreadSheet) cont.getValue(CleaningContainer.VALUE_CHECKS);
+	}
+	else if (m_InputToken.getPayload() instanceof Instances) {
+	  data = (Instances) m_InputToken.getPayload();
+	}
+	else if (m_InputToken.getPayload() instanceof Instance) {
+	  inst = (Instance) m_InputToken.getPayload();
+	}
 
-      // apply cleaner
-      if (data != null) {
-	cleaned = m_ActualCleaner.clean(data);
-	if (cleaned == null) {
-	  if (m_ActualCleaner.hasCleanInstancesError())
-	    throw new IllegalStateException(
+	// apply cleaner
+	if (data != null) {
+	  cleaned = m_ActualCleaner.clean(data);
+	  if (cleaned == null) {
+	    if (m_ActualCleaner.hasCleanInstancesError())
+	      throw new IllegalStateException(
 		"Cleaner '" + m_ActualCleaner + "' returned empty dataset:\n"
-		+ m_ActualCleaner.getCleanInstancesError());
-	  else
-	    throw new IllegalStateException(
+		  + m_ActualCleaner.getCleanInstancesError());
+	    else
+	      throw new IllegalStateException(
 		"Cleaner '" + m_ActualCleaner + "' returned empty dataset!");
-	}
-	else if ((m_Cleaner instanceof CleanerDetails) && !m_CleanerDetailsOutput.isDirectory()) {
-	  if (!FileUtils.writeToFile(
-	      m_CleanerDetailsOutput.getAbsolutePath(), 
-	      ((CleanerDetails) m_ActualCleaner).getDetails(), 
+	  }
+	  else if ((m_Cleaner instanceof CleanerDetails) && !m_CleanerDetailsOutput.isDirectory()) {
+	    if (!FileUtils.writeToFile(
+	      m_CleanerDetailsOutput.getAbsolutePath(),
+	      ((CleanerDetails) m_ActualCleaner).getDetails(),
 	      false))
-	    getLogger().severe("Failed to save cleaner details to '" + m_CleanerDetailsOutput + "'!");
+	      getLogger().severe("Failed to save cleaner details to '" + m_CleanerDetailsOutput + "'!");
+	  }
 	}
-      }
-      else if (inst != null) {
-	check = m_ActualCleaner.check(inst);
-	if (check != null) {
-	  row = checks.addRow("" + checks.getRowCount());
-	  row.addCell("Cleaner").setContent(getName());
-	  row.addCell("Check").setContent(check);
+	else if (inst != null) {
+	  check = m_ActualCleaner.check(inst);
+	  if (check != null) {
+	    row = checks.addRow("" + checks.getRowCount());
+	    row.addCell("Cleaner").setContent(getName());
+	    row.addCell("Check").setContent(check);
+	  }
 	}
-      }
 
-      // generate output
-      newCont = new CleaningContainer();
-      if (inst != null)
-	newCont.setValue(CleaningContainer.VALUE_INSTANCE, inst);
-      if (cleaned != null)
-	newCont.setValue(CleaningContainer.VALUE_INSTANCES, cleaned);
-      newCont.setValue(CleaningContainer.VALUE_CHECKS, checks);
-      newCont.setValue(CleaningContainer.VALUE_CLEANER, m_ActualCleaner);
-      m_OutputToken = new Token(newCont);
-    }
-    catch (Exception e) {
-      m_OutputToken = null;
-      result = handleException("Failed to clean!", e);
+	// generate output
+	newCont = new CleaningContainer();
+	if (inst != null)
+	  newCont.setValue(CleaningContainer.VALUE_INSTANCE, inst);
+	if (cleaned != null)
+	  newCont.setValue(CleaningContainer.VALUE_INSTANCES, cleaned);
+	newCont.setValue(CleaningContainer.VALUE_CHECKS, checks);
+	newCont.setValue(CleaningContainer.VALUE_CLEANER, m_ActualCleaner);
+	m_OutputToken = new Token(newCont);
+      }
+      catch (Exception e) {
+	m_OutputToken = null;
+	result = handleException("Failed to clean!", e);
+      }
     }
 
     return result;

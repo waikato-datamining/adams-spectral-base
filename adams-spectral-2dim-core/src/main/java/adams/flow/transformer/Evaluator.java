@@ -23,12 +23,16 @@ package adams.flow.transformer;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.VariableName;
+import adams.core.io.PlaceholderFile;
 import adams.data.evaluator.instance.AbstractEvaluator;
 import adams.data.evaluator.instance.NullEvaluator;
 import adams.event.VariableChangeEvent;
 import adams.flow.container.EvaluationContainer;
-import adams.flow.core.CallableActorHelper;
+import adams.flow.control.StorageName;
+import adams.flow.core.AbstractModelLoader.ModelLoadingType;
 import adams.flow.core.CallableActorReference;
+import adams.flow.core.EvaluatorModelLoader;
+import adams.flow.core.ModelLoaderSupporter;
 import adams.flow.core.Token;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -53,7 +57,6 @@ import java.util.Hashtable;
  * &nbsp;&nbsp;&nbsp;adams.flow.container.EvaluationContainer<br>
  * <br><br>
  * Container information:<br>
- * - adams.flow.container.EvaluationContainer: Instance, Instances, Evaluations, Evaluator, Abstention classification, Component, ID<br>
  * - adams.flow.container.EvaluationContainer: Instance, Instances, Evaluations, Evaluator, Abstention classification, Component, ID
  * <br><br>
  <!-- flow-summary-end -->
@@ -63,44 +66,60 @@ import java.util.Hashtable;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: Evaluator
  * </pre>
- * 
+ *
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
- * &nbsp;&nbsp;&nbsp;default: 
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
- * 
+ *
  * <pre>-skip &lt;boolean&gt; (property: skip)
- * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
  * &nbsp;&nbsp;&nbsp;as it is.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-silent &lt;boolean&gt; (property: silent)
- * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing 
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
  * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-evaluator &lt;adams.data.evaluator.instance.AbstractEvaluator&gt; (property: evaluator)
  * &nbsp;&nbsp;&nbsp;The Evaluator to train on the input data.
  * &nbsp;&nbsp;&nbsp;default: adams.data.evaluator.instance.NullEvaluator -missing-evaluation NaN
  * </pre>
- * 
- * <pre>-evaluator-actor &lt;adams.flow.core.CallableActorReference&gt; (property: evaluatorActor)
- * &nbsp;&nbsp;&nbsp;The callable actor to use for obtaining the evaluator, overrides the evaluator 
- * &nbsp;&nbsp;&nbsp;option if callable actor available.
- * &nbsp;&nbsp;&nbsp;default: 
+ *
+ * <pre>-model-loading-type &lt;AUTO|FILE|SOURCE_ACTOR|STORAGE&gt; (property: modelLoadingType)
+ * &nbsp;&nbsp;&nbsp;Determines how to load the model, in case of AUTO, first the model file
+ * &nbsp;&nbsp;&nbsp;is checked, then the callable actor and then the storage.
+ * &nbsp;&nbsp;&nbsp;default: AUTO
+ * </pre>
+ *
+ * <pre>-model &lt;adams.core.io.PlaceholderFile&gt; (property: modelFile)
+ * &nbsp;&nbsp;&nbsp;The file to load the model from, ignored if pointing to a directory.
+ * &nbsp;&nbsp;&nbsp;default: ${CWD}
+ * </pre>
+ *
+ * <pre>-model-actor &lt;adams.flow.core.CallableActorReference&gt; (property: modelActor)
+ * &nbsp;&nbsp;&nbsp;The callable actor (source) to obtain the model from, ignored if not present.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-model-storage &lt;adams.flow.control.StorageName&gt; (property: modelStorage)
+ * &nbsp;&nbsp;&nbsp;The storage item to obtain the model from, ignored if not present.
+ * &nbsp;&nbsp;&nbsp;default: storage
  * </pre>
  * 
  * <pre>-use-evaluator-reset-variable &lt;boolean&gt; (property: useEvaluatorResetVariable)
@@ -126,7 +145,8 @@ import java.util.Hashtable;
  * @version $Revision: 2242 $
  */
 public class Evaluator
-  extends AbstractTransformer {
+  extends AbstractTransformer
+  implements ModelLoaderSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 4523798891781897832L;
@@ -136,9 +156,6 @@ public class Evaluator
 
   /** the evaluator. */
   protected AbstractEvaluator m_Evaluator;
-
-  /** the callable actor to get the evaluator from. */
-  protected CallableActorReference m_EvaluatorActor;
 
   /** the evaluator used for training/evaluating. */
   protected AbstractEvaluator m_ActualEvaluator;
@@ -154,6 +171,9 @@ public class Evaluator
 
   /** whether we need to reset the evaluator. */
   protected boolean m_ResetEvaluator;
+
+  /** the model loader. */
+  protected EvaluatorModelLoader m_ModelLoader;
 
   /**
    * Returns a string describing the object.
@@ -180,8 +200,20 @@ public class Evaluator
       new NullEvaluator());
 
     m_OptionManager.add(
-      "evaluator-actor", "evaluatorActor",
+      "model-loading-type", "modelLoadingType",
+      ModelLoadingType.AUTO);
+
+    m_OptionManager.add(
+      "model", "modelFile",
+      new PlaceholderFile("."));
+
+    m_OptionManager.add(
+      "model-actor", "modelActor",
       new CallableActorReference());
+
+    m_OptionManager.add(
+      "model-storage", "modelStorage",
+      new StorageName());
 
     m_OptionManager.add(
       "use-evaluator-reset-variable", "useEvaluatorResetVariable",
@@ -194,6 +226,17 @@ public class Evaluator
     m_OptionManager.add(
       "component", "component",
       "");
+  }
+
+  /**
+   * Initializes the members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+
+    m_ModelLoader = new EvaluatorModelLoader();
+    m_ModelLoader.setFlowContext(this);
   }
 
   /**
@@ -226,24 +269,24 @@ public class Evaluator
   }
 
   /**
-   * Sets the callable actor to obtain the evaluator.
-   * Overrides the evaluator option if callable exists.
+   * Sets the loading type. In case of {@link ModelLoadingType#AUTO}, first
+   * file, then callable actor, then storage.
    *
-   * @param value	the actor reference
+   * @param value	the type
    */
-  public void setEvaluatorActor(CallableActorReference value) {
-    m_EvaluatorActor = value;
+  public void setModelLoadingType(ModelLoadingType value) {
+    m_ModelLoader.setModelLoadingType(value);
     reset();
   }
 
   /**
-   * Returns the callable actor to obtain the evaluator from.
-   * Overrides the evaluator option if callable exists.
+   * Returns the loading type. In case of {@link ModelLoadingType#AUTO}, first
+   * file, then callable actor, then storage.
    *
-   * @return		the actor reference
+   * @return		the type
    */
-  public CallableActorReference getEvaluatorActor() {
-    return m_EvaluatorActor;
+  public ModelLoadingType getModelLoadingType() {
+    return m_ModelLoader.getModelLoadingType();
   }
 
   /**
@@ -252,10 +295,95 @@ public class Evaluator
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String evaluatorActorTipText() {
-    return
-      "The callable actor to use for obtaining the evaluator, overrides the "
-	+ "evaluator option if callable actor available.";
+  public String modelLoadingTypeTipText() {
+    return m_ModelLoader.modelLoadingTypeTipText();
+  }
+
+  /**
+   * Sets the file to load the model from.
+   *
+   * @param value	the model file
+   */
+  public void setModelFile(PlaceholderFile value) {
+    m_ModelLoader.setModelFile(value);
+    reset();
+  }
+
+  /**
+   * Returns the file to load the model from.
+   *
+   * @return		the model file
+   */
+  public PlaceholderFile getModelFile() {
+    return m_ModelLoader.getModelFile();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelFileTipText() {
+    return m_ModelLoader.modelFileTipText();
+  }
+
+  /**
+   * Sets the filter source actor.
+   *
+   * @param value	the source
+   */
+  public void setModelActor(CallableActorReference value) {
+    m_ModelLoader.setModelActor(value);
+    reset();
+  }
+
+  /**
+   * Returns the filter source actor.
+   *
+   * @return		the source
+   */
+  public CallableActorReference getModelActor() {
+    return m_ModelLoader.getModelActor();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelActorTipText() {
+    return m_ModelLoader.modelActorTipText();
+  }
+
+  /**
+   * Sets the filter storage item.
+   *
+   * @param value	the storage item
+   */
+  public void setModelStorage(StorageName value) {
+    m_ModelLoader.setModelStorage(value);
+    reset();
+  }
+
+  /**
+   * Returns the filter storage item.
+   *
+   * @return		the storage item
+   */
+  public StorageName getModelStorage() {
+    return m_ModelLoader.getModelStorage();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelStorageTipText() {
+    return m_ModelLoader.modelStorageTipText();
   }
 
   /**
@@ -359,18 +487,13 @@ public class Evaluator
   @Override
   public String getQuickInfo() {
     String	result;
-    String	variable;
-    String	value;
 
-    result   = "evaluator: ";
-    variable = getOptionManager().getVariableForProperty("evaluator");
-    if (variable != null)
-      result += variable;
-    else
-      result += m_Evaluator.getClass().getSimpleName();
-    value  = QuickInfoHelper.toString(this, "evaluatorResetVariable", (m_UseEvaluatorResetVariable ? "reset: " + m_EvaluatorResetVariable : ""));
-    if (value != null)
-      result += ", " + value;
+    result  = QuickInfoHelper.toString(this, "evaluator", m_Evaluator, "evaluator: ");
+    result += QuickInfoHelper.toString(this, "modelLoadingType", getModelLoadingType(), ", type: ");
+    result += QuickInfoHelper.toString(this, "modelFile", getModelFile(), ", model: ");
+    result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
+    result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
+    result += QuickInfoHelper.toString(this, "evaluatorResetVariable", m_EvaluatorResetVariable, ", reset: ");
 
     return result;
   }
@@ -454,26 +577,17 @@ public class Evaluator
    */
   protected String setUpEvaluator() {
     String		result;
-    Object		obj;
-    MessageCollection errors;
+    MessageCollection	errors;
 
     result = null;
-
-    // obtain evaluator from callable actor
-    try {
-      errors = new MessageCollection();
-      obj    = CallableActorHelper.getSetup(null, m_EvaluatorActor, this, errors);
-      if (obj != null)
-	m_ActualEvaluator = (AbstractEvaluator) obj;
-    }
-    catch (Exception e) {
-      m_ActualEvaluator = null;
-      result = handleException("Failed to obtain evaluator from callable actor '" + m_EvaluatorActor + "': ", e);
-    }
-
-    // use defined evaluator
-    if (m_ActualEvaluator == null)
+    errors = new MessageCollection();
+    m_ActualEvaluator = m_ModelLoader.getModel(errors);
+    if ((m_ActualEvaluator == null) && (getModelLoadingType() == ModelLoadingType.AUTO)) {
       m_ActualEvaluator = m_Evaluator.shallowCopy();
+    }
+    else {
+      result = errors.toString();
+    }
 
     m_ResetEvaluator = false;
 
