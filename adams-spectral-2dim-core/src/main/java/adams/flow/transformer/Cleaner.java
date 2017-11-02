@@ -24,6 +24,7 @@ import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingLevel;
 import adams.data.cleaner.CleanerDetails;
 import adams.data.cleaner.instance.AbstractCleaner;
 import adams.data.cleaner.instance.IQRCleaner;
@@ -214,6 +215,17 @@ public class Cleaner
 
     m_ModelLoader = new CleanerModelLoader();
     m_ModelLoader.setFlowContext(this);
+  }
+
+  /**
+   * Sets the logging level.
+   *
+   * @param value 	the level
+   */
+  @Override
+  public synchronized void setLoggingLevel(LoggingLevel value) {
+    super.setLoggingLevel(value);
+    m_ModelLoader.setLoggingLevel(value);
   }
 
   /**
@@ -464,6 +476,7 @@ public class Cleaner
     super.reset();
 
     m_ActualCleaner = null;
+    m_ModelLoader.reset();
   }
 
   /**
