@@ -133,26 +133,6 @@ public class Intensity
   }
 
   /**
-   * Hook method for checks before generating the image.
-   *
-   * @param spectrum	the spectrum to check
-   * @return		null if successful, otherwise the error message
-   */
-  @Override
-  protected String check(Spectrum spectrum) {
-    String	result;
-
-    result = super.check(spectrum);
-    if (result != null)
-      return result;
-
-    if (m_MaxAmplitude <= m_MinAmplitude)
-      return "max amplitude must be greater than min amplitude: min=" + m_MinAmplitude + ", max=" + m_MaxAmplitude;
-
-    return null;
-  }
-
-  /**
    * Converts the spectrum into an image.
    *
    * @param spectrum	the spectrum to convert

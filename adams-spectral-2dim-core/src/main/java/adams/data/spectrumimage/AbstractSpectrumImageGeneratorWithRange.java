@@ -20,6 +20,8 @@
 
 package adams.data.spectrumimage;
 
+import adams.data.spectrum.Spectrum;
+
 /**
  * Ancestor for spectrum image generators that limit the amplitude ranges.
  *
@@ -112,5 +114,25 @@ public abstract class AbstractSpectrumImageGeneratorWithRange
    */
   public String maxAmplitudeTipText() {
     return "The maximum amplitude to assume; amplitudes below get set to this value.";
+  }
+
+  /**
+   * Hook method for checks before generating the image.
+   *
+   * @param spectrum	the spectrum to check
+   * @return		null if successful, otherwise the error message
+   */
+  @Override
+  protected String check(Spectrum spectrum) {
+    String	result;
+
+    result = super.check(spectrum);
+    if (result != null)
+      return result;
+
+    if (m_MaxAmplitude <= m_MinAmplitude)
+      return "max amplitude must be greater than min amplitude: min=" + m_MinAmplitude + ", max=" + m_MaxAmplitude;
+
+    return null;
   }
 }
