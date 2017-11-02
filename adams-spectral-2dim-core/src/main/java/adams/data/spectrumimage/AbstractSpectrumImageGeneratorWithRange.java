@@ -47,11 +47,11 @@ public abstract class AbstractSpectrumImageGeneratorWithRange
 
     m_OptionManager.add(
       "min-amplitude", "minAmplitude",
-      getDefaultMinAmplitude());
+      getDefaultMinAmplitude(), getLowerMinAmplitude(), getUpperMinAmplitude());
 
     m_OptionManager.add(
       "max-amplitude", "maxAmplitude",
-      getDefaultMaxAmplitude());
+      getDefaultMaxAmplitude(), getLowerMaxAmplitude(), getUpperMaxAmplitude());
   }
 
   /**
@@ -61,6 +61,24 @@ public abstract class AbstractSpectrumImageGeneratorWithRange
    */
   protected float getDefaultMinAmplitude() {
     return 0.0f;
+  }
+
+  /**
+   * Returns the lower bound for the minimum amplitude.
+   *
+   * @return		the lower bound, null if unbounded
+   */
+  protected Float getLowerMinAmplitude() {
+    return null;
+  }
+
+  /**
+   * Returns the upper bound for the minimum amplitude.
+   *
+   * @return		the upper bound, null if unbounded
+   */
+  protected Float getUpperMinAmplitude() {
+    return null;
   }
 
   /**
@@ -101,6 +119,24 @@ public abstract class AbstractSpectrumImageGeneratorWithRange
    */
   protected float getDefaultMaxAmplitude() {
     return 1000.0f;
+  }
+
+  /**
+   * Returns the lower bound for the maximum amplitude.
+   *
+   * @return		the lower bound, null if unbounded
+   */
+  protected Float getLowerMaxAmplitude() {
+    return null;
+  }
+
+  /**
+   * Returns the upper bound for the maximum amplitude.
+   *
+   * @return		the upper bound, null if unbounded
+   */
+  protected Float getUpperMaxAmplitude() {
+    return null;
   }
 
   /**

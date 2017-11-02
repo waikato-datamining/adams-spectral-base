@@ -50,6 +50,34 @@ public class AmplitudeRatio
   }
 
   /**
+   * Returns the default minimum amplitude.
+   *
+   * @return		the minimum
+   */
+  @Override
+  protected float getDefaultMinAmplitude() {
+    return 0.01f;
+  }
+
+  /**
+   * Returns the lower bound for the minimum amplitude.
+   *
+   * @return		the lower bound, null if unbounded
+   */
+  protected Float getLowerMinAmplitude() {
+    return 0.00001f;
+  }
+
+  /**
+   * Returns the lower bound for the maximum amplitude.
+   *
+   * @return		the lower bound, null if unbounded
+   */
+  protected Float getLowerMaxAmplitude() {
+    return 0.00001f;
+  }
+
+  /**
    * Converts the spectrum into an image.
    *
    * @param spectrum	the spectrum to convert
