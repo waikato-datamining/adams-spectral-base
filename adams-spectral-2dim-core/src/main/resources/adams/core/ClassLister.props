@@ -59,6 +59,10 @@ adams.data.spectrumfilter.amplitudetransform.AbstractAmplitudeTransformer=\
 adams.data.spectrumfilter.multiplicativescattercorrection.AbstractMultiplicativeScatterCorrection=\
   adams.data.spectrumfilter.multiplicativescattercorrection
 
+# the spectrum image generators
+adams.data.spectrumimage.AbstractSpectrumImageGenerator=\
+  adams.data.spectrumimage
+
 # the multi-spectrum filters
 adams.data.multifilter.AbstractMultiSpectrumFilter=\
   adams.data.multifilter
