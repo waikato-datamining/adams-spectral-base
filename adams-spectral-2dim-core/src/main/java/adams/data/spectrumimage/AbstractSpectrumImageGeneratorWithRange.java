@@ -47,11 +47,20 @@ public abstract class AbstractSpectrumImageGeneratorWithRange
 
     m_OptionManager.add(
       "min-amplitude", "minAmplitude",
-      0.0f);
+      getDefaultMinAmplitude());
 
     m_OptionManager.add(
       "max-amplitude", "maxAmplitude",
-      1000.0f);
+      getDefaultMaxAmplitude());
+  }
+
+  /**
+   * Returns the default minimum amplitude.
+   *
+   * @return		the minimum
+   */
+  protected float getDefaultMinAmplitude() {
+    return 0.0f;
   }
 
   /**
@@ -83,6 +92,15 @@ public abstract class AbstractSpectrumImageGeneratorWithRange
    */
   public String minAmplitudeTipText() {
     return "The minimum amplitude to assume; amplitudes below get set to this value.";
+  }
+
+  /**
+   * Returns the default maximum amplitude.
+   *
+   * @return		the minimum
+   */
+  protected float getDefaultMaxAmplitude() {
+    return 1000.0f;
   }
 
   /**
