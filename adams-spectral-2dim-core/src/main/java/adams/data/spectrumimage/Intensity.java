@@ -171,6 +171,8 @@ public class Intensity
       width  = m_Width;
       height = m_Height;
     }
+    if (isLoggingEnabled())
+      getLogger().info("width=" + width + ", height=" + height);
     result = newImage(width, height);
 
     // determine range/resolution
@@ -185,6 +187,8 @@ public class Intensity
       default:
         throw new IllegalStateException("Unhandled image type: " + m_ImageType);
     }
+    if (isLoggingEnabled())
+      getLogger().info("range=" + range + ", resolution=" + resolution);
 
     i = 0;
     for (y = 0; y < height; y++) {
