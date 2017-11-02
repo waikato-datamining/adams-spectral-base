@@ -135,4 +135,16 @@ public abstract class AbstractSpectrumImageGeneratorWithRange
 
     return null;
   }
+
+  /**
+   * Makes sure that the amplitude is within the defined ranges.
+   *
+   * @param ampl	the amplitude to process
+   * @return		the (potentially) updated amplitude
+   */
+  protected float rangeCheck(float ampl) {
+    ampl = Math.max(ampl, m_MinAmplitude);
+    ampl = Math.min(ampl, m_MaxAmplitude);
+    return ampl;
+  }
 }

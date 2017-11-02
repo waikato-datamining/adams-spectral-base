@@ -148,7 +148,7 @@ public class Intensity
     int			y;
     double		ampl;
     double		range;
-    double resolution;
+    double 		resolution;
     int			val;
     List<SpectrumPoint> points;
 
@@ -191,9 +191,7 @@ public class Intensity
       for (x = 0; x < width; x++) {
         ampl = 0.0;
         if (i < points.size()) {
-	  ampl = points.get(i).getAmplitude();
-	  ampl = Math.max(ampl, m_MinAmplitude);
-	  ampl = Math.min(ampl, m_MaxAmplitude);
+	  ampl = rangeCheck(points.get(i).getAmplitude());
 	  ampl = (ampl - m_MinAmplitude) / range;
 	}
 	val = (int) (ampl / resolution);
