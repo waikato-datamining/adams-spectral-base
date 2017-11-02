@@ -20,6 +20,7 @@
 
 package adams.data.instances;
 
+import adams.core.base.BaseString;
 import adams.data.report.DataType;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
@@ -91,6 +92,11 @@ import java.util.List;
  * <pre>-field &lt;adams.data.report.Field&gt; (property: field)
  * &nbsp;&nbsp;&nbsp;The field to act as class attribute.
  * &nbsp;&nbsp;&nbsp;default: ADN1[N]
+ * </pre>
+ *
+ * <pre>-class-label &lt;adams.core.base.BaseString&gt; [-class-label ...] (property: classLabels)
+ * &nbsp;&nbsp;&nbsp;The class labels to use for a nominal class.
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
  * <pre>-add-wave &lt;boolean&gt; (property: addWaveNumber)
@@ -264,7 +270,15 @@ public class SimpleInstanceGenerator
       atts.add(new Attribute(ArffUtils.getFieldName(m_Field), attValues));
     }
     else {
-      atts.add(new Attribute(ArffUtils.getFieldName(m_Field), (List<String>) null));
+      if (m_ClassLabels.length == 0) {
+        atts.add(new Attribute(ArffUtils.getFieldName(m_Field), (List<String>) null));
+      }
+      else {
+        attValues = new ArrayList<>();
+        for (BaseString label: m_ClassLabels)
+          attValues.add(label.getValue());
+        atts.add(new Attribute(ArffUtils.getFieldName(m_Field), attValues));
+      }
     }
 
     m_OutputHeader = new Instances(getClass().getName() + "-" + ArffUtils.getFieldName(m_Field), atts, 0);
@@ -305,12 +319,18 @@ public class SimpleInstanceGenerator
     if (data.hasReport()) {
       values[values.length - 1] = weka.core.Utils.missingValue();
       if (report.hasValue(m_Field)) {
-	if (m_Field.getDataType() == DataType.NUMERIC)
-	  values[values.length - 1] = report.getDoubleValue(m_Field);
-	else if (m_Field.getDataType() == DataType.BOOLEAN)
-	  values[values.length - 1] = m_OutputHeader.classAttribute().indexOfValue((report.getBooleanValue(m_Field) ? LABEL_TRUE : LABEL_FALSE));
-	else
-	  values[values.length - 1] = m_OutputHeader.classAttribute().addStringValue("" + report.getValue(m_Field));
+	if (m_Field.getDataType() == DataType.NUMERIC) {
+          values[values.length - 1] = report.getDoubleValue(m_Field);
+        }
+	else if (m_Field.getDataType() == DataType.BOOLEAN) {
+          values[values.length - 1] = m_OutputHeader.classAttribute().indexOfValue((report.getBooleanValue(m_Field) ? LABEL_TRUE : LABEL_FALSE));
+        }
+	else {
+	  if (m_ClassLabels.length == 0)
+            values[values.length - 1] = m_OutputHeader.classAttribute().addStringValue("" + report.getValue(m_Field));
+	  else if (m_OutputHeader.classAttribute().indexOfValue("" + report.getValue(m_Field)) > -1)
+            values[values.length - 1] = m_OutputHeader.classAttribute().indexOfValue("" + report.getValue(m_Field));
+        }
       }
     }
 

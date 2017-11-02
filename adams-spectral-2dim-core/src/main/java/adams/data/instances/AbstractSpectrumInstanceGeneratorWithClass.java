@@ -15,11 +15,12 @@
 
 /*
  * AbstractSpectrumInstanceGeneratorWithClass.java
- * Copyright (C) 2009-2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
 
+import adams.core.base.BaseString;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
@@ -41,6 +42,9 @@ public abstract class AbstractSpectrumInstanceGeneratorWithClass
   /** the field that acts as class attribute. */
   protected Field m_Field;
 
+  /** the nominal labels to use, in case of a nominal class. */
+  protected BaseString[] m_ClassLabels;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -48,8 +52,12 @@ public abstract class AbstractSpectrumInstanceGeneratorWithClass
     super.defineOptions();
 
     m_OptionManager.add(
-	    "field", "field",
-	    new Field("ADN1", DataType.NUMERIC));
+      "field", "field",
+      new Field("ADN1", DataType.NUMERIC));
+
+    m_OptionManager.add(
+      "class-label", "classLabels",
+      new BaseString[0]);
   }
 
   /**
@@ -79,6 +87,35 @@ public abstract class AbstractSpectrumInstanceGeneratorWithClass
    */
   public String fieldTipText() {
     return "The field to act as class attribute.";
+  }
+
+  /**
+   * Sets the labels for a nominal class attribute.
+   *
+   * @param value	the labels
+   */
+  public void setClassLabels(BaseString[] value) {
+    m_ClassLabels = value;
+    reset();
+  }
+
+  /**
+   * Returns the labels for a nominal class attribute.
+   *
+   * @return		the labels
+   */
+  public BaseString[] getClassLabels() {
+    return m_ClassLabels;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String classLabelsTipText() {
+    return "The class labels to use for a nominal class.";
   }
 
   /**
