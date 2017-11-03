@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * MultiClassifierEvaluator.java
  * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
  */
@@ -396,9 +396,9 @@ public class MultiClassifierEvaluator
    */
   @Override
   public void setSerializationSetup(Object[] value) {
-    m_Classifiers            = (Classifier[]) value[1];
-    m_CrossvalidationResults = (Evaluation) value[2];
-    m_Header                 = (Instances) value[3];
+    m_Classifiers            = (Classifier[]) value[0];
+    m_CrossvalidationResults = (Evaluation) value[1];
+    m_Header                 = (Instances) value[2];
   }
 
   /**
