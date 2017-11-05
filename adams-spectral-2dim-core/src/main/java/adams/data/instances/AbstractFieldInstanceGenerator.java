@@ -15,7 +15,7 @@
 
 /*
  * AbstractFieldInstanceGenerator.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -31,7 +31,8 @@ import adams.data.spectrum.Spectrum;
  * @version $Revision: 1286 $
  */
 public abstract class AbstractFieldInstanceGenerator
-  extends AbstractSpectrumBasedInstanceGenerator {
+  extends AbstractSpectrumBasedInstanceGenerator
+  implements InstanceGeneratorWithFields {
 
   /** for serialization. */
   private static final long serialVersionUID = 2083516575994387184L;

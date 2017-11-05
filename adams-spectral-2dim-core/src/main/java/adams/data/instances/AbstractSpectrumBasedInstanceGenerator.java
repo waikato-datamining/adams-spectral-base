@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumBasedInstanceGenerator.java
- * Copyright (C) 2009-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -23,9 +23,9 @@ package adams.data.instances;
 import adams.core.base.BaseString;
 import adams.data.report.DataType;
 import adams.data.report.Field;
-import adams.db.AbstractDatabaseConnection;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
+import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
 import adams.db.SpectrumT;
 import weka.core.Attribute;
@@ -45,7 +45,8 @@ import java.util.logging.Level;
  * @version $Revision: 2242 $
  */
 public abstract class AbstractSpectrumBasedInstanceGenerator
-  extends AbstractInstanceGenerator<Spectrum> {
+  extends AbstractInstanceGenerator<Spectrum>
+  implements InstanceGeneratorWithSampleID {
 
   /** for serialization. */
   private static final long serialVersionUID = 2083516575994387184L;

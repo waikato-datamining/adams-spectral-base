@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumInstanceGenerator.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -41,7 +41,8 @@ import java.util.logging.Level;
  * @version $Revision: 1905 $
  */
 public abstract class AbstractSpectrumInstanceGenerator
-  extends AbstractSpectrumBasedInstanceGenerator {
+  extends AbstractSpectrumBasedInstanceGenerator
+  implements InstanceGeneratorWithAdditionalFields {
 
   /** for serialization. */
   private static final long serialVersionUID = 2083516575994387184L;

@@ -34,7 +34,8 @@ import adams.data.spectrum.Spectrum;
  * @version $Revision: 1286 $
  */
 public abstract class AbstractSpectrumInstanceGeneratorWithClass
-  extends AbstractSpectrumInstanceGenerator {
+  extends AbstractSpectrumInstanceGenerator
+  implements InstanceGeneratorWithTargetField {
 
   /** for serialization. */
   private static final long serialVersionUID = 2083516575994387184L;
