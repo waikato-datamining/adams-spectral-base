@@ -479,7 +479,8 @@ public class PostProcessor
       m_ActualPostProcessor.setFlowContext(this);
     }
     else {
-      result = errors.toString();
+      if (!errors.isEmpty())
+	result = errors.toString();
     }
 
     return result;

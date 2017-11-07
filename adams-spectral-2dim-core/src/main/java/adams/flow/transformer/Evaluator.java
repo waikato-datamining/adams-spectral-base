@@ -600,7 +600,8 @@ public class Evaluator
       m_ActualEvaluator = m_Evaluator.shallowCopy();
     }
     else {
-      result = errors.toString();
+      if (!errors.isEmpty())
+        result = errors.toString();
     }
 
     m_ResetEvaluator = false;

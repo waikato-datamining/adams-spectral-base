@@ -517,7 +517,8 @@ public class Cleaner
       m_ActualCleaner.setFlowContext(this);
     }
     else {
-      result = errors.toString();
+      if (!errors.isEmpty())
+        result = errors.toString();
     }
 
     return result;
