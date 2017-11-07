@@ -75,10 +75,10 @@ public class CleaningContainer
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_INSTANCE, "data row; " + Instance.class.getName());
-    addHelp(VALUE_INSTANCES, "dataset; " + Instances.class.getName());
-    addHelp(VALUE_CHECKS, "checks; " + SpreadSheet.class.getName());
-    addHelp(VALUE_CLEANER, "cleaner; " + AbstractCleaner.class.getName());
+    addHelp(VALUE_INSTANCE, "data row", Instance.class);
+    addHelp(VALUE_INSTANCES, "dataset", Instances.class);
+    addHelp(VALUE_CHECKS, "checks", SpreadSheet.class);
+    addHelp(VALUE_CLEANER, "cleaner", AbstractCleaner.class);
   }
 
   /**

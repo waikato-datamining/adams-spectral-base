@@ -67,11 +67,11 @@ public class PostProcessingContainer
   protected void initHelp() {
     super.initHelp();
 
-    addHelp(VALUE_OUTPUT_INSTANCE, "output data row; " + Instance.class.getName());
-    addHelp(VALUE_OUTPUT_INSTANCES, "output dataset; " + Instances.class.getName());
-    addHelp(VALUE_INPUT_INSTANCE, "input data row; " + Instance.class.getName());
-    addHelp(VALUE_INPUT_INSTANCES, "input dataset; " + Instances.class.getName());
-    addHelp(VALUE_POSTPROCESSOR, "post-processor; " + AbstractPostProcessor.class.getName());
+    addHelp(VALUE_OUTPUT_INSTANCE, "output data row", Instance.class);
+    addHelp(VALUE_OUTPUT_INSTANCES, "output dataset", Instances.class);
+    addHelp(VALUE_INPUT_INSTANCE, "input data row", Instance.class);
+    addHelp(VALUE_INPUT_INSTANCES, "input dataset", Instances.class);
+    addHelp(VALUE_POSTPROCESSOR, "post-processor", AbstractPostProcessor.class);
   }
 
   /**
