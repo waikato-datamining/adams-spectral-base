@@ -19,8 +19,8 @@
  */
 package adams.data.conversion;
 
-import adams.flow.container.WekaPredictionContainer;
 import adams.flow.container.EvaluationContainer;
+import adams.flow.container.WekaPredictionContainer;
 import weka.core.Instance;
 
 /**
@@ -183,10 +183,24 @@ public class WekaPredictionContainerToEvaluationContainer
       inst = (Instance) inst.copy();
       inst.setClassValue((Double) input.getValue(WekaPredictionContainer.VALUE_CLASSIFICATION));
     }
+
+    // classification (or label)
+    if (input.hasValue(WekaPredictionContainer.VALUE_CLASSIFICATION_LABEL))
+      result.setValue(EvaluationContainer.VALUE_CLASSIFICATION, input.getValue(WekaPredictionContainer.VALUE_CLASSIFICATION_LABEL));
+    else if (input.hasValue(WekaPredictionContainer.VALUE_CLASSIFICATION))
+      result.setValue(EvaluationContainer.VALUE_CLASSIFICATION, input.getValue(WekaPredictionContainer.VALUE_CLASSIFICATION));
+
+    // class distribution
+    if (input.hasValue(WekaPredictionContainer.VALUE_DISTRIBUTION))
+      result.setValue(EvaluationContainer.VALUE_DISTRIBUTION, input.getValue(WekaPredictionContainer.VALUE_DISTRIBUTION));
+
     result.setValue(EvaluationContainer.VALUE_INSTANCE, inst);
-    
+
+    // abstention (or label)
     if (input.hasValue(WekaPredictionContainer.VALUE_ABSTENTION_CLASSIFICATION))
       result.setValue(EvaluationContainer.VALUE_ABSTENTION_CLASSIFICATION, input.getValue(WekaPredictionContainer.VALUE_ABSTENTION_CLASSIFICATION));
+    else if (input.hasValue(WekaPredictionContainer.VALUE_ABSTENTION_CLASSIFICATION_LABEL))
+      result.setValue(EvaluationContainer.VALUE_ABSTENTION_CLASSIFICATION, input.getValue(WekaPredictionContainer.VALUE_ABSTENTION_CLASSIFICATION_LABEL));
 
     if (!m_Component.isEmpty())
       result.setValue(EvaluationContainer.VALUE_COMPONENT, m_Component);

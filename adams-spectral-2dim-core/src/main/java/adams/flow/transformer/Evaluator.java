@@ -40,6 +40,7 @@ import weka.core.Instances;
 
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  <!-- globalinfo-start -->
@@ -631,7 +632,7 @@ public class Evaluator
     Instance			inst;
     EvaluationContainer		cont;
     EvaluationContainer		newCont;
-    Hashtable<String,Object>	evals;
+    Map<String,Object> 		evals;
     HashMap<String,Float>       eval;
 
     result = null;
@@ -645,14 +646,14 @@ public class Evaluator
 	data = null;
 	inst = null;
 	cont = null;
-	evals = new Hashtable<>();
+	evals = new HashMap<>();
 	if (m_InputToken.getPayload() instanceof EvaluationContainer) {
 	  cont = (EvaluationContainer) m_InputToken.getPayload();
 	  if (cont.hasValue(EvaluationContainer.VALUE_INSTANCES))
 	    data = (Instances) cont.getValue(EvaluationContainer.VALUE_INSTANCES);
 	  else if (cont.hasValue(EvaluationContainer.VALUE_INSTANCE))
 	    inst = (Instance) cont.getValue(EvaluationContainer.VALUE_INSTANCE);
-	  evals = (Hashtable<String, Object>) cont.getValue(EvaluationContainer.VALUE_EVALUATIONS);
+	  evals = (Map<String, Object>) cont.getValue(EvaluationContainer.VALUE_EVALUATIONS);
 	}
 	else if (m_InputToken.getPayload() instanceof Instances) {
 	  data = (Instances) m_InputToken.getPayload();
