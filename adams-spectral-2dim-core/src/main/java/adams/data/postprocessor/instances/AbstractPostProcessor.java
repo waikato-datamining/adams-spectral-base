@@ -26,6 +26,8 @@ import adams.core.option.AbstractOptionConsumer;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.ArrayConsumer;
 import adams.core.option.OptionUtils;
+import adams.flow.core.Actor;
+import adams.flow.core.FlowContextHandler;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -38,10 +40,31 @@ import weka.core.Instances;
  */
 public abstract class AbstractPostProcessor
   extends AbstractOptionHandler
-  implements Comparable, CleanUpHandler {
+  implements Comparable, CleanUpHandler, FlowContextHandler {
 
   /** for serialization. */
   private static final long serialVersionUID = -582592424411578426L;
+
+  /** the flow context. */
+  protected transient Actor m_FlowContext;
+
+  /**
+   * Sets the flow context.
+   *
+   * @param value	the context
+   */
+  public void setFlowContext(Actor value) {
+    m_FlowContext = value;
+  }
+
+  /**
+   * Returns the flow context.
+   *
+   * @return		the context, null if not available
+   */
+  public Actor getFlowContext() {
+    return m_FlowContext;
+  }
 
   /**
    * Performs some pre-checks whether the data is actually suitable.
