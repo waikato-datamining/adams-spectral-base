@@ -15,7 +15,7 @@
 
 /*
  * AbstractSerializableEvaluator.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.evaluator.instance;
@@ -151,6 +151,24 @@ public abstract class AbstractSerializableEvaluator
     return
     "If set to true, then any serialized file will be ignored and the "
     + "setup for serialization will be regenerated.";
+  }
+
+  /**
+   * Sets whether the setup was loaded/generated.
+   *
+   * @param value	true if loaded/generated
+   */
+  public void setSetupLoadedOrGenerated(boolean value) {
+    m_SerializableObjectHelper.setSetupLoadedOrGenerated(value);
+  }
+
+  /**
+   * Returns whether the setup was loaded/generated.
+   *
+   * @return		true if loaded/generated
+   */
+  public boolean isSetupLoadedOrGenerated() {
+    return m_SerializableObjectHelper.isSetupLoadedOrGenerated();
   }
 
   /**
