@@ -120,7 +120,7 @@ public abstract class AbstractCleaner
    *
    * @param value	the context
    */
-  public void setFlowContent(Actor value) {
+  public void setFlowContext(Actor value) {
     m_FlowContext = value;
   }
 

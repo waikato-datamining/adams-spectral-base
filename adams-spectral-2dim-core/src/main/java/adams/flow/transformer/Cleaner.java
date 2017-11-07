@@ -514,7 +514,7 @@ public class Cleaner
     m_ActualCleaner = m_ModelLoader.getModel(errors);
     if ((m_ActualCleaner == null) && (getModelLoadingType() == ModelLoadingType.AUTO)) {
       m_ActualCleaner = m_Cleaner.shallowCopy();
-      m_ActualCleaner.setFlowContent(this);
+      m_ActualCleaner.setFlowContext(this);
     }
     else {
       result = errors.toString();
