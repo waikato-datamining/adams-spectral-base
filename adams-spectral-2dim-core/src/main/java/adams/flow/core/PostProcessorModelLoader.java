@@ -25,7 +25,7 @@ import adams.core.Utils;
 import adams.data.io.input.SerializableObjectReader;
 import adams.data.postprocessor.instances.AbstractPostProcessor;
 import adams.flow.container.AbstractContainer;
-import adams.flow.container.CleaningContainer;
+import adams.flow.container.PostProcessingContainer;
 
 /**
  * Model loader for {@link AbstractPostProcessor} objects.
@@ -70,8 +70,8 @@ public class PostProcessorModelLoader
    */
   @Override
   protected AbstractPostProcessor getModelFromContainer(AbstractContainer cont, MessageCollection errors) {
-    if (cont instanceof CleaningContainer)
-      return (AbstractPostProcessor) cont.getValue(CleaningContainer.VALUE_CLEANER);
+    if (cont instanceof PostProcessingContainer)
+      return (AbstractPostProcessor) cont.getValue(PostProcessingContainer.VALUE_POSTPROCESSOR);
 
     unhandledContainer(cont, errors);
     return null;
