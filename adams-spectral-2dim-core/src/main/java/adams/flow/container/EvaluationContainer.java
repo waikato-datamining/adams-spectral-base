@@ -19,6 +19,7 @@
  */
 package adams.flow.container;
 
+import adams.core.Utils;
 import adams.data.evaluator.instance.AbstractEvaluator;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -120,8 +121,8 @@ public class EvaluationContainer
     addHelp(VALUE_INSTANCES, "dataset", Instances.class);
     addHelp(VALUE_EVALUATIONS, "mapping of evaluations (String/Object)", Hashtable.class);
     addHelp(VALUE_EVALUATOR, "evaluator used", AbstractEvaluator.class);
-    addHelp(VALUE_CLASSIFICATION, "classification", Double.class);
-    addHelp(VALUE_ABSTENTION_CLASSIFICATION, "abstention classification", Double.class);
+    addHelp(VALUE_CLASSIFICATION, "classification; " + Utils.classToString(Double.class) + " or " + Utils.classToString(String.class));
+    addHelp(VALUE_ABSTENTION_CLASSIFICATION, "abstention classification; " + Utils.classToString(Double.class) + " or " + Utils.classToString(String.class));
     addHelp(VALUE_DISTRIBUTION, "class distribution", double[].class);
     addHelp(VALUE_COMPONENT, "component name", String.class);
     addHelp(VALUE_ID, "(optional) ID", String.class);
