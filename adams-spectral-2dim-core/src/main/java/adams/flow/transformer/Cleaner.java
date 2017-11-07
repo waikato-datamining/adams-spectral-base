@@ -209,6 +209,9 @@ public class Cleaner
       new PlaceholderFile());
   }
 
+  /**
+   * Initializes the members.
+   */
   @Override
   protected void initialize() {
     super.initialize();
