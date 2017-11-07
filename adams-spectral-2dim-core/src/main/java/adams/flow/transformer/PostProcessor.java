@@ -20,9 +20,17 @@
 
 package adams.flow.transformer;
 
+import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingLevel;
 import adams.data.postprocessor.instances.AbstractPostProcessor;
 import adams.flow.container.PostProcessingContainer;
+import adams.flow.control.StorageName;
+import adams.flow.core.AbstractModelLoader.ModelLoadingType;
+import adams.flow.core.CallableActorReference;
+import adams.flow.core.ModelLoaderSupporter;
+import adams.flow.core.PostProcessorModelLoader;
 import adams.flow.core.Token;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -98,7 +106,8 @@ import java.util.Hashtable;
  * @version $Revision: 2242 $
  */
 public class PostProcessor
-  extends AbstractTransformer {
+  extends AbstractTransformer
+  implements ModelLoaderSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 5924370393684251310L;
@@ -114,6 +123,9 @@ public class PostProcessor
 
   /** whether to output a container. */
   protected boolean m_OutputContainer;
+
+  /** the model loader. */
+  protected PostProcessorModelLoader m_ModelLoader;
 
   /**
    * Returns a string describing the object.
@@ -140,8 +152,46 @@ public class PostProcessor
 	new adams.data.postprocessor.instances.WekaFilter());
 
     m_OptionManager.add(
+      "model-loading-type", "modelLoadingType",
+      ModelLoadingType.AUTO);
+
+    m_OptionManager.add(
+      "model", "modelFile",
+      new PlaceholderFile("."));
+
+    m_OptionManager.add(
+      "model-actor", "modelActor",
+      new CallableActorReference());
+
+    m_OptionManager.add(
+      "model-storage", "modelStorage",
+      new StorageName());
+
+    m_OptionManager.add(
 	"output-container", "outputContainer",
 	false);
+  }
+
+  /**
+   * Initializes the members.
+   */
+  @Override
+  protected void initialize() {
+    super.initialize();
+
+    m_ModelLoader = new PostProcessorModelLoader();
+    m_ModelLoader.setFlowContext(this);
+  }
+
+  /**
+   * Sets the logging level.
+   *
+   * @param value 	the level
+   */
+  @Override
+  public synchronized void setLoggingLevel(LoggingLevel value) {
+    super.setLoggingLevel(value);
+    m_ModelLoader.setLoggingLevel(value);
   }
 
   /**
@@ -171,6 +221,124 @@ public class PostProcessor
    */
   public String postProcessorTipText() {
     return "The PostProcessor to use to process the Instances.";
+  }
+
+  /**
+   * Sets the loading type. In case of {@link ModelLoadingType#AUTO}, first
+   * file, then callable actor, then storage.
+   *
+   * @param value	the type
+   */
+  public void setModelLoadingType(ModelLoadingType value) {
+    m_ModelLoader.setModelLoadingType(value);
+    reset();
+  }
+
+  /**
+   * Returns the loading type. In case of {@link ModelLoadingType#AUTO}, first
+   * file, then callable actor, then storage.
+   *
+   * @return		the type
+   */
+  public ModelLoadingType getModelLoadingType() {
+    return m_ModelLoader.getModelLoadingType();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelLoadingTypeTipText() {
+    return m_ModelLoader.modelLoadingTypeTipText();
+  }
+
+  /**
+   * Sets the file to load the model from.
+   *
+   * @param value	the model file
+   */
+  public void setModelFile(PlaceholderFile value) {
+    m_ModelLoader.setModelFile(value);
+    reset();
+  }
+
+  /**
+   * Returns the file to load the model from.
+   *
+   * @return		the model file
+   */
+  public PlaceholderFile getModelFile() {
+    return m_ModelLoader.getModelFile();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelFileTipText() {
+    return m_ModelLoader.modelFileTipText();
+  }
+
+  /**
+   * Sets the filter source actor.
+   *
+   * @param value	the source
+   */
+  public void setModelActor(CallableActorReference value) {
+    m_ModelLoader.setModelActor(value);
+    reset();
+  }
+
+  /**
+   * Returns the filter source actor.
+   *
+   * @return		the source
+   */
+  public CallableActorReference getModelActor() {
+    return m_ModelLoader.getModelActor();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelActorTipText() {
+    return m_ModelLoader.modelActorTipText();
+  }
+
+  /**
+   * Sets the filter storage item.
+   *
+   * @param value	the storage item
+   */
+  public void setModelStorage(StorageName value) {
+    m_ModelLoader.setModelStorage(value);
+    reset();
+  }
+
+  /**
+   * Returns the filter storage item.
+   *
+   * @return		the storage item
+   */
+  public StorageName getModelStorage() {
+    return m_ModelLoader.getModelStorage();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String modelStorageTipText() {
+    return m_ModelLoader.modelStorageTipText();
   }
 
   /**
@@ -212,6 +380,10 @@ public class PostProcessor
     String	result;
 
     result  = QuickInfoHelper.toString(this, "postProcessor", m_PostProcessor);
+    result += QuickInfoHelper.toString(this, "modelLoadingType", getModelLoadingType(), ", type: ");
+    result += QuickInfoHelper.toString(this, "modelFile", getModelFile(), ", model: ");
+    result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
+    result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
     result += QuickInfoHelper.toString(this, "outputContainer", (m_OutputContainer ? ", container" : ""));
 
     return result;
@@ -291,6 +463,29 @@ public class PostProcessor
   }
 
   /**
+   * Configures the postprocessor.
+   *
+   * @return		null if successful, otherwise error message
+   */
+  protected String setUpPostProcessor() {
+    String		result;
+    MessageCollection errors;
+
+    result = null;
+    errors = new MessageCollection();
+    m_ActualPostProcessor = m_ModelLoader.getModel(errors);
+    if ((m_ActualPostProcessor == null) && (getModelLoadingType() == ModelLoadingType.AUTO)) {
+      m_ActualPostProcessor = m_PostProcessor.shallowCopy();
+      m_ActualPostProcessor.setFlowContext(this);
+    }
+    else {
+      result = errors.toString();
+    }
+
+    return result;
+  }
+
+  /**
    * Executes the flow item.
    *
    * @return		null if everything is fine, otherwise error message
@@ -306,29 +501,31 @@ public class PostProcessor
     result = null;
 
     if (m_ActualPostProcessor == null)
-      m_ActualPostProcessor = m_PostProcessor.shallowCopy();
+      result = setUpPostProcessor();
 
-    try {
-      if (m_InputToken.getPayload() instanceof Instances) {
-	data          = (Instances) m_InputToken.getPayload();
-	processedData = m_ActualPostProcessor.postProcess(data);
-	if (m_OutputContainer)
-	  m_OutputToken = new Token(new PostProcessingContainer(data, processedData, m_ActualPostProcessor));
-	else
-	  m_OutputToken = new Token(processedData);
+    if (result == null) {
+      try {
+	if (m_InputToken.getPayload() instanceof Instances) {
+	  data = (Instances) m_InputToken.getPayload();
+	  processedData = m_ActualPostProcessor.postProcess(data);
+	  if (m_OutputContainer)
+	    m_OutputToken = new Token(new PostProcessingContainer(data, processedData, m_ActualPostProcessor));
+	  else
+	    m_OutputToken = new Token(processedData);
+	}
+	else if (m_InputToken.getPayload() instanceof Instance) {
+	  inst = (Instance) m_InputToken.getPayload();
+	  processedInst = m_ActualPostProcessor.postProcess(inst);
+	  if (m_OutputContainer)
+	    m_OutputToken = new Token(new PostProcessingContainer(inst, processedInst, m_ActualPostProcessor));
+	  else
+	    m_OutputToken = new Token(processedInst);
+	}
       }
-      else if (m_InputToken.getPayload() instanceof Instance) {
-	inst          = (Instance) m_InputToken.getPayload();
-	processedInst = m_ActualPostProcessor.postProcess(inst);
-	if (m_OutputContainer)
-	  m_OutputToken = new Token(new PostProcessingContainer(inst, processedInst, m_ActualPostProcessor));
-	else
-	  m_OutputToken = new Token(processedInst);
+      catch (Exception e) {
+	m_OutputToken = null;
+	result = handleException("Failed to post-process: " + m_InputToken.getPayload(), e);
       }
-    }
-    catch (Exception e) {
-      m_OutputToken = null;
-      result = handleException("Failed to post-process: " + m_InputToken.getPayload(), e);
     }
 
     return result;
