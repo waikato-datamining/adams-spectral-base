@@ -27,6 +27,7 @@ import adams.core.option.AbstractOptionHandler;
 import adams.core.option.ArrayConsumer;
 import adams.core.option.OptionUtils;
 import adams.flow.core.Actor;
+import adams.flow.core.FlowContextHandler;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.AllFilter;
@@ -45,7 +46,7 @@ import weka.filters.Filter;
  */
 public abstract class AbstractCleaner
   extends AbstractOptionHandler
-  implements Comparable, ShallowCopySupporter<AbstractCleaner> {
+  implements Comparable, ShallowCopySupporter<AbstractCleaner>, FlowContextHandler {
 
   /** for serialization. */
   private static final long serialVersionUID = 3610605513320220903L;
