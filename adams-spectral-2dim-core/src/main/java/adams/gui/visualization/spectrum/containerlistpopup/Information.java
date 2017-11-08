@@ -13,16 +13,15 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Information.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.spectrum.containerlistpopup;
 
 import adams.data.spectrum.Spectrum;
 import adams.data.statistics.InformativeStatistic;
-import adams.gui.visualization.container.ContainerTable;
 import adams.gui.visualization.container.DataContainerPanelWithContainerList;
 import adams.gui.visualization.container.datacontainerpanel.containerlistpopup.AbstractContainerListPopupCustomizer;
 import adams.gui.visualization.spectrum.SpectrumContainer;
@@ -39,7 +38,6 @@ import java.util.List;
  * Displays information about the spectra.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Information
   extends AbstractContainerListPopupCustomizer<Spectrum, SpectrumContainerManager, SpectrumContainer> {
@@ -80,23 +78,21 @@ public class Information
   /**
    * Returns a popup menu for the table of the container list.
    *
-   * @param panel	the affected panel
-   * @param table	the affected table
-   * @param row		the row the mouse is currently over
+   * @param context	the context
    * @param menu	the popup menu to customize
    */
   @Override
-  public void customize(DataContainerPanelWithContainerList<Spectrum, SpectrumContainerManager, SpectrumContainer> panel, ContainerTable<SpectrumContainerManager, SpectrumContainer> table, int row, JPopupMenu menu) {
+  public void customize(final Context<Spectrum,SpectrumContainerManager,SpectrumContainer> context, JPopupMenu menu) {
     JMenuItem				item;
     final List<SpectrumContainer> 	visibleConts;
 
-    visibleConts = panel.getTableModelContainers(true);
+    visibleConts = context.visibleConts;
     item = new JMenuItem("Information");
     item.addActionListener((ActionEvent e) -> {
       List<InformativeStatistic> stats = new ArrayList<>();
       for (SpectrumContainer cont: visibleConts)
 	stats.add(cont.getData().toStatistic());
-      ((SpectrumPanel) panel).showStatistics(stats);
+      ((SpectrumPanel) context.panel).showStatistics(stats);
     });
     menu.add(item);
   }

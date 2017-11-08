@@ -13,15 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SampleData.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.spectrum.containerlistpopup;
 
 import adams.data.spectrum.Spectrum;
-import adams.gui.visualization.container.ContainerTable;
 import adams.gui.visualization.container.DataContainerPanelWithContainerList;
 import adams.gui.visualization.container.datacontainerpanel.containerlistpopup.AbstractContainerListPopupCustomizer;
 import adams.gui.visualization.spectrum.SpectrumContainer;
@@ -37,7 +36,6 @@ import java.util.List;
  * Displays the sample data.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SampleData
   extends AbstractContainerListPopupCustomizer<Spectrum, SpectrumContainerManager, SpectrumContainer> {
@@ -78,19 +76,17 @@ public class SampleData
   /**
    * Returns a popup menu for the table of the container list.
    *
-   * @param panel	the affected panel
-   * @param table	the affected table
-   * @param row		the row the mouse is currently over
+   * @param context	the context
    * @param menu	the popup menu to customize
    */
   @Override
-  public void customize(DataContainerPanelWithContainerList<Spectrum, SpectrumContainerManager, SpectrumContainer> panel, ContainerTable<SpectrumContainerManager, SpectrumContainer> table, int row, JPopupMenu menu) {
+  public void customize(final Context<Spectrum,SpectrumContainerManager,SpectrumContainer> context, JPopupMenu menu) {
     JMenuItem			  item;
     final List<SpectrumContainer> visibleConts;
 
-    visibleConts = panel.getTableModelContainers(true);
+    visibleConts = context.visibleConts;
     item         = new JMenuItem("Sample data");
-    item.addActionListener((ActionEvent e) -> ((SpectrumPanel) panel).showSampleData(visibleConts));
+    item.addActionListener((ActionEvent e) -> ((SpectrumPanel) context.panel).showSampleData(visibleConts));
     menu.add(item);
   }
 }

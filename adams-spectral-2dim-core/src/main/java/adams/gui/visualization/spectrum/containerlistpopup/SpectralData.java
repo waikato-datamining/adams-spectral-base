@@ -13,15 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectralData.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.spectrum.containerlistpopup;
 
 import adams.data.spectrum.Spectrum;
-import adams.gui.visualization.container.ContainerTable;
 import adams.gui.visualization.container.DataContainerPanelWithContainerList;
 import adams.gui.visualization.container.datacontainerpanel.containerlistpopup.AbstractContainerListPopupCustomizer;
 import adams.gui.visualization.spectrum.SpectrumContainer;
@@ -37,7 +36,6 @@ import java.awt.event.ActionEvent;
  * Displays the spectral data as table.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SpectralData
   extends AbstractContainerListPopupCustomizer<Spectrum, SpectrumContainerManager, SpectrumContainer> {
@@ -78,24 +76,22 @@ public class SpectralData
   /**
    * Returns a popup menu for the table of the container list.
    *
-   * @param panel	the affected panel
-   * @param table	the affected table
-   * @param row		the row the mouse is currently over
+   * @param context	the context
    * @param menu	the popup menu to customize
    */
   @Override
-  public void customize(DataContainerPanelWithContainerList<Spectrum, SpectrumContainerManager, SpectrumContainer> panel, ContainerTable<SpectrumContainerManager, SpectrumContainer> table, int row, JPopupMenu menu) {
+  public void customize(final Context<Spectrum,SpectrumContainerManager,SpectrumContainer> context, JPopupMenu menu) {
     JMenuItem				item;
     final SpectrumContainerModel	model;
     final int				actRow;
     final int[]				indices;
 
-    model   = (SpectrumContainerModel) panel.getContainerList().getContainerModel();
-    actRow  = panel.getContainerManager().indexOf(model.getContainerAt(row));
-    indices = panel.getActualSelectedContainerIndices(table, row);
+    model   = (SpectrumContainerModel) context.panel.getContainerList().getContainerModel();
+    actRow  = context.panel.getContainerManager().indexOf(model.getContainerAt(context.row));
+    indices = context.actualSelectedContainerIndices;
     item    = new JMenuItem("Spectral data");
     item.setEnabled(indices.length == 1);
-    item.addActionListener((ActionEvent e) -> ((SpectrumPanel) panel).showSpectralData(panel.getContainerManager().get(actRow)));
+    item.addActionListener((ActionEvent e) -> ((SpectrumPanel) context.panel).showSpectralData(context.panel.getContainerManager().get(actRow)));
     menu.add(item);
   }
 }
