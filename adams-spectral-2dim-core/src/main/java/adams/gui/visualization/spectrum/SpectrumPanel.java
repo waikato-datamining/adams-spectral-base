@@ -53,6 +53,7 @@ import adams.gui.visualization.core.DefaultColorProvider;
 import adams.gui.visualization.core.Paintlet;
 import adams.gui.visualization.core.PlotPanel;
 import adams.gui.visualization.core.plot.Axis;
+import adams.gui.visualization.core.plot.HitDetectorSupporter;
 import adams.gui.visualization.core.plot.TipTextCustomizer;
 import adams.gui.visualization.report.ReportContainer;
 import adams.gui.visualization.report.ReportFactory;
@@ -85,7 +86,7 @@ import java.util.List;
  */
 public class SpectrumPanel
   extends DataContainerPanelWithContainerList<Spectrum, SpectrumContainerManager, SpectrumContainer>
-  implements PaintListener, TipTextCustomizer, AntiAliasingSupporter {
+  implements PaintListener, TipTextCustomizer, AntiAliasingSupporter, HitDetectorSupporter<SpectrumPointHitDetector> {
 
   /** for serialization. */
   private static final long serialVersionUID = -9059718549932104312L;
@@ -175,6 +176,15 @@ public class SpectrumPanel
   @Override
   public AbstractSpectrumPaintlet getContainerPaintlet() {
     return m_SpectrumPaintlet;
+  }
+
+  /**
+   * Returns the hit detector.
+   *
+   * @return		the hit detector
+   */
+  public SpectrumPointHitDetector getHitDetector() {
+    return m_SpectrumPointHitDetector;
   }
 
   /**
