@@ -85,7 +85,7 @@ import java.util.List;
  */
 public class SpectrumPanel
   extends DataContainerPanelWithContainerList<Spectrum, SpectrumContainerManager, SpectrumContainer>
-  implements PaintListener, TipTextCustomizer {
+  implements PaintListener, TipTextCustomizer, AntiAliasingSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -9059718549932104312L;
