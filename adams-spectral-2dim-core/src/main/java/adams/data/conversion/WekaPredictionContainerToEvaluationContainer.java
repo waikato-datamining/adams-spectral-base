@@ -54,6 +54,9 @@ public class WekaPredictionContainerToEvaluationContainer
   /** the optional component to store. */
   protected String m_Component;
 
+  /** the optional version to store. */
+  protected String m_Version;
+
   /** the optional ID to store. */
   protected String m_ID;
 
@@ -78,6 +81,10 @@ public class WekaPredictionContainerToEvaluationContainer
 
     m_OptionManager.add(
 	    "component", "component",
+	    "");
+
+    m_OptionManager.add(
+	    "version", "version",
 	    "");
 
     m_OptionManager.add(
@@ -112,6 +119,35 @@ public class WekaPredictionContainerToEvaluationContainer
    */
   public String componentTipText() {
     return "The (optional) component for the evaluation.";
+  }
+
+  /**
+   * Sets the version to use for the evaluation.
+   *
+   * @param value	the version
+   */
+  public void setVersion(String value) {
+    m_Version = value;
+    reset();
+  }
+
+  /**
+   * Returns the version to use for the evaluation.
+   *
+   * @return 		the version
+   */
+  public String getVersion() {
+    return m_Version;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String versionTipText() {
+    return "The (optional) version of the evaluation.";
   }
 
   /**
@@ -204,6 +240,8 @@ public class WekaPredictionContainerToEvaluationContainer
 
     if (!m_Component.isEmpty())
       result.setValue(EvaluationContainer.VALUE_COMPONENT, m_Component);
+    if (!m_Version.isEmpty())
+      result.setValue(EvaluationContainer.VALUE_VERSION, m_Version);
     if (!m_ID.isEmpty())
       result.setValue(EvaluationContainer.VALUE_ID, m_ID);
 

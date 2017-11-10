@@ -165,6 +165,9 @@ public class Evaluator
   /** the name of the component. */
   protected String m_Component;
 
+  /** the version of the component. */
+  protected String m_Version;
+
   /** whether to use a variable to monitor for changes, triggering resets of the evaluator. */
   protected boolean m_UseEvaluatorResetVariable;
 
@@ -227,6 +230,10 @@ public class Evaluator
 
     m_OptionManager.add(
       "component", "component",
+      "");
+
+    m_OptionManager.add(
+      "version", "version",
       "");
   }
 
@@ -493,6 +500,35 @@ public class Evaluator
   }
 
   /**
+   * Sets the version to use.
+   *
+   * @param value	the version
+   */
+  public void setVersion(String value) {
+    m_Version = value;
+    reset();
+  }
+
+  /**
+   * Returns the version.
+   *
+   * @return		the version
+   */
+  public String getVersion() {
+    return m_Version;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String versionTipText() {
+    return "The version.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -696,7 +732,10 @@ public class Evaluator
 	  }
 	}
 	newCont.setValue(EvaluationContainer.VALUE_EVALUATIONS, evals);
-	newCont.setValue(EvaluationContainer.VALUE_COMPONENT, m_Component);
+	if (!m_Component.isEmpty())
+          newCont.setValue(EvaluationContainer.VALUE_COMPONENT, m_Component);
+	if (!m_Version.isEmpty())
+          newCont.setValue(EvaluationContainer.VALUE_VERSION, m_Version);
 	m_OutputToken = new Token(newCont);
       }
       catch (Exception e) {

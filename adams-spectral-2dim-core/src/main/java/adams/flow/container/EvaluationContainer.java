@@ -66,6 +66,9 @@ public class EvaluationContainer
   /** the identifier for the component. */
   public final static String VALUE_COMPONENT = "Component";
 
+  /** the identifier for the version. */
+  public final static String VALUE_VERSION = "Version";
+
   /** the identifier for the (optional) ID. */
   public final static String VALUE_ID = "ID";
 
@@ -125,6 +128,7 @@ public class EvaluationContainer
     addHelp(VALUE_ABSTENTION_CLASSIFICATION, "abstention classification; " + Utils.classToString(Double.class) + " or " + Utils.classToString(String.class));
     addHelp(VALUE_DISTRIBUTION, "class distribution", double[].class);
     addHelp(VALUE_COMPONENT, "component name", String.class);
+    addHelp(VALUE_VERSION, "version", String.class);
     addHelp(VALUE_ID, "(optional) ID", String.class);
   }
 
@@ -147,6 +151,7 @@ public class EvaluationContainer
     result.add(VALUE_ABSTENTION_CLASSIFICATION);
     result.add(VALUE_DISTRIBUTION);
     result.add(VALUE_COMPONENT);
+    result.add(VALUE_VERSION);
     result.add(VALUE_ID);
 
     return result.iterator();
