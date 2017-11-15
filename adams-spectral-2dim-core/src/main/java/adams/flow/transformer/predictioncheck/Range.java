@@ -27,9 +27,28 @@ import java.util.Map;
 
 /**
  <!-- globalinfo-start -->
+ * Ensures that the specified (numeric) evaluator results are within a specified range.<br>
+ * Adds a new boolean evaluation to the container, with the same name as the checked one, but appended with the suffix '.passed'.<br>
+ * E.g., when checking the evaluation 'sqr', 'sqr..passed' will get added, either with 'true' or 'false' as value.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-evaluation &lt;java.lang.String&gt; (property: evaluation)
+ * &nbsp;&nbsp;&nbsp;The name of the evaluation value to check.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-range &lt;adams.core.base.BaseInterval&gt; (property: range)
+ * &nbsp;&nbsp;&nbsp;The allowed range of the numeric value of the evaluation.
+ * &nbsp;&nbsp;&nbsp;default: (-Infinity;+Infinity)
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
