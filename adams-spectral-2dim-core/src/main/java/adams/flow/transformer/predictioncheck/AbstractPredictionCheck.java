@@ -20,6 +20,7 @@
 
 package adams.flow.transformer.predictioncheck;
 
+import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionHandler;
 import adams.flow.container.EvaluationContainer;
 
@@ -29,9 +30,21 @@ import adams.flow.container.EvaluationContainer;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public abstract class AbstractPredictionCheck
-  extends AbstractOptionHandler {
+  extends AbstractOptionHandler
+  implements QuickInfoSupporter {
 
   private static final long serialVersionUID = 7570611371164863558L;
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   * <br>
+   * Default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    return null;
+  }
 
   /**
    * Hook method for checks.

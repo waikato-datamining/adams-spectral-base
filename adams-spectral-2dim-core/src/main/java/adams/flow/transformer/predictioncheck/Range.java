@@ -20,6 +20,7 @@
 
 package adams.flow.transformer.predictioncheck;
 
+import adams.core.QuickInfoHelper;
 import adams.core.base.BaseInterval;
 import adams.flow.container.EvaluationContainer;
 
@@ -154,6 +155,21 @@ public class Range
    */
   public String rangeTipText() {
     return "The allowed range of the numeric value of the evaluation.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  public String getQuickInfo() {
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "evaluation", m_Evaluation);
+    result += " within ";
+    result += QuickInfoHelper.toString(this, "range", m_Range);
+
+    return result;
   }
 
   /**
