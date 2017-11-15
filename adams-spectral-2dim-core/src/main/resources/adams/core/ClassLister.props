@@ -39,6 +39,10 @@ adams.data.cleaner.instance.AbstractCleaner=\
 adams.data.evaluator.instance.AbstractEvaluator=\
   adams.data.evaluator.instance
 
+# the prediction check schemes
+adams.flow.transformer.predictioncheck.AbstractPredictionCheck=\
+  adams.flow.transformer.predictioncheck
+
 # the plot updaters for the SpectrumDisplay
 adams.flow.sink.spectrumdisplay.AbstractPlotUpdater=\
   adams.flow.sink.spectrumdisplay
