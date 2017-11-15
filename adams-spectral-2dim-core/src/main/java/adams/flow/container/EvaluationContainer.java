@@ -25,7 +25,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +77,7 @@ public class EvaluationContainer
    */
   public EvaluationContainer() {
     super();
-    store(VALUE_EVALUATIONS, new Hashtable<String,Object>());
+    store(VALUE_EVALUATIONS, new HashMap<String,Object>());
     store(VALUE_COMPONENT, "");
   }
 
@@ -87,7 +87,7 @@ public class EvaluationContainer
    * @param inst	the instance
    */
   public EvaluationContainer(Instance inst) {
-    this(inst, new Hashtable<>());
+    this(inst, new HashMap<>());
   }
 
   /**
@@ -122,7 +122,7 @@ public class EvaluationContainer
 
     addHelp(VALUE_INSTANCE, "data row", Instance.class);
     addHelp(VALUE_INSTANCES, "dataset", Instances.class);
-    addHelp(VALUE_EVALUATIONS, "mapping of evaluations (String/Object)", Hashtable.class);
+    addHelp(VALUE_EVALUATIONS, "mapping of evaluations (String/Object)", Map.class);
     addHelp(VALUE_EVALUATOR, "evaluator used", AbstractEvaluator.class);
     addHelp(VALUE_CLASSIFICATION, "classification; " + Utils.classToString(Double.class) + " or " + Utils.classToString(String.class));
     addHelp(VALUE_ABSTENTION_CLASSIFICATION, "abstention classification; " + Utils.classToString(Double.class) + " or " + Utils.classToString(String.class));
