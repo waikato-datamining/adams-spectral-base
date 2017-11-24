@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectralCommandProcessor.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.scripting;
@@ -129,8 +129,6 @@ public class SpectralCommandProcessor
    */
   protected void setupScriptlet(AbstractScriptlet scriptlet) {
     super.setupScriptlet(scriptlet);
-
-    if (getDatabaseConnection().isConnected())
-      scriptlet.setDataProvider(SpectrumT.getSingleton(getDatabaseConnection()));
+    scriptlet.setDataProvider(SpectrumT.getSingleton(getDatabaseConnection()));
   }
 }
