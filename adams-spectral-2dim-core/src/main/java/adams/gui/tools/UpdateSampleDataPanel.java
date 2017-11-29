@@ -15,12 +15,14 @@
 
 /*
  * UpdateSampleDataPanel.java
- * Copyright (C) 2016 FracPete (fracpete at gmail dot com)
+ * Copyright (C) 2016-2017 FracPete (fracpete at gmail dot com)
  *
  */
 
 package adams.gui.tools;
 
+import adams.core.DateFormat;
+import adams.core.DateUtils;
 import adams.core.Properties;
 import adams.core.base.BaseDate;
 import adams.core.base.BaseDateTime;
@@ -34,7 +36,7 @@ import adams.db.DatabaseConnection;
 import adams.db.SampleDataT;
 import adams.db.SpectrumConditionsMulti;
 import adams.env.Environment;
-import adams.gui.core.BaseObjectTextField;
+import adams.gui.chooser.DateChooserPanel;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
@@ -74,7 +76,6 @@ import java.util.List;
  * Allows the user to update/set values in selected spectra.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class UpdateSampleDataPanel
   extends BasePanel {
@@ -150,10 +151,10 @@ public class UpdateSampleDataPanel
   protected static Properties m_Properties;
 
   /** the from date. */
-  protected BaseObjectTextField<BaseDate> m_TextFrom;
+  protected DateChooserPanel m_TextFrom;
 
   /** the to date. */
-  protected BaseObjectTextField<BaseDate> m_TextTo;
+  protected DateChooserPanel m_TextTo;
 
   /** the button for the options. */
   protected JButton m_ButtonConditions;
@@ -212,6 +213,9 @@ public class UpdateSampleDataPanel
   /** whether the search is currently happening. */
   protected boolean m_Searching;
 
+  /** the formatter to use. */
+  protected DateFormat m_Formatter;
+
   /**
    * Initializes the members.
    */
@@ -221,6 +225,7 @@ public class UpdateSampleDataPanel
 
     super.initialize();
 
+    m_Formatter = DateUtils.getDateFormatter();
     props       = getProperties();
     m_Searching = false;
     try {
@@ -261,8 +266,9 @@ public class UpdateSampleDataPanel
     bdate = new BaseDate(BaseDate.NOW);
 
     // from
-    m_TextFrom = new BaseObjectTextField<>(new BaseDate(props.getDate("From", bdate.dateValue())));
-    m_TextFrom.setColumns(10);
+    m_TextFrom = new DateChooserPanel();
+    m_TextFrom.setCurrent(props.getDate("From", bdate.dateValue()));
+    m_TextFrom.setTextColumns(10);
     label = new JLabel("From");
     label.setDisplayedMnemonic('F');
     label.setLabelFor(m_TextFrom);
@@ -270,8 +276,9 @@ public class UpdateSampleDataPanel
     panel.add(m_TextFrom);
 
     // to
-    m_TextTo = new BaseObjectTextField<>(new BaseDate(props.getDate("To", bdate.dateValue())));
-    m_TextTo.setColumns(10);
+    m_TextTo = new DateChooserPanel();
+    m_TextTo.setCurrent(props.getDate("To", bdate.dateValue()));
+    m_TextTo.setTextColumns(10);
     label = new JLabel("To");
     label.setLabelFor(m_TextTo);
     panel.add(label);
@@ -429,16 +436,16 @@ public class UpdateSampleDataPanel
    * Transfers the fields to the conditions object.
    */
   protected void fieldsToConditions() {
-    m_Conditions.setStartDate(new BaseDateTime(m_TextFrom.getObject().getValue() + " 00:00:00"));
-    m_Conditions.setEndDate(new BaseDateTime(m_TextTo.getObject().getValue() + " 23:59:59"));
+    m_Conditions.setStartDate(new BaseDateTime(m_Formatter.format(m_TextFrom.getCurrent()) + " 00:00:00"));
+    m_Conditions.setEndDate(new BaseDateTime(m_Formatter.format(m_TextTo.getCurrent()) + " 23:59:59"));
   }
 
   /**
    * Transfers the conditions to the fields.
    */
   protected void conditionsToFields() {
-    m_TextFrom.setObject(new BaseDate(m_Conditions.getStartDate().dateValue()));
-    m_TextTo.setObject(new BaseDate(m_Conditions.getEndDate().dateValue()));
+    m_TextFrom.setCurrent(m_Conditions.getStartDate().dateValue());
+    m_TextTo.setCurrent(m_Conditions.getEndDate().dateValue());
   }
 
   /**
@@ -602,8 +609,8 @@ public class UpdateSampleDataPanel
     Properties		props;
 
     props = getProperties();
-    props.setDate("From", m_TextFrom.getObject().dateValue());
-    props.setDate("To", m_TextTo.getObject().dateValue());
+    props.setDate("From", m_TextFrom.getCurrent());
+    props.setDate("To", m_TextTo.getCurrent());
     props.setProperty("Conditions", m_Conditions.toCommandLine());
     props.setProperty("Field", getField().toParseableString());
     props.setProperty("Value", m_TextValue.getText());
