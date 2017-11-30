@@ -505,6 +505,9 @@ public class UpdateSampleDataPanel
 	  GUIHelper.showErrorMessage(
 	    UpdateSampleDataPanel.this, "Failed to retrieve any IDs from database, check console for potential errors!");
 	}
+	else {
+	  updateProperties();
+	}
       }
     };
     worker.execute();
