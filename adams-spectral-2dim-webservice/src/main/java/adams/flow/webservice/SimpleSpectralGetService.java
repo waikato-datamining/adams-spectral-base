@@ -22,6 +22,7 @@ package adams.flow.webservice;
 
 import adams.core.option.AbstractOptionHandler;
 import adams.data.spectrum.Spectrum;
+import adams.db.DatabaseConnectionUser;
 import adams.db.SpectrumT;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.GetSpectrumHelper;
@@ -33,11 +34,10 @@ import nz.ac.waikato.adams.webservice.spectral.get.SpectralGetService;
  * Class that implements the Spectral get web service.  
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SimpleSpectralGetService
   extends AbstractOptionHandler
-  implements SpectralGetService, OwnedBySpectralGetServiceWS {
+  implements SpectralGetService, OwnedBySpectralGetServiceWS, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -6102580694812360595L;

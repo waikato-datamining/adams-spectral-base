@@ -23,6 +23,7 @@ package adams.flow.transformer;
 import adams.data.report.Report;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
 import weka.core.Instance;
@@ -81,10 +82,10 @@ import weka.core.Instance;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class InstanceGenerator
-  extends AbstractTransformer {
+  extends AbstractTransformer
+  implements DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = 9173099269238100664L;

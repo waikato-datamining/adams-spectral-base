@@ -24,6 +24,7 @@ import adams.core.QuickInfoHelper;
 import adams.data.multireportfilter.AbstractMultiSpectrumReportFilter;
 import adams.data.spectrum.MultiSpectrum;
 import adams.db.DatabaseConnectionHandler;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
 import adams.flow.provenance.ActorType;
@@ -90,7 +91,8 @@ import adams.flow.provenance.ProvenanceInformation;
  * @version $Revision: 1286 $
  */
 public class MultiSpectrumReportFilter
-  extends AbstractTransformer {
+  extends AbstractTransformer
+  implements DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -8678582872628608282L;

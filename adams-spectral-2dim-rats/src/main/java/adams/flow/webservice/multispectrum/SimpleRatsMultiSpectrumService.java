@@ -21,6 +21,7 @@
 package adams.flow.webservice.multispectrum;
 
 import adams.core.option.AbstractOptionHandler;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.RatsMultiSpectrumHelper;
 import adams.flow.standalone.rats.WSMultiSpectrumReception;
@@ -36,7 +37,7 @@ import nz.ac.waikato.adams.webservice.rats.multispectrum.UploadResponse;
  */
 public class SimpleRatsMultiSpectrumService
   extends AbstractOptionHandler
-  implements RatsMultiSpectrumService, OwnedByRatsMultiSpectrumServiceWS {
+  implements RatsMultiSpectrumService, OwnedByRatsMultiSpectrumServiceWS, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -6102580694812360595L;

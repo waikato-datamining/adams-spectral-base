@@ -23,6 +23,7 @@ import adams.core.Constants;
 import adams.data.sampledata.SampleData;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
+import adams.db.DatabaseConnectionUser;
 import adams.db.SpectrumT;
 import adams.flow.core.ActorUtils;
 import adams.flow.transformer.AbstractReportDbWriter;
@@ -34,7 +35,8 @@ import adams.flow.transformer.AbstractReportDbWriter;
  * @version $Revision$
  */
 public class UpdateDatabaseID
-  extends AbstractReportPreProcessor<SampleData> {
+  extends AbstractReportPreProcessor<SampleData>
+  implements DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = 8536463609958106232L;

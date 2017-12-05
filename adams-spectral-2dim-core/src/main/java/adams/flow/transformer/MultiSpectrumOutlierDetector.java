@@ -27,6 +27,7 @@ import adams.data.outlier.PassThrough;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
 import adams.db.DatabaseConnectionHandler;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
 import adams.flow.provenance.ActorType;
@@ -103,10 +104,10 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1286 $
  */
 public class MultiSpectrumOutlierDetector
-  extends AbstractTransformer {
+  extends AbstractTransformer
+  implements DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -8678582872628608282L;

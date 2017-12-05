@@ -23,6 +23,7 @@ package adams.flow.webservice;
 import adams.core.Utils;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.spectrum.Spectrum;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.CallableActorHelper;
@@ -40,11 +41,10 @@ import nz.ac.waikato.adams.webservice.spectral.transform.TransformResponse;
  * Class that implements the Spectral web service.  
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2070 $
  */
 public class SimpleSpectralTransformService
   extends AbstractOptionHandler
-  implements SpectralTransformService, OwnedBySpectralTransformServiceWS {
+  implements SpectralTransformService, OwnedBySpectralTransformServiceWS, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -6102580694812360595L;

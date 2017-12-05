@@ -24,6 +24,7 @@ import adams.data.cleaner.spectrum.AbstractCleaner;
 import adams.data.cleaner.spectrum.PassThrough;
 import adams.data.spectrum.Spectrum;
 import adams.db.DatabaseConnectionHandler;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorExecution;
 import adams.flow.core.ActorHandler;
@@ -127,11 +128,10 @@ import adams.flow.sink.Null;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2355 $
  */
 public class SpectrumCleaner
   extends AbstractControlActor
-  implements InputConsumer, OutputProducer {
+  implements InputConsumer, OutputProducer, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -3989728996485003609L;

@@ -23,6 +23,7 @@ package adams.flow.control;
 import adams.data.cleaner.instance.AbstractCleaner;
 import adams.data.cleaner.instance.PassThrough;
 import adams.db.DatabaseConnectionHandler;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.Actor;
 import adams.flow.core.ActorExecution;
 import adams.flow.core.ActorHandler;
@@ -127,11 +128,10 @@ import weka.core.Instance;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2256 $
  */
 public class InstanceCleaner
   extends AbstractControlActor
-  implements InputConsumer, OutputProducer {
+  implements InputConsumer, OutputProducer, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -3989728996485003609L;

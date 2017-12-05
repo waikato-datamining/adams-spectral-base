@@ -22,6 +22,7 @@ package adams.flow.webservice;
 
 import adams.core.Constants;
 import adams.core.option.AbstractOptionHandler;
+import adams.db.DatabaseConnectionUser;
 import adams.db.SpectrumT;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.PutSpectrumHelper;
@@ -33,11 +34,10 @@ import nz.ac.waikato.adams.webservice.spectral.put.SpectralPutService;
  * Class that implements the Spectral put web service.  
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2070 $
  */
 public class SimpleSpectralPutService
   extends AbstractOptionHandler
-  implements SpectralPutService, OwnedBySpectralPutServiceWS {
+  implements SpectralPutService, OwnedBySpectralPutServiceWS, DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -6102580694812360595L;

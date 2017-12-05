@@ -13,13 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SampleDataDatabaseWriter.java
- * Copyright (C) 2012-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
 import adams.core.ShallowCopySupporter;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.Actor;
 import adams.flow.core.InputConsumer;
 import adams.flow.core.OutputProducer;
@@ -28,9 +29,8 @@ import adams.flow.core.OutputProducer;
  * Indicator interface for database writers for sample data.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1730 $
  */
 public interface SampleDataDatabaseWriter
-  extends ShallowCopySupporter<Actor>, InputConsumer, OutputProducer {
+  extends ShallowCopySupporter<Actor>, InputConsumer, OutputProducer, DatabaseConnectionUser {
 
 }

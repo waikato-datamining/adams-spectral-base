@@ -29,6 +29,7 @@ import adams.data.sampledata.SampleData;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
 import adams.db.DatabaseConnectionHandler;
+import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
 import adams.flow.provenance.ActorType;
@@ -103,10 +104,10 @@ import adams.flow.provenance.ProvenanceInformation;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1286 $
  */
 public class MultiSpectrumFilter
-  extends AbstractTransformer {
+  extends AbstractTransformer
+  implements DatabaseConnectionUser {
 
   /** for serialization. */
   private static final long serialVersionUID = -8678582872628608282L;
