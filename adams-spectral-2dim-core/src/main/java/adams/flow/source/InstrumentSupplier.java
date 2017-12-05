@@ -13,12 +13,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * InstrumentSupplier.java
  * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.source;
 
+import adams.db.AbstractDatabaseConnection;
 import adams.db.InstrumentProvider;
 import adams.db.SampleDataT;
 import adams.flow.core.ActorUtils;
@@ -73,7 +74,6 @@ import adams.flow.core.ActorUtils;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class InstrumentSupplier
   extends AbstractInstrumentSupplier {
@@ -100,6 +100,15 @@ public class InstrumentSupplier
   }
 
   /**
+   * Returns the default database connection.
+   *
+   * @return 		the default database connection
+   */
+  protected AbstractDatabaseConnection getDefaultDatabaseConnection() {
+    return adams.db.DatabaseConnection.getSingleton();
+  }
+
+  /**
    * Determines the database connection in the flow.
    *
    * @return		the database connection to use
@@ -108,6 +117,6 @@ public class InstrumentSupplier
     return ActorUtils.getDatabaseConnection(
 	  this,
 	  adams.flow.standalone.DatabaseConnectionProvider.class,
-	  adams.db.DatabaseConnection.getSingleton());
+	  getDefaultDatabaseConnection());
   }
 }
