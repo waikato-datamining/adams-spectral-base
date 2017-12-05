@@ -64,7 +64,8 @@ public class RebaseTest
     return new String[]{
 	"872280-nir.spec",
 	"872280-nir.spec",
-	"872280-nir.spec"
+	"872280-nir.spec",
+	"872280-nir.spec",
     };
   }
 
@@ -77,7 +78,7 @@ public class RebaseTest
   protected Filter[] getRegressionSetups() {
     Rebase[]	result;
 
-    result = new Rebase[3];
+    result = new Rebase[4];
 
     result[0] = new Rebase();
 
@@ -86,6 +87,11 @@ public class RebaseTest
 
     result[2] = new Rebase();
     result[2].setStart(100.0f);
+
+    result[3] = new Rebase();
+    result[3].setStart(100.0f);
+    result[3].setUpdateWaveNumbers(true);
+    result[3].setWaveStep(2.0f);
 
     return result;
   }

@@ -15,7 +15,7 @@
 
 /*
  * Rebase.java
- * Copyright (C) 2012-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -33,18 +33,29 @@ import java.util.List;
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <br><br>
- * 
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to 
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
+ * <pre>-no-id-update &lt;boolean&gt; (property: dontUpdateID)
+ * &nbsp;&nbsp;&nbsp;If enabled, suppresses updating the ID of adams.data.id.IDHandler data containers.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  * <pre>-start &lt;float&gt; (property: start)
  * &nbsp;&nbsp;&nbsp;The new starting point for the wave numbers.
  * &nbsp;&nbsp;&nbsp;default: 0.0
+ * </pre>
+ *
+ * <pre>-update-wave-numbers &lt;boolean&gt; (property: updateWaveNumbers)
+ * &nbsp;&nbsp;&nbsp;If enabled, the wave numbers get updated using the specified step size.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-wave-step &lt;float&gt; (property: waveStep)
+ * &nbsp;&nbsp;&nbsp;The difference between two wave numbers when updating the wave numbers.
+ * &nbsp;&nbsp;&nbsp;default: 1.0
  * </pre>
  * 
  <!-- options-end -->
@@ -60,6 +71,12 @@ public class Rebase
 
   /** the new starting point for wave numbers. */
   protected float m_Start;
+
+  /** whether to introduce new step size between points. */
+  protected boolean m_UpdateWaveNumbers;
+
+  /** the difference between two wave numbers. */
+  protected float m_WaveStep;
 
   /**
    * Returns a string describing the object.
@@ -81,8 +98,16 @@ public class Rebase
     super.defineOptions();
 
     m_OptionManager.add(
-	    "start", "start",
-	    0.0f);
+      "start", "start",
+      0.0f);
+
+    m_OptionManager.add(
+      "update-wave-numbers", "updateWaveNumbers",
+      false);
+
+    m_OptionManager.add(
+      "wave-step", "waveStep",
+      1.0f);
   }
 
   /**
@@ -115,6 +140,64 @@ public class Rebase
   }
 
   /**
+   * Sets whether to update the wave numbers using the specified step size.
+   *
+   * @param value 	true if to update
+   */
+  public void setUpdateWaveNumbers(boolean value) {
+    m_UpdateWaveNumbers = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to update the wave numbers using the specified step size.
+   *
+   * @return 		true if to update
+   */
+  public boolean getUpdateWaveNumbers() {
+    return m_UpdateWaveNumbers;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String updateWaveNumbersTipText() {
+    return "If enabled, the wave numbers get updated using the specified step size.";
+  }
+
+  /**
+   * Sets the difference between two wave numbers when updating them.
+   *
+   * @param value 	the difference
+   */
+  public void setWaveStep(float value) {
+    m_WaveStep = value;
+    reset();
+  }
+
+  /**
+   * Returns the difference between two wave numbers when updating them.
+   *
+   * @return 		the difference
+   */
+  public float getWaveStep() {
+    return m_WaveStep;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String waveStepTipText() {
+    return "The difference between two wave numbers when updating the wave numbers.";
+  }
+
+  /**
    * Performs the actual filtering.
    *
    * @param data	the data to filter
@@ -131,15 +214,26 @@ public class Rebase
     result = data.getHeader();
     points = data.toList();
     if (points.size() > 0) {
-      diff = m_Start - points.get(0).getWaveNumber();
-      if (isLoggingEnabled())
-	getLogger().info("Difference: " + diff + " (= shifting " + ((diff < 0) ? "left" : "right") + ")");
-      for (i = 0; i < points.size(); i++) {
-	point = points.get(i);
-	result.add(
+      if (m_UpdateWaveNumbers) {
+	for (i = 0; i < points.size(); i++) {
+	  point = points.get(i);
+	  result.add(
 	    new SpectrumPoint(
-		point.getWaveNumber() + diff, 
-		point.getAmplitude()));
+	      m_Start + i * m_WaveStep,
+	      point.getAmplitude()));
+	}
+      }
+      else {
+	diff = m_Start - points.get(0).getWaveNumber();
+	if (isLoggingEnabled())
+	  getLogger().info("Difference: " + diff + " (= shifting " + ((diff < 0) ? "left" : "right") + ")");
+	for (i = 0; i < points.size(); i++) {
+	  point = points.get(i);
+	  result.add(
+	    new SpectrumPoint(
+	      point.getWaveNumber() + diff,
+	      point.getAmplitude()));
+	}
       }
     }
 
