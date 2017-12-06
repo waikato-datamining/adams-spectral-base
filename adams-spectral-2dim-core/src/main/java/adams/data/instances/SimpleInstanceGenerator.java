@@ -231,7 +231,7 @@ public class SimpleInstanceGenerator
     if (size != data.size())
       throw new IllegalStateException(
 	  "Spectrum and output data differ in number of waves (#" + data.getDatabaseID() + ": "
-	  + data.size() + " != " + size);
+	  + data.size() + " != " + size + "\n" + data);
   }
 
   /**
