@@ -15,7 +15,7 @@
 
 /*
  * WaveNumberHitDetector.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -31,10 +31,9 @@ import java.awt.event.MouseEvent;
  * Detects selections of wave numbers.
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2348 $
  */
 public class WaveNumberHitDetector
-  extends AbstractHitDetector {
+  extends AbstractHitDetector<Double, Object> {
 
   /** for serialization. */
   private static final long serialVersionUID = -2638471486048948476L;
@@ -79,7 +78,7 @@ public class WaveNumberHitDetector
    * @param e		the MouseEvent (for coordinates)
    * @return 		the associated object with the hit, otherwise null
    */
-  protected Object isHit(MouseEvent e) {
+  protected Double isHit(MouseEvent e) {
     Double result;
 
     result = null;
@@ -97,18 +96,14 @@ public class WaveNumberHitDetector
    * @param hit		the object that got determined by the hit
    * @return 		always null
    */
-  protected Object processHit(MouseEvent e, Object hit) {
-    Double 	waveno;
-
-    waveno = (Double) hit;
-
+  protected Object processHit(MouseEvent e, Double hit) {
     if (m_Owner.getScriptingEngine().isRecording()) {
       m_Owner.getScriptingEngine().add(
 	  m_Owner,
-	  SelectWaveNumber.ACTION + " " + waveno);
+	  SelectWaveNumber.ACTION + " " + hit);
     }
     else {
-      select(m_Owner, waveno.floatValue());
+      select(m_Owner, hit.floatValue());
     }
 
     return null;

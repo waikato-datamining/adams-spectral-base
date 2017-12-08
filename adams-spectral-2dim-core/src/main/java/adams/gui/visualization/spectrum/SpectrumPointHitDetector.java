@@ -15,7 +15,7 @@
 
 /*
  * SpectrumPointHitDetector.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -29,17 +29,16 @@ import adams.gui.visualization.core.plot.Axis;
 
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Detects selections of spectrum points in the spectrum panel.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2348 $
  */
 public class SpectrumPointHitDetector
-  extends AbstractDistanceBasedHitDetector {
+  extends AbstractDistanceBasedHitDetector<List<SpectrumPoint>, String> {
 
   /** for serialization. */
   private static final long serialVersionUID = 7459498872766468963L;
@@ -86,7 +85,8 @@ public class SpectrumPointHitDetector
    * @return		the associated object with the hit, otherwise null
    */
   @Override
-  protected Object isHit(MouseEvent e) {
+  protected List<SpectrumPoint> isHit(MouseEvent e) {
+    List<SpectrumPoint>		result;
     float			amplitude;
     float			waveno;
     float			diffAmplitude;
@@ -94,9 +94,8 @@ public class SpectrumPointHitDetector
     float			diffPixel;
     int				i;
     Spectrum			s;
-    SpectrumPoint sp;
+    SpectrumPoint 		sp;
     SpectrumPoint		sp2;
-    Vector<SpectrumPoint>	result;
     AxisPanel			axisBottom;
     AxisPanel			axisLeft;
     int[]			indices;
@@ -105,7 +104,7 @@ public class SpectrumPointHitDetector
     List<SpectrumPoint> 	points;
     SpectrumContainerModel	model;
 
-    result     = new Vector<>();
+    result     = new ArrayList<>();
     axisBottom = m_Owner.getPlot().getAxis(Axis.BOTTOM);
     axisLeft   = m_Owner.getPlot().getAxis(Axis.LEFT);
     amplitude  = (float) axisLeft.posToValue((int) e.getY());
@@ -178,20 +177,17 @@ public class SpectrumPointHitDetector
    * @return		the generated appendix for the tiptext
    */
   @Override
-  protected Object processHit(MouseEvent e, Object hit) {
+  protected String processHit(MouseEvent e, List<SpectrumPoint> hit) {
     String			result;
-    Vector<SpectrumPoint>	hits;
     int				i;
     Spectrum 			sp;
     SpectrumContainer 		cont;
 
-    hits = (Vector<SpectrumPoint>) hit;
-
     result = " (";
-    for (i = 0; i < hits.size(); i++) {
+    for (i = 0; i < hit.size(); i++) {
       if (i > 0)
 	result += ", ";
-      sp  = (Spectrum) hits.get(i).getParent();
+      sp  = (Spectrum) hit.get(i).getParent();
       cont = m_Owner.getContainerManager().newContainer(sp);
       result += cont.getDisplayID();
     }
