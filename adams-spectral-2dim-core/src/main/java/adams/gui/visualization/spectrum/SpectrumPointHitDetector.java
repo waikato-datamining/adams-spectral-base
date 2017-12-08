@@ -26,6 +26,7 @@ import adams.data.spectrum.SpectrumUtils;
 import adams.gui.visualization.core.AxisPanel;
 import adams.gui.visualization.core.plot.AbstractDistanceBasedHitDetector;
 import adams.gui.visualization.core.plot.Axis;
+import adams.gui.visualization.core.plot.ContainerHitDetector;
 
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
@@ -38,7 +39,8 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class SpectrumPointHitDetector
-  extends AbstractDistanceBasedHitDetector<List<SpectrumPoint>, String> {
+  extends AbstractDistanceBasedHitDetector<List<SpectrumPoint>, String>
+  implements ContainerHitDetector<List<SpectrumPoint>, String, SpectrumContainer> {
 
   /** for serialization. */
   private static final long serialVersionUID = 7459498872766468963L;
@@ -194,6 +196,31 @@ public class SpectrumPointHitDetector
     result += ")";
 
     return result;
+  }
+
+  /**
+   * Detects hits and associates them with the containers.
+   *
+   * @param e		the mouse event to analyze for a hit
+   * @return		optional result of processing the event
+   */
+  @Override
+  public SpectrumContainer[] containers(MouseEvent e) {
+    List<SpectrumContainer>	result;
+    List<SpectrumPoint> 	hit;
+    SpectrumContainerManager	manager;
+    int				index;
+
+    result  = new ArrayList<>();
+    hit     = isHit(e);
+    manager = getOwner().getContainerManager();
+    for (SpectrumPoint point: hit) {
+      index = manager.indexOf(point.getParent().getID());
+      if (index > -1)
+        result.add(manager.get(index));
+    }
+
+    return result.toArray(new SpectrumContainer[result.size()]);
   }
 
   /**
