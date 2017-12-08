@@ -2957,7 +2957,7 @@ waveno,amplitude
 # Clay\tDataType=N
 # Dummy\ report=false
 # Dummy\ report\tDataType=B
-# Format=NIR
+# Format=XRF MAIN
 # Format\tDataType=S
 # GLV0=39.9
 # GLV0\tDataType=N
