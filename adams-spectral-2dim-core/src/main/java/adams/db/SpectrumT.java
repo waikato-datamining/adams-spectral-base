@@ -15,15 +15,13 @@
 
 /*
  * SpectrumT.java
- * Copyright (C) 2008-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2017 University of Waikato, Hamilton, New Zealand
  *
  */
 
 package adams.db;
 
 import adams.core.Constants;
-import adams.core.LRUCache;
-import adams.core.Performance;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
@@ -33,7 +31,6 @@ import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
 import adams.db.types.AutoIncrementType;
 import adams.db.types.ColumnType;
-import adams.event.DatabaseConnectionChangeEvent;
 
 import java.sql.ResultSet;
 import java.sql.Types;
@@ -60,12 +57,6 @@ public class SpectrumT
 
   public static final String MAX_NUM_SPECTRUMS_CACHED = "maxNumSpectrumsCached";
 
-  /** Stores Spectrums for Reference (key is AUTO_ID). */
-  protected static LRUCache<Integer, Spectrum> m_cacheDatabaseID;
-
-  /** Stores Spectrums for Reference (key is SAMPLE_ID TAB FORMAT). */
-  protected static LRUCache<String, Spectrum> m_cacheSampleIDFormat;
-
   /** the table manager. */
   protected static TableManager<SpectrumT> m_TableManager;
 
@@ -76,12 +67,6 @@ public class SpectrumT
    */
   protected SpectrumT(AbstractDatabaseConnection dbcon) {
     super(dbcon, SpectrumT.TABLE_NAME);
-
-    int maxCached = Performance.getInteger(MAX_NUM_SPECTRUMS_CACHED, 100);
-    if (m_cacheDatabaseID == null)
-      m_cacheDatabaseID = new LRUCache<>(maxCached);
-    if (m_cacheSampleIDFormat == null)
-      m_cacheSampleIDFormat = new LRUCache<>(maxCached);
   }
 
   /**
@@ -154,13 +139,7 @@ public class SpectrumT
    * @return 		Spectrum, or null if not found
    */
   public synchronized Spectrum load(int auto_id){
-    Spectrum sp = m_cacheDatabaseID.get(auto_id);
-    if (sp == null) {
-      sp = loadFromDB(auto_id, "", true);
-      if (m_cacheDatabaseID.isEnabled())
-	m_cacheDatabaseID.put(sp.getDatabaseID(), sp);
-    }
-    return sp;
+    return loadFromDB(auto_id, "", true);
   }
 
   /**
@@ -183,18 +162,7 @@ public class SpectrumT
    * @return 		Spectrum, or null if not found
    */
   public synchronized Spectrum load(String sample_id, String format){
-    Spectrum sp = m_cacheSampleIDFormat.get(sample_id + "\t" + format);
-
-    if (sp == null) {
-      sp = loadFromDB(sample_id, format, true);
-      if (m_cacheSampleIDFormat.isEnabled())
-	m_cacheSampleIDFormat.put(sample_id + "\t" + format, sp);
-    }
-    else {
-      sp = (Spectrum) sp.getClone();
-    }
-
-    return sp;
+    return loadFromDB(sample_id, format, true);
   }
 
   /**
@@ -611,23 +579,6 @@ public class SpectrumT
   }
 
   /**
-   * Clears the caches.
-   */
-  protected void clearCaches() {
-    if (m_cacheDatabaseID != null) {
-      m_cacheDatabaseID.setEnabled(false);
-      m_cacheDatabaseID.clear();
-      m_cacheDatabaseID.setEnabled(true);
-    }
-
-    if (m_cacheSampleIDFormat != null) {
-      m_cacheSampleIDFormat.setEnabled(false);
-      m_cacheSampleIDFormat.clear();
-      m_cacheSampleIDFormat.setEnabled(true);
-    }
-  }
-
-  /**
    * Removes the spectrum and its sample data.
    * Uses {@link SampleData#DEFAULT_FORMAT} as format.
    *
@@ -699,40 +650,7 @@ public class SpectrumT
       // delete sample data
       result = SampleDataT.getSingleton(getDatabaseConnection()).remove(sp.getID());
 
-    // invalidate chromatogram
-    removeFromCache(id);
-
     return result;
-  }
-
-  /**
-   * Removes the spectrum from the cache.
-   *
-   * @param sp		the spectrum to remove
-   */
-  public synchronized void removeFromCache(Spectrum sp) {
-    removeFromCache(sp.getDatabaseID());
-  }
-
-  /**
-   * Removes the spectrum from the cache.
-   *
-   * @param id		the ID of the spectrum to remove
-   */
-  public synchronized void removeFromCache(int id) {
-    if (m_cacheDatabaseID.contains(id))
-      m_cacheDatabaseID.remove(id);
-  }
-
-  /**
-   * A change in the database connection occurred. Derived classes can
-   * override this method to react to changes in the connection.
-   *
-   * @param e		the event
-   */
-  @Override
-  public void databaseConnectionStateChanged(DatabaseConnectionChangeEvent e) {
-    clearCaches();
   }
 
   /**
@@ -752,7 +670,7 @@ public class SpectrumT
    */
   public static synchronized SpectrumT getSingleton(AbstractDatabaseConnection dbcon) {
     if (m_TableManager == null)
-      m_TableManager = new TableManager<SpectrumT>(TABLE_NAME, dbcon.getOwner());
+      m_TableManager = new TableManager<>(TABLE_NAME, dbcon.getOwner());
     if (!m_TableManager.has(dbcon)) {
       if (JDBC.isMySQL(dbcon))
         m_TableManager.add(dbcon, new SpectrumTMySQL(dbcon));

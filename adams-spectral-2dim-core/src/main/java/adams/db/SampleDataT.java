@@ -29,7 +29,6 @@ import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
-import adams.data.spectrum.Spectrum;
 import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
@@ -236,18 +235,13 @@ public abstract class SampleDataT
 	Boolean rs = execute(q);
 	if ((rs == null) || rs) {
 	  getLogger().severe("Some error:\n" + Utils.getStackTrace(-1));
-	  return(false);
+	  return false;
 	}
       }
       catch (Exception e) {
 	getLogger().log(Level.SEVERE, "Failed to store: " + q, e);
 	return(false);
       }
-
-      // invalidate spectrum
-      Spectrum sp = getSpectrumT().load(id, report.getStringValue(SampleData.FORMAT));
-      if (sp != null)
-	getSpectrumT().removeFromCache(sp.getDatabaseID());
     }
 
     return true;
