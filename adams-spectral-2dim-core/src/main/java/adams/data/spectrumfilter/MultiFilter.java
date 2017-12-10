@@ -21,7 +21,6 @@
 package adams.data.spectrumfilter;
 
 import adams.data.container.DataContainer;
-import adams.data.filter.Filter;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumUtils;
 
@@ -147,12 +146,10 @@ public class MultiFilter
   protected Spectrum processDataParallel(Spectrum data) {
     Spectrum			result;
     int				i;
-    List<Filter>		filters;
     List<DataContainer>		outputs;
     List<Spectrum>		outputsC;
 
     // filter the data
-    filters = new ArrayList<>();
     outputs = new ArrayList<>();
     for (i = 0; i < m_Filters.length; i++)
       outputs.add(m_Filters[i].shallowCopy(true).filter(data));
@@ -162,11 +159,6 @@ public class MultiFilter
     for (i = 0; i < outputs.size(); i++)
       outputsC.add((Spectrum) outputs.get(i));
     result = SpectrumUtils.merge(outputsC);
-
-    // clean up
-    for (i = 0; i < m_Filters.length; i++)
-      filters.get(i).destroy();
-    filters.clear();
 
     return result;
   }
