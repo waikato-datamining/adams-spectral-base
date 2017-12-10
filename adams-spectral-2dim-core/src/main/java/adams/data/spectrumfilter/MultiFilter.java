@@ -15,13 +15,12 @@
 
 /*
  * MultiFilter.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
 
 import adams.data.container.DataContainer;
-import adams.data.filter.AbstractFilter;
 import adams.data.filter.Filter;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumUtils;
@@ -154,9 +153,9 @@ public class MultiFilter
 
     // filter the data
     filters = new ArrayList<>();
+    outputs = new ArrayList<>();
     for (i = 0; i < m_Filters.length; i++)
-      filters.add(m_Filters[i].shallowCopy(true));
-    outputs = AbstractFilter.filter(filters, data);
+      outputs.add(m_Filters[i].shallowCopy(true).filter(data));
 
     // merge outputs
     outputsC = new ArrayList<>();
