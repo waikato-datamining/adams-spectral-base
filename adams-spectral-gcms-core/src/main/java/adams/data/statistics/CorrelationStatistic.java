@@ -15,13 +15,12 @@
 
 /*
  * CorrelationStatistic.java
- * Copyright (C) 2008-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2017 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.statistics;
 
 import adams.core.ClassLister;
-import adams.core.Performance;
 import adams.core.logging.LoggingObject;
 import adams.core.option.OptionHandler;
 import adams.core.option.OptionManager;
@@ -29,9 +28,6 @@ import adams.core.option.OptionUtils;
 import adams.data.chromatogram.Chromatogram;
 import adams.data.chromatogram.GCPoint;
 import adams.multiprocess.AbstractJob;
-import adams.multiprocess.JobList;
-import adams.multiprocess.JobRunner;
-import adams.multiprocess.LocalJobRunner;
 
 import java.util.List;
 import java.util.Vector;
@@ -42,7 +38,6 @@ import java.util.logging.Level;
  * two data vectors.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 4402 $
  */
 public abstract class CorrelationStatistic
   extends LoggingObject
@@ -646,82 +641,5 @@ public abstract class CorrelationStatistic
    */
   public static String[] getCorrelationStatistics() {
     return ClassLister.getSingleton().getClassnames(CorrelationStatistic.class);
-  }
-
-  /**
-   * Passes the data through the given statistics algorithm and returns the
-   * correlation.
-   *
-   * @param statistic	the correlation statistic to use
-   * @param reference	the reference data
-   * @param data	the data to compare with
-   * @return		the correlation
-   */
-  public static Correlation correlate(CorrelationStatistic statistic, Chromatogram reference, Chromatogram data) {
-    Vector<Chromatogram>	list;
-    Vector<Correlation>		result;
-
-    list = new Vector<>();
-    list.add(data);
-    result = correlate(statistic, reference, list);
-
-    return result.get(0);
-  }
-
-  /**
-   * Passes the data through the given statistics algorithm and returns a vector
-   * containing the correlation for each chromatogram. Makes use of
-   * multiple cores, i.e., for each dataset a new thread will be run with a
-   * copy of the statistics algorithm.
-   *
-   * @param statistic	the statistics algorithm to use for calculating the
-   * 			correlations (a new algorithm with the same options will
-   * 			be created and used in each thread)
-   * @param reference	the reference data
-   * @param data	the data to compare with
-   * @return		the correlations
-   */
-  public static Vector<Correlation> correlate(CorrelationStatistic statistic, Chromatogram reference, Vector<Chromatogram> data) {
-    Vector<Correlation>			result;
-    CorrelationStatistic		threadStatistic;
-    JobRunner<CorrelationStatisticJob> 	runner;
-    JobList<CorrelationStatisticJob>	jobs;
-    CorrelationStatisticJob		job;
-    int					i;
-
-    result = new Vector<Correlation>();
-
-    if (Performance.getMultiProcessingEnabled()) {
-      runner = new LocalJobRunner<>();
-      jobs   = new JobList<>();
-
-      // fill job list
-      for (i = 0; i < data.size(); i++) {
-	threadStatistic = statistic.shallowCopy(true);
-	jobs.add(new CorrelationStatisticJob(threadStatistic, reference, data.get(i)));
-      }
-      runner.add(jobs);
-      runner.start();
-      runner.stop();
-
-      // gather results
-      for (i = 0; i < jobs.size(); i++) {
-	job = jobs.get(i);
-	// success? If not, just add null
-	if (job.getCorrelation() != null)
-	  result.add(job.getCorrelation());
-	else
-	  result.add(null);
-	job.cleanUp();
-      }
-    }
-    else {
-      for (i = 0; i < data.size(); i++) {
-	threadStatistic = statistic.shallowCopy(true);
-	result.add(threadStatistic.getCorrelation(reference.toList(), data.get(i).toList()));
-      }
-    }
-
-    return result;
   }
 }
