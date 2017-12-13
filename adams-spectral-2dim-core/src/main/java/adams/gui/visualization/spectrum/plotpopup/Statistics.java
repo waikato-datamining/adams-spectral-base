@@ -98,5 +98,6 @@ public class Statistics
 	stats.add(cont.getData().toStatistic());
       ((SpectrumPanel) panel).showStatistics(stats);
     });
+    menu.add(item);
   }
 }
