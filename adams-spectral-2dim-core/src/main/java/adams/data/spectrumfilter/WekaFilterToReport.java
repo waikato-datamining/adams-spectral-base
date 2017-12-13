@@ -473,6 +473,8 @@ public class WekaFilterToReport
       m_Filter.input(inst);
       m_Filter.batchFinished();
       filtered = m_Filter.output();
+      if (filtered == null)
+        throw new IllegalStateException("Filter didn't return an instance! Wrong number of wave numbers?");
 
       // transfer data
       report = result.getReport();
