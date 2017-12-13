@@ -213,6 +213,9 @@ public class SpectrumPointHitDetector
 
     result  = new ArrayList<>();
     hit     = isHit(e);
+    if (hit == null)
+      return new SpectrumContainer[0];
+
     manager = getOwner().getContainerManager();
     for (SpectrumPoint point: hit) {
       index = manager.indexOf(point.getParent().getID());
