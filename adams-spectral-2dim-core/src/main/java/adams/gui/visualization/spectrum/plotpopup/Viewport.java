@@ -13,7 +13,7 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Viewport.java
  * Copyright (C) 2017 University of Waikato, Hamilton, NZ
  */
@@ -59,7 +59,6 @@ import java.util.Set;
  * viewport.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Viewport
   extends AbstractPlotPopupCustomizer<Spectrum, SpectrumContainerManager, SpectrumContainer> {
@@ -276,6 +275,29 @@ public class Viewport
   }
 
   /**
+   * Allows the user to hide all other spectra.
+   *
+   * @param panel	the affected panel
+   * @param conts	the containers to keep
+   */
+  protected void hideOthers(DataContainerPanelWithContainerList<Spectrum, SpectrumContainerManager, SpectrumContainer> panel, List<SpectrumContainer> conts) {
+    SpectrumContainerManager	manager;
+    int				i;
+    Set<SpectrumContainer>	keep;
+
+    keep = new HashSet<>(conts);
+    manager = panel.getContainerManager();
+    manager.startUpdate();
+
+    for (i = 0; i < manager.count(); i++) {
+      if (!keep.contains(manager.get(i)))
+        manager.get(i).setVisible(false);
+    }
+
+    manager.finishUpdate();
+  }
+
+  /**
    * Returns a popup menu for the table of the container list.
    *
    * @param panel	the affected panel
@@ -305,6 +327,10 @@ public class Viewport
 
       item = new JMenuItem("Hide");
       item.addActionListener((ActionEvent ae) -> hide(panel, conts));
+      submenu.add(item);
+
+      item = new JMenuItem("Hide others");
+      item.addActionListener((ActionEvent ae) -> hideOthers(panel, conts));
       submenu.add(item);
     }
   }
