@@ -218,7 +218,7 @@ public class SelectSpectrumPanel
      */
     public boolean isSearchMatch(SearchParameters params, int row) {
       // ID columns
-      if (params.isInteger()) {
+      if (params.getLong()) {
 	// ID
 	if (params.matches(m_IDs[row]))
 	  return true;
