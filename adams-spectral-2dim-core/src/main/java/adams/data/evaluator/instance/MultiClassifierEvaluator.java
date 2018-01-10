@@ -15,11 +15,12 @@
 
 /*
  * MultiClassifierEvaluator.java
- * Copyright (C) 2016-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.evaluator.instance;
 
 import adams.core.Randomizable;
+import adams.core.option.OptionUtils;
 import adams.flow.core.EvaluationHelper;
 import adams.flow.core.EvaluationStatistic;
 import weka.classifiers.Classifier;
@@ -414,18 +415,25 @@ public class MultiClassifierEvaluator
     try {
       m_CrossvalidationResults = new Evaluation(data);
       m_CrossvalidationResults.crossValidateModel(m_Base, data, m_Folds, new Random(m_Seed));
-
-      m_Header = new Instances(m_TrainingData, 0);
-
-      for (Classifier c: m_Classifiers)
-	c.buildClassifier(data);
-
-      m_SerializableObjectHelper.saveSetup();
     }
     catch (Exception e) {
-      getLogger().log(Level.SEVERE, "Failed to build classifier(s)!", e);
+      getLogger().log(Level.SEVERE, "Failed to cross-validate classifier: " + OptionUtils.getCommandLine(m_Base), e);
       return false;
     }
+
+    m_Header = new Instances(m_TrainingData, 0);
+
+    for (Classifier c: m_Classifiers) {
+      try {
+	c.buildClassifier(data);
+      }
+      catch (Exception e) {
+	getLogger().log(Level.SEVERE, "Failed to build classifier: " + OptionUtils.getCommandLine(c), e);
+	return false;
+      }
+    }
+
+    m_SerializableObjectHelper.saveSetup();
 
     return true;
   }
