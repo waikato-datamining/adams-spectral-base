@@ -22,9 +22,9 @@
   </organization>
 
   <scm>
-    <connection>scm:git:https://github.com/waikato/adams-spectral-base</connection>
-    <developerConnection>scm:git:https://github.com/waikato/adams-spectral-base</developerConnection>
-    <url>https://github.com/waikato/adams-spectral-base</url>
+    <connection>scm:git:https://github.com/waikato-datamining/adams-spectral-base</connection>
+    <developerConnection>scm:git:https://github.com/waikato-datamining/adams-spectral-base</developerConnection>
+    <url>https://github.com/waikato-datamining/adams-spectral-base</url>
     <tag>HEAD</tag>
   </scm>
 
