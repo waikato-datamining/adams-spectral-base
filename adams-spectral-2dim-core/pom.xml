@@ -106,13 +106,13 @@
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-weka</artifactId>
+      <artifactId>adams-weka-stable</artifactId>
       <version>${adams.version}</version>
     </dependency>
 
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
-      <artifactId>adams-weka</artifactId>
+      <artifactId>adams-weka-stable</artifactId>
       <version>${adams.version}</version>
       <scope>test</scope>
       <type>test-jar</type>
@@ -121,7 +121,7 @@
     <dependency>
       <groupId>nz.ac.waikato.cms.weka</groupId>
       <artifactId>weka-dev</artifactId>
-      <version>${weka.version}</version>
+      <version>${weka-stable.version}</version>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
