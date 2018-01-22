@@ -1,0 +1,13 @@
+{
+  "id": "someid",
+  "format": "NIR",
+  "data": [
+    {"wave": 1.0, "ampl": 1.1},
+    {"wave": 2.0, "ampl": 2.1}
+  ],
+  "report": {
+    "Sample ID": "someid",
+    "GLV2": 1.123,
+    "valid": true
+  }
+}

@@ -20,16 +20,31 @@
 
 package adams.data.conversion;
 
-import adams.data.report.AbstractField;
-import adams.data.report.Report;
+import adams.core.QuickInfoHelper;
+import adams.core.io.PrettyPrintingSupporter;
+import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
-import adams.data.spectrum.SpectrumPoint;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 /**
  <!-- globalinfo-start -->
- * Turns a spectrum into a JSON object.
+ * Turns a spectrum into a JSON string.<br>
+ * Output format:<br>
+ * {<br>
+ *   "id": "someid",<br>
+ *   "format": "NIR",<br>
+ *   "data": [<br>
+ *     {"wave": 1.0, "ampl": 1.1},<br>
+ *     {"wave": 2.0, "ampl": 2.1}<br>
+ *   ],<br>
+ *   "report": {<br>
+ *     "Sample ID": "someid",<br>
+ *     "GLV2": 1.123,<br>
+ *     "valid": true<br>
+ *   }<br>
+ * }<br>
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -39,14 +54,23 @@ import net.minidev.json.JSONObject;
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
  *
+ * <pre>-pretty-printing &lt;boolean&gt; (property: prettyPrinting)
+ * &nbsp;&nbsp;&nbsp;If enabled, the output is printed in a 'pretty' format.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SpectrumToJson
-  extends AbstractConversion {
+  extends AbstractConversion
+  implements PrettyPrintingSupporter {
 
   private static final long serialVersionUID = 2957342595369694174L;
+
+  /** whether to use pretty-printing. */
+  protected boolean m_PrettyPrinting;
 
   /**
    * Returns a string describing the object.
@@ -55,7 +79,59 @@ public class SpectrumToJson
    */
   @Override
   public String globalInfo() {
-    return "Turns a spectrum into a JSON object.";
+    return "Turns a spectrum into a JSON string.\n"
+      + "Output format:\n"
+      + JsonUtils.example();
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "pretty-printing", "prettyPrinting",
+      false);
+  }
+
+  /**
+   * Sets whether to use pretty-printing or not.
+   *
+   * @param value	true if to use pretty-printing
+   */
+  public void setPrettyPrinting(boolean value) {
+    m_PrettyPrinting = value;
+    reset();
+  }
+
+  /**
+   * Returns whether pretty-printing is used or not.
+   *
+   * @return		true if to use pretty-printing
+   */
+  public boolean getPrettyPrinting() {
+    return m_PrettyPrinting;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String prettyPrintingTipText() {
+    return "If enabled, the output is printed in a 'pretty' format.";
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "prettyPrinting", m_PrettyPrinting, "pretty-printing");
   }
 
   /**
@@ -75,7 +151,7 @@ public class SpectrumToJson
    */
   @Override
   public Class generates() {
-    return JSONObject.class;
+    return String.class;
   }
 
   /**
@@ -86,56 +162,15 @@ public class SpectrumToJson
    */
   @Override
   protected Object doConvert() throws Exception {
-    JSONObject	result;
-    JSONObject	data;
-    JSONArray	array;
-    Spectrum	input;
-    Report	report;
+    GsonBuilder		builder;
+    Gson 		gson;
+    JsonObject		jobj;
 
-    result = new JSONObject();
-    input  = (Spectrum) m_Input;
-
-    // basic
-    result.put("id", input.getID());
-    result.put("format", input.getFormat());
-
-    // spectrum
-    array = new JSONArray();
-    for (SpectrumPoint p: input) {
-      data = new JSONObject();
-      data.put("wave", p.getWaveNumber());
-      data.put("ampl", p.getAmplitude());
-      array.add(data);
-    }
-    result.put("spectrum", array);
-
-    // sample data
-    array = new JSONArray();
-    if (input.hasReport()) {
-      report = input.getReport();
-      for (AbstractField field : report.getFields()) {
-	data = new JSONObject();
-	data.put("name", field.getName());
-	data.put("type", field.getDataType().toString());
-	switch (field.getDataType()) {
-	  case NUMERIC:
-	    data.put("value", report.getDoubleValue(field));
-	    break;
-	  case BOOLEAN:
-	    data.put("value", report.getBooleanValue(field));
-	    break;
-	  case STRING:
-	  case UNKNOWN:
-	    data.put("value", report.getStringValue(field));
-	    break;
-	  default:
-	    throw new IllegalStateException("Unhandled data type: " + field.getDataType());
-	}
-	array.add(data);
-      }
-    }
-    result.put("sampledata", array);
-
-    return result;
+    jobj = JsonUtils.toJson((Spectrum) m_Input);
+    builder = new GsonBuilder();
+    if (m_PrettyPrinting)
+      builder.setPrettyPrinting();
+    gson = builder.create();
+    return gson.toJson(jobj);
   }
 }

@@ -21,26 +21,36 @@
 package adams.data.io.input;
 
 import adams.core.io.FileUtils;
-import adams.data.report.DataType;
-import adams.data.report.Field;
-import adams.data.report.Report;
-import adams.data.sampledata.SampleData;
+import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
-import adams.data.spectrum.SpectrumPoint;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
- * Reads spectra in JSON format.
+ * Reads spectra in JSON format.<br>
+ * Input format (single spectrum):<br>
+ * {<br>
+ *   "id": "someid",<br>
+ *   "format": "NIR",<br>
+ *   "data": [<br>
+ *     {"wave": 1.0, "ampl": 1.1},<br>
+ *     {"wave": 2.0, "ampl": 2.1}<br>
+ *   ],<br>
+ *   "report": {<br>
+ *     "Sample ID": "someid",<br>
+ *     "GLV2": 1.123,<br>
+ *     "valid": true<br>
+ *   }<br>
+ * }<br>
+ * <br>
+ * Multiple spectra are wrapped in an array called 'spectra'.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -86,7 +96,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class JsonSpectrumReader
   extends AbstractSpectrumReader {
@@ -101,7 +110,10 @@ public class JsonSpectrumReader
    */
   @Override
   public String globalInfo() {
-    return "Reads spectra in JSON format.";
+    return "Reads spectra in JSON format.\n"
+      + "Input format (single spectrum):\n"
+      + JsonUtils.example() + "\n"
+      + "Multiple spectra are wrapped in an array called 'spectra'.";
   }
 
   /**
@@ -123,70 +135,6 @@ public class JsonSpectrumReader
   @Override
   public String[] getFormatExtensions() {
     return new String[]{"json"};
-  }
-
-  /**
-   * Creates a spectrum from the JSON object (spectral + report).
-   *
-   * @param jobj	the object to get the data from
-   * @return		the spectrum, null if failed to create or find data
-   */
-  protected Spectrum fromJson(JsonObject jobj) {
-    Spectrum		result;
-    Report		report;
-    JsonArray		array;
-    JsonObject		jreport;
-    JsonObject		jo;
-    Field		field;
-    JsonPrimitive	prim;
-
-    result = null;
-
-    if (jobj.has("data")) {
-      result = new Spectrum();
-
-      // data
-      array = jobj.getAsJsonArray("data");
-      for (JsonElement je: array) {
-	jo = je.getAsJsonObject();
-	if (jo.has("wave") && jo.has("ampl"))
-	  result.add(new SpectrumPoint(jo.get("wave").getAsFloat(), jo.get("ampl").getAsFloat()));
-      }
-
-      // report
-      if (jobj.has("report")) {
-	report  = result.getReport();
-	jreport = jobj.getAsJsonObject("report");
-	for (Entry<String, JsonElement> entry: jreport.entrySet()) {
-	  prim = entry.getValue().getAsJsonPrimitive();
-	  if (prim.isBoolean()) {
-	    field = new Field(entry.getKey(), DataType.BOOLEAN);
-	    report.addField(field);
-	    report.setBooleanValue(field.getName(), prim.getAsBoolean());
-	  }
-	  else if (prim.isNumber()) {
-	    field = new Field(entry.getKey(), DataType.NUMERIC);
-	    report.addField(field);
-	    report.setNumericValue(field.getName(), prim.getAsNumber().doubleValue());
-	  }
-	  else {
-	    field = new Field(entry.getKey(), DataType.STRING);
-	    if (field.getName().equals(SampleData.SAMPLE_ID)) {
-	      result.setID(prim.getAsString());
-	    }
-	    else if (field.getName().equals(SampleData.FORMAT)) {
-	      result.setFormat(prim.getAsString());
-	    }
-	    else {
-	      report.addField(field);
-	      report.setStringValue(field.getName(), prim.getAsString());
-	    }
-	  }
-	}
-      }
-    }
-
-    return result;
   }
 
   /**
@@ -215,7 +163,7 @@ public class JsonSpectrumReader
       if (jobj.has("spectra")) {
 	array = jobj.getAsJsonArray("spectra");
 	for (JsonElement jo: array) {
-	  spec = fromJson(jo.getAsJsonObject());
+	  spec = JsonUtils.fromJson(jo.getAsJsonObject());
 	  if (spec != null)
 	    m_ReadData.add(spec);
 	}

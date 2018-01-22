@@ -15,16 +15,15 @@
 
 /*
  * JsonSpectrumWriter.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.output;
 
 import adams.core.io.FileUtils;
-import adams.data.report.AbstractField;
-import adams.data.report.Report;
+import adams.core.io.PrettyPrintingSupporter;
+import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
-import adams.data.spectrum.SpectrumPoint;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -34,7 +33,23 @@ import java.util.List;
 
 /**
 <!-- globalinfo-start -->
-* Writes spectra in JSON format.
+* Writes spectra in JSON format.<br>
+* Output format for single spectrum:<br>
+* {<br>
+*   "id": "someid",<br>
+*   "format": "NIR",<br>
+*   "data": [<br>
+*     {"wave": 1.0, "ampl": 1.1},<br>
+*     {"wave": 2.0, "ampl": 2.1}<br>
+*   ],<br>
+*   "report": {<br>
+*     "Sample ID": "someid",<br>
+*     "GLV2": 1.123,<br>
+*     "valid": true<br>
+*   }<br>
+* }<br>
+* <br>
+* Multiple spectra get wrapped in an array called 'spectra'.
 * <br><br>
 <!-- globalinfo-end -->
 *
@@ -43,26 +58,82 @@ import java.util.List;
 * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
 * &nbsp;&nbsp;&nbsp;default: WARNING
 * </pre>
-* 
+*
 * <pre>-output &lt;adams.core.io.PlaceholderFile&gt; (property: output)
 * &nbsp;&nbsp;&nbsp;The file to write the container to.
 * &nbsp;&nbsp;&nbsp;default: ${TMP}&#47;out.tmp
 * </pre>
+*
+* <pre>-pretty-printing &lt;boolean&gt; (property: prettyPrinting)
+* &nbsp;&nbsp;&nbsp;If enabled, the output is printed in a 'pretty' format.
+* &nbsp;&nbsp;&nbsp;default: false
+* </pre>
 * 
 <!-- options-end -->
 *
-* @author  dale (dale at waikato dot ac dot nz)
-* @version $Revision: 2242 $
+* @author FracPete (fracpete at waikato dot ac dot nz)
 */
 public class JsonSpectrumWriter
-  extends AbstractSpectrumWriter {
+  extends AbstractSpectrumWriter
+  implements PrettyPrintingSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 208155740775061862L;
 
+  /** whether to use pretty-printing. */
+  protected boolean m_PrettyPrinting;
+
+  /**
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
+   */
   @Override
   public String globalInfo() {
-    return "Writes spectra in JSON format.";
+    return "Writes spectra in JSON format.\n"
+      + "Output format for single spectrum:\n"
+      + JsonUtils.example() + "\n"
+      + "Multiple spectra get wrapped in an array called 'spectra'.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "pretty-printing", "prettyPrinting",
+      false);
+  }
+
+  /**
+   * Sets whether to use pretty-printing or not.
+   *
+   * @param value	true if to use pretty-printing
+   */
+  public void setPrettyPrinting(boolean value) {
+    m_PrettyPrinting = value;
+    reset();
+  }
+
+  /**
+   * Returns whether pretty-printing is used or not.
+   *
+   * @return		true if to use pretty-printing
+   */
+  public boolean getPrettyPrinting() {
+    return m_PrettyPrinting;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String prettyPrintingTipText() {
+    return "If enabled, the output is printed in a 'pretty' format.";
   }
 
   /**
@@ -105,56 +176,6 @@ public class JsonSpectrumWriter
   }
 
   /**
-   * Turns the spectrum into a json structure (spectral + report).
-   *
-   * @param spec	the spectrum to convert
-   * @return		the json data structure
-   */
-  protected JsonObject toJson(Spectrum spec) {
-    JsonObject		result;
-    JsonArray		array;
-    JsonObject		data;
-    Report		report;
-
-    result = new JsonObject();
-
-    // data
-    array = new JsonArray();
-    for (SpectrumPoint p: spec) {
-      data = new JsonObject();
-      data.addProperty("wave", p.getWaveNumber());
-      data.addProperty("ampl", p.getAmplitude());
-      array.add(data);
-    }
-    result.add("data", array);
-
-    // report
-    data = new JsonObject();
-    if (spec.hasReport()) {
-      report = spec.getReport();
-      for (AbstractField field : report.getFields()) {
-	switch (field.getDataType()) {
-	  case NUMERIC:
-	    data.addProperty(field.getName(), report.getDoubleValue(field));
-	    break;
-	  case BOOLEAN:
-	    data.addProperty(field.getName(), report.getBooleanValue(field));
-	    break;
-	  case STRING:
-	  case UNKNOWN:
-	    data.addProperty(field.getName(), report.getStringValue(field));
-	    break;
-	  default:
-	    throw new IllegalStateException("Unhandled data type: " + field.getDataType());
-	}
-      }
-    }
-    result.add("report", data);
-
-    return result;
-  }
-
-  /**
    * Performs the actual writing.
    *
    * @param data	the data to write
@@ -165,6 +186,7 @@ public class JsonSpectrumWriter
     JsonObject		jspec;
     JsonArray		jspecs;
     JsonObject		jcont;
+    GsonBuilder		builder;
     Gson 		gson;
     String		content;
     String		msg;
@@ -172,11 +194,14 @@ public class JsonSpectrumWriter
     jcont  = new JsonObject();
     jspecs = new JsonArray();
     for (Spectrum spec: data) {
-      jspec = toJson(spec);
+      jspec = JsonUtils.toJson(spec);
       jspecs.add(jspec);
     }
     jcont.add("spectra", jspecs);
-    gson    = new GsonBuilder().setPrettyPrinting().create();
+    builder = new GsonBuilder();
+    if (m_PrettyPrinting)
+      builder.setPrettyPrinting();
+    gson    = builder.create();
     content = gson.toJson(jcont);
 
     msg = FileUtils.writeToFileMsg(getOutput().getAbsolutePath(), content, false, null);
