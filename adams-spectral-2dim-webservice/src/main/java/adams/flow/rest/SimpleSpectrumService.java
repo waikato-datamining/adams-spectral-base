@@ -22,12 +22,7 @@ package adams.flow.rest;
 
 import adams.data.conversion.SpectrumToJson;
 import adams.data.spectrum.Spectrum;
-import adams.db.AbstractDatabaseConnection;
-import adams.db.DatabaseConnection;
 import adams.db.SpectrumT;
-import adams.flow.core.Actor;
-import adams.flow.core.ActorUtils;
-import adams.flow.core.FlowContextHandler;
 import net.minidev.json.JSONObject;
 
 import javax.ws.rs.GET;
@@ -41,16 +36,9 @@ import javax.ws.rs.Produces;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SimpleSpectrumService
-  extends AbstractRESTPlugin
-  implements FlowContextHandler {
+  extends AbstractRESTPluginWithDatabaseConnection {
 
   private static final long serialVersionUID = -826056354423201513L;
-
-  /** the flow context. */
-  protected Actor m_FlowContext;
-
-  /** the database to use. */
-  protected AbstractDatabaseConnection m_DatabaseConnection;
 
   /**
    * Returns a string describing the object.
@@ -60,49 +48,6 @@ public class SimpleSpectrumService
   @Override
   public String globalInfo() {
     return "Provides access to spectra.";
-  }
-
-  /**
-   * Resets the plugin.
-   */
-  @Override
-  protected void reset() {
-    super.reset();
-
-    m_DatabaseConnection = null;
-  }
-
-  /**
-   * Sets the flow context.
-   *
-   * @param value	the actor
-   */
-  public void setFlowContext(Actor value) {
-    m_FlowContext        = value;
-    m_DatabaseConnection = null;
-  }
-
-  /**
-   * Returns the flow context, if any.
-   *
-   * @return		the actor, null if none available
-   */
-  public Actor getFlowContext() {
-    return m_FlowContext;
-  }
-
-  /**
-   * Initializes the database from the flow context.
-   */
-  protected void initDatabase() {
-    if (m_FlowContext == null)
-      throw new IllegalStateException("No flow context, cannot initialize database connection!");
-    if (m_DatabaseConnection == null) {
-      m_DatabaseConnection = ActorUtils.getDatabaseConnection(
-	m_FlowContext, AbstractDatabaseConnection.class, DatabaseConnection.getSingleton());
-      if (m_DatabaseConnection == null)
-	throw new IllegalStateException("Failed to initialize database connection!");
-    }
   }
 
   @GET
