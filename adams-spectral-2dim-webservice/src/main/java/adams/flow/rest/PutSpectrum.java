@@ -28,6 +28,7 @@ import adams.db.SpectrumT;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
 /**
  * REST plugin for uploading spectra.
@@ -62,6 +63,7 @@ public class PutSpectrum
    */
   @POST
   @Path("/spectrum/put/{id}/{format}")
+  @Produces("text/plain")
   public String put(@PathParam("id") String id, @PathParam("format") String format, String content) {
     Spectrum 		sp;
     JsonToSpectrum 	conv;
