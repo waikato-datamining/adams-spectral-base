@@ -1,8 +1,10 @@
 # Project: adams
-# Date: 2018-01-23 14:09:07
+# Date: 2018-01-24 11:17:15
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Example flow for uplading a spectrum via REST and storing it in the DB.\\n\\nRequires \\\"adams-spectral-2dim-webservice_server.flow\\\" to be running." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
  adams.flow.standalone.SetVariable -name url -var-name url -var-value http://localhost:8080/spectrum/put/@{id}/@{format}
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
@@ -12,6 +14,13 @@ adams.flow.control.Flow -annotation "Example flow for uplading a spectrum via RE
  adams.flow.control.Trigger -name upload
   adams.flow.source.Variable -var-name file -conversion adams.data.conversion.StringToString
   adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
-  adams.flow.transformer.HttpRequest -url @{actual_url} -header Content-Type=text/json -header Accept=text/json
+  adams.flow.transformer.HttpRequest -url @{actual_url} -header Content-Type=text/json
+  adams.flow.control.ContainerValuePicker -name "ContainerValuePicker (2)" -value "Status code"
+   adams.flow.transformer.SetVariable -var-name code
+   adams.flow.control.Block -condition "adams.flow.condition.bool.Expression -expression \"@{code} = 200\""
+   adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+   adams.flow.transformer.StringInsert -position first -value "Status code returned: "
+   adams.flow.sink.CallableSink -callable Display
+  adams.flow.control.Block -condition "adams.flow.condition.bool.Expression -expression \"@{code} != 200\""
   adams.flow.control.ContainerValuePicker -value Body -switch-outputs true
-  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+  adams.flow.sink.CallableSink -callable Display

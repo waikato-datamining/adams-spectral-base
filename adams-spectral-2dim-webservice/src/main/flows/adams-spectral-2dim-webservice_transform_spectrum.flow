@@ -1,9 +1,11 @@
 # Project: adams
-# Date: 2018-01-23 14:10:00
+# Date: 2018-01-24 11:14:37
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Example flow for filtering a spectrum via REST and a filter specified on the server.\\n\\nRequires \\\"adams-spectral-2dim-webservice_server.flow\\\" to be running." -flow-execution-listener adams.flow.execution.NullListener
- adams.flow.standalone.SetVariable -name url -var-name url -var-value http://localhost:8080/spectrum/put/@{id}/@{format}
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.standalone.SetVariable -name url -var-name url -var-value http://localhost:8080/spectrum/transform/@{id}/@{format}
  adams.flow.source.Start
  adams.flow.control.Trigger -name "prompt user"
   adams.flow.source.EnterManyValues -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name id -display \"Sample ID\" -default-value dummy" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name format -display Format -default-value NIR" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name file -display \"Spectrum file (in json)\" -type FILE_ABSOLUTE -default-value ${FLOWS}/data/dummy_spectrum.json" -output-type MAP
@@ -13,6 +15,13 @@ adams.flow.control.Flow -annotation "Example flow for filtering a spectrum via R
   adams.flow.source.Variable -var-name file -conversion adams.data.conversion.StringToString
   adams.flow.transformer.TextFileReader -reader adams.data.io.input.SingleStringTextReader
   adams.flow.transformer.HttpRequest -url @{actual_url} -header Content-Type=text/json -header Accept=text/json
+  adams.flow.control.ContainerValuePicker -name "ContainerValuePicker (2)" -value "Status code"
+   adams.flow.transformer.SetVariable -var-name code
+   adams.flow.control.Block -condition "adams.flow.condition.bool.Expression -expression \"@{code} = 200\""
+   adams.flow.transformer.Convert -conversion adams.data.conversion.AnyToString
+   adams.flow.transformer.StringInsert -position first -value "Status code returned: "
+   adams.flow.sink.CallableSink -callable Display
+  adams.flow.control.Block -condition "adams.flow.condition.bool.Expression -expression \"@{code} != 200\""
   adams.flow.control.ContainerValuePicker -value Body -switch-outputs true
   adams.flow.transformer.Convert -conversion "adams.data.conversion.MultiConversion -conversion adams.data.conversion.StringToJson -conversion \"adams.data.conversion.JsonToString -pretty-printing true\""
-  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+  adams.flow.sink.CallableSink -callable Display
