@@ -25,6 +25,7 @@ import adams.db.SpectrumT;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
 /**
  * REST plugin for deleting spectra.
@@ -55,6 +56,7 @@ public class DeleteSpectrum
    */
   @GET
   @Path("/spectrum/delete/{id}/{format}")
+  @Produces("text/plain")
   public String delete(@PathParam("id") String id, @PathParam("format") String format) {
     SpectrumT	spt;
 
