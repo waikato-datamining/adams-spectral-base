@@ -40,7 +40,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2016} &
+		\parbox[c][2cm]{2cm}{\copyright 2016-2018} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 \end{table}
@@ -48,17 +48,32 @@
 \end{titlepage}
 
 \tableofcontents
-\listoffigures
+%\listoffigures
 %\listoftables
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
-TODO
-
+The \textit{adams-spectral-webservice} module offers SOAP and REST webservices
+support for spectral data.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Flow}
-TODO
+\chapter{Webservices}
+\section{REST}
+The following REST plugins are available:
+\begin{tight_itemize}
+  \item \textit{DeleteSpectrum} -- for deleting spectra via ID and (optional) format
+  \item \textit{GetSpectrum} -- for retrieving spectra via ID and format
+  \item \textit{PutSpectrum} -- for retrieving spectra via ID and format
+  \item \textit{TransformSpectrum} -- for filtering spectra
+\end{tight_itemize}
+
+\section{SOAP}
+The following SOAP services are available:
+\begin{tight_itemize}
+  \item \textit{SpectralGetService} -- for retrieving spectra via ID and format
+  \item \textit{SpectralPutService} -- for uploading spectra into the database
+  \item \textit{SpectralTransformService} -- for filtering spectra
+\end{tight_itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

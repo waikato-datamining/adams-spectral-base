@@ -1,0 +1,10 @@
+# Project: adams
+# Date: 2018-01-23 14:08:33
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Offers REST services using the GetSpectrum REST plugin.\\nA default database connection with spectral data must be present\\nin order to run this flow." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.RESTServer -web-service "adams.flow.rest.GenericServer -in-interceptor adams.flow.rest.interceptor.incoming.NullGenerator -out-interceptor adams.flow.rest.interceptor.outgoing.NullGenerator -plugin adams.flow.rest.GetSpectrum -plugin adams.flow.rest.DeleteSpectrum -plugin adams.flow.rest.PutSpectrum -plugin \"adams.flow.rest.TransformSpectrum -filter adams.data.spectrumfilter.LogTransform\""
+ adams.flow.source.Start
+ adams.flow.control.WhileLoop -condition adams.flow.condition.bool.True
+  adams.flow.source.Start
+  adams.flow.control.Sleep

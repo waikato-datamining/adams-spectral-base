@@ -14,28 +14,27 @@
  */
 
 /*
- * SimpleSpectrumService.java
+ * PutSpectrum.java
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
 
-import adams.data.conversion.SpectrumToJson;
+import adams.data.conversion.JsonToSpectrum;
+import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
 import adams.db.SpectrumT;
-import net.minidev.json.JSONObject;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 
 /**
- * Simple REST plugin for spectral data.
+ * REST plugin for uploading spectra.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SimpleSpectrumService
+public class PutSpectrum
   extends AbstractRESTPluginWithDatabaseConnection {
 
   private static final long serialVersionUID = -826056354423201513L;
@@ -47,42 +46,51 @@ public class SimpleSpectrumService
    */
   @Override
   public String globalInfo() {
-    return "Provides access to spectra.";
+    return "Stores spectra in the database.\n"
+      + "Delete any spectrum that already exists with this ID/format beforehand.\n"
+      + "Format:\n"
+      + JsonUtils.example();
   }
 
-  @GET
-  @Path("/get/{id}/{format}")
-  @Produces("text/json")
-  public String get(@PathParam("id") String id, @PathParam("format") String format) {
+  /**
+   * Stores the upload spectrum (in JSON format) in the database.
+   *
+   * @param id		the sample ID
+   * @param format	the format, eg NIR
+   * @param content	the spectrum in JSON format
+   * @return		the database ID or error message
+   */
+  @POST
+  @Path("/spectrum/put/{id}/{format}")
+  public String put(@PathParam("id") String id, @PathParam("format") String format, String content) {
     Spectrum 		sp;
-    JSONObject		json;
-    SpectrumToJson	conv;
+    JsonToSpectrum 	conv;
     String		msg;
+    SpectrumT		spt;
 
     initDatabase();
-    sp = SpectrumT.getSingleton(m_DatabaseConnection).load(id, format);
-    if (sp == null) {
-      json = new JSONObject();
-      json.put("id", id);
-      json.put("format", format);
-      json.put("message", "not found");
+    conv = new JsonToSpectrum();
+    conv.setInput(content);
+    msg = conv.convert();
+    if (msg == null) {
+      sp = (Spectrum) conv.getOutput();
+      sp.setID(id);
+      sp.setFormat(format);
+      spt = SpectrumT.getSingleton(m_DatabaseConnection);
+      if (spt.exists(id, format))
+        spt.remove(id, format);
+      return "" + spt.add(sp);
     }
     else {
-      conv = new SpectrumToJson();
-      conv.setInput(sp);
-      msg = conv.convert();
-      if (msg == null) {
-        json = (JSONObject) conv.getOutput();
-	json.put("message", "success");
-      }
-      else {
-	json = new JSONObject();
-	json.put("id", id);
-	json.put("format", format);
-	json.put("message", msg);
-      }
-      conv.cleanUp();
+      return
+	"Failed to parse JSON string:\n"
+	  + content
+	  + "\n"
+	  + "Error message:\n"
+	  + msg
+	  + "\n"
+	  + "Expected format:\n"
+	  + JsonUtils.example();
     }
-    return json.toJSONString();
   }
 }

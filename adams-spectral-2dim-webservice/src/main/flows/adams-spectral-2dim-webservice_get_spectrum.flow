@@ -1,0 +1,16 @@
+# Project: adams
+# Date: 2018-01-23 09:01:12
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Example flow for retrieving spectrum via REST.\\n\\nRequires \\\"adams-spectral-2dim-webservice_server.flow\\\" to be running." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.SetVariable -name url -var-name url -var-value http://localhost:8080/spectrum/get/@{id}/@{format}
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "prompt user"
+  adams.flow.source.EnterManyValues -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name id -display \"Sample ID\" -default-value 592952" -value "adams.flow.source.valuedefinition.DefaultValueDefinition -name format -display Format -default-value NIR" -output-type MAP
+  adams.flow.transformer.MapToVariables
+  adams.flow.transformer.SetVariable -var-name actual_url -var-value @{url} -expand-value true
+ adams.flow.control.Trigger -name "get spectrum"
+  adams.flow.source.HttpRequest -url @{actual_url} -method GET
+  adams.flow.control.ContainerValuePicker -value Body -switch-outputs true
+  adams.flow.transformer.Convert -conversion "adams.data.conversion.MultiConversion -conversion adams.data.conversion.StringToJson -conversion \"adams.data.conversion.JsonToString -pretty-printing true\""
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
