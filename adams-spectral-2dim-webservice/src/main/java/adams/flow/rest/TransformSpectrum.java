@@ -25,6 +25,7 @@ import adams.data.conversion.SpectrumToJson;
 import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -107,6 +108,7 @@ public class TransformSpectrum
    */
   @POST
   @Path("/spectrum/put/{id}/{format}")
+  @Consumes("text/json")
   @Produces("text/json")
   public String put(@PathParam("id") String id, @PathParam("format") String format, String content) {
     Spectrum 		sp;
