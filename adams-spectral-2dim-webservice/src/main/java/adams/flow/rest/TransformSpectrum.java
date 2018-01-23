@@ -107,7 +107,7 @@ public class TransformSpectrum
    * @return		the spectrum or error message
    */
   @POST
-  @Path("/spectrum/put/{id}/{format}")
+  @Path("/spectrum/transform/{id}/{format}")
   @Consumes("text/json")
   @Produces("text/json")
   public String put(@PathParam("id") String id, @PathParam("format") String format, String content) {
