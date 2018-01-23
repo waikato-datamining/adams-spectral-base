@@ -65,6 +65,6 @@ public class DeleteSpectrum
     if (spt.exists(id, format))
       return "" + spt.remove(id, format);
     else
-      return "spectrum does not exist";
+      return "Spectrum " + id + "/" + format + " does not exist!";
   }
 }
