@@ -15,7 +15,7 @@
 
 /*
  * SpectrumT.java
- * Copyright (C) 2008-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2018 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -43,7 +43,6 @@ import java.util.logging.Level;
  * <code>Performance</code> class.
  *
  * @author dale
- * @version $Revision: 12453 $
  */
 public class SpectrumT
   extends AbstractIndexedTable
@@ -583,11 +582,12 @@ public class SpectrumT
    * Uses {@link SampleData#DEFAULT_FORMAT} as format.
    *
    * @param sample_id	the sample ID of the spectrum
+   * @param keepReport	if true does not delete associated report
    * @return		true if no error
-   * @see		SpectrumT#remove(String, String)
+   * @see		SpectrumT#remove(String, String, boolean)
    */
-  public boolean remove(String sample_id) {
-    return remove(sample_id, SampleData.FORMAT);
+  public boolean remove(String sample_id, boolean keepReport) {
+    return remove(sample_id, SampleData.FORMAT, keepReport);
   }
 
   /**
@@ -595,9 +595,10 @@ public class SpectrumT
    *
    * @param sample_id	the sample ID of the spectrum
    * @param format	the format of the spectrum (eg NIR)
+   * @param keepReport	if true does not delete associated report
    * @return		true if no error
    */
-  public synchronized boolean remove(String sample_id, String format) {
+  public synchronized boolean remove(String sample_id, String format, boolean keepReport) {
     ResultSet	rs;
     String	id;
     String	form;
@@ -606,7 +607,7 @@ public class SpectrumT
     try {
       rs = select("AUTO_ID", "SAMPLEID = " + backquote(sample_id) + " AND FORMAT = " + backquote(format));
       if (rs.next()) {
-	return remove(rs.getInt(1));
+	return remove(rs.getInt(1), keepReport);
       }
       else {
 	getLogger().severe("Failed to locate DB-ID for: " + sample_id + "/" + format);
@@ -626,9 +627,10 @@ public class SpectrumT
    * Removes the spectrum and its sample data.
    *
    * @param id		the ID of the spectrum to remove from the database
+   * @param keepReport	if true does not delete associated report
    * @return		true if no error
    */
-  public synchronized boolean remove(int id) {
+  public synchronized boolean remove(int id, boolean keepReport) {
     boolean	result;
     String	sql;
     Spectrum	sp;
@@ -646,7 +648,7 @@ public class SpectrumT
       getLogger().log(Level.SEVERE, "Failed to remove: " + id, e);
     }
 
-    if (result && (sp != null))
+    if (result && (sp != null) && !keepReport)
       // delete sample data
       result = SampleDataT.getSingleton(getDatabaseConnection()).remove(sp.getID());
 

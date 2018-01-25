@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * DeleteSpectrum.java
- * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
@@ -90,7 +90,6 @@ import adams.flow.core.Token;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class DeleteSpectrum
   extends AbstractDeleteDataContainer<Spectrum> {
@@ -227,8 +226,8 @@ public class DeleteSpectrum
 
     spec = (SpectrumT) getDataProvider();
     if (m_InputToken.getPayload() instanceof Integer)
-      return spec.remove((Integer) m_InputToken.getPayload());
+      return spec.remove((Integer) m_InputToken.getPayload(), m_KeepReport);
     else
-      return spec.remove((String) m_InputToken.getPayload(), m_Format);
+      return spec.remove((String) m_InputToken.getPayload(), m_Format, m_KeepReport);
   }
 }

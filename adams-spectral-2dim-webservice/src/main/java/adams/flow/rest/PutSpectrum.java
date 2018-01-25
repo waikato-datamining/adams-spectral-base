@@ -80,7 +80,7 @@ public class PutSpectrum
       sp.setFormat(format);
       spt = SpectrumT.getSingleton(m_DatabaseConnection);
       if (spt.exists(id, format))
-        spt.remove(id, format);
+        spt.remove(id, format, false);
       return "" + spt.add(sp);
     }
     else {

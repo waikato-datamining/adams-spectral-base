@@ -63,7 +63,7 @@ public class DeleteSpectrum
     initDatabase();
     spt = SpectrumT.getSingleton(m_DatabaseConnection);
     if (spt.exists(id, format))
-      return "" + spt.remove(id, format);
+      return "" + spt.remove(id, format, false);
     else
       return "Spectrum " + id + "/" + format + " does not exist!";
   }
