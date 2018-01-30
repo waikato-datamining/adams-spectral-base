@@ -1,0 +1,28 @@
+--> 146048-NIR-FOSS-out0.report
+Field,Type,Value
+"Parent ID",U,8
+ADN2,N,266.226623
+AMN2,N,2.728273
+BON2,N,61.166117
+CLN2,N,5.97
+DFN2,N,100.110011
+DLN2,N,19.80198
+DSN2,N,60
+"Dummy report",B,false
+Format,S,NIR-FOSS
+"Insert Timestamp",S,"2010-04-15 11:16:21"
+Instrument,S,FOSS
+NDN2,N,448.844884
+NHN2,N,0.74
+NIN2,N,0.15
+PHN2,N,6.1
+RAN2,N,91
+RCN2,N,237.623762
+REN2,N,141.914191
+RVN2,N,39.60396
+"Sample ID",S,146048
+"Sample Type",S,2
+SKN2,N,224.422442
+Source,S,/home/fracpete/temp/knir/conversion2/files/7PIN-FOSS.arff
+VON2,N,81.8
+

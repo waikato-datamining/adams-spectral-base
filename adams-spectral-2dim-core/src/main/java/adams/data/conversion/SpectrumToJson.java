@@ -22,8 +22,8 @@ package adams.data.conversion;
 
 import adams.core.QuickInfoHelper;
 import adams.core.io.PrettyPrintingSupporter;
-import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
+import adams.data.spectrum.SpectrumJsonUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -81,7 +81,7 @@ public class SpectrumToJson
   public String globalInfo() {
     return "Turns a spectrum into a JSON string.\n"
       + "Output format:\n"
-      + JsonUtils.example();
+      + SpectrumJsonUtils.example();
   }
 
   /**
@@ -166,7 +166,7 @@ public class SpectrumToJson
     Gson 		gson;
     JsonObject		jobj;
 
-    jobj = JsonUtils.toJson((Spectrum) m_Input);
+    jobj = SpectrumJsonUtils.toJson((Spectrum) m_Input);
     builder = new GsonBuilder();
     if (m_PrettyPrinting)
       builder.setPrettyPrinting();

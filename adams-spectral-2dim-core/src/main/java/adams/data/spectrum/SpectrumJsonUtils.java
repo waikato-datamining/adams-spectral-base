@@ -14,30 +14,33 @@
  */
 
 /*
- * JsonUtils.java
+ * SpectrumJsonUtils.java
  * Copyright (C) 2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.spectrum;
 
-import adams.data.report.AbstractField;
-import adams.data.report.DataType;
-import adams.data.report.Field;
 import adams.data.report.Report;
+import adams.data.report.ReportJsonUtils;
 import adams.data.sampledata.SampleData;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-
-import java.util.Map.Entry;
 
 /**
  * For converting spectra to JSON and vice versa.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class JsonUtils {
+public class SpectrumJsonUtils {
+
+  public static final String KEY_DATA = "data";
+
+  public static final String KEY_WAVE = "wave";
+
+  public static final String KEY_AMPL = "ampl";
+
+  public static final String KEY_REPORT = "report";
 
   /**
    * Returns an example spectrum in JSON.
@@ -70,54 +73,29 @@ public class JsonUtils {
     Spectrum		result;
     Report 		report;
     JsonArray 		array;
-    JsonObject		jreport;
     JsonObject		jo;
-    Field 		field;
-    JsonPrimitive 	prim;
 
     result = null;
 
-    if (jobj.has("data")) {
+    if (jobj.has(KEY_DATA)) {
       result = new Spectrum();
 
       // data
-      array = jobj.getAsJsonArray("data");
+      array = jobj.getAsJsonArray(KEY_DATA);
       for (JsonElement je: array) {
 	jo = je.getAsJsonObject();
-	if (jo.has("wave") && jo.has("ampl"))
-	  result.add(new SpectrumPoint(jo.get("wave").getAsFloat(), jo.get("ampl").getAsFloat()));
+	if (jo.has(KEY_WAVE) && jo.has(KEY_AMPL))
+	  result.add(new SpectrumPoint(jo.get(KEY_WAVE).getAsFloat(), jo.get(KEY_AMPL).getAsFloat()));
       }
 
       // report
-      if (jobj.has("report")) {
-	report  = result.getReport();
-	jreport = jobj.getAsJsonObject("report");
-	for (Entry<String, JsonElement> entry: jreport.entrySet()) {
-	  prim = entry.getValue().getAsJsonPrimitive();
-	  if (prim.isBoolean()) {
-	    field = new Field(entry.getKey(), DataType.BOOLEAN);
-	    report.addField(field);
-	    report.setBooleanValue(field.getName(), prim.getAsBoolean());
-	  }
-	  else if (prim.isNumber()) {
-	    field = new Field(entry.getKey(), DataType.NUMERIC);
-	    report.addField(field);
-	    report.setNumericValue(field.getName(), prim.getAsNumber().doubleValue());
-	  }
-	  else {
-	    field = new Field(entry.getKey(), DataType.STRING);
-	    if (field.getName().equals(SampleData.SAMPLE_ID)) {
-	      result.setID(prim.getAsString());
-	    }
-	    else if (field.getName().equals(SampleData.FORMAT)) {
-	      result.setFormat(prim.getAsString());
-	    }
-	    else {
-	      report.addField(field);
-	      report.setStringValue(field.getName(), prim.getAsString());
-	    }
-	  }
-	}
+      if (jobj.has(KEY_REPORT)) {
+	report = ReportJsonUtils.fromJson(jobj.getAsJsonObject(KEY_REPORT));
+	result.getReport().mergeWith(report);
+	if (report.hasValue(SampleData.SAMPLE_ID))
+	  result.setID(report.getStringValue(SampleData.SAMPLE_ID));
+	if (report.hasValue(SampleData.FORMAT))
+	  result.setFormat(report.getStringValue(SampleData.FORMAT));
       }
     }
 
@@ -134,7 +112,6 @@ public class JsonUtils {
     JsonObject		result;
     JsonArray		array;
     JsonObject		data;
-    Report		report;
 
     result = new JsonObject();
 
@@ -142,34 +119,17 @@ public class JsonUtils {
     array = new JsonArray();
     for (SpectrumPoint p: spec) {
       data = new JsonObject();
-      data.addProperty("wave", p.getWaveNumber());
-      data.addProperty("ampl", p.getAmplitude());
+      data.addProperty(KEY_WAVE, p.getWaveNumber());
+      data.addProperty(KEY_AMPL, p.getAmplitude());
       array.add(data);
     }
-    result.add("data", array);
+    result.add(KEY_DATA, array);
 
     // report
     data = new JsonObject();
-    if (spec.hasReport()) {
-      report = spec.getReport();
-      for (AbstractField field : report.getFields()) {
-	switch (field.getDataType()) {
-	  case NUMERIC:
-	    data.addProperty(field.getName(), report.getDoubleValue(field));
-	    break;
-	  case BOOLEAN:
-	    data.addProperty(field.getName(), report.getBooleanValue(field));
-	    break;
-	  case STRING:
-	  case UNKNOWN:
-	    data.addProperty(field.getName(), report.getStringValue(field));
-	    break;
-	  default:
-	    throw new IllegalStateException("Unhandled data type: " + field.getDataType());
-	}
-      }
-    }
-    result.add("report", data);
+    if (spec.hasReport())
+      data = ReportJsonUtils.toJson(spec.getReport());
+    result.add(KEY_REPORT, data);
 
     return result;
   }

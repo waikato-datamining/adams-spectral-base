@@ -21,8 +21,8 @@
 package adams.flow.rest;
 
 import adams.data.conversion.JsonToSpectrum;
-import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
+import adams.data.spectrum.SpectrumJsonUtils;
 import adams.db.SpectrumT;
 
 import javax.ws.rs.POST;
@@ -50,7 +50,7 @@ public class PutSpectrum
     return "Stores spectra in the database.\n"
       + "Delete any spectrum that already exists with this ID/format beforehand.\n"
       + "Format:\n"
-      + JsonUtils.example();
+      + SpectrumJsonUtils.example();
   }
 
   /**
@@ -92,7 +92,7 @@ public class PutSpectrum
 	  + msg
 	  + "\n"
 	  + "Expected format:\n"
-	  + JsonUtils.example();
+	  + SpectrumJsonUtils.example();
     }
   }
 }

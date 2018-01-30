@@ -21,8 +21,8 @@
 package adams.data.conversion;
 
 import adams.core.io.FileUtils;
-import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
+import adams.data.spectrum.SpectrumJsonUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
@@ -73,7 +73,7 @@ public class JsonToSpectrum
   public String globalInfo() {
     return "Turns a JSON string into a spectrum.\n"
       + "Input format:\n"
-      + JsonUtils.example();
+      + SpectrumJsonUtils.example();
   }
 
   /**
@@ -116,7 +116,7 @@ public class JsonToSpectrum
       breader = new BufferedReader(new StringReader(input));
       jp = new JsonParser();
       je = jp.parse(breader);
-      result = JsonUtils.fromJson(je.getAsJsonObject());
+      result = SpectrumJsonUtils.fromJson(je.getAsJsonObject());
     }
     catch (Exception e) {
       result = null;

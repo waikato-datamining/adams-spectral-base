@@ -22,8 +22,8 @@ package adams.data.io.output;
 
 import adams.core.io.FileUtils;
 import adams.core.io.PrettyPrintingSupporter;
-import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
+import adams.data.spectrum.SpectrumJsonUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -92,7 +92,7 @@ public class JsonSpectrumWriter
   public String globalInfo() {
     return "Writes spectra in JSON format.\n"
       + "Output format for single spectrum:\n"
-      + JsonUtils.example() + "\n"
+      + SpectrumJsonUtils.example() + "\n"
       + "Multiple spectra get wrapped in an array called 'spectra'.";
   }
 
@@ -194,7 +194,7 @@ public class JsonSpectrumWriter
     jcont  = new JsonObject();
     jspecs = new JsonArray();
     for (Spectrum spec: data) {
-      jspec = JsonUtils.toJson(spec);
+      jspec = SpectrumJsonUtils.toJson(spec);
       jspecs.add(jspec);
     }
     jcont.add("spectra", jspecs);

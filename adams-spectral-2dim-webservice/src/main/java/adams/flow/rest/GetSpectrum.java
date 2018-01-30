@@ -21,8 +21,8 @@
 package adams.flow.rest;
 
 import adams.data.conversion.SpectrumToJson;
-import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
+import adams.data.spectrum.SpectrumJsonUtils;
 import adams.db.SpectrumT;
 
 import javax.ws.rs.GET;
@@ -50,7 +50,7 @@ public class GetSpectrum
   public String globalInfo() {
     return "Retrieves spectra via ID and format.\n"
       + "Format:\n"
-      + JsonUtils.example();
+      + SpectrumJsonUtils.example();
   }
 
   /**

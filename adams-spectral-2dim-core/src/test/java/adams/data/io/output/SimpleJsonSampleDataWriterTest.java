@@ -14,70 +14,43 @@
  */
 
 /*
- * JsonToSpectrumTest.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * SimpleJsonSampleDataWriterTest.java
+ * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
+package adams.data.io.output;
 
-package adams.data.conversion;
-
-import adams.core.Utils;
-import adams.data.spectrum.Spectrum;
 import adams.env.Environment;
-import adams.test.TmpFile;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import java.nio.file.Files;
-import java.util.List;
-
 /**
- * Tests the JsonToSpectrum conversion.
+ * Test class for the SimpleReportWriter data container. Run from the command line with: <br><br>
+ * java adams.data.io.output.SimpleJsonSampleDataWriterTest
  *
- * @author FracPete (fracpete at waikato dot ac dot nz)
+ * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class JsonToSpectrumTest
-  extends AbstractSpectralConversionTestCase {
+public class SimpleJsonSampleDataWriterTest
+  extends AbstractSampleDataWriterTestCase {
 
   /**
    * Constructs the test case. Called by subclasses.
    *
-   * @param name the name of the test
+   * @param name 	the name of the test
    */
-  public JsonToSpectrumTest(String name) {
+  public SimpleJsonSampleDataWriterTest(String name) {
     super(name);
   }
 
   /**
-   * Turns the data object into a useful string representation.
+   * Returns the filenames (without path) of the input data files to use
+   * in the regression test.
    *
-   * @param data	the object to convert
-   * @return		the string representation
+   * @return		the filenames
    */
-  @Override
-  protected String toString(Object data) {
-    return ((Spectrum) data).toSpreadSheet().toString();
-  }
-
-  /**
-   * Returns the input data to use in the regression test.
-   *
-   * @return		the objects
-   */
-  @Override
-  protected Object[] getRegressionInput() {
-    Object[]		result;
-    List<String>	lines;
-
-    try {
-      m_TestHelper.copyResourceToTmp("spectrum.json");
-      lines = Files.readAllLines(new TmpFile("simple.json").toPath());
-      result = new Object[]{Utils.flatten(lines, "\n")};
-    }
-    catch (Exception e) {
-      result = new Object[0];
-    }
-
-    return result;
+  protected String[] getRegressionInputFiles() {
+    return new String[]{
+	"146048-NIR-FOSS.report"
+    };
   }
 
   /**
@@ -85,10 +58,9 @@ public class JsonToSpectrumTest
    *
    * @return		the setups
    */
-  @Override
-  protected Conversion[] getRegressionSetups() {
-    return new JsonToSpectrum[]{
-      new JsonToSpectrum(),
+  protected AbstractReportWriter[] getRegressionSetups() {
+    return new AbstractReportWriter[]{
+	new SimpleJsonSampleDataWriter()
     };
   }
 
@@ -97,9 +69,8 @@ public class JsonToSpectrumTest
    *
    * @return		the setups
    */
-  @Override
   protected int[] getRegressionIgnoredLineIndices() {
-    return new int[0];
+    return new int[]{};
   }
 
   /**
@@ -108,7 +79,7 @@ public class JsonToSpectrumTest
    * @return		the suite
    */
   public static Test suite() {
-    return new TestSuite(JsonToSpectrumTest.class);
+    return new TestSuite(SimpleJsonSampleDataWriterTest.class);
   }
 
   /**

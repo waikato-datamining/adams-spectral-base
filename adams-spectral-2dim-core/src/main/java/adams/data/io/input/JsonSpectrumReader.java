@@ -21,8 +21,8 @@
 package adams.data.io.input;
 
 import adams.core.io.FileUtils;
-import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
+import adams.data.spectrum.SpectrumJsonUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -112,7 +112,7 @@ public class JsonSpectrumReader
   public String globalInfo() {
     return "Reads spectra in JSON format.\n"
       + "Input format (single spectrum):\n"
-      + JsonUtils.example() + "\n"
+      + SpectrumJsonUtils.example() + "\n"
       + "Multiple spectra are wrapped in an array called 'spectra'.";
   }
 
@@ -163,7 +163,7 @@ public class JsonSpectrumReader
       if (jobj.has("spectra")) {
 	array = jobj.getAsJsonArray("spectra");
 	for (JsonElement jo: array) {
-	  spec = JsonUtils.fromJson(jo.getAsJsonObject());
+	  spec = SpectrumJsonUtils.fromJson(jo.getAsJsonObject());
 	  if (spec != null)
 	    m_ReadData.add(spec);
 	}

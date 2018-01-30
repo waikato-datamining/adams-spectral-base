@@ -22,8 +22,8 @@ package adams.flow.rest;
 
 import adams.data.conversion.JsonToSpectrum;
 import adams.data.conversion.SpectrumToJson;
-import adams.data.spectrum.JsonUtils;
 import adams.data.spectrum.Spectrum;
+import adams.data.spectrum.SpectrumJsonUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -53,7 +53,7 @@ public class TransformSpectrum
   public String globalInfo() {
     return "Filters spectra with the specified filter.\n"
       + "Format:\n"
-      + JsonUtils.example();
+      + SpectrumJsonUtils.example();
   }
 
   /**
@@ -145,7 +145,7 @@ public class TransformSpectrum
 	  + msg
 	  + "\n"
 	  + "Expected format:\n"
-	  + JsonUtils.example();
+	  + SpectrumJsonUtils.example();
     }
   }
 }
