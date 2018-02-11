@@ -85,6 +85,7 @@ The following sources are available:
 \begin{tight_itemize}
   \item \textit{InstrumentSupplier} -- returns all instrument names from the
   database.
+  \item \textit{NewSpectrum} -- creates an empty spectrum.
   \item \textit{SpectrumIdSupplier} -- outputs database or sample IDs from spectra
   stored in the database.
   \item \textit{SQLSpectrumIdSupplier} -- outputs IDs (integer or string)
@@ -104,6 +105,8 @@ The following transformers are available:
   applies the evaluator on single Weka Instance objects.
   \item \textit{GetSampleDataValue} -- retrieves a single value from a
   sample data object.
+  \item \textit{GetSpectrumAmplitude} -- retrieves the amplitude of the
+  specified wave number.
   \item \textit{InstanceGenerator} -- turns a spectrum into a Weka Instance.
   \item \textit{InstanceToSpectrum} -- turns a Weka Instance into a spectrum.
   \item \textit{MultiSpectrumAdd} -- adds a spectrum obtained from storage or
@@ -122,6 +125,8 @@ The following transformers are available:
   \item \textit{SampleDataFileWriter} -- writes sample data to disk.
   \item \textit{SetSampleDataValue} -- sets the value for the specified
   sample data field.
+  \item \textit{SetSpectrumAmplitude} -- set the amplitude of the
+  specified wave number or adds a new spectrum point altogether.
   \item \textit{SpectrumAppend} -- appens the incoming spectrum to the one
   in storage (latter doesn't have to be present).
   \item \textit{SpectrumDbReader} -- loads a spectrum from the database.
