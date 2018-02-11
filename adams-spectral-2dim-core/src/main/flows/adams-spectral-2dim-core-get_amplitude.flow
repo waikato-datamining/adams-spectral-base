@@ -1,0 +1,18 @@
+# Project: adams
+# Date: 2018-02-12 10:44:41
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Shows how to retrieve the amplitude of a spetrum point." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.Display -writer adams.data.io.output.NullWriter
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/141009_001-01_0-6.0
+ adams.flow.transformer.SpectrumFileReader -reader adams.data.io.input.OpusSpectrumReader
+ adams.flow.control.Tee -name index
+  adams.flow.transformer.GetSpectrumAmplitude -index 8
+  adams.flow.sink.CallableSink -callable Display
+ adams.flow.control.Tee -name "wave no"
+  adams.flow.transformer.GetSpectrumAmplitude -type WAVE_NUMBER -wave-number 3648.9077
+  adams.flow.sink.CallableSink -callable Display
+ adams.flow.control.Tee -name "wave no (closest)"
+  adams.flow.transformer.GetSpectrumAmplitude -type WAVE_NUMBER_CLOSEST -wave-number 3648.9
+  adams.flow.sink.CallableSink -callable Display

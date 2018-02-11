@@ -1,0 +1,27 @@
+# Project: adams
+# Date: 2018-02-12 11:02:44
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Shows how to create a spectrum from scratch." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.SetVariable -var-name max_wave -var-value 1000
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "new spectrum"
+  adams.flow.source.NewSpectrum -id 12345
+  adams.flow.transformer.SetStorageValue -storage-name spec
+ adams.flow.control.Trigger -name "wobble factor array"
+  adams.flow.source.RandomNumberGenerator -output-array true -generator adams.data.random.JavaRandomDouble -max-num @{max_wave}
+  adams.flow.transformer.SetStorageValue -storage-name wobble
+ adams.flow.control.Trigger -name "fill with data"
+  adams.flow.source.StorageForLoop -upper @{max_wave} -variable i -storage spec
+  adams.flow.control.Trigger -name "get wobble factor"
+   adams.flow.source.StorageValue -storage-name wobble -conversion adams.data.conversion.UnknownToUnknown
+   adams.flow.transformer.GetArrayElement -index @{i}
+   adams.flow.transformer.SetVariable -var-name wobble
+  adams.flow.control.Trigger -name "calc amplitude"
+   adams.flow.source.MathExpression -expression "sin((@{i}) / 100) + @{wobble}/10"
+   adams.flow.transformer.SetVariable -var-name ampl
+  adams.flow.transformer.SetSpectrumAmplitude -no-copy true -type INSERT -wave-number @{i} -amplitude @{ampl}
+  adams.flow.transformer.SetStorageValue -storage-name spec
+ adams.flow.control.Trigger -name display
+  adams.flow.source.StorageValue -storage-name spec -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.sink.SpectrumDisplay -writer adams.gui.print.NullWriter -color-provider adams.gui.visualization.core.DefaultColorProvider -paintlet adams.gui.visualization.spectrum.SpectrumPaintlet -plot-updater adams.flow.sink.spectrumdisplay.SimplePlotUpdater

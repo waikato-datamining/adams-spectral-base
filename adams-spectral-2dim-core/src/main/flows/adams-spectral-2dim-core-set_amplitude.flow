@@ -1,0 +1,27 @@
+# Project: adams
+# Date: 2018-02-12 11:16:28
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Shows how to update the amplitudes of a spectrum." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.SpectrumDisplay -writer adams.gui.print.NullWriter -color-provider adams.gui.visualization.core.DefaultColorProvider -paintlet adams.gui.visualization.spectrum.SpectrumPaintlet -plot-updater adams.flow.sink.spectrumdisplay.SimplePlotUpdater
+ adams.flow.standalone.SetVariable -var-name max_wave -var-value 10
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name "new spectrum"
+  adams.flow.source.NewSpectrum -id 12345
+  adams.flow.transformer.SetStorageValue -storage-name spec
+ adams.flow.control.Trigger -name "fill with data"
+  adams.flow.source.StorageForLoop -upper @{max_wave} -variable i -storage spec
+  adams.flow.transformer.SetSpectrumAmplitude -no-copy true -type INSERT -wave-number @{i} -amplitude @{i}
+  adams.flow.transformer.SetStorageValue -storage-name spec
+ adams.flow.control.Trigger -name update
+  adams.flow.source.StorageValue -storage-name spec -conversion adams.data.conversion.UnknownToUnknown
+  adams.flow.control.Tee -name original
+   adams.flow.sink.CallableSink -callable SpectrumDisplay
+  adams.flow.transformer.Copy
+  adams.flow.transformer.SetID -id 12345-updated
+  adams.flow.transformer.SetSpectrumAmplitude -name index -index 3
+  adams.flow.transformer.SetSpectrumAmplitude -name "wave no" -type WAVE_NUMBER -wave-number 5.0
+  adams.flow.transformer.SetSpectrumAmplitude -name "wave no (closest)" -type WAVE_NUMBER_CLOSEST -wave-number 7.1
+  adams.flow.transformer.SetSpectrumAmplitude -name insert -type INSERT -wave-number 11.0 -amplitude 5.0
+  adams.flow.sink.CallableSink -callable SpectrumDisplay
