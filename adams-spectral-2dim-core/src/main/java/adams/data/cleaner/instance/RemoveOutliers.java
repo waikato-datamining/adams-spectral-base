@@ -13,13 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * RemoveOutliers.java
- * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.cleaner.instance;
 
+import adams.core.MessageCollection;
 import adams.core.Performance;
 import adams.core.Randomizable;
 import adams.core.ThreadLimiter;
@@ -36,7 +37,7 @@ import adams.multiprocess.JobList;
 import adams.multiprocess.JobRunner;
 import adams.multiprocess.LocalJobRunner;
 import adams.multiprocess.WekaCrossValidationJob;
-import weka.classifiers.AggregateableEvaluationExt;
+import weka.classifiers.AggregateEvaluations;
 import weka.classifiers.Classifier;
 import weka.classifiers.CrossValidationFoldGenerator;
 import weka.classifiers.CrossValidationHelper;
@@ -101,7 +102,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class RemoveOutliers
   extends AbstractCleaner
@@ -355,10 +355,11 @@ public class RemoveOutliers
    * @throws Exception	if cross-validation fails
    */
   protected Evaluation crossValidate(Instances data, int folds) throws Exception {
-    String 				msg;
+    MessageCollection 			msg;
     int 				numThreads;
     Evaluation				eval;
-    AggregateableEvaluationExt 		evalAgg;
+    Evaluation				agg;
+    AggregateEvaluations 		evalAgg;
     CrossValidationFoldGenerator	generator;
     JobList<WekaCrossValidationJob>	list;
     WekaCrossValidationJob 		job;
@@ -396,27 +397,30 @@ public class RemoveOutliers
       m_JobRunner.start();
       m_JobRunner.stop();
       // aggregate data
-      msg     = null;
-      evalAgg = new AggregateableEvaluationExt(data);
+      msg     = new MessageCollection();
+      evalAgg = new AggregateEvaluations();
       for (i = 0; i < m_JobRunner.getJobs().size(); i++) {
 	job = (WekaCrossValidationJob) m_JobRunner.getJobs().get(i);
 	if (job.getEvaluation() == null) {
-	  msg = "Fold #" + (i + 1) + " failed to evaluate";
-	  if (!job.hasExecutionError())
-	    msg += "?";
-	  else
-	    msg += ":\n" + job.getExecutionError();
+	  msg.add("Fold #" + (i + 1) + " failed to evaluate" + (!job.hasExecutionError() ? "?" : ":\n" + job.getExecutionError()));
 	  break;
 	}
-	evalAgg.aggregate(job.getEvaluation());
+	evalAgg.add(job.getEvaluation());
 	job.cleanUp();
       }
-      if (msg != null)
-	getLogger().severe(msg);
+      if (!msg.isEmpty())
+	getLogger().severe(msg.toString());
       list.cleanUp();
       m_JobRunner.cleanUp();
       m_JobRunner = null;
-      return evalAgg;
+      agg = evalAgg.aggregated();
+      if (agg == null) {
+        if (evalAgg.hasLastError())
+          getLogger().severe(evalAgg.getLastError());
+        else
+          getLogger().severe("Failed to aggregate evaluations!");
+      }
+      return agg;
     }
   }
 
