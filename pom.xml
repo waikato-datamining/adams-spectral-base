@@ -32,12 +32,12 @@
     <snapshotRepository>
       <id>adams-spectral-snapshots</id>
       <name>ADAMS Spectral Snapshot Repository</name>
-      <url>https://adams.cms.waikato.ac.nz/nexus3/content/repositories/adams-spectral-snapshots</url>
+      <url>https://adams.cms.waikato.ac.nz/nexus/content/repositories/adams-spectral-snapshots</url>
     </snapshotRepository>
     <repository>
       <id>adams-spectral-releases</id>
       <name>ADAMS Spectral Release Repository</name>
-      <url>https://adams.cms.waikato.ac.nz/nexus3/content/repositories/adams-spectral-releases</url>
+      <url>https://adams.cms.waikato.ac.nz/nexus/content/repositories/adams-spectral-releases</url>
     </repository>
   </distributionManagement>
 
