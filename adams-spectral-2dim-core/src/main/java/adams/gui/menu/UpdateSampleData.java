@@ -105,6 +105,6 @@ public class UpdateSampleData
    * @return		the category/menu name
    */
   public String getCategory() {
-    return CATEGORY_MAINTENANCE;
+    return CATEGORY_TOOLS;
   }
 }

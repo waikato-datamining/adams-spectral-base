@@ -264,6 +264,6 @@ public class ExportValidationSets
    * @return		the category/menu name
    */
   public String getCategory() {
-    return CATEGORY_MAINTENANCE;
+    return CATEGORY_TOOLS;
   }
 }
