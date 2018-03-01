@@ -121,7 +121,7 @@
     <dependency>
       <groupId>nz.ac.waikato.cms.weka</groupId>
       <artifactId>weka-dev</artifactId>
-      <version>${weka-stable.version}</version>
+      <version>${weka-lts.version}</version>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
