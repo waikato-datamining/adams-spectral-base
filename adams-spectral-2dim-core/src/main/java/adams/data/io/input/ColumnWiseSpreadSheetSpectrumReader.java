@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * ColumnWiseSpreadSheetSpectrumReader.java
- * Copyright (C) 2013-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.input;
 
@@ -30,6 +30,10 @@ import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
@@ -120,7 +124,6 @@ import adams.data.spreadsheet.SpreadSheetColumnRange;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2332 $
  */
 public class ColumnWiseSpreadSheetSpectrumReader
   extends AbstractSpectrumReader
@@ -133,7 +136,6 @@ public class ColumnWiseSpreadSheetSpectrumReader
    * Determines whether the sample ID is located.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision: 2332 $
    */
   public enum SampleIDLocation {
     HEADER,
@@ -498,9 +500,9 @@ public class ColumnWiseSpreadSheetSpectrumReader
    */
   @Override
   protected void readData() {
-    SpreadSheet		sheet;
+    List<SpreadSheet>   sheets;
     Spectrum 		sp;
-    SampleData sd;
+    SampleData 		sd;
     int[]		cols;
     int[]		rows;
     int			i;
@@ -511,92 +513,109 @@ public class ColumnWiseSpreadSheetSpectrumReader
     float		wave;
     int			labels;
     String		label;
+    int			sheetNo;
 
     // read spreadsheet
-    sheet = m_Reader.read(m_Input);
-    if (m_Stopped)
-      return;
-    if (sheet == null) {
-      getLogger().severe("Failed to read spreadsheet: " + m_Input);
-      return;
+    if (m_Reader instanceof MultiSheetSpreadSheetReader) {
+      sheets = ((MultiSheetSpreadSheetReader) m_Reader).readRange(m_Input);
+    }
+    else {
+      sheets = new ArrayList<>();
+      sheets.add(m_Reader.read(m_Input));
     }
 
-    // configure ranges/indices
-    m_SpectrumColumns.setSpreadSheet(sheet);
-    m_AmplitudeRows.setMax(sheet.getRowCount());
-    m_WaveNumberColumn.setSpreadSheet(sheet);
-    waveNo = m_WaveNumberColumn.getIntIndex();
-    m_SampleDataLabelsColumn.setSpreadSheet(sheet);
-    m_SampleDataRows.setMax(sheet.getRowCount());
-    m_SampleIDRow.setMax(sheet.getRowCount());
-    sampleID = m_SampleIDRow.getIntIndex();
-    labels   = m_SampleDataLabelsColumn.getIntIndex();
-    
-    // read spectra
-    cols = m_SpectrumColumns.getIntIndices();
-    for (int col: cols) {
-      sp = new Spectrum();
-      sd = new SampleData();
-      sp.setReport(sd);
-      m_ReadData.add(sp);
-      
-      // sample ID
-      if (m_SampleIDLocation == SampleIDLocation.ROW) {
-	if (sampleID > -1) {
-	  cell = sheet.getCell(sampleID, col);
-	  if ((cell != null) && !cell.isMissing())
-	    sp.setID(cell.getContent());
-	}
-      }
-      else if (m_SampleIDLocation == SampleIDLocation.HEADER) {
-	cell = sheet.getHeaderRow().getCell(col);
-	if ((cell != null) && !cell.isMissing())
-	  sp.setID(cell.getContent());
-      }
-      
-      // amplitudes
-      rows = m_AmplitudeRows.getIntIndices();
-      for (i = 0; i < rows.length; i++) {
-	wave = i;
-	if (waveNo != -1) {
-	  cell = sheet.getCell(rows[i], waveNo);
-	  if ((cell != null) && !cell.isMissing() && cell.isNumeric())
-	    wave = cell.toDouble().floatValue();
-	}
-	cell = sheet.getCell(rows[i], col);
-	if ((cell != null) && !cell.isMissing() && cell.isNumeric())
-	  sp.add(new SpectrumPoint(wave, cell.toDouble().floatValue()));
-	else
-	  System.out.println("missing: " + rows[i]);
-      }
-      
-      // sample data
-      if (labels > -1) {
-	rows = m_SampleDataRows.getIntIndices();
-	for (i = 0; i < rows.length; i++) {
-	  cell = sheet.getCell(rows[i], labels);
-	  if ((cell != null) && !cell.isMissing()) {
-	    label = cell.getContent();
-	    cell  = sheet.getCell(rows[i], col);
-	    if ((cell != null) && !cell.isMissing()) {
-	      if (cell.isNumeric()) {
-		field = new Field(label, DataType.NUMERIC);
-		sd.addField(field);
-		sd.setNumericValue(label, cell.toDouble());
-	      }
-	      else if (cell.isBoolean()) {
-		field = new Field(label, DataType.BOOLEAN);
-		sd.addField(field);
-		sd.setBooleanValue(label, cell.toBoolean());
-	      }
-	      else {
-		field = new Field(label, DataType.STRING);
-		sd.addField(field);
-		sd.setStringValue(label, cell.getContent());
-	      }
+    sheetNo = 0;
+    for (SpreadSheet sheet: sheets) {
+      sheetNo++;
+      if (m_Stopped)
+        return;
+
+      // configure ranges/indices
+      m_SpectrumColumns.setSpreadSheet(sheet);
+      m_AmplitudeRows.setMax(sheet.getRowCount());
+      m_WaveNumberColumn.setSpreadSheet(sheet);
+      waveNo = m_WaveNumberColumn.getIntIndex();
+      m_SampleDataLabelsColumn.setSpreadSheet(sheet);
+      m_SampleDataRows.setMax(sheet.getRowCount());
+      m_SampleIDRow.setMax(sheet.getRowCount());
+      sampleID = m_SampleIDRow.getIntIndex();
+      labels = m_SampleDataLabelsColumn.getIntIndex();
+
+      // read spectra
+      cols = m_SpectrumColumns.getIntIndices();
+      for (int col : cols) {
+        sp = new Spectrum();
+        sd = new SampleData();
+        sp.setReport(sd);
+        m_ReadData.add(sp);
+
+        // sample ID
+        if (m_SampleIDLocation == SampleIDLocation.ROW) {
+          if (sampleID > -1) {
+            cell = sheet.getCell(sampleID, col);
+            if ((cell != null) && !cell.isMissing())
+              sp.setID(cell.getContent());
+          }
+        }
+        else if (m_SampleIDLocation == SampleIDLocation.HEADER) {
+          cell = sheet.getHeaderRow().getCell(col);
+          if ((cell != null) && !cell.isMissing())
+            sp.setID(cell.getContent());
+        }
+
+        // amplitudes
+        rows = m_AmplitudeRows.getIntIndices();
+        for (i = 0; i < rows.length; i++) {
+          wave = i;
+          if (waveNo != -1) {
+            cell = sheet.getCell(rows[i], waveNo);
+            if ((cell != null) && !cell.isMissing() && cell.isNumeric())
+              wave = cell.toDouble().floatValue();
+          }
+          cell = sheet.getCell(rows[i], col);
+	  if ((cell != null) && !cell.isMissing() && cell.isNumeric()) {
+	    try {
+	      sp.add(new SpectrumPoint(wave, cell.toDouble().floatValue()));
+	    }
+	    catch (Exception e) {
+	      getLogger().log(
+	        Level.SEVERE,
+		"Failed to parse amplitude in row " + (rows[i] + 1) + " of sheet " + sheetNo, e);
 	    }
 	  }
-	}
+	  else {
+	    getLogger().warning("missing: " + rows[i]);
+	  }
+        }
+
+        // sample data
+        if (labels > -1) {
+          rows = m_SampleDataRows.getIntIndices();
+          for (i = 0; i < rows.length; i++) {
+            cell = sheet.getCell(rows[i], labels);
+            if ((cell != null) && !cell.isMissing()) {
+              label = cell.getContent();
+              cell = sheet.getCell(rows[i], col);
+              if ((cell != null) && !cell.isMissing()) {
+                if (cell.isNumeric()) {
+                  field = new Field(label, DataType.NUMERIC);
+                  sd.addField(field);
+                  sd.setNumericValue(label, cell.toDouble());
+                }
+                else if (cell.isBoolean()) {
+                  field = new Field(label, DataType.BOOLEAN);
+                  sd.addField(field);
+                  sd.setBooleanValue(label, cell.toBoolean());
+                }
+                else {
+                  field = new Field(label, DataType.STRING);
+                  sd.addField(field);
+                  sd.setStringValue(label, cell.getContent());
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

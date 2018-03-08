@@ -460,7 +460,7 @@ public class RowWiseSpreadSheetSpectrumReader
    */
   @Override
   protected void readData() {
-    SpreadSheet 	sheet;
+    List<SpreadSheet>	sheets;
     TIntArrayList	cols;
     TFloatArrayList	waveNo;
     int[]		waveCols;
@@ -472,67 +472,80 @@ public class RowWiseSpreadSheetSpectrumReader
     SpectrumPoint 	point;
     SampleData 		sd;
     int			i;
+    int			sheetNo;
 
-    sheet = m_Reader.read(m_Input);
-    if (m_Stopped)
-      return;
+    if (m_Reader instanceof MultiSheetSpreadSheetReader) {
+      sheets = ((MultiSheetSpreadSheetReader) m_Reader).readRange(m_Input);
+    }
+    else {
+      sheets = new ArrayList<>();
+      sheets.add(m_Reader.read(m_Input));
+    }
 
-    // ID
-    m_SampleIDColumn.setData(sheet);
-    idCol = m_SampleIDColumn.getIntIndex();
+    sheetNo = 0;
+    for (SpreadSheet sheet: sheets) {
+      sheetNo++;
+      if (m_Stopped)
+	return;
 
-    // sample data
-    m_SampleDataColumns.setData(sheet);
-    cols     = new TIntArrayList(m_SampleDataColumns.getIntIndices());
-    cols.remove(idCol);
-    sdCols   = cols.toArray();
-    sdFields = identifySampleData(sheet, sdCols);
-
-    // wave numbers
-    m_WaveColumns.setData(sheet);
-    cols = new TIntArrayList(m_WaveColumns.getIntIndices());
-    cols.remove(idCol);
-    for (int col: sdCols)
-      cols.remove(col);
-    waveCols = cols.toArray();
-    waveNo   = identifyWaveNumbers(sheet, waveCols);
-
-    for (Row row: sheet.rows()) {
-      sp = new Spectrum();
-
-      // wave numbers
-      for (i = 0; i < waveCols.length; i++) {
-	if (row.hasCell(waveCols[i]) && !row.getCell(waveCols[i]).isMissing()) {
-	  try {
-            point = new SpectrumPoint(waveNo.get(i), row.getCell(waveCols[i]).toDouble().floatValue());
-            sp.add(point);
-          }
-          catch (Exception e) {
-	    getLogger().log(
-	      Level.SEVERE,
-              "Failed to convert cell in col #" + (waveCols[i] + 1) + ": " + row.getCell(waveCols[i]), e);
-          }
-	}
-      }
+      // ID
+      m_SampleIDColumn.setData(sheet);
+      idCol = m_SampleIDColumn.getIntIndex();
 
       // sample data
-      sd = new SampleData();
-      for (i = 0; i < sdCols.length; i++) {
-	if (row.hasCell(sdCols[i]) && !row.getCell(sdCols[i]).isMissing()) {
-	  field = sdFields.get(i);
-	  sd.addField(field);
-	  sd.setValue(field, row.getCell(sdCols[i]).getContent());
+      m_SampleDataColumns.setData(sheet);
+      cols = new TIntArrayList(m_SampleDataColumns.getIntIndices());
+      cols.remove(idCol);
+      sdCols = cols.toArray();
+      sdFields = identifySampleData(sheet, sdCols);
+
+      // wave numbers
+      m_WaveColumns.setData(sheet);
+      cols = new TIntArrayList(m_WaveColumns.getIntIndices());
+      cols.remove(idCol);
+      for (int col : sdCols)
+	cols.remove(col);
+      waveCols = cols.toArray();
+      waveNo = identifyWaveNumbers(sheet, waveCols);
+
+      for (Row row : sheet.rows()) {
+	sp = new Spectrum();
+
+	// wave numbers
+	for (i = 0; i < waveCols.length; i++) {
+	  if (row.hasCell(waveCols[i]) && !row.getCell(waveCols[i]).isMissing()) {
+	    try {
+	      point = new SpectrumPoint(waveNo.get(i), row.getCell(waveCols[i]).toDouble().floatValue());
+	      sp.add(point);
+	    }
+	    catch (Exception e) {
+	      getLogger().log(
+		Level.SEVERE,
+		"Failed to convert cell in col #" + (waveCols[i] + 1) + " of sheet " + sheetNo + ": "
+		  + row.getCell(waveCols[i]), e);
+	    }
+	  }
 	}
-      }
-      sp.setReport(sd);
 
-      // sample ID
-      if (idCol != -1) {
-	if (row.hasCell(idCol) && !row.getCell(idCol).isMissing())
-	  sp.setID(row.getCell(idCol).getContent());
-      }
+	// sample data
+	sd = new SampleData();
+	for (i = 0; i < sdCols.length; i++) {
+	  if (row.hasCell(sdCols[i]) && !row.getCell(sdCols[i]).isMissing()) {
+	    field = sdFields.get(i);
+	    sd.addField(field);
+	    sd.setValue(field, row.getCell(sdCols[i]).getContent());
+	  }
+	}
+	sp.setReport(sd);
 
-      m_ReadData.add(sp);
+	// sample ID
+	if (idCol != -1) {
+	  if (row.hasCell(idCol) && !row.getCell(idCol).isMissing())
+	    sp.setID(row.getCell(idCol).getContent());
+	}
+
+	m_ReadData.add(sp);
+      }
     }
   }
 
