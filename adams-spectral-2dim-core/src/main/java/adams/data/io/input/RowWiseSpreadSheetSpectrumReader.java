@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * RowWiseSpreadSheetSpectrumReader.java
- * Copyright (C) 2015-2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -35,6 +35,7 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
@@ -117,7 +118,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class RowWiseSpreadSheetSpectrumReader
   extends AbstractSpectrumReader
@@ -503,8 +503,15 @@ public class RowWiseSpreadSheetSpectrumReader
       // wave numbers
       for (i = 0; i < waveCols.length; i++) {
 	if (row.hasCell(waveCols[i]) && !row.getCell(waveCols[i]).isMissing()) {
-	  point = new SpectrumPoint(waveNo.get(i), row.getCell(waveCols[i]).toDouble().floatValue());
-	  sp.add(point);
+	  try {
+            point = new SpectrumPoint(waveNo.get(i), row.getCell(waveCols[i]).toDouble().floatValue());
+            sp.add(point);
+          }
+          catch (Exception e) {
+	    getLogger().log(
+	      Level.SEVERE,
+              "Failed to convert cell in col #" + (waveCols[i] + 1) + ": " + row.getCell(waveCols[i]), e);
+          }
 	}
       }
 
