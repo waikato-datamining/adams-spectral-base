@@ -70,7 +70,7 @@ public class JsonToSpectrumTest
 
     try {
       m_TestHelper.copyResourceToTmp("spectrum.json");
-      lines = Files.readAllLines(new TmpFile("simple.json").toPath());
+      lines = Files.readAllLines(new TmpFile("spectrum.json").toPath());
       result = new Object[]{Utils.flatten(lines, "\n")};
     }
     catch (Exception e) {
