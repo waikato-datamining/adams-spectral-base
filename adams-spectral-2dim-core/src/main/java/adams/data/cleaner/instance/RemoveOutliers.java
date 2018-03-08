@@ -39,8 +39,8 @@ import adams.multiprocess.LocalJobRunner;
 import adams.multiprocess.WekaCrossValidationJob;
 import weka.classifiers.AggregateEvaluations;
 import weka.classifiers.Classifier;
-import weka.classifiers.CrossValidationFoldGenerator;
 import weka.classifiers.CrossValidationHelper;
+import weka.classifiers.DefaultCrossValidationFoldGenerator;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LinearRegressionJ;
 import weka.core.Instance;
@@ -360,7 +360,7 @@ public class RemoveOutliers
     Evaluation				eval;
     Evaluation				agg;
     AggregateEvaluations 		evalAgg;
-    CrossValidationFoldGenerator	generator;
+    DefaultCrossValidationFoldGenerator generator;
     JobList<WekaCrossValidationJob>	list;
     WekaCrossValidationJob 		job;
     WekaTrainTestSetContainer		cont;
@@ -375,7 +375,7 @@ public class RemoveOutliers
       return eval;
     }
     else {
-      generator = new CrossValidationFoldGenerator(data, folds, m_Seed, true);
+      generator = new DefaultCrossValidationFoldGenerator(data, folds, m_Seed, true);
       if (m_JobRunnerSetup == null)
 	m_JobRunner = new LocalJobRunner<WekaCrossValidationJob>();
       else

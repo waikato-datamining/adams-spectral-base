@@ -25,7 +25,7 @@ import adams.data.statistics.StatUtils;
 import adams.flow.container.WekaTrainTestSetContainer;
 import gnu.trove.list.array.TDoubleArrayList;
 import weka.classifiers.Classifier;
-import weka.classifiers.CrossValidationFoldGenerator;
+import weka.classifiers.DefaultCrossValidationFoldGenerator;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.AttributeStats;
 import weka.core.Instance;
@@ -436,7 +436,7 @@ public class CrossValidatedPrediction
     Float				result;
     Instances				neighbors;
     int					folds;
-    CrossValidationFoldGenerator	generator;
+    DefaultCrossValidationFoldGenerator generator;
     WekaTrainTestSetContainer		cont;
     TDoubleArrayList			values;
     Classifier				cls;
@@ -453,7 +453,7 @@ public class CrossValidatedPrediction
 	folds = neighbors.numInstances();
       else
         folds = Math.min(m_Folds, neighbors.numInstances());
-      generator = new CrossValidationFoldGenerator(neighbors, folds, m_Seed, true);
+      generator = new DefaultCrossValidationFoldGenerator(neighbors, folds, m_Seed, true);
       values    = new TDoubleArrayList();
       while (generator.hasNext()) {
 	cont = generator.next();
