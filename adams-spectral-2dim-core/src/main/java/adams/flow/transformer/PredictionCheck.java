@@ -15,7 +15,7 @@
 
 /*
  * PredictionCheck.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -23,6 +23,7 @@ package adams.flow.transformer;
 import adams.core.QuickInfoHelper;
 import adams.data.InPlaceProcessing;
 import adams.flow.container.EvaluationContainer;
+import adams.flow.core.FlowContextHandler;
 import adams.flow.core.Token;
 import adams.flow.transformer.predictioncheck.AbstractPredictionCheck;
 import adams.flow.transformer.predictioncheck.PassThrough;
@@ -93,8 +94,7 @@ import adams.flow.transformer.predictioncheck.PassThrough;
  *
  <!-- options-end -->
  *
- * @author  dale (dale at waikato dot ac dot nz)
- * @version $Revision: 2242 $
+ * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class PredictionCheck
   extends AbstractTransformer
@@ -247,6 +247,8 @@ public class PredictionCheck
     try {
       if (!m_NoCopy)
         cont = (EvaluationContainer) cont.getClone();
+      if (m_Check instanceof FlowContextHandler)
+        ((FlowContextHandler) m_Check).setFlowContext(this);
       newCont = m_Check.checkPrediction(cont);
       m_OutputToken = new Token(newCont);
     }
