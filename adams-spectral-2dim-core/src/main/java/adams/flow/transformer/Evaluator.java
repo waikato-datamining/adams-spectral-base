@@ -15,7 +15,7 @@
 
 /*
  * Evaluator.java
- * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -25,6 +25,7 @@ import adams.core.QuickInfoHelper;
 import adams.core.VariableName;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
+import adams.data.InPlaceProcessing;
 import adams.data.evaluator.instance.AbstractEvaluator;
 import adams.data.evaluator.instance.NullEvaluator;
 import adams.event.VariableChangeEvent;
@@ -144,17 +145,19 @@ import java.util.Map;
  <!-- options-end -->
  *
  * @author  dale (dale at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class Evaluator
   extends AbstractTransformer
-  implements ModelLoaderSupporter {
+  implements ModelLoaderSupporter, InPlaceProcessing {
 
   /** for serialization. */
   private static final long serialVersionUID = 4523798891781897832L;
 
   /** the key for storing the current evaluator in the backup. */
   public final static String BACKUP_ACTUALEVALUATOR = "evaluator";
+
+  /** whether to only update the container or work on a copy. */
+  protected boolean m_NoCopy;
 
   /** the evaluator. */
   protected AbstractEvaluator m_Evaluator;
@@ -199,6 +202,10 @@ public class Evaluator
   @Override
   public void defineOptions() {
     super.defineOptions();
+
+    m_OptionManager.add(
+      "no-copy", "noCopy",
+      false);
 
     m_OptionManager.add(
       "evaluator", "evaluator",
@@ -257,6 +264,37 @@ public class Evaluator
   public synchronized void setLoggingLevel(LoggingLevel value) {
     super.setLoggingLevel(value);
     m_ModelLoader.setLoggingLevel(value);
+  }
+
+  /**
+   * Sets whether to skip creating a copy of the container before updating it.
+   *
+   * @param value	true if to skip creating copy
+   */
+  public void setNoCopy(boolean value) {
+    m_NoCopy = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to skip creating a copy of the container before updating it.
+   *
+   * @return		true if copying is skipped
+   */
+  public boolean getNoCopy() {
+    return m_NoCopy;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String noCopyTipText() {
+    return
+      "If enabled, no copy of the evaluation container is generated before "
+	+ "adding the additional evaluations.";
   }
 
   /**
@@ -543,6 +581,7 @@ public class Evaluator
     result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
     result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
     result += QuickInfoHelper.toString(this, "evaluatorResetVariable", m_EvaluatorResetVariable, ", reset: ");
+    result += QuickInfoHelper.toString(this, "noCopy", (m_NoCopy ? "no copy" : "copy"), ", ");
 
     return result;
   }
@@ -713,10 +752,15 @@ public class Evaluator
 	}
 
 	// generate output
-	if (cont != null)
-	  newCont = (EvaluationContainer) cont.getClone();
-	else
-	  newCont = new EvaluationContainer();
+	if (cont != null) {
+	  if (m_NoCopy)
+	    newCont = cont;
+	  else
+            newCont = (EvaluationContainer) cont.getClone();
+        }
+	else {
+          newCont = new EvaluationContainer();
+        }
 	newCont.setValue(EvaluationContainer.VALUE_EVALUATOR, m_ActualEvaluator);
 	if (data != null)
 	  newCont.setValue(EvaluationContainer.VALUE_INSTANCES, data);
