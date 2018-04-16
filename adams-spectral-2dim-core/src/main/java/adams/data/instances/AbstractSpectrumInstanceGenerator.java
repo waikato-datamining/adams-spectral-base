@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumInstanceGenerator.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -47,6 +47,12 @@ public abstract class AbstractSpectrumInstanceGenerator
   /** for serialization. */
   private static final long serialVersionUID = 2083516575994387184L;
 
+  /** the prefix for the wave-numbers attributes. */
+  protected String m_WaveNumberPrefix;
+
+  /** the prefix for the amplitude attributes. */
+  protected String m_AmplitudePrefix;
+
   /** additional fields to add to the output data. */
   protected Field[] m_AdditionalFields;
 
@@ -61,12 +67,78 @@ public abstract class AbstractSpectrumInstanceGenerator
     super.defineOptions();
 
     m_OptionManager.add(
-	    "additional", "additionalFields",
-	    new Field[0]);
+      "wave-number-prefix", "waveNumberPrefix",
+      ArffUtils.PREFIX_WAVE_NUMBER);
 
     m_OptionManager.add(
-	    "no-additional-prefix", "noAdditionalFieldsPrefix",
-	    false);
+      "amplitude-prefix", "amplitudePrefix",
+      ArffUtils.PREFIX_AMPLITUDE);
+
+    m_OptionManager.add(
+      "additional", "additionalFields",
+      new Field[0]);
+
+    m_OptionManager.add(
+      "no-additional-prefix", "noAdditionalFieldsPrefix",
+      false);
+  }
+
+  /**
+   * Sets the prefix for the wave number attributes.
+   *
+   * @param value	the prefix
+   */
+  public void setWaveNumberPrefix(String value) {
+    m_WaveNumberPrefix = value;
+    reset();
+  }
+
+  /**
+   * Returns the prefix for the wave number attributes.
+   *
+   * @return		the prefix
+   */
+  public String getWaveNumberPrefix() {
+    return m_WaveNumberPrefix;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String waveNumberPrefixTipText() {
+    return "The prefix to use for the wave number attributes.";
+  }
+
+  /**
+   * Sets the prefix for the wave number attributes.
+   *
+   * @param value	the prefix
+   */
+  public void setAmplitudePrefix(String value) {
+    m_AmplitudePrefix = value;
+    reset();
+  }
+
+  /**
+   * Returns the prefix for the wave number attributes.
+   *
+   * @return		the prefix
+   */
+  public String getAmplitudePrefix() {
+    return m_AmplitudePrefix;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String amplitudePrefixTipText() {
+    return "The prefix to use for the amplitude attributes.";
   }
 
   /**

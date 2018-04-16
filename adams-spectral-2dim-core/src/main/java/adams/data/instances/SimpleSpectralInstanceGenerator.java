@@ -236,11 +236,11 @@ public class SimpleSpectralInstanceGenerator
     for (i = 0; i < data.size(); i++) {
       waveno = data.toList().get(i).getWaveNumber();
       if (m_AddWaveNumber) {
-	atts.add(new Attribute(m_WaveNumberAsSuffix ? ArffUtils.getWaveNumberName(waveno) : ArffUtils.getWaveNumberName(i)));
-	atts.add(new Attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(waveno) : ArffUtils.getAmplitudeName(i)));
+	atts.add(new Attribute(m_WaveNumberAsSuffix ? ArffUtils.getWaveNumberName(m_WaveNumberPrefix, waveno) : ArffUtils.getWaveNumberName(m_WaveNumberPrefix, i)));
+	atts.add(new Attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(m_AmplitudePrefix, waveno) : ArffUtils.getAmplitudeName(m_AmplitudePrefix, i)));
       }
       else {
-	atts.add(new Attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(waveno) : ArffUtils.getAmplitudeName(i)));
+	atts.add(new Attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(m_AmplitudePrefix, waveno) : ArffUtils.getAmplitudeName(m_AmplitudePrefix, i)));
       }
     }
 
@@ -269,10 +269,10 @@ public class SimpleSpectralInstanceGenerator
     for (i = 0; i < data.size(); i++) {
       waveno = data.toList().get(i).getWaveNumber();
       if (m_AddWaveNumber) {
-	index         = m_OutputHeader.attribute(m_WaveNumberAsSuffix ? ArffUtils.getWaveNumberName(waveno) : ArffUtils.getWaveNumberName(i)).index();
+	index         = m_OutputHeader.attribute(m_WaveNumberAsSuffix ? ArffUtils.getWaveNumberName(m_WaveNumberPrefix, waveno) : ArffUtils.getWaveNumberName(m_WaveNumberPrefix, i)).index();
 	values[index] = points.get(i).getWaveNumber();
       }
-      index         = m_OutputHeader.attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(waveno) : ArffUtils.getAmplitudeName(i)).index();
+      index         = m_OutputHeader.attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(m_AmplitudePrefix, waveno) : ArffUtils.getAmplitudeName(m_AmplitudePrefix, i)).index();
       values[index] = points.get(i).getAmplitude();
     }
 

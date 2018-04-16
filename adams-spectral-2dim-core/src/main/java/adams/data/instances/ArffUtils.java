@@ -55,9 +55,22 @@ public class ArffUtils
    *
    * @param index	the 0-based index
    * @return		the attribute name
+   * @see		#PREFIX_WAVE_NUMBER
    */
   public static String getWaveNumberName(int index) {
-    return PREFIX_WAVE_NUMBER + (index+1);
+    return getWaveNumberName(PREFIX_WAVE_NUMBER, index);
+  }
+
+  /**
+   * Returns the name of an attribute for a wave number. Gets prefixed
+   * with the specified prefix.
+   *
+   * @param prefix	the prefix string to use
+   * @param index	the 0-based index
+   * @return		the attribute name
+   */
+  public static String getWaveNumberName(String prefix, int index) {
+    return prefix + (index+1);
   }
 
   /**
@@ -66,9 +79,22 @@ public class ArffUtils
    *
    * @param waveno	the wave number
    * @return		the attribute name
+   * @see		#PREFIX_WAVE_NUMBER
    */
   public static String getWaveNumberName(float waveno) {
-    return PREFIX_WAVE_NUMBER + waveno;
+    return getWaveNumberName(PREFIX_WAVE_NUMBER, waveno);
+  }
+
+  /**
+   * Returns the name of an attribute for a wave number. Gets prefixed
+   * with the specified prefix.
+   *
+   * @param prefix	the prefix string to use
+   * @param waveno	the wave number
+   * @return		the attribute name
+   */
+  public static String getWaveNumberName(String prefix, float waveno) {
+    return prefix + waveno;
   }
 
   /**
@@ -77,9 +103,22 @@ public class ArffUtils
    *
    * @param index	the 0-based index
    * @return		the attribute name
+   * @see		#PREFIX_AMPLITUDE
    */
   public static String getAmplitudeName(int index) {
-    return PREFIX_AMPLITUDE + (index+1);
+    return getAmplitudeName(PREFIX_AMPLITUDE, index);
+  }
+
+  /**
+   * Returns the name of an attribute for an amplitude. Gets prefixed
+   * with the specified prefix.
+   *
+   * @param prefix	the prefix string to use
+   * @param index	the 0-based index
+   * @return		the attribute name
+   */
+  public static String getAmplitudeName(String prefix, int index) {
+    return prefix + (index+1);
   }
 
   /**
@@ -90,7 +129,19 @@ public class ArffUtils
    * @return		the attribute name
    */
   public static String getAmplitudeName(float waveno) {
-    return PREFIX_AMPLITUDE + waveno;
+    return getAmplitudeName(PREFIX_AMPLITUDE, waveno);
+  }
+
+  /**
+   * Returns the name of an attribute for an amplitude. Gets prefixed
+   * with the specified prefix.
+   *
+   * @param prefix	the prefix string to use
+   * @param waveno	the wave number
+   * @return		the attribute name
+   */
+  public static String getAmplitudeName(String prefix, float waveno) {
+    return prefix + waveno;
   }
 
   /**
