@@ -15,7 +15,7 @@
 
 /*
  * ArffUtils.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -30,10 +30,15 @@ import java.util.Vector;
  * A helper class for turning spectrum data into ARFF files and vice versa.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1911 $
  */
 public class ArffUtils
   extends adams.data.weka.ArffUtils {
+
+  public static final String SAMPLE_ID = "sample_id";
+
+  public static final String PREFIX_WAVE_NUMBER = "wave-number-";
+
+  public static final String PREFIX_AMPLITUDE = "amplitude-";
 
   /**
    * Returns the name of the attribute containing the sample ID of the spectrum.
@@ -41,7 +46,7 @@ public class ArffUtils
    * @return		the attribute name
    */
   public static String getSampleIDName() {
-    return "sample_id";
+    return SAMPLE_ID;
   }
 
   /**
@@ -52,7 +57,7 @@ public class ArffUtils
    * @return		the attribute name
    */
   public static String getWaveNumberName(int index) {
-    return "wave-number-" + (index+1);
+    return PREFIX_WAVE_NUMBER + (index+1);
   }
 
   /**
@@ -63,7 +68,7 @@ public class ArffUtils
    * @return		the attribute name
    */
   public static String getWaveNumberName(float waveno) {
-    return "wave-number-" + waveno;
+    return PREFIX_WAVE_NUMBER + waveno;
   }
 
   /**
@@ -74,7 +79,7 @@ public class ArffUtils
    * @return		the attribute name
    */
   public static String getAmplitudeName(int index) {
-    return "amplitude-" + (index+1);
+    return PREFIX_AMPLITUDE + (index+1);
   }
 
   /**
@@ -85,7 +90,7 @@ public class ArffUtils
    * @return		the attribute name
    */
   public static String getAmplitudeName(float waveno) {
-    return "amplitude-" + waveno;
+    return PREFIX_AMPLITUDE + waveno;
   }
 
   /**
