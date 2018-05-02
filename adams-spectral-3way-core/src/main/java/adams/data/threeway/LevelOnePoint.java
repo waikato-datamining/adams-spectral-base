@@ -107,7 +107,7 @@ public class LevelOnePoint
    * @return		the comparator instance
    */
   public DataPointComparator<LevelTwoPoint> newComparator() {
-    return new LevelTwoPointComparator();
+    return new LevelTwoPointComparator(true, true);
   }
 
   /**

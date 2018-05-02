@@ -15,7 +15,7 @@
 
 /*
  * ThreeWayData.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -37,10 +37,9 @@ import java.util.Date;
 import java.util.Iterator;
 
 /**
- * Stores a complete chromatogram plus reference values (if they exist).
+ * Stores 3-way data and associated meta-data.
  *
- * @author dale
- * @version $Revision: 4313 $
+ * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class ThreeWayData
   extends AbstractDataContainer<LevelOnePoint>
@@ -104,7 +103,7 @@ public class ThreeWayData
    * @return		the comparator instance
    */
   public DataPointComparator<LevelOnePoint> newComparator() {
-    return new LevelOnePointComparator();
+    return new LevelOnePointComparator(true, true);
   }
 
   /**
