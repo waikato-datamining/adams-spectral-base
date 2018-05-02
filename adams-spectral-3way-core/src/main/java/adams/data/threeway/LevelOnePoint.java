@@ -15,7 +15,7 @@
 
 /*
  * LevelOnePoint.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -30,10 +30,9 @@ import adams.data.statistics.LevelOnePointStatistic;
 import java.util.Collections;
 
 /**
- * Mass Spectrogram, plus GC date (time, abundance).
+ * Level 1 data point.
  *
- * @author dale
- * @version $Revision: 4217 $
+ * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class LevelOnePoint
   extends AbstractDataContainer<LevelTwoPoint>
@@ -394,6 +393,18 @@ public class LevelOnePoint
    */
   public double getY() {
     return m_Y;
+  }
+
+  /**
+   * Uses the sum of the Y values of all level 2 points for its own Y value.
+   */
+  public void updateY() {
+    double	sum;
+
+    sum = 0.0;
+    for (LevelTwoPoint p: this)
+      sum += p.getY();
+    setY(sum);
   }
 
   /**
