@@ -22,8 +22,8 @@ package adams.data.io.input;
 
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.data.threeway.LevelOnePoint;
-import adams.data.threeway.LevelTwoPoint;
+import adams.data.threeway.L1Point;
+import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 
 import java.util.HashMap;
@@ -122,9 +122,9 @@ public class SimpleXYZReader
     CsvSpreadSheetReader	reader;
     SpreadSheet			sheet;
     ThreeWayData		data;
-    LevelOnePoint		l1;
-    LevelTwoPoint		l2;
-    Map<Double,Map<Double,LevelOnePoint>> cache;
+    L1Point l1;
+    L2Point l2;
+    Map<Double,Map<Double,L1Point>> cache;
     double			x;
     double			y;
     double			z;
@@ -150,13 +150,13 @@ public class SimpleXYZReader
         l1 = cache.get(x).get(y);
       }
       else {
-	l1 = new LevelOnePoint(x, y);
+	l1 = new L1Point(x, y);
 	if (!cache.containsKey(x))
 	  cache.put(x, new HashMap<>());
 	cache.get(x).put(y, l1);
 	data.add(l1);
       }
-      l2 = new LevelTwoPoint(z, d);
+      l2 = new L2Point(z, d);
       l1.add(l2);
     }
 

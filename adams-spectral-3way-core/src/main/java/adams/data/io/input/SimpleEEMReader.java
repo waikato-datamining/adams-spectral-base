@@ -22,8 +22,8 @@ package adams.data.io.input;
 
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.data.threeway.LevelOnePoint;
-import adams.data.threeway.LevelTwoPoint;
+import adams.data.threeway.L1Point;
+import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 
 /**
@@ -121,8 +121,8 @@ public class SimpleEEMReader
     CsvSpreadSheetReader	reader;
     SpreadSheet			sheet;
     ThreeWayData		data;
-    LevelOnePoint		l1;
-    LevelTwoPoint		l2;
+    L1Point l1;
+    L2Point l2;
     Row				header;
     int				i;
 
@@ -141,10 +141,10 @@ public class SimpleEEMReader
 
     header = sheet.getHeaderRow();
     for (Row row: sheet.rows()) {
-      l1 = new LevelOnePoint();
+      l1 = new L1Point();
       l1.setX(row.getCell(0).toDouble());
       for (i = 1; i < sheet.getColumnCount(); i++) {
-	l2 = new LevelTwoPoint(header.getCell(i).toDouble(), row.getCell(i).toDouble());
+	l2 = new L2Point(header.getCell(i).toDouble(), row.getCell(i).toDouble());
 	l1.add(l2);
       }
       l1.updateY();

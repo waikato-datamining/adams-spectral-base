@@ -21,8 +21,8 @@
 package adams.data.threewayfilter;
 
 import adams.data.container.DataPoint;
-import adams.data.threeway.LevelOnePoint;
-import adams.data.threeway.LevelTwoPoint;
+import adams.data.threeway.L1Point;
+import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 
 import java.util.List;
@@ -61,15 +61,15 @@ public class DownSample
    */
   @Override
   protected DataPoint copy(int index, List<DataPoint> points) {
-    LevelOnePoint 	result;
-    LevelOnePoint 	l1;
+    L1Point result;
+    L1Point l1;
     int			i;
 
-    l1     = (LevelOnePoint) points.get(index);
-    result = new LevelOnePoint(l1.getX(), l1.getY());
+    l1     = (L1Point) points.get(index);
+    result = new L1Point(l1.getX(), l1.getY());
     for (i = 0; i < l1.size(); i++) {
       if ((i+1) % m_NthPoint == 0)
-	result.add((LevelTwoPoint) l1.toList().get(i).getClone());
+	result.add((L2Point) l1.toList().get(i).getClone());
     }
 
     return result;

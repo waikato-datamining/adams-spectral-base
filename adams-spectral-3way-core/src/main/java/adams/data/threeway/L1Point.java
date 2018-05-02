@@ -14,7 +14,7 @@
  */
 
 /*
- * LevelOnePoint.java
+ * L1Point.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  *
  */
@@ -25,7 +25,7 @@ import adams.data.container.AbstractDataContainer;
 import adams.data.container.DataContainer;
 import adams.data.container.DataPoint;
 import adams.data.container.DataPointComparator;
-import adams.data.statistics.LevelOnePointStatistic;
+import adams.data.statistics.L1PointStatistic;
 
 import java.util.Collections;
 
@@ -34,8 +34,8 @@ import java.util.Collections;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class LevelOnePoint
-  extends AbstractDataContainer<LevelTwoPoint>
+public class L1Point
+  extends AbstractDataContainer<L2Point>
   implements DataPoint {
 
   /** for serialization. */
@@ -51,24 +51,24 @@ public class LevelOnePoint
   protected double m_Y;
 
   /** point of greatest x. */
-  protected LevelTwoPoint m_MaxX;
+  protected L2Point m_MaxX;
 
   /** point of smallest x. */
-  protected LevelTwoPoint m_MinX;
+  protected L2Point m_MinX;
 
   /** point of greatest y. */
-  protected LevelTwoPoint m_MaxY;
+  protected L2Point m_MaxY;
 
   /** point of smallest y. */
-  protected LevelTwoPoint m_MinY;
+  protected L2Point m_MinY;
 
   /** the default comparator. */
-  protected static DataPointComparator<LevelTwoPoint> m_Comparator;
+  protected static DataPointComparator<L2Point> m_Comparator;
 
   /**
    * Constructor.
    */
-  public LevelOnePoint() {
+  public L1Point() {
     this(-1, -1);
   }
 
@@ -78,7 +78,7 @@ public class LevelOnePoint
    * @param x	the x
    * @param y	the y
    */
-  public LevelOnePoint(double x, double y) {
+  public L1Point(double x, double y) {
     this(null, x, y);
   }
 
@@ -89,7 +89,7 @@ public class LevelOnePoint
    * @param x		the x
    * @param y		the y
    */
-  public LevelOnePoint(ThreeWayData parent, double x, double y) {
+  public L1Point(ThreeWayData parent, double x, double y) {
     m_X      = x;
     m_Y      = y;
     m_Parent = parent;
@@ -106,8 +106,8 @@ public class LevelOnePoint
    *
    * @return		the comparator instance
    */
-  public DataPointComparator<LevelTwoPoint> newComparator() {
-    return new LevelTwoPointComparator(true, true);
+  public DataPointComparator<L2Point> newComparator() {
+    return new L2PointComparator(true, true);
   }
 
   /**
@@ -115,7 +115,7 @@ public class LevelOnePoint
    *
    * @return		the comparator in use
    */
-  public DataPointComparator<LevelTwoPoint> getComparator() {
+  public DataPointComparator<L2Point> getComparator() {
     return m_Comparator;
   }
 
@@ -141,7 +141,7 @@ public class LevelOnePoint
    * @param other	the data point to get the values from
    */
   @Override
-  public void assign(DataContainer<LevelTwoPoint> other) {
+  public void assign(DataContainer<L2Point> other) {
     super.assign(other);
 
     assign((DataPoint) other);
@@ -167,9 +167,9 @@ public class LevelOnePoint
    * @param other	the data point to get the values from
    */
   public void assign(DataPoint other) {
-    LevelOnePoint point;
+    L1Point point;
 
-    point = (LevelOnePoint) other;
+    point = (L1Point) other;
 
     setX(point.getX());
     setY(point.getY());
@@ -181,8 +181,8 @@ public class LevelOnePoint
    *
    * @return		the new DataContainer point
    */
-  public LevelTwoPoint newPoint() {
-    return new LevelTwoPoint(-1.0f, -1);
+  public L2Point newPoint() {
+    return new L2Point(-1.0f, -1);
   }
 
   /**
@@ -229,7 +229,7 @@ public class LevelOnePoint
     if (m_MinY != null)
       return;
 
-    for (LevelTwoPoint point: this) {
+    for (L2Point point: this) {
       if (    (m_MaxY == null)
 	   || (point.getY() > m_MaxY.getY()) )
 	m_MaxY = point;
@@ -250,7 +250,7 @@ public class LevelOnePoint
    *
    * @return	point
    */
-  public LevelTwoPoint getMaxY() {
+  public L2Point getMaxY() {
     validateMinMax();
     return m_MaxY;
   }
@@ -260,7 +260,7 @@ public class LevelOnePoint
    *
    * @return	point
    */
-  public LevelTwoPoint getMinY() {
+  public L2Point getMinY() {
     validateMinMax();
     return m_MinY;
   }
@@ -270,7 +270,7 @@ public class LevelOnePoint
    *
    * @return	point
    */
-  public LevelTwoPoint getMaxX() {
+  public L2Point getMaxX() {
     validateMinMax();
     return m_MaxX;
   }
@@ -280,7 +280,7 @@ public class LevelOnePoint
    *
    * @return	point
    */
-  public LevelTwoPoint getMinX() {
+  public L2Point getMinX() {
     validateMinMax();
     return m_MinX;
   }
@@ -292,7 +292,7 @@ public class LevelOnePoint
    * @param y		the y
    */
   public void add(double x, double y) {
-    add(new LevelTwoPoint(x, y));
+    add(new L2Point(x, y));
   }
 
   /**
@@ -301,8 +301,8 @@ public class LevelOnePoint
    * @param x		the x to look for
    * @return		the LevelTwoPoint or null if not found
    */
-  public LevelTwoPoint find(double x) {
-    LevelTwoPoint result;
+  public L2Point find(double x) {
+    L2Point result;
 
     result = findClosest(x);
     if ((result != null) && (result.getX() != x))
@@ -317,10 +317,10 @@ public class LevelOnePoint
    * @param x		the x to look for
    * @return		the LevelTwoPoint
    */
-  public LevelTwoPoint findClosest(double x) {
-    LevelTwoPoint 	result;
+  public L2Point findClosest(double x) {
+    L2Point result;
     int			index;
-    LevelTwoPoint 	currPoint;
+    L2Point currPoint;
     double		currDist;
     double		dist;
     int			i;
@@ -330,7 +330,7 @@ public class LevelOnePoint
     if (m_Points.size() == 0)
       return result;
 
-    index = Collections.binarySearch(m_Points, new LevelTwoPoint(x, 0), m_Comparator);
+    index = Collections.binarySearch(m_Points, new L2Point(x, 0), m_Comparator);
 
     // no exact match -> find closest
     if (index < 0) {
@@ -402,7 +402,7 @@ public class LevelOnePoint
     double	sum;
 
     sum = 0.0;
-    for (LevelTwoPoint p: this)
+    for (L2Point p: this)
       sum += p.getY();
     setY(sum);
   }
@@ -421,13 +421,13 @@ public class LevelOnePoint
   @Override
   public int compareToHeader(Object o) {
     int		result;
-    LevelOnePoint p;
+    L1Point p;
 
     result = super.compareToHeader(o);
     if (result != 0)
       return result;
 
-    p = (LevelOnePoint) o;
+    p = (L1Point) o;
 
     if (result == 0)
       result = Double.compare(getX(), p.getX());
@@ -459,7 +459,7 @@ public class LevelOnePoint
    *
    * @return		statistics about this GC point
    */
-  public LevelOnePointStatistic toStatistic() {
-    return new LevelOnePointStatistic(this);
+  public L1PointStatistic toStatistic() {
+    return new L1PointStatistic(this);
   }
 }

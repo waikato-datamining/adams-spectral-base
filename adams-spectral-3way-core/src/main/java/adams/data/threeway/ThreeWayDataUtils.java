@@ -39,9 +39,9 @@ public class ThreeWayDataUtils
   extends DataContainerUtils {
 
   /** comparator for finding timestamps. */
-  protected static LevelOnePointComparator m_Comparator;
+  protected static L1PointComparator m_Comparator;
   static {
-    m_Comparator = new LevelOnePointComparator(false, true);
+    m_Comparator = new L1PointComparator(false, true);
   }
 
   /**
@@ -49,7 +49,7 @@ public class ThreeWayDataUtils
    *
    * @return		the comparator
    */
-  public static LevelOnePointComparator getComparator() {
+  public static L1PointComparator getComparator() {
     return m_Comparator;
   }
 
@@ -59,7 +59,7 @@ public class ThreeWayDataUtils
    * @param points	the LevelOnePoint points to create the header for
    * @return		the generated header
    */
-  protected static ThreeWayData getHeader(List<LevelOnePoint> points) {
+  protected static ThreeWayData getHeader(List<L1Point> points) {
     ThreeWayData	result;
 
     if ((points.size() > 0) && (points.get(0).getParent() != null))
@@ -77,7 +77,7 @@ public class ThreeWayDataUtils
    * @param p		the point to get the index for
    * @return		the index or -1 if not found
    */
-  public static int findX(List<LevelOnePoint> points, LevelOnePoint p) {
+  public static int findX(List<L1Point> points, L1Point p) {
     int		result;
 
     result = Collections.binarySearch(points, p, m_Comparator);
@@ -94,8 +94,8 @@ public class ThreeWayDataUtils
    * @param x		the X to get the index for
    * @return		the index
    */
-  public static int findX(List<LevelOnePoint> points, double x) {
-    return findX(points, new LevelOnePoint(x, 0));
+  public static int findX(List<L1Point> points, double x) {
+    return findX(points, new L1Point(x, 0));
   }
 
   /**
@@ -105,10 +105,10 @@ public class ThreeWayDataUtils
    * @param x		the X to get the closest index for
    * @return		the index
    */
-  public static int findClosestX(List<LevelOnePoint> points, double x) {
+  public static int findClosestX(List<L1Point> points, double x) {
     int			result;
     int			index;
-    LevelOnePoint	currPoint;
+    L1Point currPoint;
     double		currDist;
     double		dist;
     int			i;
@@ -118,7 +118,7 @@ public class ThreeWayDataUtils
     if (points.size() == 0)
       return result;
 
-    index = Collections.binarySearch(points, new LevelOnePoint(x, 0), m_Comparator);
+    index = Collections.binarySearch(points, new L1Point(x, 0), m_Comparator);
 
     // no exact match -> find closest
     if (index < 0) {
@@ -157,7 +157,7 @@ public class ThreeWayDataUtils
    * @param x		the X to get the enclosing indices for
    * @return		the indices
    */
-  public static int[] findEnclosingXs(List<LevelOnePoint> points, double x) {
+  public static int[] findEnclosingXs(List<L1Point> points, double x) {
     int[]	result;
     int		index;
 
@@ -194,7 +194,7 @@ public class ThreeWayDataUtils
    * 			smaller (= true) or next larger (= false) timestamp
    * @return		the index of the LevelOnePoint point, -1 if not found
    */
-  public static int findX(List<LevelOnePoint> points, double x, boolean less) {
+  public static int findX(List<L1Point> points, double x, boolean less) {
     int		result;
 
     result = findClosestX(points, x);
@@ -224,8 +224,8 @@ public class ThreeWayDataUtils
    * @param windowEnd	the end of the window, use -1 for right-most point
    * @return		the generated window
    */
-  public static List<LevelOnePoint> createWindow(List<LevelOnePoint> points, double windowStart, double windowEnd) {
-    List<LevelOnePoint>	result;
+  public static List<L1Point> createWindow(List<L1Point> points, double windowStart, double windowEnd) {
+    List<L1Point>	result;
     double		start;
     double		end;
     int			startLevelOnePoint;
@@ -256,7 +256,7 @@ public class ThreeWayDataUtils
     // create window
     result = new ArrayList<>();
     for (i = startLevelOnePoint; i <= endLevelOnePoint; i++)
-      result.add((LevelOnePoint) points.get(i).getClone());
+      result.add((L1Point) points.get(i).getClone());
 
     return result;
   }
@@ -272,7 +272,7 @@ public class ThreeWayDataUtils
    * 			the last point in the data is used.
    * @return		the generated region
    */
-  public static ThreeWayData getConsecutiveRegion(List<LevelOnePoint> points, LevelOnePoint lastEnd, LevelOnePoint end) {
+  public static ThreeWayData getConsecutiveRegion(List<L1Point> points, L1Point lastEnd, L1Point end) {
     ThreeWayData	result;
     int			indexStart;
     int			indexEnd;
@@ -291,7 +291,7 @@ public class ThreeWayDataUtils
       indexEnd = findX(points, end);
 
     for (i = indexStart; i <= indexEnd; i++)
-      result.add((LevelOnePoint) points.get(i).getClone());
+      result.add((L1Point) points.get(i).getClone());
 
     return result;
   }
@@ -306,7 +306,7 @@ public class ThreeWayDataUtils
    * 			the last point in the data is used.
    * @return		the generated region
    */
-  public static ThreeWayData getRegion(List<LevelOnePoint> points, LevelOnePoint start, LevelOnePoint end) {
+  public static ThreeWayData getRegion(List<L1Point> points, L1Point start, L1Point end) {
     ThreeWayData	result;
     int			indexStart;
     int			indexEnd;
@@ -325,7 +325,7 @@ public class ThreeWayDataUtils
       indexEnd = findX(points, end);
 
     for (i = indexStart; i <= indexEnd; i++)
-      result.add((LevelOnePoint) points.get(i).getClone());
+      result.add((L1Point) points.get(i).getClone());
 
     return result;
   }
@@ -339,13 +339,13 @@ public class ThreeWayDataUtils
    * @param end		the last X
    * @return		the number of changes in sign
    */
-  public static int countSignChanges(List<LevelOnePoint> points, double start, double end) {
+  public static int countSignChanges(List<L1Point> points, double start, double end) {
     int			result;
     int			startIndex;
     int			endIndex;
     int			i;
     double		abund;
-    LevelOnePoint	point;
+    L1Point point;
 
     result     = 0;
     startIndex = findX(points, start);
@@ -374,13 +374,13 @@ public class ThreeWayDataUtils
    * 			negative ones
    * @return		the number of positive/negative regions
    */
-  public static int countRegions(List<LevelOnePoint> points, double start, double end, boolean positive) {
+  public static int countRegions(List<L1Point> points, double start, double end, boolean positive) {
     int			result;
     int			startIndex;
     int			endIndex;
     int			i;
     double		abund;
-    LevelOnePoint	point;
+    L1Point point;
 
     result     = 0;
     startIndex = findX(points, start);
@@ -415,7 +415,7 @@ public class ThreeWayDataUtils
    */
   public static ThreeWayData union(ThreeWayData a, ThreeWayData b) {
     ThreeWayData	result;
-    List<LevelOnePoint>	points;
+    List<L1Point>	points;
     int			i;
 
     result = (ThreeWayData) a.getClone();
@@ -423,7 +423,7 @@ public class ThreeWayDataUtils
     points = b.toList();
     for (i = 0; i < points.size(); i++) {
       if (findX(a.toList(), points.get(i).getX()) == -1)
-	result.add((LevelOnePoint) points.get(i).getClone());
+	result.add((L1Point) points.get(i).getClone());
     }
 
     return result;
@@ -440,7 +440,7 @@ public class ThreeWayDataUtils
    */
   public static ThreeWayData minus(ThreeWayData a, ThreeWayData b) {
     ThreeWayData	result;
-    List<LevelOnePoint>	points;
+    List<L1Point>	points;
     int			i;
 
     result = (ThreeWayData) a.getHeader();
@@ -448,7 +448,7 @@ public class ThreeWayDataUtils
     points = a.toList();
     for (i = 0; i < points.size(); i++) {
       if (findX(b.toList(), points.get(i).getX()) == -1)
-	result.add((LevelOnePoint) points.get(i).getClone());
+	result.add((L1Point) points.get(i).getClone());
     }
 
     return result;
@@ -464,7 +464,7 @@ public class ThreeWayDataUtils
    */
   public static ThreeWayData intersect(ThreeWayData a, ThreeWayData b) {
     ThreeWayData	result;
-    List<LevelOnePoint>	points;
+    List<L1Point>	points;
     int			i;
 
     result = (ThreeWayData) a.getHeader();
@@ -472,7 +472,7 @@ public class ThreeWayDataUtils
     points = a.toList();
     for (i = 0; i < points.size(); i++) {
       if (findX(b.toList(), points.get(i).getX()) != -1)
-	result.add((LevelOnePoint) points.get(i).getClone());
+	result.add((L1Point) points.get(i).getClone());
     }
 
     return result;
@@ -489,7 +489,7 @@ public class ThreeWayDataUtils
   public static List<ThreeWayData> getMissingRegions(ThreeWayData a, ThreeWayData b) {
     List<ThreeWayData>	result;
     ThreeWayData		region;
-    List<LevelOnePoint>		points;
+    List<L1Point>		points;
     int				i;
 
     result = new ArrayList<>();
@@ -502,7 +502,7 @@ public class ThreeWayDataUtils
 	  region = (ThreeWayData) a.getHeader();
 	  result.add(region);
 	}
-	region.add((LevelOnePoint) points.get(i).getClone());
+	region.add((L1Point) points.get(i).getClone());
       }
       else {
 	region = null;
@@ -524,8 +524,8 @@ public class ThreeWayDataUtils
   public static ThreeWayData fillGaps(ThreeWayData gaps, ThreeWayData reference, GapFilling type) {
     ThreeWayData	result;
     ThreeWayData	tmpData;
-    List<LevelOnePoint>	points;
-    LevelOnePoint	point;
+    List<L1Point>	points;
+    L1Point point;
     int			i;
     int			first;
     int			second;
@@ -544,7 +544,7 @@ public class ThreeWayDataUtils
       tmpData = ThreeWayDataUtils.minus(reference, gaps);
       points  = tmpData.toList();
       for (i = 0; i < points.size(); i++) {
-	point = (LevelOnePoint) points.get(i).getClone();
+	point = (L1Point) points.get(i).getClone();
 	point.setY(0);
 	result.add(point);
       }
@@ -555,7 +555,7 @@ public class ThreeWayDataUtils
       tmpData = ThreeWayDataUtils.minus(reference, gaps);
       points  = tmpData.toList();
       for (i = 0; i < points.size(); i++) {
-	point = (LevelOnePoint) points.get(i).getClone();
+	point = (L1Point) points.get(i).getClone();
 	result.add(point);
       }
     }
@@ -592,7 +592,7 @@ public class ThreeWayDataUtils
 
 	  // fill in points
 	  for (i = first + 1; i < second; i++) {
-	    point = (LevelOnePoint) points.get(i).getClone();
+	    point = (L1Point) points.get(i).getClone();
 	    point.setY(((i - first) * delta) + base);
 	    result.add(point);
 	  }
@@ -616,19 +616,19 @@ public class ThreeWayDataUtils
    * @param pool	the current data pool
    * @param c		the objet to merge with the pool
    */
-  protected static void add(HashMap<Double,LevelOnePoint> pool, ThreeWayData c) {
-    Iterator<LevelOnePoint> 	iterLevelOnePoint;
-    LevelOnePoint		pointLevelOnePoint;
-    LevelOnePoint		poolLevelOnePoint;
+  protected static void add(HashMap<Double,L1Point> pool, ThreeWayData c) {
+    Iterator<L1Point> 	iterLevelOnePoint;
+    L1Point pointL1Point;
+    L1Point poolL1Point;
 
     iterLevelOnePoint = c.toList().iterator();
     while (iterLevelOnePoint.hasNext()) {
-      pointLevelOnePoint = iterLevelOnePoint.next();
-      poolLevelOnePoint  = pool.get(pointLevelOnePoint.getX());
-      if (poolLevelOnePoint == null)
-	poolLevelOnePoint = new LevelOnePoint(pointLevelOnePoint.getX(), 0);
-      poolLevelOnePoint = LevelOnePointUtils.merge(poolLevelOnePoint, pointLevelOnePoint);
-      pool.put(poolLevelOnePoint.getX(), poolLevelOnePoint);
+      pointL1Point = iterLevelOnePoint.next();
+      poolL1Point = pool.get(pointL1Point.getX());
+      if (poolL1Point == null)
+	poolL1Point = new L1Point(pointL1Point.getX(), 0);
+      poolL1Point = L1PointUtils.merge(poolL1Point, pointL1Point);
+      pool.put(poolL1Point.getX(), poolL1Point);
     }
   }
 
@@ -660,7 +660,7 @@ public class ThreeWayDataUtils
   public static ThreeWayData merge(List<ThreeWayData> list) {
     ThreeWayData			result;
     int					i;
-    HashMap<Double,LevelOnePoint>	pool;
+    HashMap<Double,L1Point>	pool;
 
     if (list.size() == 0)
       return null;
@@ -683,7 +683,7 @@ public class ThreeWayDataUtils
     }
 
     // create output data
-    for (LevelOnePoint l1: pool.values())
+    for (L1Point l1: pool.values())
       result.add(l1);
 
     return result;
@@ -705,13 +705,13 @@ public class ThreeWayDataUtils
    * @param data	the LevelOnePoint points to turn into a double array
    * @return		the abundances as double array
    */
-  public static double[] toDoubleArray(List<LevelOnePoint> data) {
+  public static double[] toDoubleArray(List<L1Point> data) {
     double[] 	result;
     int 	i;
 
     result = new double[data.size()];
     i      = 0;
-    for (LevelOnePoint l1 :data)
+    for (L1Point l1 :data)
       result[i++] = l1.getY();
 
     return result;

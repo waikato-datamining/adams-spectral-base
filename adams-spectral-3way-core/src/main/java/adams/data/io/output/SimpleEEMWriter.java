@@ -27,8 +27,8 @@ import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.HeaderRow;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.data.threeway.LevelOnePoint;
-import adams.data.threeway.LevelTwoPoint;
+import adams.data.threeway.L1Point;
+import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 
 import java.util.List;
@@ -121,9 +121,9 @@ public class SimpleEEMWriter
 
     // header
     header = sheet.getHeaderRow();
-    for (LevelOnePoint l1 : three) {
+    for (L1Point l1 : three) {
       header.addCell("S").setContentAsString("Sample");
-      for (LevelTwoPoint l2: l1) {
+      for (L2Point l2: l1) {
         if (!header.hasCell("" + l2.getX()))
           header.addCell("" + l2.getX()).setContent(l2.getX());
       }
@@ -138,10 +138,10 @@ public class SimpleEEMWriter
     }
 
     // data
-    for (LevelOnePoint l1 : three) {
+    for (L1Point l1 : three) {
       row = sheet.addRow();
       row.addCell("S").setContent(l1.getX());
-      for (LevelTwoPoint l2: l1)
+      for (L2Point l2: l1)
         row.addCell("" + l2.getX()).setContent(l2.getY());
     }
 

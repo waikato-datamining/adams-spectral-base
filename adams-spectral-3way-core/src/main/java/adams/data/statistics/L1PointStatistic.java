@@ -14,14 +14,14 @@
  */
 
 /*
- * LevelOnePointStatistic.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * L1PointStatistic.java
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.statistics;
 
-import adams.data.threeway.LevelOnePoint;
-import adams.data.threeway.LevelTwoPoint;
+import adams.data.threeway.L1Point;
+import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 
 import java.util.List;
@@ -30,10 +30,9 @@ import java.util.List;
  * A Level 1 point specific statistic.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 3839 $
  */
-public class LevelOnePointStatistic
-  extends AbstractDataStatistic<LevelOnePoint> {
+public class L1PointStatistic
+  extends AbstractDataStatistic<L1Point> {
 
   /** for serialization. */
   private static final long serialVersionUID = 3716117305318401778L;
@@ -77,7 +76,7 @@ public class LevelOnePointStatistic
   /**
    * Initializes the statistic.
    */
-  public LevelOnePointStatistic() {
+  public L1PointStatistic() {
     super();
   }
 
@@ -86,7 +85,7 @@ public class LevelOnePointStatistic
    *
    * @param data	the gc point to generate the statistics for
    */
-  public LevelOnePointStatistic(LevelOnePoint data) {
+  public L1PointStatistic(L1Point data) {
     super(data);
   }
 
@@ -121,7 +120,7 @@ public class LevelOnePointStatistic
    * calculates the statistics.
    */
   protected void calculate() {
-    List<LevelTwoPoint> points;
+    List<L2Point> points;
     int			i;
     Double[] 		x;
     Double[] 		y;

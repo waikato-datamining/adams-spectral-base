@@ -25,8 +25,8 @@ import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.HeaderRow;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
-import adams.data.threeway.LevelOnePoint;
-import adams.data.threeway.LevelTwoPoint;
+import adams.data.threeway.L1Point;
+import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 
 import java.util.List;
@@ -124,8 +124,8 @@ public class SimpleXYZWriter
     header.addCell("D").setContentAsString("Data");
 
     // data
-    for (LevelOnePoint l1 : three) {
-      for (LevelTwoPoint l2: l1) {
+    for (L1Point l1 : three) {
+      for (L2Point l2: l1) {
         row = sheet.addRow();
         row.addCell("X").setContent(l1.getX());
         row.addCell("Y").setContent(l1.getY());

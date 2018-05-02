@@ -21,8 +21,8 @@
 package adams.data.conversion;
 
 import adams.data.heatmap.Heatmap;
-import adams.data.threeway.LevelOnePoint;
-import adams.data.threeway.LevelTwoPoint;
+import adams.data.threeway.L1Point;
+import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 
 /**
@@ -96,14 +96,14 @@ public class ThreeWayDataToHeatmap
 
     input  = (ThreeWayData) m_Input;
     cols   = 0;
-    for (LevelOnePoint l1: input.toList())
+    for (L1Point l1: input.toList())
       cols = Math.max(cols, l1.size());
     result = new Heatmap(input.size(), cols);
 
     n = 0;
-    for (LevelOnePoint l1: input.toList()) {
+    for (L1Point l1: input.toList()) {
       i = 0;
-      for (LevelTwoPoint l2: l1.toList()) {
+      for (L2Point l2: l1.toList()) {
 	result.set(n, i, l2.getY());
 	i++;
       }

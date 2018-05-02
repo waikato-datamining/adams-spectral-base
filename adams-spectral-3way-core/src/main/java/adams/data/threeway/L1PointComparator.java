@@ -14,8 +14,8 @@
  */
 
 /*
- * LevelTwoPointComparator.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * L1PointComparator.java
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.threeway;
@@ -23,46 +23,45 @@ package adams.data.threeway;
 import adams.data.container.DataPointComparator;
 
 /**
- * A comparator for MS points.
+ * A comparator for level one points.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 3800 $
  */
-public class LevelTwoPointComparator
-  extends DataPointComparator<LevelTwoPoint> {
+public class L1PointComparator
+  extends DataPointComparator<L1Point> {
 
   /** for serialization. */
-  private static final long serialVersionUID = -2616612006241389909L;
+  private static final long serialVersionUID = -5536677097973106152L;
 
-  /** whether to compare y or x. */
+  /** whether to compare Y as well. */
   protected boolean m_UseY;
 
   /**
-   * The default constructor uses comparison by x in ascending manner.
+   * The default constructor uses comparison by X in ascending manner.
    */
-  public LevelTwoPointComparator() {
+  public L1PointComparator() {
     this(false, true);
   }
 
   /**
    * This constructor initializes the comparator either with comparison by
-   * x or by y as well. Either in ascending manner or descending.
+   * X or Y as well. Either in ascending manner or descending.
    *
-   * @param useY		if true then y is used for comparison
-   * 				as well as x
+   * @param useY		if true then Y is used for comparison
+   * 				as well as X
    * @param ascending		if true then the ordering is done in ascending
    * 				manner, otherwise descending
    */
-  public LevelTwoPointComparator(boolean useY, boolean ascending) {
+  public L1PointComparator(boolean useY, boolean ascending) {
     super(ascending);
 
     m_UseY = useY;
   }
 
   /**
-   * Returns whether the x or y is used for ordering as well.
+   * Returns whether the Y used for ordering as well.
    *
-   * @return		true if y is used for ordering as well
+   * @return		true if Y is used as well
    */
   public boolean isUsingY() {
     return m_UseY;
@@ -79,7 +78,7 @@ public class LevelTwoPointComparator
    * 			the first argument is less than, equal to, or greater
    * 			than the second.
    */
-  public int compare(LevelTwoPoint o1, LevelTwoPoint o2) {
+  public int compare(L1Point o1, L1Point o2) {
     int		result;
 
     result = Double.compare(o1.getX(), o2.getX());

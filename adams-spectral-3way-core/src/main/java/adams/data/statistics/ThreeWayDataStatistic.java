@@ -20,7 +20,7 @@
 
 package adams.data.statistics;
 
-import adams.data.threeway.LevelOnePoint;
+import adams.data.threeway.L1Point;
 import adams.data.threeway.ThreeWayData;
 
 import java.util.List;
@@ -135,7 +135,7 @@ public class ThreeWayDataStatistic
    */
   @Override
   protected void calculate() {
-    List<LevelOnePoint> points;
+    List<L1Point> points;
     int			i;
     Double[] 		deltaXs;
     Double[]		ys;

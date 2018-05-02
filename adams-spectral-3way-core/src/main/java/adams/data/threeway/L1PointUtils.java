@@ -14,7 +14,7 @@
  */
 
 /*
- * LevelOnePointUtils.java
+ * L1PointUtils.java
  * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
  */
 
@@ -33,14 +33,13 @@ import java.util.List;
  * A helper class for the Level 2 points of a given Level 1 point.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 3800 $
  */
-public class LevelOnePointUtils {
+public class L1PointUtils {
 
   /** the comparator in use. */
-  protected static LevelTwoPointComparator m_Comparator;
+  protected static L2PointComparator m_Comparator;
   static {
-    m_Comparator = new LevelTwoPointComparator(false, true);
+    m_Comparator = new L2PointComparator(false, true);
   }
 
   /**
@@ -50,7 +49,7 @@ public class LevelOnePointUtils {
    * @param p		the point to get the index for
    * @return		the index or -1 if not found
    */
-  public static int findX(List<LevelTwoPoint> points, LevelTwoPoint p) {
+  public static int findX(List<L2Point> points, L2Point p) {
     int		result;
 
     result = Collections.binarySearch(points, p, m_Comparator);
@@ -67,8 +66,8 @@ public class LevelOnePointUtils {
    * @param x		the X to get the index for
    * @return		the index
    */
-  public static int findMassCharge(List<LevelTwoPoint> points, double x) {
-    return findX(points, new LevelTwoPoint(x, 0));
+  public static int findMassCharge(List<L2Point> points, double x) {
+    return findX(points, new L2Point(x, 0));
   }
 
   /**
@@ -80,20 +79,20 @@ public class LevelOnePointUtils {
    * @param point2	the second point
    * @return		the merged data
    */
-  public static LevelOnePoint merge(LevelOnePoint point1, LevelOnePoint point2) {
-    LevelOnePoint 			result;
-    List<LevelTwoPoint>			points1;
-    List<LevelTwoPoint>			points2;
-    Hashtable<Double,LevelTwoPoint>	pool;
+  public static L1Point merge(L1Point point1, L1Point point2) {
+    L1Point result;
+    List<L2Point>			points1;
+    List<L2Point>			points2;
+    Hashtable<Double,L2Point>	pool;
     int					i;
-    LevelTwoPoint 			l2;
-    LevelTwoPoint 			l2Pool;
-    Enumeration<LevelTwoPoint>		elements;
+    L2Point l2;
+    L2Point l2Pool;
+    Enumeration<L2Point>		elements;
 
-    result = new LevelOnePoint(point1.getX(), point1.getY() + point2.getY());
+    result = new L1Point(point1.getX(), point1.getY() + point2.getY());
 
-    points1 = point1.toList(new LevelTwoPointComparator(false, true));
-    points2 = point2.toList(new LevelTwoPointComparator(false, true));
+    points1 = point1.toList(new L2PointComparator(false, true));
+    points2 = point2.toList(new L2PointComparator(false, true));
 
     // init pool
     pool = new Hashtable<>();
@@ -117,7 +116,7 @@ public class LevelOnePointUtils {
     // create new point
     elements = pool.elements();
     while (elements.hasMoreElements())
-      result.add((LevelTwoPoint) elements.nextElement().getClone());
+      result.add((L2Point) elements.nextElement().getClone());
 
     return result;
   }
@@ -130,8 +129,8 @@ public class LevelOnePointUtils {
    * @param numBins	the number of bins to generate
    * @return		the histogram data
    */
-  public static double[] getHistogram(LevelOnePoint l1, int numBins) {
-    List<LevelTwoPoint>	points;
+  public static double[] getHistogram(L1Point l1, int numBins) {
+    List<L2Point>	points;
     double[]		result;
     double		min;
     double		max;
@@ -140,7 +139,7 @@ public class LevelOnePointUtils {
 
     result = new double[numBins];
 
-    points = new ArrayList<>(l1.toTreeSet(new LevelTwoPointComparator(true, true)));
+    points = new ArrayList<>(l1.toTreeSet(new L2PointComparator(true, true)));
     min    = points.get(0).getY();
     max    = points.get(points.size() - 1).getY();
     scale  = 1.0 / (max - min) / ((double) numBins);
@@ -156,7 +155,7 @@ public class LevelOnePointUtils {
    * @param c		the GC point to turn into a double array
    * @return		the abundances as double array
    */
-  public static double[] toDoubleArray(LevelOnePoint c) {
+  public static double[] toDoubleArray(L1Point c) {
     return toDoubleArray(c.toList());
   }
 
@@ -166,13 +165,13 @@ public class LevelOnePointUtils {
    * @param data	the MS points to turn into a double array
    * @return		the abundances as double array
    */
-  public static double[] toDoubleArray(List<LevelTwoPoint> data) {
+  public static double[] toDoubleArray(List<L2Point> data) {
     double[] 	result;
     int 	i;
 
     result = new double[data.size()];
     i      = 0;
-    for (LevelTwoPoint l2 : data)
+    for (L2Point l2 : data)
       result[i++] = l2.getY();
 
     return result;
@@ -186,22 +185,22 @@ public class LevelOnePointUtils {
    * @param right	the right level 1 point
    * @return		the interpolated level 1 point
    */
-  public static LevelOnePoint interpolate(double x, LevelOnePoint left, LevelOnePoint right) {
-    LevelOnePoint 		result;
+  public static L1Point interpolate(double x, L1Point left, L1Point right) {
+    L1Point result;
     double[]			weights;
     double			percLeft;
     double			percRight;
-    Iterator<LevelTwoPoint>	iterLeft;
-    Iterator<LevelTwoPoint>	iterRight;
-    LevelTwoPoint 		l2Left;
-    LevelTwoPoint 		l2Right;
-    LevelTwoPoint 		l2New;
+    Iterator<L2Point>	iterLeft;
+    Iterator<L2Point>	iterRight;
+    L2Point l2Left;
+    L2Point l2Right;
+    L2Point l2New;
     double 			l2LeftX;
     double 			l2RightX;
 
     // interpolate GCpoint
     weights   = new double[2];
-    result    = new LevelOnePoint(x, InterpolationUtils.interpolate(x, left.getX(), left.getY(), right.getX(), right.getY(), weights));
+    result    = new L1Point(x, InterpolationUtils.interpolate(x, left.getX(), left.getY(), right.getX(), right.getY(), weights));
     percLeft  = weights[0];
     percRight = weights[1];
 
@@ -227,7 +226,7 @@ public class LevelOnePointUtils {
       if (    (l2Left != null)
 	   && (l2Right != null)
 	   && (l2LeftX == l2RightX) ) {
-	l2New = new LevelTwoPoint(
+	l2New = new L2Point(
 	  l2Left.getX(),
 	  (Math.round(l2Left.getY() * percLeft) + Math.round(l2Right.getY() * percRight)));
 	l2Left = null;
@@ -236,14 +235,14 @@ public class LevelOnePointUtils {
       }
       else {
 	if ((l2Left != null) && (l2LeftX < l2RightX)) {
-	  l2New = new LevelTwoPoint(
+	  l2New = new L2Point(
 	    l2Left.getX(),
 	    Math.round(l2Left.getY() * percLeft));
 	  l2Left = null;
 	  result.add(l2New);
 	}
 	else if ((l2Right != null) && (l2RightX < l2LeftX)) {
-	  l2New = new LevelTwoPoint(
+	  l2New = new L2Point(
 	      l2Right.getX(),
 	      Math.round(l2Right.getY() * percRight));
 	  l2Right = null;
@@ -268,17 +267,17 @@ public class LevelOnePointUtils {
    * @param right	the right level 1 point
    * @return		the interpolated level 1point
    */
-  public static LevelOnePoint closest(long x, LevelOnePoint left, LevelOnePoint right) {
-    LevelOnePoint 		result;
+  public static L1Point closest(long x, L1Point left, L1Point right) {
+    L1Point result;
     double 			xdiff;
     double			percLeft;
     double			percRight;
-    Iterator<LevelTwoPoint> 	l2Iter;
+    Iterator<L2Point> 	l2Iter;
 
     xdiff = right.getX() - left.getX();
     percLeft  = 1 - (x - left.getX()) / xdiff;
     percRight = 1 - (right.getX() - x) / xdiff;
-    result    = new LevelOnePoint(x, Math.round(left.getY()*percLeft + right.getY()*percRight));
+    result    = new L1Point(x, Math.round(left.getY()*percLeft + right.getY()*percRight));
 
     // add level 2 dta
     if (percLeft > percRight)
@@ -287,7 +286,7 @@ public class LevelOnePointUtils {
       l2Iter = right.toList().iterator();
 
     while (l2Iter.hasNext())
-      result.add((LevelTwoPoint) l2Iter.next().getClone());
+      result.add((L2Point) l2Iter.next().getClone());
 
     return result;
   }

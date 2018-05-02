@@ -14,7 +14,7 @@
  */
 
 /*
- * LevelTwoPoint.java
+ * L2Point.java
  * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  *
  */
@@ -29,7 +29,7 @@ import adams.data.container.DataPoint;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class LevelTwoPoint
+public class L2Point
   extends AbstractDataPoint {
 
   /** for serialization. */
@@ -44,7 +44,7 @@ public class LevelTwoPoint
   /**
    * Constructor.
    */
-  public LevelTwoPoint() {
+  public L2Point() {
     this(-1, -1);
   }
 
@@ -54,7 +54,7 @@ public class LevelTwoPoint
    * @param x		the x
    * @param y		the y
    */
-  public LevelTwoPoint(double x, double y) {
+  public L2Point(double x, double y) {
     this(null, x, y);
   }
 
@@ -65,7 +65,7 @@ public class LevelTwoPoint
    * @param x		the x
    * @param y		the y
    */
-  public LevelTwoPoint(LevelOnePoint parent, double x, double y) {
+  public L2Point(L1Point parent, double x, double y) {
     m_Parent = parent;
     m_X      = x;
     m_Y      = y;
@@ -77,11 +77,11 @@ public class LevelTwoPoint
    * @param other	the data point to get the values from
    */
   public void assign(DataPoint other) {
-    LevelTwoPoint point;
+    L2Point point;
 
     super.assign(other);
 
-    point = (LevelTwoPoint) other;
+    point = (L2Point) other;
 
     setX(point.getX());
     setY(point.getY());
@@ -136,14 +136,14 @@ public class LevelTwoPoint
    */
   public int compareTo(Object o) {
     int		result;
-    LevelTwoPoint p;
+    L2Point p;
 
     if (o == null)
       return 1;
     else
       result = 0;
 
-    p = (LevelTwoPoint) o;
+    p = (L2Point) o;
 
     if (result == 0)
       result = Double.compare(getX(), p.getX());

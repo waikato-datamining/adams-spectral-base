@@ -42,7 +42,7 @@ import java.util.Iterator;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class ThreeWayData
-  extends AbstractDataContainer<LevelOnePoint>
+  extends AbstractDataContainer<L1Point>
   implements DatabaseNotesHandler, MutableReportHandler<ThreeWayReport>,
              InformativeStatisticSupporter<ThreeWayDataStatistic>{
 
@@ -56,22 +56,22 @@ public class ThreeWayData
   protected ThreeWayReport m_Reference;
 
   /** point of greatest Y. */
-  protected LevelOnePoint m_MaxY;
+  protected L1Point m_MaxY;
 
   /** point of smallest Y. */
-  protected LevelOnePoint m_MinY;
+  protected L1Point m_MinY;
 
   /** point of greatest X. */
-  protected LevelOnePoint m_MaxX;
+  protected L1Point m_MaxX;
 
   /** point of smallest X. */
-  protected LevelOnePoint m_MinX;
+  protected L1Point m_MinX;
 
   /** the notes for the data structure. */
   protected Notes m_Notes;
 
   /** the default comparator. */
-  protected static DataPointComparator<LevelOnePoint> m_Comparator;
+  protected static DataPointComparator<L1Point> m_Comparator;
 
   /**
    * Initialise data.
@@ -102,8 +102,8 @@ public class ThreeWayData
    *
    * @return		the comparator instance
    */
-  public DataPointComparator<LevelOnePoint> newComparator() {
-    return new LevelOnePointComparator(true, true);
+  public DataPointComparator<L1Point> newComparator() {
+    return new L1PointComparator(true, true);
   }
 
   /**
@@ -111,7 +111,7 @@ public class ThreeWayData
    *
    * @return		the comparator in use
    */
-  public DataPointComparator<LevelOnePoint> getComparator() {
+  public DataPointComparator<L1Point> getComparator() {
     return m_Comparator;
   }
 
@@ -120,8 +120,8 @@ public class ThreeWayData
    *
    * @return		the new DataContainer point
    */
-  public LevelOnePoint newPoint() {
-    return new LevelOnePoint(-1, -1);
+  public L1Point newPoint() {
+    return new L1Point(-1, -1);
   }
 
   /**
@@ -141,7 +141,7 @@ public class ThreeWayData
     if (m_MinY != null)
       return;
 
-    for (LevelOnePoint point: this) {
+    for (L1Point point: this) {
       if (    (m_MaxY == null)
 	  || (point.getY() > m_MaxY.getY()) )
 	m_MaxY = point;
@@ -231,7 +231,7 @@ public class ThreeWayData
    *
    * @return	gc point
    */
-  public LevelOnePoint getMaxY(){
+  public L1Point getMaxY(){
     validateMinMax();
     return m_MaxY;
   }
@@ -241,7 +241,7 @@ public class ThreeWayData
    *
    * @return	gc point
    */
-  public LevelOnePoint getMinY(){
+  public L1Point getMinY(){
     validateMinMax();
     return m_MinY;
   }
@@ -251,7 +251,7 @@ public class ThreeWayData
    *
    * @return	gc point
    */
-  public LevelOnePoint getMaxX(){
+  public L1Point getMaxX(){
     validateMinMax();
     return m_MaxX;
   }
@@ -261,7 +261,7 @@ public class ThreeWayData
    *
    * @return	gc point
    */
-  public LevelOnePoint getMinX(){
+  public L1Point getMinX(){
     validateMinMax();
     return m_MinX;
   }
@@ -287,8 +287,8 @@ public class ThreeWayData
    * @return		the level 1 point or null if not found
    * @see		#findClosest(double)
    */
-  public LevelOnePoint find(double x) {
-    LevelOnePoint result;
+  public L1Point find(double x) {
+    L1Point result;
     int		index;
 
     result = null;
@@ -307,8 +307,8 @@ public class ThreeWayData
    * @return		the level 1 point
    * @see		#find(double)
    */
-  public LevelOnePoint findClosest(double x) {
-    LevelOnePoint result;
+  public L1Point findClosest(double x) {
+    L1Point result;
     int		index;
 
     result = null;
@@ -329,11 +329,11 @@ public class ThreeWayData
    */
   public ThreeWayData getXSubset(double x) {
     ThreeWayData 		result;
-    Iterator<LevelOnePoint>	iter;
-    LevelOnePoint 		l1point;
-    LevelOnePoint 		newLevelOnePoint;
-    LevelTwoPoint 		l2point;
-    LevelTwoPoint 		newLevelTwoPoint;
+    Iterator<L1Point>	iter;
+    L1Point l1point;
+    L1Point newL1Point;
+    L2Point l2point;
+    L2Point newL2Point;
 
     result = (ThreeWayData) getHeader();
 
@@ -342,14 +342,14 @@ public class ThreeWayData
       l1point = iter.next();
       l2point = l1point.find(x);
       if (l2point != null) {
-	newLevelOnePoint = new LevelOnePoint(l1point.getX(), l2point.getY());
-	newLevelTwoPoint = new LevelTwoPoint(l2point.getX(), l2point.getY());
-	newLevelOnePoint.add(newLevelTwoPoint);
-	result.add(newLevelOnePoint);
+	newL1Point = new L1Point(l1point.getX(), l2point.getY());
+	newL2Point = new L2Point(l2point.getX(), l2point.getY());
+	newL1Point.add(newL2Point);
+	result.add(newL1Point);
       }
       else {
-	newLevelOnePoint = new LevelOnePoint(l1point.getX(), 0);
-	result.add(newLevelOnePoint);
+	newL1Point = new L1Point(l1point.getX(), 0);
+	result.add(newL1Point);
       }
     }
 
@@ -363,7 +363,7 @@ public class ThreeWayData
    * @param other	the data point to get the values from
    */
   @Override
-  public void assign(DataContainer<LevelOnePoint> other) {
+  public void assign(DataContainer<L1Point> other) {
     ThreeWayData 	data;
 
     super.assign(other);
