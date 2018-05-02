@@ -46,10 +46,10 @@ public class LevelTwoPointComparator
 
   /**
    * This constructor initializes the comparator either with comparison by
-   * x or by y. Either in ascending manner or descending.
+   * x or by y as well. Either in ascending manner or descending.
    *
    * @param useY		if true then y is used for comparison
-   * 				otherwise x
+   * 				as well as x
    * @param ascending		if true then the ordering is done in ascending
    * 				manner, otherwise descending
    */
@@ -60,9 +60,9 @@ public class LevelTwoPointComparator
   }
 
   /**
-   * Returns whether the x or y is used for ordering.
+   * Returns whether the x or y is used for ordering as well.
    *
-   * @return		true if y is used for ordering
+   * @return		true if y is used for ordering as well
    */
   public boolean isUsingY() {
     return m_UseY;
@@ -82,10 +82,10 @@ public class LevelTwoPointComparator
   public int compare(LevelTwoPoint o1, LevelTwoPoint o2) {
     int		result;
 
-    if (m_UseY)
+    result = Double.compare(o1.getX(), o2.getX());
+
+    if ((result == 0) && m_UseY)
       result = Double.compare(o1.getY(), o2.getY());
-    else
-      result = Double.compare(o1.getX(), o2.getX());
 
     // flip ordering?
     if (!m_Ascending)

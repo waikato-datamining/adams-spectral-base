@@ -15,7 +15,7 @@
 
 /*
  * LevelOnePointComparator.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.threeway;
@@ -26,7 +26,6 @@ import adams.data.container.DataPointComparator;
  * A comparator for level one points.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 3800 $
  */
 public class LevelOnePointComparator
   extends DataPointComparator<LevelOnePoint> {
@@ -34,7 +33,7 @@ public class LevelOnePointComparator
   /** for serialization. */
   private static final long serialVersionUID = -5536677097973106152L;
 
-  /** whether to compare Y or X. */
+  /** whether to compare Y as well. */
   protected boolean m_UseY;
 
   /**
@@ -46,10 +45,10 @@ public class LevelOnePointComparator
 
   /**
    * This constructor initializes the comparator either with comparison by
-   * X or by Y. Either in ascending manner or descending.
+   * X or Y as well. Either in ascending manner or descending.
    *
    * @param useY		if true then Y is used for comparison
-   * 				otherwise the X
+   * 				as well as X
    * @param ascending		if true then the ordering is done in ascending
    * 				manner, otherwise descending
    */
@@ -60,9 +59,9 @@ public class LevelOnePointComparator
   }
 
   /**
-   * Returns whether the Y or the X is used for ordering.
+   * Returns whether the Y used for ordering as well.
    *
-   * @return		true if abundance is used for ordering
+   * @return		true if Y is used as well
    */
   public boolean isUsingY() {
     return m_UseY;
@@ -82,10 +81,10 @@ public class LevelOnePointComparator
   public int compare(LevelOnePoint o1, LevelOnePoint o2) {
     int		result;
 
-    if (m_UseY)
+    result = Double.compare(o1.getX(), o2.getX());
+
+    if ((result == 0) && m_UseY)
       result = Double.compare(o1.getY(), o2.getY());
-    else
-      result = Double.compare(o1.getX(), o2.getX());
 
     // flip ordering?
     if (!m_Ascending)
