@@ -81,6 +81,8 @@ public class SimpleEEMReader
 
   private static final long serialVersionUID = 3881844348241663649L;
 
+  public static final String PREFIX_INFO = "Info-";
+
   /**
    * Returns a string describing the object.
    *
@@ -135,7 +137,7 @@ public class SimpleEEMReader
     i = 0;
     while (!sheet.getCell(0, 0).isNumeric()) {
       i++;
-      data.getReport().setStringValue("Info-" + i, sheet.getCell(0, 0).getContent());
+      data.getReport().setStringValue(PREFIX_INFO + i, sheet.getCell(0, 0).getContent());
       sheet.removeRow(0);
     }
 
