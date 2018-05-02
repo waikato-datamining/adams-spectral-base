@@ -38,7 +38,7 @@ public class L1PointStatistic
   private static final long serialVersionUID = 3716117305318401778L;
 
   /** the key for the database ID. */
-  public final static String KEY_DBID = "Database ID of chromatogram";
+  public final static String KEY_DBID = "Database ID";
 
   /** the key for abundance. */
   public final static String KEY_Y = "Y";
