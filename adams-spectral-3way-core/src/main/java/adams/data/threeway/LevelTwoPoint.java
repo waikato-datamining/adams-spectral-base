@@ -15,7 +15,7 @@
 
 /*
  * LevelTwoPoint.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -25,10 +25,9 @@ import adams.data.container.AbstractDataPoint;
 import adams.data.container.DataPoint;
 
 /**
- * A data point in the mass spectrum.
+ * Level 2 data point.
  *
- * @author dale
- * @version $Revision: 3800 $
+ * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class LevelTwoPoint
   extends AbstractDataPoint {
