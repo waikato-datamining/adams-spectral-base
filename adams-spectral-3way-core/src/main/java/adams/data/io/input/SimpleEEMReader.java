@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SimpleEEMReader.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -74,7 +74,6 @@ import adams.data.threeway.ThreeWayData;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SimpleEEMReader
   extends AbstractThreeWayDataReader {
@@ -125,7 +124,6 @@ public class SimpleEEMReader
     LevelOnePoint		l1;
     LevelTwoPoint		l2;
     Row				header;
-    double			sum;
     int				i;
 
     data   = new ThreeWayData();
@@ -145,13 +143,11 @@ public class SimpleEEMReader
     for (Row row: sheet.rows()) {
       l1 = new LevelOnePoint();
       l1.setX(row.getCell(0).toDouble());
-      sum = 0.0;
       for (i = 1; i < sheet.getColumnCount(); i++) {
 	l2 = new LevelTwoPoint(header.getCell(i).toDouble(), row.getCell(i).toDouble());
 	l1.add(l2);
-	sum += l2.getY();
       }
-      l1.setY(sum);
+      l1.updateY();
       data.add(l1);
     }
 
