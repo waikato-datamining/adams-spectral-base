@@ -227,16 +227,13 @@ public class ThreeWayDataHeatmapPanel
    * @param value	the data to display
    */
   public void setData(ThreeWayData value) {
-    String			result;
-    Properties			props;
-    StringBuilder		errors;
-    String			error;
+    StringBuilder	errors;
+    String		error;
 
     if (value == null)
       return;
 
     m_Data = (ThreeWayData) value.getClone();
-    props  = getProperties();
     errors = new StringBuilder();
 
     // image
@@ -246,6 +243,10 @@ public class ThreeWayDataHeatmapPanel
 
     // report
     m_ReportTable.setModel(new ReportFactory.Model(m_Data.getReport()));
+
+    // display errors in owner's statusbar
+    if ((errors.length() > 0) && (m_Owner != null))
+      m_Owner.showStatus(errors.toString());
   }
 
   /**
