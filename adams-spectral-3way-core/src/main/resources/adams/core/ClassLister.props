@@ -14,3 +14,7 @@ adams.data.io.input.AbstractThreeWayDataReader=\
 # the data writers
 adams.data.io.output.AbstractThreeWayDataWriter=\
   adams.data.io.output
+
+# overlays
+adams.gui.visualization.threewaydata.heatmapviewer.overlay.AbstractThreeWayDataOverlay=\
+  adams.gui.visualization.threewaydata.heatmapviewer.overlay
