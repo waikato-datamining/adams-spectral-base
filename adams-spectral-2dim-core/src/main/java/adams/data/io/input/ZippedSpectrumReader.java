@@ -378,6 +378,9 @@ public class ZippedSpectrumReader
 	sublist = m_Reader.read();
 	if (sublist != null)
 	  m_ReadData.addAll(sublist);
+
+	// delete file again
+	FileUtils.delete(outFile);
       }
     }
     catch (Exception e) {
