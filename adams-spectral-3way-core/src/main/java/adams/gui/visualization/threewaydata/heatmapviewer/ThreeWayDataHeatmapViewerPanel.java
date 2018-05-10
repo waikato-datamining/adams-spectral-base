@@ -33,10 +33,10 @@ import adams.gui.chooser.HeatmapFileChooser;
 import adams.gui.chooser.ThreeWayDataFileChooser;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseStatusBar;
-import adams.gui.core.BaseTabbedPane;
 import adams.gui.core.CustomColorImageIcon;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MenuBarProvider;
+import adams.gui.core.MultiPagePane;
 import adams.gui.core.RecentFilesHandlerWithCommandline;
 import adams.gui.core.RecentFilesHandlerWithCommandline.Setup;
 import adams.gui.core.SearchPanel;
@@ -98,7 +98,7 @@ public class ThreeWayDataHeatmapViewerPanel
   protected static Properties m_Properties;
 
   /** the tabbed pane for the data structures. */
-  protected BaseTabbedPane m_TabbedPane;
+  protected MultiPagePane m_MultiPagePane;
 
   /** the status bar. */
   protected BaseStatusBar m_StatusBar;
@@ -216,18 +216,15 @@ public class ThreeWayDataHeatmapViewerPanel
     panel = new JPanel(new BorderLayout());
     add(panel, BorderLayout.CENTER);
 
-    m_TabbedPane = new BaseTabbedPane();
-    m_TabbedPane.setTabLayoutPolicy(BaseTabbedPane.SCROLL_TAB_LAYOUT);
-    m_TabbedPane.setCloseTabsWithMiddleMouseButton(true);
-    m_TabbedPane.setShowCloseTabButton(true);
-    m_TabbedPane.addChangeListener(new ChangeListener() {
+    m_MultiPagePane = new MultiPagePane();
+    m_MultiPagePane.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
 	if ((m_MenuItemViewMissingValueColor != null) && (getCurrentPanel() != null))
 	  m_MenuItemViewMissingValueColor.setIcon(new CustomColorImageIcon(16, 16, getCurrentPanel().getMissingValueColor()));
       }
     });
-    panel.add(m_TabbedPane, BorderLayout.CENTER);
+    panel.add(m_MultiPagePane, BorderLayout.CENTER);
 
     m_SearchPanel = new SearchPanel(LayoutType.HORIZONTAL, true, "_Search", true, null);
     m_SearchPanel.setMinimumChars(2);
@@ -318,8 +315,8 @@ public class ThreeWayDataHeatmapViewerPanel
       });
       m_MenuItemFileSaveAs = menuitem;
 
-      // File/Close tab
-      menuitem = new JMenuItem("Close tab");
+      // File/Close page
+      menuitem = new JMenuItem("Close page");
       menu.addSeparator();
       menu.add(menuitem);
       menuitem.setMnemonic('t');
@@ -333,8 +330,8 @@ public class ThreeWayDataHeatmapViewerPanel
       });
       m_MenuItemFileCloseCurrent = menuitem;
 
-      // File/Close all tabs
-      menuitem = new JMenuItem("Close all tabs");
+      // File/Close all pages
+      menuitem = new JMenuItem("Close all pages");
       menu.add(menuitem);
       menuitem.setMnemonic('a');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed N"));
@@ -585,7 +582,7 @@ public class ThreeWayDataHeatmapViewerPanel
    * @return            the number of panels
    */
   public int getPanelCount() {
-    return m_TabbedPane.getTabCount();
+    return m_MultiPagePane.getPageCount();
   }
 
   /**
@@ -600,7 +597,7 @@ public class ThreeWayDataHeatmapViewerPanel
     result = null;
 
     if (index != -1)
-      result = (ThreeWayDataHeatmapPanel) m_TabbedPane.getComponentAt(index);
+      result = (ThreeWayDataHeatmapPanel) m_MultiPagePane.getPageAt(index);
 
     return result;
   }
@@ -611,7 +608,7 @@ public class ThreeWayDataHeatmapViewerPanel
    * @return		the panel, null if none selected
    */
   public ThreeWayDataHeatmapPanel getCurrentPanel() {
-    return getPanelAt(m_TabbedPane.getSelectedIndex());
+    return getPanelAt(m_MultiPagePane.getSelectedIndex());
   }
 
   /**
@@ -623,8 +620,8 @@ public class ThreeWayDataHeatmapViewerPanel
     List<ThreeWayDataHeatmapPanel>	result;
     int			i;
 
-    result = new ArrayList<ThreeWayDataHeatmapPanel>();
-    for (i = 0; i < m_TabbedPane.getTabCount(); i++)
+    result = new ArrayList<>();
+    for (i = 0; i < m_MultiPagePane.getPageCount(); i++)
       result.add(getPanelAt(i));
 
     return result.toArray(new ThreeWayDataHeatmapPanel[result.size()]);
@@ -639,7 +636,7 @@ public class ThreeWayDataHeatmapViewerPanel
     if (m_MenuBar == null)
       return;
 
-    dataLoaded = (m_TabbedPane.getTabCount() > 0);
+    dataLoaded = (m_MultiPagePane.getPageCount() > 0);
 
     // File
     m_MenuItemFileSaveAs.setEnabled(getCurrentPanel() != null);
@@ -665,15 +662,15 @@ public class ThreeWayDataHeatmapViewerPanel
    * Removes the current tab.
    */
   public void closeCurrent() {
-    if (m_TabbedPane.getSelectedIndex() != -1)
-      m_TabbedPane.removeTabAt(m_TabbedPane.getSelectedIndex());
+    if (m_MultiPagePane.getSelectedIndex() != -1)
+      m_MultiPagePane.removePageAt(m_MultiPagePane.getSelectedIndex());
   }
 
   /**
    * Removes all the data.
    */
   public void closeAll() {
-    m_TabbedPane.removeAll();
+    m_MultiPagePane.removeAllPages();
   }
 
   /**
@@ -701,9 +698,8 @@ public class ThreeWayDataHeatmapViewerPanel
   public void newTab(ThreeWayData data, String comment) {
     SwingUtilities.invokeLater(() -> {
       ThreeWayDataHeatmapPanel panel = newPanel(data);
-      panel.log(comment);
-      m_TabbedPane.addTab(panel.getTitle(), panel);
-      m_TabbedPane.setSelectedComponent(panel);
+      m_MultiPagePane.addPage(panel.getTitle(), panel);
+      m_MultiPagePane.setSelectedIndex(panel);
       showStatus("");
     });
   }
@@ -727,9 +723,8 @@ public class ThreeWayDataHeatmapViewerPanel
             return;
           }
           ThreeWayDataHeatmapPanel panel = newPanel(data.get(0));
-	  panel.log("Load: " + file);
-          m_TabbedPane.addTab(panel.getTitle(), panel);
-	  m_TabbedPane.setSelectedComponent(panel);
+          m_MultiPagePane.addPage(panel.getTitle(), panel);
+	  m_MultiPagePane.setSelectedIndex(panel);
           showStatus("");
           if (m_RecentFilesHandler != null)
             m_RecentFilesHandler.addRecentItem(new Setup(file, reader));
@@ -822,14 +817,14 @@ public class ThreeWayDataHeatmapViewerPanel
     m_CurrentFilter             = e.getFilter();
     m_FilterOverlayOriginalData = e.getOverlayOriginalData();
 
-    count = m_TabbedPane.getTabCount();
+    count = m_MultiPagePane.getPageCount();
     if (m_FilterAll) {
       indices = new int[count];
       for (i = 0; i < count; i++)
 	indices[i] = i;
     }
     else {
-      indices = new int[]{m_TabbedPane.getSelectedIndex()};
+      indices = new int[]{m_MultiPagePane.getSelectedIndex()};
     }
 
     for (i = 0; i < indices.length; i++) {
@@ -841,14 +836,13 @@ public class ThreeWayDataHeatmapViewerPanel
 	  ThreeWayDataHeatmapPanel panel = getPanelAt(index);
 	  ThreeWayData filtered = filter.filter(panel.getData());
 	  filter.cleanUp();
-	  panel.log("Filter: " + filter.toCommandLine());
 	  if (e.getOverlayOriginalData()) {
 	    panel = newPanel(filtered);
-	    m_TabbedPane.addTab(panel.getTitle(), panel);
+	    m_MultiPagePane.addPage(panel.getTitle(), panel);
 	  }
 	  else {
 	    panel.setData(filtered);
-	    m_TabbedPane.setTitleAt(index, panel.getTitle());
+	    m_MultiPagePane.setTitleAt(index, panel.getTitle());
 	  }
 	}
       };
@@ -865,7 +859,7 @@ public class ThreeWayDataHeatmapViewerPanel
   public void search(String text, boolean isRegExp) {
     int		i;
 
-    for (i = 0; i < m_TabbedPane.getTabCount(); i++)
+    for (i = 0; i < m_MultiPagePane.getPageCount(); i++)
       getPanelAt(i).search(text, isRegExp);
   }
 

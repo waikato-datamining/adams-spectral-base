@@ -26,12 +26,9 @@ import adams.data.conversion.MultiConversion;
 import adams.data.conversion.ThreeWayDataToHeatmap;
 import adams.data.image.AbstractImageContainer;
 import adams.data.threeway.ThreeWayData;
-import adams.gui.core.BaseLogPanel;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
-import adams.gui.core.BaseTabbedPane;
-import adams.gui.core.BaseTabbedPaneWithTabHiding;
 import adams.gui.core.ColorHelper;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
@@ -76,9 +73,6 @@ public class ThreeWayDataHeatmapPanel
   /** the search panel for the data report. */
   protected SearchPanel m_SearchPanel;
 
-  /** the tabbed pane for image/report and log. */
-  protected BaseTabbedPaneWithTabHiding m_LogTabbedPane;
-
   /** the split pane for image/spreadsheet and report. */
   protected BaseSplitPane m_SplitPane;
 
@@ -87,9 +81,6 @@ public class ThreeWayDataHeatmapPanel
 
   /** the color to use for missing values. */
   protected Color m_MissingValueColor;
-
-  /** the log panel. */
-  protected BaseLogPanel m_PanelLog;
 
   /**
    * Initializes the panel.
@@ -131,13 +122,10 @@ public class ThreeWayDataHeatmapPanel
 
     setLayout(new BorderLayout());
 
-    m_LogTabbedPane = new BaseTabbedPaneWithTabHiding();
-    m_LogTabbedPane.setTabPlacement(BaseTabbedPane.BOTTOM);
-    add(m_LogTabbedPane, BorderLayout.CENTER);
 
     m_SplitPane = new BaseSplitPane();
     m_SplitPane.setDividerLocation(props.getInteger("Panel.DividerLocation", 600));
-    m_LogTabbedPane.addTab("Data", m_SplitPane);
+    add(m_SplitPane, BorderLayout.CENTER);
 
     m_DataImage = new ImagePanel();
     m_DataImage.setSelectionEnabled(true);
@@ -156,11 +144,6 @@ public class ThreeWayDataHeatmapPanel
     panel.add(new BaseScrollPane(m_ReportTable), BorderLayout.CENTER);
     panel.add(m_SearchPanel, BorderLayout.SOUTH);
     m_SplitPane.setRightComponent(panel);
-
-    m_PanelLog = new BaseLogPanel();
-    m_PanelLog.setRows(5);
-    m_PanelLog.setColumns(80);
-    m_LogTabbedPane.addTab("Log", m_PanelLog);
   }
 
   /**
@@ -370,7 +353,7 @@ public class ThreeWayDataHeatmapPanel
 
     if (m_Properties == null) {
       try {
-	props = ThreeWayDataHeatmapPanel.class.getName().replaceAll("\\.", "/") + ".props";
+	props = ThreeWayDataHeatmapViewerPanel.class.getName().replaceAll("\\.", "/") + ".props";
 	m_Properties = Properties.read(props);
       }
       catch (Exception e) {
@@ -400,15 +383,6 @@ public class ThreeWayDataHeatmapPanel
   }
 
   /**
-   * Logs the message in the log panel.
-   *
-   * @param msg		the log message
-   */
-  public void log(String msg) {
-    m_PanelLog.append(msg);
-  }
-
-  /**
    * Returns whether the report table is visible.
    *
    * @return		true if visible
@@ -424,26 +398,5 @@ public class ThreeWayDataHeatmapPanel
    */
   public void setReportVisible(boolean value) {
     m_SplitPane.setRightComponentHidden(!value);
-  }
-
-  /**
-   * Returns whether the report table is visible.
-   *
-   * @return		true if visible
-   */
-  public boolean isLogVisible() {
-    return !m_LogTabbedPane.isHidden(m_PanelLog);
-  }
-
-  /**
-   * Sets the visibility state of the report table.
-   *
-   * @param value	true if visible
-   */
-  public void setLogVisible(boolean value) {
-    if (value)
-      m_LogTabbedPane.displayTab(m_PanelLog);
-    else
-      m_LogTabbedPane.hideTab(m_PanelLog);
   }
 }

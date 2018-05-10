@@ -6,7 +6,7 @@
 Panel.DividerLocation=550
 
 # The generator to use for creating the color gradient
-Image.GradientColorGenerator=adams.gui.visualization.core.BiColorGenerator
+Image.GradientColorGenerator=adams.gui.visualization.core.MultiColorGenerator
 
 # The color to use for missing values
 Image.MissingValueColor=#22ff0000

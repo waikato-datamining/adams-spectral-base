@@ -428,7 +428,6 @@ public class ThreeWayDataHeatmapDisplay
     result.setMissingValueColor(m_MissingValueColor);
     result.setZoom(m_Zoom / 100.0);
     result.setReportVisible(m_ShowReportTable);
-    result.setLogVisible(false);
 
     return result;
   }
@@ -479,7 +478,6 @@ public class ThreeWayDataHeatmapDisplay
 	m_Panel.setMissingValueColor(m_MissingValueColor);
 	m_Panel.setZoom(m_Zoom / 100.0);
 	m_Panel.setReportVisible(m_ShowReportTable);
-	m_Panel.setLogVisible(false);
 	add(m_Panel, BorderLayout.CENTER);
       }
       @Override

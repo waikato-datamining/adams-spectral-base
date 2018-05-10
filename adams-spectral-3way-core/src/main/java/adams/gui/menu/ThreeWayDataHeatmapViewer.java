@@ -67,7 +67,7 @@ public class ThreeWayDataHeatmapViewer
    */
   public void launch() {
     adams.gui.visualization.threewaydata.heatmapviewer.ThreeWayDataHeatmapViewerPanel panel = new adams.gui.visualization.threewaydata.heatmapviewer.ThreeWayDataHeatmapViewerPanel();
-    createChildFrame(panel, GUIHelper.getDefaultLargeDialogDimension());
+    createChildFrame(panel, GUIHelper.makeWider(GUIHelper.getDefaultLargeDialogDimension()));
   }
 
   /**
