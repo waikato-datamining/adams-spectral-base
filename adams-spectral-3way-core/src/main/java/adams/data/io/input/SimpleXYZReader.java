@@ -20,6 +20,7 @@
 
 package adams.data.io.input;
 
+import adams.core.io.FileUtils;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.threeway.L1Point;
@@ -122,8 +123,8 @@ public class SimpleXYZReader
     CsvSpreadSheetReader	reader;
     SpreadSheet			sheet;
     ThreeWayData		data;
-    L1Point l1;
-    L2Point l2;
+    L1Point 			l1;
+    L2Point 			l2;
     Map<Double,Map<Double,L1Point>> cache;
     double			x;
     double			y;
@@ -131,6 +132,7 @@ public class SimpleXYZReader
     double			d;
 
     data   = new ThreeWayData();
+    data.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
     cache = new HashMap<>();
     reader = new CsvSpreadSheetReader();
     reader.setSeparator(",");

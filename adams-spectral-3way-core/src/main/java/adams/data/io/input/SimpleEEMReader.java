@@ -20,6 +20,7 @@
 
 package adams.data.io.input;
 
+import adams.core.io.FileUtils;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.threeway.L1Point;
@@ -121,12 +122,13 @@ public class SimpleEEMReader
     CsvSpreadSheetReader	reader;
     SpreadSheet			sheet;
     ThreeWayData		data;
-    L1Point l1;
-    L2Point l2;
+    L1Point 			l1;
+    L2Point 			l2;
     Row				header;
     int				i;
 
     data   = new ThreeWayData();
+    data.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
     reader = new CsvSpreadSheetReader();
     reader.setSeparator("\\t");
     sheet  = reader.read(m_Input);
