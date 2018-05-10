@@ -699,7 +699,7 @@ public class ThreeWayDataHeatmapViewerPanel
     SwingUtilities.invokeLater(() -> {
       ThreeWayDataHeatmapPanel panel = newPanel(data);
       m_MultiPagePane.addPage(panel.getTitle(), panel);
-      m_MultiPagePane.setSelectedIndex(panel);
+      m_MultiPagePane.setSelectedPage(panel);
       showStatus("");
     });
   }
@@ -724,7 +724,7 @@ public class ThreeWayDataHeatmapViewerPanel
           }
           ThreeWayDataHeatmapPanel panel = newPanel(data.get(0));
           m_MultiPagePane.addPage(panel.getTitle(), panel);
-	  m_MultiPagePane.setSelectedIndex(panel);
+	  m_MultiPagePane.setSelectedPage(panel);
           showStatus("");
           if (m_RecentFilesHandler != null)
             m_RecentFilesHandler.addRecentItem(new Setup(file, reader));
