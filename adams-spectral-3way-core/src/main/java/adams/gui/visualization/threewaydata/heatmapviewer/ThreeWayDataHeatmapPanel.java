@@ -36,6 +36,7 @@ import adams.gui.event.SearchEvent;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
 import adams.gui.visualization.image.ImagePanel;
+import adams.gui.visualization.image.selectionshape.RectanglePainter;
 import adams.gui.visualization.report.ReportFactory;
 import adams.gui.visualization.threewaydata.heatmapviewer.overlay.AbstractThreeWayDataOverlay;
 
@@ -113,8 +114,9 @@ public class ThreeWayDataHeatmapPanel
    */
   @Override
   protected void initGUI() {
-    Properties	props;
-    JPanel	panel;
+    Properties		props;
+    JPanel		panel;
+    RectanglePainter	painter;
 
     super.initGUI();
 
@@ -127,9 +129,11 @@ public class ThreeWayDataHeatmapPanel
     m_SplitPane.setDividerLocation(props.getInteger("Panel.DividerLocation", 600));
     add(m_SplitPane, BorderLayout.CENTER);
 
+    painter = new RectanglePainter();
+    painter.setColor(Color.RED);
     m_DataImage = new ImagePanel();
     m_DataImage.setSelectionEnabled(true);
-    m_DataImage.setSelectionBoxColor(Color.RED);
+    m_DataImage.setSelectionShapePainter(painter);
     m_SplitPane.setLeftComponent(m_DataImage);
 
     m_ReportTable = new ReportFactory.Table();
