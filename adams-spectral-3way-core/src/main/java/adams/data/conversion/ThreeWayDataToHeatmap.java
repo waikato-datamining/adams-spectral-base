@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * ThreeWayDataToHeatmap.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.conversion;
@@ -32,7 +32,7 @@ import gnu.trove.set.hash.TDoubleHashSet;
 /**
  <!-- globalinfo-start -->
  * Turns a adams.data.threeway.ThreeWayData data structure into a heatmap.<br>
- * Does not take the X of the level 2 points into account.
+ * Sums up the data values of the Z layers that fall into the specified min&#47;max.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -40,6 +40,16 @@ import gnu.trove.set.hash.TDoubleHashSet;
  * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ * <pre>-min-z &lt;double&gt; (property: minZ)
+ * &nbsp;&nbsp;&nbsp;The minimum Z layer to include.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
+ * </pre>
+ *
+ * <pre>-max-z &lt;double&gt; (property: maxZ)
+ * &nbsp;&nbsp;&nbsp;The maximum Z layer to include.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
  * </pre>
  * 
  <!-- options-end -->
@@ -51,8 +61,11 @@ public class ThreeWayDataToHeatmap
 
   private static final long serialVersionUID = -8371135112409803967L;
 
-  /** the z layer to use. */
-  protected double m_Z;
+  /** the minimum z layer to use. */
+  protected double m_MinZ;
+
+  /** the maximum z layer to use. */
+  protected double m_MaxZ;
 
   /**
    * Returns a string describing the object.
@@ -63,7 +76,7 @@ public class ThreeWayDataToHeatmap
   public String globalInfo() {
     return
       "Turns a " + ThreeWayData.class.getName() + " data structure into a heatmap.\n"
-      + "Does not take the X of the level 2 points into account.";
+      + "Sums up the data values of the Z layers that fall into the specified min/max.";
   }
 
   /**
@@ -74,27 +87,31 @@ public class ThreeWayDataToHeatmap
     super.defineOptions();
 
     m_OptionManager.add(
-      "z", "Z",
+      "min-z", "minZ",
+      0.0);
+
+    m_OptionManager.add(
+      "max-z", "maxZ",
       0.0);
   }
 
   /**
-   * Sets the Z layer to use.
+   * Sets the minimum Z layer to use.
    *
-   * @param value 	the Z
+   * @param value 	the minimum Z
    */
-  public void setZ(double value) {
-    m_Z = value;
+  public void setMinZ(double value) {
+    m_MinZ = value;
     reset();
   }
 
   /**
-   * Returns the Z layer to use.
+   * Returns the minimum Z layer to use.
    *
-   * @return 		the Z
+   * @return 		the minimum Z
    */
-  public double getZ() {
-    return m_Z;
+  public double getMinZ() {
+    return m_MinZ;
   }
 
   /**
@@ -103,8 +120,37 @@ public class ThreeWayDataToHeatmap
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String ZTipText() {
-    return "The Z layer to use.";
+  public String minZTipText() {
+    return "The minimum Z layer to include.";
+  }
+
+  /**
+   * Sets the maximum Z layer to use.
+   *
+   * @param value 	the maximum Z
+   */
+  public void setMaxZ(double value) {
+    m_MaxZ = value;
+    reset();
+  }
+
+  /**
+   * Returns the maximum Z layer to use.
+   *
+   * @return 		the maximum Z
+   */
+  public double getMaxZ() {
+    return m_MaxZ;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String maxZTipText() {
+    return "The maximum Z layer to include.";
   }
 
   /**
@@ -125,6 +171,25 @@ public class ThreeWayDataToHeatmap
   @Override
   public Class generates() {
     return Heatmap.class;
+  }
+
+  /**
+   * Checks whether the data can be processed.
+   *
+   * @return		null if checks passed, otherwise error message
+   */
+  @Override
+  protected String checkData() {
+    String	result;
+
+    result = super.checkData();
+
+    if (result == null) {
+      if (m_MaxZ < m_MinZ)
+        result = "MaxZ must be smaller than MinZ: MinZ=" + m_MinZ + ", MaxZ=" + m_MaxZ;
+    }
+
+    return result;
   }
 
   /**
@@ -161,8 +226,8 @@ public class ThreeWayDataToHeatmap
       x = listX.indexOf(l1.getX());
       y = listY.indexOf(l1.getY());
       for (L2Point l2: l1.toList()) {
-        if (l2.getZ() == m_Z)
-	  result.set(y, x, l2.getData());
+        if ((l2.getZ() >= m_MinZ) && (l2.getZ() <= m_MaxZ))
+	  result.set(y, x, result.get(y, x) + l2.getData());
       }
     }
 
