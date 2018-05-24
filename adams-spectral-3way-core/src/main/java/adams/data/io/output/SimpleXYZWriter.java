@@ -20,6 +20,7 @@
 
 package adams.data.io.output;
 
+import adams.core.Utils;
 import adams.data.io.input.SimpleXYZReader;
 import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.HeaderRow;
@@ -57,6 +58,9 @@ public class SimpleXYZWriter
 
   private static final long serialVersionUID = 5576166671141967708L;
 
+  /** the column separator. */
+  protected String m_Separator;
+
   /**
    * Returns a string describing the object.
    *
@@ -65,6 +69,52 @@ public class SimpleXYZWriter
   @Override
   public String globalInfo() {
     return "Writes 3-way data in CSV format (x/y/z/data columns).";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "separator", "separator",
+      " ");
+  }
+
+  /**
+   * Sets the string to use as separator for the columns, use '\t' for tab.
+   *
+   * @param value	the separator
+   */
+  public void setSeparator(String value) {
+    if (Utils.unbackQuoteChars(value).length() == 1) {
+      m_Separator = Utils.unbackQuoteChars(value);
+      reset();
+    }
+    else {
+      getLogger().severe("Only one character allowed (or two, in case of backquoted ones) for separator, provided: " + value);
+    }
+  }
+
+  /**
+   * Returns the string used as separator for the columns, '\t' for tab.
+   *
+   * @return		the separator
+   */
+  public String getSeparator() {
+    return Utils.backQuoteChars(m_Separator);
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String separatorTipText() {
+    return "The separator to use for the columns; use '\\t' for tab.";
   }
 
   /**
@@ -137,7 +187,7 @@ public class SimpleXYZWriter
     // write data
     writer = new CsvSpreadSheetWriter();
     writer.setQuoteCharacter("");
-    writer.setSeparator(",");
+    writer.setSeparator(m_Separator);
     writer.setOutputComments(false);
     return writer.write(sheet, m_Output);
   }

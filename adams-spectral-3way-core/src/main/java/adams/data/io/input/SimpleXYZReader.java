@@ -20,6 +20,7 @@
 
 package adams.data.io.input;
 
+import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
@@ -84,6 +85,9 @@ public class SimpleXYZReader
 
   private static final long serialVersionUID = 3881844348241663649L;
 
+  /** the column separator. */
+  protected String m_Separator;
+
   /**
    * Returns a string describing the object.
    *
@@ -92,6 +96,52 @@ public class SimpleXYZReader
   @Override
   public String globalInfo() {
     return "Reads 3-day data in CSV format with X, Y, Z and data columns.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "separator", "separator",
+      " ");
+  }
+
+  /**
+   * Sets the string to use as separator for the columns, use '\t' for tab.
+   *
+   * @param value	the separator
+   */
+  public void setSeparator(String value) {
+    if (Utils.unbackQuoteChars(value).length() == 1) {
+      m_Separator = Utils.unbackQuoteChars(value);
+      reset();
+    }
+    else {
+      getLogger().severe("Only one character allowed (or two, in case of backquoted ones) for separator, provided: " + value);
+    }
+  }
+
+  /**
+   * Returns the string used as separator for the columns, '\t' for tab.
+   *
+   * @return		the separator
+   */
+  public String getSeparator() {
+    return Utils.backQuoteChars(m_Separator);
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String separatorTipText() {
+    return "The separator to use for the columns; use '\\t' for tab.";
   }
 
   /**
@@ -135,7 +185,7 @@ public class SimpleXYZReader
     data.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
     cache = new HashMap<>();
     reader = new CsvSpreadSheetReader();
-    reader.setSeparator(",");
+    reader.setSeparator(m_Separator);
     sheet  = reader.read(m_Input);
     if (sheet.getColumnCount() != 4) {
       getLogger().severe("Requires four columns (x/y/z/data), found: " + sheet.getColumnCount());
