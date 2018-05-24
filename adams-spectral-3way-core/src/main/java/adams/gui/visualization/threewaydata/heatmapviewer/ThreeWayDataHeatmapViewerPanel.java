@@ -65,6 +65,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
@@ -85,8 +86,8 @@ import java.util.List;
 public class ThreeWayDataHeatmapViewerPanel
   extends BasePanel
   implements MenuBarProvider, StatusMessageHandler,
-             FilterListener<ThreeWayData>, SendToActionSupporter, CleanUpHandler,
-             ToolPluginSupporter<ThreeWayDataHeatmapPanel> {
+  FilterListener<ThreeWayData>, SendToActionSupporter, CleanUpHandler,
+  ToolPluginSupporter<ThreeWayDataHeatmapPanel> {
 
   /** for serialization. */
   private static final long serialVersionUID = -2642034258827736757L;
@@ -288,7 +289,7 @@ public class ThreeWayDataHeatmapViewerPanel
       submenu = new JMenu("Open recent");
       menu.add(submenu);
       m_RecentFilesHandler = new RecentFilesHandlerWithCommandline<JMenu>(
-	  SESSION_FILE, getProperties().getInteger("MaxRecentFiles", 5), submenu);
+	SESSION_FILE, getProperties().getInteger("MaxRecentFiles", 5), submenu);
       m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<JMenu,Setup>() {
 	@Override
 	public void recentItemAdded(RecentItemEvent<JMenu,Setup> e) {
@@ -451,30 +452,30 @@ public class ThreeWayDataHeatmapViewerPanel
 
       // zoom levels
       zooms = new int[]{
-	  -100,
-	  25,
-	  50,
-	  66,
-	  75,
-	  100,
-	  150,
-	  200,
-	  400,
-	  800,
-	  1600,
+	-100,
+	25,
+	50,
+	66,
+	75,
+	100,
+	150,
+	200,
+	400,
+	800,
+	1600,
       };
       shortcuts = new String[]{
-	  "F",
-	  "",
-	  "",
-	  "",
-	  "",
-	  "1",
-	  "",
-	  "2",
-	  "4",
-	  "",
-	  "",
+	"F",
+	"",
+	"",
+	"",
+	"",
+	"1",
+	"",
+	"2",
+	"4",
+	"",
+	"",
       };
       submenu.addSeparator();
       for (i = 0; i < zooms.length; i++) {
@@ -509,16 +510,16 @@ public class ThreeWayDataHeatmapViewerPanel
       menuitem.setMnemonic('R');
       menuitem.setIcon(GUIHelper.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          if (m_MenuItemViewApplyAll.isSelected()) {
-            for (int i = 0; i < getPanelCount(); i++)
-              getPanelAt(i).removeOverlays();
-          }
-          else {
-            getCurrentPanel().removeOverlays();
-          }
-        }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	  if (m_MenuItemViewApplyAll.isSelected()) {
+	    for (int i = 0; i < getPanelCount(); i++)
+	      getPanelAt(i).removeOverlays();
+	  }
+	  else {
+	    getCurrentPanel().removeOverlays();
+	  }
+	}
       });
       m_MenuItemViewRemoveOverlays = menuitem;
 
@@ -529,19 +530,19 @@ public class ThreeWayDataHeatmapViewerPanel
       menuitem.setMnemonic('d');
       menuitem.setIcon(GUIHelper.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          AbstractThreeWayDataOverlay overlay = selectOverlay();
-          if (overlay == null)
-            return;
-          if (m_MenuItemViewApplyAll.isSelected()) {
-            for (int i = 0; i < getPanelCount(); i++)
-              getPanelAt(i).addOverlay(overlay);
-          }
-          else {
-            getCurrentPanel().addOverlay(overlay);
-          }
-        }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+	  AbstractThreeWayDataOverlay overlay = selectOverlay();
+	  if (overlay == null)
+	    return;
+	  if (m_MenuItemViewApplyAll.isSelected()) {
+	    for (int i = 0; i < getPanelCount(); i++)
+	      getPanelAt(i).addOverlay(overlay);
+	  }
+	  else {
+	    getCurrentPanel().addOverlay(overlay);
+	  }
+	}
       });
       m_MenuItemViewAddOverlay = menuitem;
 
@@ -708,31 +709,36 @@ public class ThreeWayDataHeatmapViewerPanel
    * Loads data structures from disk, popping up a file chooser dialog.
    */
   public void load(final File[] files, final AbstractThreeWayDataReader reader) {
-    Runnable	run;
+    SwingWorker 	worker;
 
-    for (final File file: files) {
-      run = new Runnable() {
-        @Override
-	public void run() {
-          showStatus("Loading file: " + file);
-          reader.setInput(new PlaceholderFile(file));
-          List<ThreeWayData> data = reader.read();
-          if (data.size() == 0) {
-            GUIHelper.showErrorMessage(ThreeWayDataHeatmapViewerPanel.this, "Failed to read data from:\n" + reader.getInput());
+    worker = new SwingWorker() {
+      @Override
+      protected Object doInBackground() throws Exception {
+	for (final File file: files) {
+	  showStatus("Loading file: " + file);
+	  reader.setInput(new PlaceholderFile(file));
+	  List<ThreeWayData> data = reader.read();
+	  if (data.size() == 0) {
+	    GUIHelper.showErrorMessage(ThreeWayDataHeatmapViewerPanel.this, "Failed to read data from:\n" + reader.getInput());
 	    showStatus("");
-            return;
-          }
-          ThreeWayDataHeatmapPanel panel = newPanel(data.get(0));
-          m_MultiPagePane.addPage(panel.getTitle(), panel);
+	    return null;
+	  }
+	  ThreeWayDataHeatmapPanel panel = newPanel(data.get(0));
+	  m_MultiPagePane.addPage(panel.getTitle(), panel);
 	  m_MultiPagePane.setSelectedPage(panel);
-          showStatus("");
-          if (m_RecentFilesHandler != null)
-            m_RecentFilesHandler.addRecentItem(new Setup(file, reader));
-        }
-      };
-      SwingUtilities.invokeLater(run);
-    }
-    showStatus("");
+	  if (m_RecentFilesHandler != null)
+	    m_RecentFilesHandler.addRecentItem(new Setup(file, reader));
+	}
+	return null;
+      }
+
+      @Override
+      protected void done() {
+	showStatus("");
+	super.done();
+      }
+    };
+    worker.execute();
   }
 
   /**
@@ -769,7 +775,7 @@ public class ThreeWayDataHeatmapViewerPanel
     if (!writer.write(data))
       GUIHelper.showErrorMessage(this, "Failed to write heatmap to '" + file + "'!\nCheck console for error message.");
   }
-  
+
   /**
    * closes the dialog/frame.
    */
@@ -938,7 +944,7 @@ public class ThreeWayDataHeatmapViewerPanel
       m_DialogColorGenerator.getGOEEditor().setCanChangeClassInDialog(true);
       m_DialogColorGenerator.setLocationRelativeTo(this);
     }
-    
+
     m_DialogColorGenerator.setCurrent(getCurrentPanel().getColorGenerator().shallowCopy());
     m_DialogColorGenerator.setVisible(true);
     if (m_DialogColorGenerator.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
