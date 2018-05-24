@@ -35,11 +35,11 @@ public class L2Point
   /** for serialization. */
   private static final long serialVersionUID = -3787806109050570412L;
 
-  /** x. */
-  protected double m_X;
+  /** z. */
+  protected double m_Z;
 
-  /** y. */
-  protected double m_Y;
+  /** value. */
+  protected double m_Data;
 
   /**
    * Constructor.
@@ -51,24 +51,24 @@ public class L2Point
   /**
    * Constructor.
    *
-   * @param x		the x
-   * @param y		the y
+   * @param z		the z
+   * @param data	the value
    */
-  public L2Point(double x, double y) {
-    this(null, x, y);
+  public L2Point(double z, double data) {
+    this(null, z, data);
   }
 
   /**
    * Constructor.
    *
    * @param parent	the parent
-   * @param x		the x
-   * @param y		the y
+   * @param z		the z
+   * @param data	the value
    */
-  public L2Point(L1Point parent, double x, double y) {
+  public L2Point(L1Point parent, double z, double data) {
     m_Parent = parent;
-    m_X      = x;
-    m_Y      = y;
+    m_Z = z;
+    m_Data = data;
   }
 
   /**
@@ -83,44 +83,44 @@ public class L2Point
 
     point = (L2Point) other;
 
-    setX(point.getX());
-    setY(point.getY());
+    setZ(point.getZ());
+    setData(point.getData());
   }
 
   /**
-   * Sets the X.
+   * Sets the Z.
    *
-   * @param value	the x
+   * @param value	the z
    */
-  public void setX(double value) {
-    m_X = value;
+  public void setZ(double value) {
+    m_Z = value;
   }
 
   /**
-   * Returns the X.
+   * Returns the Z.
    *
-   * @return		the x
+   * @return		the z
    */
-  public double getX() {
-    return m_X;
+  public double getZ() {
+    return m_Z;
   }
 
   /**
-   * Sets the y.
+   * Sets the value.
    *
-   * @param value	the y
+   * @param value	the value
    */
-  public void setY(double value) {
-    m_Y = value;
+  public void setData(double value) {
+    m_Data = value;
   }
 
   /**
-   * Returns the Y.
+   * Returns the value.
    *
-   * @return		the y
+   * @return		the value
    */
-  public double getY() {
-    return m_Y;
+  public double getData() {
+    return m_Data;
   }
 
   /**
@@ -140,16 +140,12 @@ public class L2Point
 
     if (o == null)
       return 1;
-    else
-      result = 0;
 
-    p = (L2Point) o;
-
-    if (result == 0)
-      result = Double.compare(getX(), p.getX());
+    p      = (L2Point) o;
+    result = Double.compare(getZ(), p.getZ());
 
     if (result == 0)
-      result = Double.compare(getY(), p.getY());
+      result = Double.compare(getData(), p.getData());
 
     return result;
   }
@@ -162,8 +158,8 @@ public class L2Point
   public String toString() {
     String	result;
 
-    result  = "x=" + getX();
-    result += ", y=" + getY();
+    result  = "Z=" + getZ();
+    result += ", V=" + getData();
 
     return result;
   }

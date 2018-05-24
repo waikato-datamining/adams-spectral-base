@@ -81,10 +81,10 @@ public class L2PointComparator
   public int compare(L2Point o1, L2Point o2) {
     int		result;
 
-    result = Double.compare(o1.getX(), o2.getX());
+    result = Double.compare(o1.getZ(), o2.getZ());
 
     if ((result == 0) && m_UseY)
-      result = Double.compare(o1.getY(), o2.getY());
+      result = Double.compare(o1.getData(), o2.getData());
 
     // flip ordering?
     if (!m_Ascending)

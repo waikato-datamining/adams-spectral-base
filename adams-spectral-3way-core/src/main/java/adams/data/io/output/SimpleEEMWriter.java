@@ -124,8 +124,8 @@ public class SimpleEEMWriter
     for (L1Point l1 : three) {
       header.addCell("S").setContentAsString("Sample");
       for (L2Point l2: l1) {
-        if (!header.hasCell("" + l2.getX()))
-          header.addCell("" + l2.getX()).setContent(l2.getX());
+        if (!header.hasCell("" + l2.getZ()))
+          header.addCell("" + l2.getZ()).setContent(l2.getZ());
       }
     }
 
@@ -142,7 +142,7 @@ public class SimpleEEMWriter
       row = sheet.addRow();
       row.addCell("S").setContent(l1.getX());
       for (L2Point l2: l1)
-        row.addCell("" + l2.getX()).setContent(l2.getY());
+        row.addCell("" + l2.getZ()).setContent(l2.getData());
     }
 
     // write data

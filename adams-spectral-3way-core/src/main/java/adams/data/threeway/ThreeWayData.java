@@ -29,6 +29,10 @@ import adams.data.container.AbstractDataContainer;
 import adams.data.container.DataContainer;
 import adams.data.container.DataPointComparator;
 import adams.data.report.MutableReportHandler;
+import adams.data.spreadsheet.DefaultSpreadSheet;
+import adams.data.spreadsheet.Row;
+import adams.data.spreadsheet.SpreadSheet;
+import adams.data.spreadsheet.SpreadSheetSupporter;
 import adams.data.statistics.InformativeStatisticSupporter;
 import adams.data.statistics.ThreeWayDataStatistic;
 import adams.data.threewayreport.ThreeWayReport;
@@ -44,7 +48,7 @@ import java.util.Iterator;
 public class ThreeWayData
   extends AbstractDataContainer<L1Point>
   implements DatabaseNotesHandler, MutableReportHandler<ThreeWayReport>,
-             InformativeStatisticSupporter<ThreeWayDataStatistic>{
+             InformativeStatisticSupporter<ThreeWayDataStatistic>, SpreadSheetSupporter  {
 
   /** for serialization. */
   private static final long serialVersionUID = 1318149681899877295L;
@@ -342,8 +346,8 @@ public class ThreeWayData
       l1point = iter.next();
       l2point = l1point.find(x);
       if (l2point != null) {
-	newL1Point = new L1Point(l1point.getX(), l2point.getY());
-	newL2Point = new L2Point(l2point.getX(), l2point.getY());
+	newL1Point = new L1Point(l1point.getX(), l2point.getData());
+	newL2Point = new L2Point(l2point.getZ(), l2point.getData());
 	newL1Point.add(newL2Point);
 	result.add(newL1Point);
       }
@@ -399,8 +403,7 @@ public class ThreeWayData
 
     c = (ThreeWayData) o;
 
-    if (result == 0)
-      result = Integer.compare(getDatabaseID(), c.getDatabaseID());
+    result = Integer.compare(getDatabaseID(), c.getDatabaseID());
 
     if (result == 0)
       result = Utils.compare(getReport(), c.getReport());
@@ -443,10 +446,6 @@ public class ThreeWayData
     result  = "ID=" + getID();
     result += ", DB-ID=" + getDatabaseID();
     result += ", # Level 1 points=" + size();
-    if (size() > 0) {
-      result += ", first X=" + m_Points.get(0).getX();
-      result += ", last X=" + m_Points.get(m_Points.size() - 1).getX();
-    }
 
     return result;
   }
@@ -467,5 +466,33 @@ public class ThreeWayData
    */
   public Notes getNotes() {
     return m_Notes;
+  }
+
+  /**
+   * Returns the content as spreadsheet.
+   *
+   * @return		the content
+   */
+  public SpreadSheet toSpreadSheet() {
+    SpreadSheet		result;
+    Row			row;
+
+    result = new DefaultSpreadSheet();
+    row    = result.getHeaderRow();
+    row.addCell("X").setContentAsString("X");
+    row.addCell("Y").setContentAsString("Y");
+    row.addCell("Z").setContentAsString("Z");
+    row.addCell("D").setContentAsString("Data");
+    for (L1Point l1: this) {
+      for (L2Point l2: l1) {
+        row = result.addRow();
+        row.addCell("X").setContent(l1.getX());
+        row.addCell("Y").setContent(l1.getY());
+        row.addCell("Z").setContent(l2.getZ());
+        row.addCell("D").setContent(l2.getData());
+      }
+    }
+
+    return result;
   }
 }

@@ -139,8 +139,8 @@ public class L1PointStatistic
       y = new Double[points.size()];
       x = new Double[points.size()];
       for (i = 0; i < points.size(); i++) {
-	x[i] = points.get(i).getX();
-	y[i] = points.get(i).getY();
+	x[i] = points.get(i).getZ();
+	y[i] = points.get(i).getData();
       }
     }
 

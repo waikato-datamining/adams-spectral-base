@@ -129,8 +129,8 @@ public class SimpleXYZWriter
         row = sheet.addRow();
         row.addCell("X").setContent(l1.getX());
         row.addCell("Y").setContent(l1.getY());
-        row.addCell("Z").setContent(l2.getX());
-        row.addCell("D").setContent(l2.getY());
+        row.addCell("Z").setContent(l2.getZ());
+        row.addCell("D").setContent(l2.getData());
       }
     }
 

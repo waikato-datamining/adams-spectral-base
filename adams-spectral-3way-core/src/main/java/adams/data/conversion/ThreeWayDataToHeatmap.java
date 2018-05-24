@@ -24,6 +24,10 @@ import adams.data.heatmap.Heatmap;
 import adams.data.threeway.L1Point;
 import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.set.TDoubleSet;
+import gnu.trove.set.hash.TDoubleHashSet;
 
 /**
  <!-- globalinfo-start -->
@@ -41,12 +45,14 @@ import adams.data.threeway.ThreeWayData;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class ThreeWayDataToHeatmap
   extends AbstractConversion {
 
   private static final long serialVersionUID = -8371135112409803967L;
+
+  /** the z layer to use. */
+  protected double m_Z;
 
   /**
    * Returns a string describing the object.
@@ -58,6 +64,47 @@ public class ThreeWayDataToHeatmap
     return
       "Turns a " + ThreeWayData.class.getName() + " data structure into a heatmap.\n"
       + "Does not take the X of the level 2 points into account.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "z", "Z",
+      0.0);
+  }
+
+  /**
+   * Sets the Z layer to use.
+   *
+   * @param value 	the Z
+   */
+  public void setZ(double value) {
+    m_Z = value;
+    reset();
+  }
+
+  /**
+   * Returns the Z layer to use.
+   *
+   * @return 		the Z
+   */
+  public double getZ() {
+    return m_Z;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String ZTipText() {
+    return "The Z layer to use.";
   }
 
   /**
@@ -90,24 +137,33 @@ public class ThreeWayDataToHeatmap
   protected Object doConvert() throws Exception {
     Heatmap		result;
     ThreeWayData	input;
-    int			cols;
-    int			n;
-    int			i;
+    int			x;
+    int			y;
+    TDoubleSet 		setX;
+    TDoubleSet 		setY;
+    TDoubleList		listX;
+    TDoubleList		listY;
 
-    input  = (ThreeWayData) m_Input;
-    cols   = 0;
-    for (L1Point l1: input.toList())
-      cols = Math.max(cols, l1.size());
-    result = new Heatmap(input.size(), cols);
-
-    n = 0;
+    input = (ThreeWayData) m_Input;
+    setX  = new TDoubleHashSet();
+    setY  = new TDoubleHashSet();
     for (L1Point l1: input.toList()) {
-      i = 0;
+      setX.add(l1.getX());
+      setY.add(l1.getY());
+    }
+    result = new Heatmap(setY.size(), setX.size());
+
+    listX = new TDoubleArrayList(setX);
+    listX.sort();
+    listY = new TDoubleArrayList(setY);
+    listY.sort();
+    for (L1Point l1: input.toList()) {
+      x = listX.indexOf(l1.getX());
+      y = listY.indexOf(l1.getY());
       for (L2Point l2: l1.toList()) {
-	result.set(n, i, l2.getY());
-	i++;
+        if (l2.getZ() == m_Z)
+	  result.set(y, x, l2.getData());
       }
-      n++;
     }
 
     return result;

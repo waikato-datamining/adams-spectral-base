@@ -98,18 +98,18 @@ public class L1PointUtils {
     pool = new Hashtable<>();
     for (i = 0; i < points1.size(); i++) {
       l2 = points1.get(i);
-      pool.put(l2.getX(), l2);
+      pool.put(l2.getZ(), l2);
     }
 
     // add to pool
     for (i = 0; i < points2.size(); i++) {
       l2 = points2.get(i);
-      if (pool.containsKey(l2.getX())) {
-	l2Pool = pool.get(l2.getX());
-	l2Pool.setY(l2Pool.getY() + l2.getY());
+      if (pool.containsKey(l2.getZ())) {
+	l2Pool = pool.get(l2.getZ());
+	l2Pool.setData(l2Pool.getData() + l2.getData());
       }
       else {
-	pool.put(l2.getX(), l2);
+	pool.put(l2.getZ(), l2);
       }
     }
 
@@ -140,11 +140,11 @@ public class L1PointUtils {
     result = new double[numBins];
 
     points = new ArrayList<>(l1.toTreeSet(new L2PointComparator(true, true)));
-    min    = points.get(0).getY();
-    max    = points.get(points.size() - 1).getY();
+    min    = points.get(0).getData();
+    max    = points.get(points.size() - 1).getData();
     scale  = 1.0 / (max - min) / ((double) numBins);
     for (i = 0; i < points.size(); i++)
-      result[(int) ((points.get(i).getY() - min)*scale)]++;
+      result[(int) ((points.get(i).getData() - min)*scale)]++;
 
     return result;
   }
@@ -172,7 +172,7 @@ public class L1PointUtils {
     result = new double[data.size()];
     i      = 0;
     for (L2Point l2 : data)
-      result[i++] = l2.getY();
+      result[i++] = l2.getData();
 
     return result;
   }
@@ -215,11 +215,11 @@ public class L1PointUtils {
       // get points, if necessary/possible
       if ((l2Left == null) && (iterLeft.hasNext())) {
 	l2Left  = iterLeft.next();
-	l2LeftX = l2Left.getX();
+	l2LeftX = l2Left.getZ();
       }
       if ((l2Right == null) && (iterRight.hasNext())) {
 	l2Right  = iterRight.next();
-	l2RightX = l2Right.getX();
+	l2RightX = l2Right.getZ();
       }
 
       // interpolate MS points
@@ -227,8 +227,8 @@ public class L1PointUtils {
 	   && (l2Right != null)
 	   && (l2LeftX == l2RightX) ) {
 	l2New = new L2Point(
-	  l2Left.getX(),
-	  (Math.round(l2Left.getY() * percLeft) + Math.round(l2Right.getY() * percRight)));
+	  l2Left.getZ(),
+	  (Math.round(l2Left.getData() * percLeft) + Math.round(l2Right.getData() * percRight)));
 	l2Left = null;
 	l2Right = null;
 	result.add(l2New);
@@ -236,15 +236,15 @@ public class L1PointUtils {
       else {
 	if ((l2Left != null) && (l2LeftX < l2RightX)) {
 	  l2New = new L2Point(
-	    l2Left.getX(),
-	    Math.round(l2Left.getY() * percLeft));
+	    l2Left.getZ(),
+	    Math.round(l2Left.getData() * percLeft));
 	  l2Left = null;
 	  result.add(l2New);
 	}
 	else if ((l2Right != null) && (l2RightX < l2LeftX)) {
 	  l2New = new L2Point(
-	      l2Right.getX(),
-	      Math.round(l2Right.getY() * percRight));
+	      l2Right.getZ(),
+	      Math.round(l2Right.getData() * percRight));
 	  l2Right = null;
 	  result.add(l2New);
 	}

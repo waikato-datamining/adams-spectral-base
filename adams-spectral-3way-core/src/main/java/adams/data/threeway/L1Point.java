@@ -231,16 +231,16 @@ public class L1Point
 
     for (L2Point point: this) {
       if (    (m_MaxY == null)
-	   || (point.getY() > m_MaxY.getY()) )
+	   || (point.getData() > m_MaxY.getData()) )
 	m_MaxY = point;
       if (    (m_MinY == null)
-	   || (point.getY() < m_MinY.getY()))
+	   || (point.getData() < m_MinY.getData()))
 	m_MinY = point;
       if (    (m_MaxX == null)
-	   || (point.getX() > m_MaxX.getX()) )
+	   || (point.getZ() > m_MaxX.getZ()) )
 	m_MaxX = point;
       if (    (m_MinX == null)
-	   || (point.getX() < m_MinX.getX()) )
+	   || (point.getZ() < m_MinX.getZ()) )
 	m_MinX = point;
     }
   }
@@ -305,7 +305,7 @@ public class L1Point
     L2Point result;
 
     result = findClosest(x);
-    if ((result != null) && (result.getX() != x))
+    if ((result != null) && (result.getZ() != x))
       result = null;
 
     return result;
@@ -338,12 +338,12 @@ public class L1Point
       if (index >= m_Points.size())
 	index = m_Points.size() - 1;
       result = m_Points.get(index);
-      dist   = Math.abs(x - result.getX());
+      dist   = Math.abs(x - result.getZ());
 
       for (i = index - 2; i <= index + 2; i++) {
 	if ((i >= 0) && (i < m_Points.size())) {
 	  currPoint = m_Points.get(i);
-	  currDist  = Math.abs(x - currPoint.getX());
+	  currDist  = Math.abs(x - currPoint.getZ());
 
 	  if (currDist < dist) {
 	    dist   = currDist;
@@ -396,18 +396,6 @@ public class L1Point
   }
 
   /**
-   * Uses the sum of the Y values of all level 2 points for its own Y value.
-   */
-  public void updateY() {
-    double	sum;
-
-    sum = 0.0;
-    for (L2Point p: this)
-      sum += p.getY();
-    setY(sum);
-  }
-
-  /**
    * Compares this object with the specified object for order.  Returns a
    * negative integer, zero, or a positive integer as this object is less
    * than, equal to, or greater than the specified object.
@@ -427,10 +415,8 @@ public class L1Point
     if (result != 0)
       return result;
 
-    p = (L1Point) o;
-
-    if (result == 0)
-      result = Double.compare(getX(), p.getX());
+    p      = (L1Point) o;
+    result = Double.compare(getX(), p.getX());
 
     if (result == 0)
       result = Double.compare(getY(), p.getY());

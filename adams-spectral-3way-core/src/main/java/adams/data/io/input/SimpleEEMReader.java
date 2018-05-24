@@ -143,14 +143,14 @@ public class SimpleEEMReader
 
     header = sheet.getHeaderRow();
     for (Row row: sheet.rows()) {
-      l1 = new L1Point();
-      l1.setX(row.getCell(0).toDouble());
       for (i = 1; i < sheet.getColumnCount(); i++) {
-	l2 = new L2Point(header.getCell(i).toDouble(), row.getCell(i).toDouble());
+        l1 = new L1Point();
+        l1.setX(row.getCell(0).toDouble());              // X
+        l1.setY(header.getCell(i).toDouble());           // Y
+	l2 = new L2Point(0, row.getCell(i).toDouble());  // Z is always 0
 	l1.add(l2);
+        data.add(l1);
       }
-      l1.updateY();
-      data.add(l1);
     }
 
     m_ReadData.add(data);
