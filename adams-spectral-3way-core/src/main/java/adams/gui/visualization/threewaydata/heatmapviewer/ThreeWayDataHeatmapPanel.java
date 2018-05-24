@@ -20,16 +20,19 @@
 package adams.gui.visualization.threewaydata.heatmapviewer;
 
 import adams.core.Properties;
+import adams.core.base.BaseDouble;
 import adams.data.conversion.Conversion;
 import adams.data.conversion.HeatmapToBufferedImage;
 import adams.data.conversion.MultiConversion;
 import adams.data.conversion.ThreeWayDataToHeatmap;
 import adams.data.image.AbstractImageContainer;
 import adams.data.threeway.ThreeWayData;
+import adams.gui.core.BaseObjectTextField;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.ColorHelper;
+import adams.gui.core.GUIHelper;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.event.SearchEvent;
@@ -40,9 +43,13 @@ import adams.gui.visualization.image.selectionshape.RectanglePainter;
 import adams.gui.visualization.report.ReportFactory;
 import adams.gui.visualization.threewaydata.heatmapviewer.overlay.AbstractThreeWayDataOverlay;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 
 /**
@@ -83,6 +90,15 @@ public class ThreeWayDataHeatmapPanel
   /** the color to use for missing values. */
   protected Color m_MissingValueColor;
 
+  /** the Z layer minimum. */
+  protected BaseObjectTextField<BaseDouble> m_TextMinZ;
+
+  /** the Z layer maximum. */
+  protected BaseObjectTextField<BaseDouble> m_TextMaxZ;
+
+  /** the button for applying the min/max Z layer. */
+  protected JButton m_ButtonApplyZ;
+
   /**
    * Initializes the panel.
    *
@@ -116,6 +132,7 @@ public class ThreeWayDataHeatmapPanel
   protected void initGUI() {
     Properties		props;
     JPanel		panel;
+    JLabel		label;
     RectanglePainter	painter;
 
     super.initGUI();
@@ -124,7 +141,32 @@ public class ThreeWayDataHeatmapPanel
 
     setLayout(new BorderLayout());
 
+    panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    add(panel, BorderLayout.NORTH);
 
+    // Z layer
+    m_TextMinZ = new BaseObjectTextField<>(new BaseDouble(), "0.0");
+    m_TextMinZ.setColumns(10);
+    label = new JLabel("Min Z");
+    label.setDisplayedMnemonic('i');
+    label.setLabelFor(m_TextMinZ);
+    panel.add(label);
+    panel.add(m_TextMinZ);
+    
+    m_TextMaxZ = new BaseObjectTextField<>(new BaseDouble(), "0.0");
+    m_TextMaxZ.setColumns(10);
+    label = new JLabel("Max Z");
+    label.setDisplayedMnemonic('a');
+    label.setLabelFor(m_TextMaxZ);
+    panel.add(label);
+    panel.add(m_TextMaxZ);
+
+    m_ButtonApplyZ = new JButton("Apply");
+    m_ButtonApplyZ.setMnemonic('p');
+    m_ButtonApplyZ.addActionListener((ActionEvent e) -> refresh());
+    panel.add(m_ButtonApplyZ);
+
+    // main
     m_SplitPane = new BaseSplitPane();
     m_SplitPane.setDividerLocation(props.getInteger("Panel.DividerLocation", 600));
     add(m_SplitPane, BorderLayout.CENTER);
@@ -180,6 +222,8 @@ public class ThreeWayDataHeatmapPanel
     props  = getProperties();
 
     tw2hm = new ThreeWayDataToHeatmap();
+    tw2hm.setMinZ(m_TextMinZ.getObject().doubleValue());
+    tw2hm.setMaxZ(m_TextMaxZ.getObject().doubleValue());
 
     hm2bi = new HeatmapToBufferedImage();
     hm2bi.setGenerator(m_ColorGenerator);
@@ -194,7 +238,7 @@ public class ThreeWayDataHeatmapPanel
       if (errors.length() > 0)
 	errors.append("\n");
       errors.append(error);
-      System.err.println(error);
+      GUIHelper.showErrorMessage(this, error);
       m_DataImage.setCurrentImage((BufferedImage) null);
     }
     else {
