@@ -51,6 +51,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 /**
  * Panel for displaying a single 3-way data structure.
@@ -99,6 +100,9 @@ public class ThreeWayDataHeatmapPanel
   /** the button for applying the min/max Z layer. */
   protected JButton m_ButtonApplyZ;
 
+  /** the current file. */
+  protected File m_CurrentFile;
+
   /**
    * Initializes the panel.
    *
@@ -121,6 +125,7 @@ public class ThreeWayDataHeatmapPanel
 
     props                = getProperties();
     m_Data               = new ThreeWayData();
+    m_CurrentFile        = null;
     m_ColorGenerator     = AbstractColorGradientGenerator.forCommandLine(props.getProperty("Image.GradientColorGenerator", new BiColorGenerator().toCommandLine()));
     m_MissingValueColor  = props.getColor("Image.MissingValueColor", ColorHelper.valueOf("#88ff0000"));
   }
@@ -264,6 +269,7 @@ public class ThreeWayDataHeatmapPanel
     if (value == null)
       return;
 
+    m_CurrentFile = null;
     m_Data = (ThreeWayData) value.getClone();
     errors = new StringBuilder();
 
@@ -287,6 +293,24 @@ public class ThreeWayDataHeatmapPanel
    */
   public ThreeWayData getData() {
     return m_Data;
+  }
+
+  /**
+   * Sets the current file.
+   *
+   * @param value	the file to use
+   */
+  public void setCurrentFile(File value) {
+    m_CurrentFile = value;
+  }
+
+  /**
+   * Returns the current file.
+   *
+   * @return		the file, null if none set
+   */
+  public File getCurrentFile() {
+    return m_CurrentFile;
   }
 
   /**

@@ -18,3 +18,7 @@ adams.data.io.output.AbstractThreeWayDataWriter=\
 # overlays
 adams.gui.visualization.threewaydata.heatmapviewer.overlay.AbstractThreeWayDataOverlay=\
   adams.gui.visualization.threewaydata.heatmapviewer.overlay
+
+# the multi-page actions of the 3way heatmap viewer
+adams.gui.visualization.threewaydata.heatmapviewer.multipageaction.AbstractMultiPageMenuItem=\
+  adams.gui.visualization.threewaydata.heatmapviewer.multipageaction

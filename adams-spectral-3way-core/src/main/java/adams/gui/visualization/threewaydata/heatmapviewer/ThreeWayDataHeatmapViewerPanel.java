@@ -36,7 +36,6 @@ import adams.gui.core.BaseStatusBar;
 import adams.gui.core.CustomColorImageIcon;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MenuBarProvider;
-import adams.gui.core.MultiPagePane;
 import adams.gui.core.RecentFilesHandlerWithCommandline;
 import adams.gui.core.RecentFilesHandlerWithCommandline.Setup;
 import adams.gui.core.SearchPanel;
@@ -99,7 +98,7 @@ public class ThreeWayDataHeatmapViewerPanel
   protected static Properties m_Properties;
 
   /** the tabbed pane for the data structures. */
-  protected MultiPagePane m_MultiPagePane;
+  protected ThreeWayDataHeatmapViewerMultiPagePane m_MultiPagePane;
 
   /** the status bar. */
   protected BaseStatusBar m_StatusBar;
@@ -217,7 +216,7 @@ public class ThreeWayDataHeatmapViewerPanel
     panel = new JPanel(new BorderLayout());
     add(panel, BorderLayout.CENTER);
 
-    m_MultiPagePane = new MultiPagePane();
+    m_MultiPagePane = new ThreeWayDataHeatmapViewerMultiPagePane();
     m_MultiPagePane.addChangeListener(new ChangeListener() {
       @Override
       public void stateChanged(ChangeEvent e) {
@@ -724,6 +723,7 @@ public class ThreeWayDataHeatmapViewerPanel
 	    return null;
 	  }
 	  ThreeWayDataHeatmapPanel panel = newPanel(data.get(0));
+	  panel.setCurrentFile(file);
 	  m_MultiPagePane.addPage(panel.getTitle(), panel);
 	  m_MultiPagePane.setSelectedPage(panel);
 	  if (m_RecentFilesHandler != null)
@@ -840,6 +840,7 @@ public class ThreeWayDataHeatmapViewerPanel
 	public void run() {
 	  Filter<ThreeWayData> filter = e.getFilter().shallowCopy();
 	  ThreeWayDataHeatmapPanel panel = getPanelAt(index);
+	  File current = panel.getCurrentFile();
 	  ThreeWayData filtered = filter.filter(panel.getData());
 	  filter.cleanUp();
 	  if (e.getOverlayOriginalData()) {
