@@ -1,0 +1,25 @@
+# Project: adams
+# Modules: adams-core,adams-heatmap,adams-imaging,adams-imaging-boofcv,adams-spectral-3way-core,adams-spreadsheet
+# Date: 2018-05-25 16:59:58
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Builds PARAFAC on an EEM data file\\nand displays the loading matrices." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.standalone.CallableActors
+  adams.flow.sink.DisplayPanelManager -provider "adams.flow.sink.SpreadSheetDisplay -cell-rendering-customizer adams.gui.core.spreadsheettable.DefaultCellRenderingCustomizer -writer adams.data.io.output.NullWriter" -entry-name-variable entry
+ adams.flow.source.Start
+ adams.flow.control.Trigger -name train
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/CFF4.dat
+  adams.flow.transformer.ThreeWayDataFileReader -reader adams.data.io.input.SimpleEEMReader
+  adams.flow.transformer.Convert -conversion adams.data.conversion.ThreeWayDataToTensor
+  adams.flow.transformer.ThreeWayDataTrain -algorithm "nz.ac.waikato.cms.adams.multiway.algorithm.PARAFAC -init-method SVD -num-components 3 -num-starts 1"
+  adams.flow.transformer.SetStorageValue -storage-name model
+ adams.flow.control.Trigger -name filter
+  adams.flow.source.FileSupplier -file ${FLOWS}/data/CFF5.dat -file ${FLOWS}/data/CFF6.dat
+  adams.flow.control.Tee -name filename
+   adams.flow.transformer.BaseName -remove-extensions true
+   adams.flow.transformer.SetVariable -var-name entry
+  adams.flow.transformer.ThreeWayDataFileReader -reader adams.data.io.input.SimpleEEMReader
+  adams.flow.transformer.Convert -conversion adams.data.conversion.ThreeWayDataToTensor
+  adams.flow.transformer.ThreeWayDataModelFilter -model-loading-type STORAGE -model-storage model
+  adams.flow.transformer.Convert -name "Convert (2)" -conversion adams.data.conversion.TensorToSpreadSheet
+  adams.flow.sink.CallableSink -callable DisplayPanelManager
