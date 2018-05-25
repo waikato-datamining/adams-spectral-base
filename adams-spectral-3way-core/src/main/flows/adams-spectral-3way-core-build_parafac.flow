@@ -1,11 +1,11 @@
 # Project: adams
 # Modules: adams-core,adams-heatmap,adams-imaging,adams-imaging-boofcv,adams-spectral-3way-core,adams-spreadsheet
-# Date: 2018-05-25 15:52:44
+# Date: 2018-05-25 16:19:24
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Builds PARAFAC on an EEM data file\\nand displays the loading matrices." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
-  adams.flow.sink.HistoryDisplay -entry-name-variable entry
+  adams.flow.sink.DisplayPanelManager -provider "adams.flow.sink.SpreadSheetDisplay -cell-rendering-customizer adams.gui.core.spreadsheettable.DefaultCellRenderingCustomizer -writer adams.data.io.output.NullWriter" -entry-name-variable entry
  adams.flow.source.FileSupplier -file ${FLOWS}/data/CFF4.dat
  adams.flow.transformer.ThreeWayDataFileReader -reader adams.data.io.input.SimpleEEMReader
  adams.flow.transformer.Convert -conversion adams.data.conversion.ThreeWayDataToTensor
@@ -13,12 +13,15 @@ adams.flow.control.Flow -annotation "Builds PARAFAC on an EEM data file\\nand di
  adams.flow.control.Tee -name A
   adams.flow.transformer.SetVariable -var-name entry -var-value A
   adams.flow.transformer.ThreeWayDataLoadingMatrix -matrix A
-  adams.flow.sink.CallableSink -callable HistoryDisplay
+  adams.flow.transformer.Convert -conversion adams.data.conversion.TensorToSpreadSheet
+  adams.flow.sink.CallableSink -callable DisplayPanelManager
  adams.flow.control.Tee -name B
   adams.flow.transformer.SetVariable -var-name entry -var-value B
   adams.flow.transformer.ThreeWayDataLoadingMatrix -matrix B
-  adams.flow.sink.CallableSink -callable HistoryDisplay
+  adams.flow.transformer.Convert -conversion adams.data.conversion.TensorToSpreadSheet
+  adams.flow.sink.CallableSink -callable DisplayPanelManager
  adams.flow.control.Tee -name C
   adams.flow.transformer.SetVariable -var-name entry -var-value C
   adams.flow.transformer.ThreeWayDataLoadingMatrix -matrix C
-  adams.flow.sink.CallableSink -callable HistoryDisplay
+  adams.flow.transformer.Convert -conversion adams.data.conversion.TensorToSpreadSheet
+  adams.flow.sink.CallableSink -callable DisplayPanelManager
