@@ -26,6 +26,8 @@ import adams.data.conversion.HeatmapToBufferedImage;
 import adams.data.conversion.MultiConversion;
 import adams.data.conversion.ThreeWayDataToHeatmap;
 import adams.data.image.AbstractImageContainer;
+import adams.data.threeway.L1Point;
+import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 import adams.gui.core.BaseObjectTextField;
 import adams.gui.core.BasePanel;
@@ -42,8 +44,14 @@ import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.image.selectionshape.RectanglePainter;
 import adams.gui.visualization.report.ReportFactory;
 import adams.gui.visualization.threewaydata.heatmapviewer.overlay.AbstractThreeWayDataOverlay;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.set.TDoubleSet;
+import gnu.trove.set.hash.TDoubleHashSet;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
@@ -52,6 +60,8 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Panel for displaying a single 3-way data structure.
@@ -96,6 +106,9 @@ public class ThreeWayDataHeatmapPanel
 
   /** the Z layer maximum. */
   protected BaseObjectTextField<BaseDouble> m_TextMaxZ;
+
+  /** the combobox with all the Z values. */
+  protected JComboBox<Object> m_ComboBoxZ;
 
   /** the button for applying the min/max Z layer. */
   protected JButton m_ButtonApplyZ;
@@ -166,6 +179,13 @@ public class ThreeWayDataHeatmapPanel
     panel.add(label);
     panel.add(m_TextMaxZ);
 
+    m_ComboBoxZ = new JComboBox<>();
+    label = new JLabel("or Select Z");
+    label.setDisplayedMnemonic('l');
+    label.setLabelFor(m_TextMaxZ);
+    panel.add(label);
+    panel.add(m_ComboBoxZ);
+
     m_ButtonApplyZ = new JButton("Apply");
     m_ButtonApplyZ.setMnemonic('p');
     m_ButtonApplyZ.addActionListener((ActionEvent e) -> refresh());
@@ -227,8 +247,14 @@ public class ThreeWayDataHeatmapPanel
     props  = getProperties();
 
     tw2hm = new ThreeWayDataToHeatmap();
-    tw2hm.setMinZ(m_TextMinZ.getObject().doubleValue());
-    tw2hm.setMaxZ(m_TextMaxZ.getObject().doubleValue());
+    if (m_ComboBoxZ.getSelectedIndex() > 0) {
+      tw2hm.setMinZ((Double) m_ComboBoxZ.getSelectedItem());
+      tw2hm.setMaxZ((Double) m_ComboBoxZ.getSelectedItem());
+    }
+    else {
+      tw2hm.setMinZ(m_TextMinZ.getObject().doubleValue());
+      tw2hm.setMaxZ(m_TextMaxZ.getObject().doubleValue());
+    }
 
     hm2bi = new HeatmapToBufferedImage();
     hm2bi.setGenerator(m_ColorGenerator);
@@ -265,6 +291,9 @@ public class ThreeWayDataHeatmapPanel
   public void setData(ThreeWayData value) {
     StringBuilder	errors;
     String		error;
+    TDoubleSet 		setZ;
+    TDoubleList		listZ;
+    List<Object> 	valuesZ;
 
     if (value == null)
       return;
@@ -272,6 +301,21 @@ public class ThreeWayDataHeatmapPanel
     m_CurrentFile = null;
     m_Data = (ThreeWayData) value.getClone();
     errors = new StringBuilder();
+
+    // z values
+    valuesZ = new ArrayList<>();
+    valuesZ.add("");
+    setZ = new TDoubleHashSet();
+    for (L1Point l1: m_Data) {
+      for (L2Point l2: l1)
+        setZ.add(l2.getZ());
+    }
+    listZ = new TDoubleArrayList(setZ);
+    listZ.sort();
+    for (double z: listZ.toArray())
+      valuesZ.add(z);
+    m_ComboBoxZ.setModel(new DefaultComboBoxModel<>(valuesZ.toArray(new Object[0])));
+    m_ComboBoxZ.setSelectedIndex(0);
 
     // image
     error = refresh();
