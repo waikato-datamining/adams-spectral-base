@@ -27,7 +27,10 @@ import nz.ac.waikato.cms.adams.multiway.data.tensor.Tensor;
 
 /**
  <!-- globalinfo-start -->
- * Turns a Tensor data structure into a spreadsheet.
+ * Turns a Tensor data structure into a spreadsheet.<br>
+ * - 1D: single row<br>
+ * - 2D: matrix<br>
+ * - 3D: three index columns (X,Y,Z) and data column
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -53,7 +56,10 @@ public class TensorToSpreadSheet
    */
   @Override
   public String globalInfo() {
-    return "Turns a Tensor data structure into a spreadsheet.";
+    return "Turns a Tensor data structure into a spreadsheet.\n"
+      + "- 1D: single row\n"
+      + "- 2D: matrix\n"
+      + "- 3D: three index columns (X,Y,Z) and data column";
   }
 
   /**
