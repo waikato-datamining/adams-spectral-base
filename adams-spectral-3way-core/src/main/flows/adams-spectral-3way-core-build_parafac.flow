@@ -1,0 +1,11 @@
+# Project: adams
+# Modules: adams-core,adams-heatmap,adams-imaging,adams-imaging-boofcv,adams-spectral-3way-core,adams-spreadsheet
+# Date: 2018-05-25 14:44:23
+# User: fracpete
+# Charset: UTF-8
+adams.flow.control.Flow -annotation "Builds PARAFAC on an EEM data file." -flow-execution-listener adams.flow.execution.NullListener
+ adams.flow.source.FileSupplier -file ${FLOWS}/data/CFF4.dat
+ adams.flow.transformer.ThreeWayDataFileReader -reader adams.data.io.input.SimpleEEMReader
+ adams.flow.transformer.Convert -conversion adams.data.conversion.ThreeWayDataToTensor
+ adams.flow.transformer.ThreeWayDataTrain -algorithm "nz.ac.waikato.cms.adams.multiway.algorithm.PARAFAC -init-method SVD -num-components 3 -num-starts 1"
+ adams.flow.sink.Display -writer adams.data.io.output.NullWriter

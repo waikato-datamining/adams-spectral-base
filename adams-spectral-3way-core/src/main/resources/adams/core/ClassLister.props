@@ -22,3 +22,11 @@ adams.gui.visualization.threewaydata.heatmapviewer.overlay.AbstractThreeWayDataO
 # the multi-page actions of the 3way heatmap viewer
 adams.gui.visualization.threewaydata.heatmapviewer.multipageaction.AbstractMultiPageMenuItem=\
   adams.gui.visualization.threewaydata.heatmapviewer.multipageaction
+
+# the multi-way algorithms
+nz.ac.waikato.cms.adams.multiway.algorithm.api.AbstractAlgorithm=\
+  nz.ac.waikato.cms.adams.multiway.algorithm
+
+# the multi-way filters
+nz.ac.waikato.cms.adams.multiway.algorithm.api.Filter=\
+  nz.ac.waikato.cms.adams.multiway.algorithm
