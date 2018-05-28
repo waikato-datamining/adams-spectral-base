@@ -61,11 +61,11 @@ public class ThreeWayDataToHeatmap
 
   private static final long serialVersionUID = -8371135112409803967L;
 
-  /** the minimum z layer to use. */
-  protected double m_MinZ;
+  /** the minimum x to use. */
+  protected double m_MinX;
 
-  /** the maximum z layer to use. */
-  protected double m_MaxZ;
+  /** the maximum x to use. */
+  protected double m_MaxX;
 
   /**
    * Returns a string describing the object.
@@ -76,7 +76,7 @@ public class ThreeWayDataToHeatmap
   public String globalInfo() {
     return
       "Turns a " + ThreeWayData.class.getName() + " data structure into a heatmap.\n"
-      + "Sums up the data values of the Z layers that fall into the specified min/max.";
+      + "Sums up the data values of the X layers that fall into the specified min/max.";
   }
 
   /**
@@ -87,31 +87,31 @@ public class ThreeWayDataToHeatmap
     super.defineOptions();
 
     m_OptionManager.add(
-      "min-z", "minZ",
+      "min-x", "minX",
       0.0);
 
     m_OptionManager.add(
-      "max-z", "maxZ",
+      "max-X", "maxX",
       0.0);
   }
 
   /**
-   * Sets the minimum Z layer to use.
+   * Sets the minimum X layer to use.
    *
-   * @param value 	the minimum Z
+   * @param value 	the minimum X
    */
-  public void setMinZ(double value) {
-    m_MinZ = value;
+  public void setMinX(double value) {
+    m_MinX = value;
     reset();
   }
 
   /**
-   * Returns the minimum Z layer to use.
+   * Returns the minimum X layer to use.
    *
-   * @return 		the minimum Z
+   * @return 		the minimum X
    */
-  public double getMinZ() {
-    return m_MinZ;
+  public double getMinX() {
+    return m_MinX;
   }
 
   /**
@@ -120,27 +120,27 @@ public class ThreeWayDataToHeatmap
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String minZTipText() {
-    return "The minimum Z layer to include.";
+  public String minXTipText() {
+    return "The minimum X layer to include.";
   }
 
   /**
-   * Sets the maximum Z layer to use.
+   * Sets the maximum X layer to use.
    *
-   * @param value 	the maximum Z
+   * @param value 	the maximum X
    */
-  public void setMaxZ(double value) {
-    m_MaxZ = value;
+  public void setMaxX(double value) {
+    m_MaxX = value;
     reset();
   }
 
   /**
-   * Returns the maximum Z layer to use.
+   * Returns the maximum X layer to use.
    *
-   * @return 		the maximum Z
+   * @return 		the maximum X
    */
-  public double getMaxZ() {
-    return m_MaxZ;
+  public double getMaxX() {
+    return m_MaxX;
   }
 
   /**
@@ -149,8 +149,8 @@ public class ThreeWayDataToHeatmap
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String maxZTipText() {
-    return "The maximum Z layer to include.";
+  public String maxXTipText() {
+    return "The maximum X layer to include.";
   }
 
   /**
@@ -185,8 +185,8 @@ public class ThreeWayDataToHeatmap
     result = super.checkData();
 
     if (result == null) {
-      if (m_MaxZ < m_MinZ)
-        result = "MaxZ must be smaller than MinZ: MinZ=" + m_MinZ + ", MaxZ=" + m_MaxZ;
+      if (m_MaxX < m_MinX)
+        result = "MaxX must be smaller than MinX: MinX=" + m_MinX + ", MaxX=" + m_MaxX;
     }
 
     return result;
@@ -204,30 +204,32 @@ public class ThreeWayDataToHeatmap
     ThreeWayData	input;
     int			x;
     int			y;
-    TDoubleSet 		setX;
     TDoubleSet 		setY;
-    TDoubleList		listX;
-    TDoubleList		listY;
+    TDoubleSet 		setZ;
+    TDoubleList 	listY;
+    TDoubleList 	listZ;
 
     input = (ThreeWayData) m_Input;
-    setX  = new TDoubleHashSet();
     setY  = new TDoubleHashSet();
+    setZ  = new TDoubleHashSet();
     for (L1Point l1: input.toList()) {
-      setX.add(l1.getX());
       setY.add(l1.getY());
+      for (L2Point l2: l1)
+	setZ.add(l2.getZ());
     }
-    result = new Heatmap(setY.size(), setX.size());
+    result = new Heatmap(setZ.size(), setY.size());
 
-    listX = new TDoubleArrayList(setX);
-    listX.sort();
     listY = new TDoubleArrayList(setY);
     listY.sort();
+    listZ = new TDoubleArrayList(setZ);
+    listZ.sort();
     for (L1Point l1: input.toList()) {
-      x = listX.indexOf(l1.getX());
-      y = listY.indexOf(l1.getY());
-      for (L2Point l2: l1.toList()) {
-        if ((l2.getZ() >= m_MinZ) && (l2.getZ() <= m_MaxZ))
+      if ((l1.getX() >= m_MinX) && (l1.getX() <= m_MaxX)) {
+	x = listY.indexOf(l1.getY());
+	for (L2Point l2: l1.toList()) {
+	  y = listZ.indexOf(l2.getZ());
 	  result.set(y, x, result.get(y, x) + l2.getData());
+	}
       }
     }
 

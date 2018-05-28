@@ -72,6 +72,11 @@ import adams.data.threeway.ThreeWayData;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
+ * <pre>-x &lt;double&gt; (property: X)
+ * &nbsp;&nbsp;&nbsp;The value to use for the X axis.
+ * &nbsp;&nbsp;&nbsp;default: 0.0
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -83,6 +88,9 @@ public class SimpleEEMReader
 
   public static final String PREFIX_INFO = "Info-";
 
+  /** the X value to use for the 3-way data. */
+  protected double m_X;
+
   /**
    * Returns a string describing the object.
    *
@@ -91,6 +99,47 @@ public class SimpleEEMReader
   @Override
   public String globalInfo() {
     return "Reads EEM data in spreadsheet format (tab-separated columns).";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "x", "X",
+      0.0);
+  }
+
+  /**
+   * Sets the value to use for the X axis.
+   *
+   * @param value	the value
+   */
+  public void setX(double value) {
+    m_X = value;
+    reset();
+  }
+
+  /**
+   * Returns the value to use for the X axis.
+   *
+   * @return		the value
+   */
+  public double getX() {
+    return m_X;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String XTipText() {
+    return "The value to use for the X axis.";
   }
 
   /**
@@ -143,13 +192,13 @@ public class SimpleEEMReader
 
     header = sheet.getHeaderRow();
     for (Row row: sheet.rows()) {
+      l1 = new L1Point();
+      l1.setX(m_X);                                                               // X is user-defined
+      l1.setY(row.getCell(0).toDouble());                                         // Y
+      data.add(l1);
       for (i = 1; i < sheet.getColumnCount(); i++) {
-        l1 = new L1Point();
-        l1.setX(row.getCell(0).toDouble());              // X
-        l1.setY(header.getCell(i).toDouble());           // Y
-	l2 = new L2Point(0, row.getCell(i).toDouble());  // Z is always 0
+	l2 = new L2Point(header.getCell(i).toDouble(), row.getCell(i).toDouble());  // Z and value
 	l1.add(l2);
-        data.add(l1);
       }
     }
 

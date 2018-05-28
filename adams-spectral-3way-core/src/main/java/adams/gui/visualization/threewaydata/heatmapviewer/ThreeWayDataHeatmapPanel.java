@@ -27,7 +27,6 @@ import adams.data.conversion.MultiConversion;
 import adams.data.conversion.ThreeWayDataToHeatmap;
 import adams.data.image.AbstractImageContainer;
 import adams.data.threeway.L1Point;
-import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 import adams.gui.core.BaseObjectTextField;
 import adams.gui.core.BasePanel;
@@ -101,14 +100,14 @@ public class ThreeWayDataHeatmapPanel
   /** the color to use for missing values. */
   protected Color m_MissingValueColor;
 
-  /** the Z layer minimum. */
-  protected BaseObjectTextField<BaseDouble> m_TextMinZ;
+  /** the X layer minimum. */
+  protected BaseObjectTextField<BaseDouble> m_TextMinX;
 
-  /** the Z layer maximum. */
-  protected BaseObjectTextField<BaseDouble> m_TextMaxZ;
+  /** the X layer maximum. */
+  protected BaseObjectTextField<BaseDouble> m_TextMaxX;
 
-  /** the combobox with all the Z values. */
-  protected JComboBox<Object> m_ComboBoxZ;
+  /** the combobox with all the X values. */
+  protected JComboBox<Object> m_ComboBoxX;
 
   /** the button for applying the min/max Z layer. */
   protected JButton m_ButtonApplyZ;
@@ -162,29 +161,29 @@ public class ThreeWayDataHeatmapPanel
     panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     add(panel, BorderLayout.NORTH);
 
-    // Z layer
-    m_TextMinZ = new BaseObjectTextField<>(new BaseDouble(), "0.0");
-    m_TextMinZ.setColumns(10);
-    label = new JLabel("Min Z");
+    // X layer
+    m_TextMinX = new BaseObjectTextField<>(new BaseDouble(), "0.0");
+    m_TextMinX.setColumns(10);
+    label = new JLabel("Min X");
     label.setDisplayedMnemonic('i');
-    label.setLabelFor(m_TextMinZ);
+    label.setLabelFor(m_TextMinX);
     panel.add(label);
-    panel.add(m_TextMinZ);
+    panel.add(m_TextMinX);
     
-    m_TextMaxZ = new BaseObjectTextField<>(new BaseDouble(), "0.0");
-    m_TextMaxZ.setColumns(10);
-    label = new JLabel("Max Z");
+    m_TextMaxX = new BaseObjectTextField<>(new BaseDouble(), "0.0");
+    m_TextMaxX.setColumns(10);
+    label = new JLabel("Max X");
     label.setDisplayedMnemonic('a');
-    label.setLabelFor(m_TextMaxZ);
+    label.setLabelFor(m_TextMaxX);
     panel.add(label);
-    panel.add(m_TextMaxZ);
+    panel.add(m_TextMaxX);
 
-    m_ComboBoxZ = new JComboBox<>();
-    label = new JLabel("or Select Z");
+    m_ComboBoxX = new JComboBox<>();
+    label = new JLabel("or Select X");
     label.setDisplayedMnemonic('l');
-    label.setLabelFor(m_TextMaxZ);
+    label.setLabelFor(m_TextMaxX);
     panel.add(label);
-    panel.add(m_ComboBoxZ);
+    panel.add(m_ComboBoxX);
 
     m_ButtonApplyZ = new JButton("Apply");
     m_ButtonApplyZ.setMnemonic('p');
@@ -247,13 +246,13 @@ public class ThreeWayDataHeatmapPanel
     props  = getProperties();
 
     tw2hm = new ThreeWayDataToHeatmap();
-    if (m_ComboBoxZ.getSelectedIndex() > 0) {
-      tw2hm.setMinZ((Double) m_ComboBoxZ.getSelectedItem());
-      tw2hm.setMaxZ((Double) m_ComboBoxZ.getSelectedItem());
+    if (m_ComboBoxX.getSelectedIndex() > 0) {
+      tw2hm.setMinX((Double) m_ComboBoxX.getSelectedItem());
+      tw2hm.setMaxX((Double) m_ComboBoxX.getSelectedItem());
     }
     else {
-      tw2hm.setMinZ(m_TextMinZ.getObject().doubleValue());
-      tw2hm.setMaxZ(m_TextMaxZ.getObject().doubleValue());
+      tw2hm.setMinX(m_TextMinX.getObject().doubleValue());
+      tw2hm.setMaxX(m_TextMaxX.getObject().doubleValue());
     }
 
     hm2bi = new HeatmapToBufferedImage();
@@ -291,9 +290,9 @@ public class ThreeWayDataHeatmapPanel
   public void setData(ThreeWayData value) {
     StringBuilder	errors;
     String		error;
-    TDoubleSet 		setZ;
-    TDoubleList		listZ;
-    List<Object> 	valuesZ;
+    TDoubleSet 		setX;
+    TDoubleList 	listX;
+    List<Object> 	valuesX;
 
     if (value == null)
       return;
@@ -302,20 +301,18 @@ public class ThreeWayDataHeatmapPanel
     m_Data = (ThreeWayData) value.getClone();
     errors = new StringBuilder();
 
-    // z values
-    valuesZ = new ArrayList<>();
-    valuesZ.add("");
-    setZ = new TDoubleHashSet();
-    for (L1Point l1: m_Data) {
-      for (L2Point l2: l1)
-        setZ.add(l2.getZ());
-    }
-    listZ = new TDoubleArrayList(setZ);
-    listZ.sort();
-    for (double z: listZ.toArray())
-      valuesZ.add(z);
-    m_ComboBoxZ.setModel(new DefaultComboBoxModel<>(valuesZ.toArray(new Object[0])));
-    m_ComboBoxZ.setSelectedIndex(0);
+    // x values
+    valuesX = new ArrayList<>();
+    valuesX.add("");
+    setX = new TDoubleHashSet();
+    for (L1Point l1: m_Data)
+      setX.add(l1.getX());
+    listX = new TDoubleArrayList(setX);
+    listX.sort();
+    for (double x : listX.toArray())
+      valuesX.add(x);
+    m_ComboBoxX.setModel(new DefaultComboBoxModel<>(valuesX.toArray(new Object[0])));
+    m_ComboBoxX.setSelectedIndex(0);
 
     // image
     error = refresh();

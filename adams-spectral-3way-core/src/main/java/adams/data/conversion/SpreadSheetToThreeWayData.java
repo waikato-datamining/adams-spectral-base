@@ -98,7 +98,7 @@ public class SpreadSheetToThreeWayData
   public String globalInfo() {
     return "Converts a spreadsheet into a 3-way data structure.\n"
       + "The sheet requires four columns: X, Y, Z and data.\n"
-      + "The Z column is optional, which, if not provided, is simply assumed to be 0.";
+      + "The X column is optional, which, if not provided, is simply assumed to be 0.";
   }
 
   /**
@@ -110,11 +110,11 @@ public class SpreadSheetToThreeWayData
 
     m_OptionManager.add(
       "column-x", "columnX",
-      new SpreadSheetColumnIndex("1"));
+      new SpreadSheetColumnIndex(""));
 
     m_OptionManager.add(
       "column-y", "columnY",
-      new SpreadSheetColumnIndex("2"));
+      new SpreadSheetColumnIndex(""));
 
     m_OptionManager.add(
       "column-z", "columnZ",
@@ -122,7 +122,7 @@ public class SpreadSheetToThreeWayData
 
     m_OptionManager.add(
       "column-data", "columnData",
-      new SpreadSheetColumnIndex("3"));
+      new SpreadSheetColumnIndex(""));
   }
 
   /**
@@ -151,7 +151,7 @@ public class SpreadSheetToThreeWayData
    * 			displaying in the GUI or for listing the options.
    */
   public String columnXTipText() {
-    return "The column in the spreadsheet representing the X axis.";
+    return "The (optional) column in the spreadsheet representing the X axis.";
   }
 
   /**
@@ -209,7 +209,7 @@ public class SpreadSheetToThreeWayData
    * 			displaying in the GUI or for listing the options.
    */
   public String columnZTipText() {
-    return "The column in the spreadsheet representing the (optional) Z axis.";
+    return "The column in the spreadsheet representing the Z axis.";
   }
 
   /**
@@ -293,19 +293,19 @@ public class SpreadSheetToThreeWayData
     colY = m_ColumnY.getIntIndex();
     colZ = m_ColumnZ.getIntIndex();
     colD = m_ColumnData.getIntIndex();
-    if (colX == -1)
-      throw new IllegalStateException("Column for X not found: " + m_ColumnX);
     if (colY == -1)
       throw new IllegalStateException("Column for Y not found: " + m_ColumnY);
+    if (colZ == -1)
+      throw new IllegalStateException("Column for Z not found: " + m_ColumnZ);
     if (colD == -1)
       throw new IllegalStateException("Column for Data not found: " + m_ColumnData);
     cache = new HashMap<>();
     for (Row row: sheet.rows()) {
-      x = row.getCell(colX).toDouble();
+      x = 0.0;
+      if (colX > -1)
+        x = row.getCell(colX).toDouble();
       y = row.getCell(colY).toDouble();
-      z = 0.0;
-      if (colZ > -1)
-	z = row.getCell(colZ).toDouble();
+      z = row.getCell(colZ).toDouble();
       d = row.getCell(colD).toDouble();
 
       if (cache.containsKey(x) && cache.get(x).containsKey(y)) {
