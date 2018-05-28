@@ -26,7 +26,7 @@ import adams.data.threeway.ThreeWayData;
 import adams.flow.core.Token;
 import adams.gui.core.BasePanel;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
-import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.MultiColorGenerator;
 import adams.gui.visualization.threewaydata.heatmapviewer.ThreeWayDataHeatmapPanel;
 import adams.gui.visualization.threewaydata.heatmapviewer.overlay.AbstractThreeWayDataOverlay;
 
@@ -127,7 +127,7 @@ import java.awt.Color;
  *
  * <pre>-color-generator &lt;adams.gui.visualization.core.AbstractColorGradientGenerator&gt; (property: colorGenerator)
  * &nbsp;&nbsp;&nbsp;The generator for the color gradient.
- * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
+ * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.MultiColorGenerator
  * </pre>
  *
  * <pre>-overlay &lt;adams.gui.visualization.threewaydata.heatmapviewer.overlay.AbstractThreeWayDataOverlay&gt; [-overlay ...] (property: overlays)
@@ -197,7 +197,7 @@ public class ThreeWayDataHeatmapDisplay
 
     m_OptionManager.add(
       "color-generator", "colorGenerator",
-      new BiColorGenerator());
+      new MultiColorGenerator());
 
     m_OptionManager.add(
       "overlay", "overlays",
