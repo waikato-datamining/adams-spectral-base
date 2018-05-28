@@ -77,6 +77,12 @@ import adams.data.threeway.ThreeWayData;
  * &nbsp;&nbsp;&nbsp;default: 0.0
  * </pre>
  *
+ * <pre>-ignore-wave-numbers &lt;boolean&gt; (property: ignoreWaveNumbers)
+ * &nbsp;&nbsp;&nbsp;If enabled, the wave numbers get ignored and column and row indices are
+ * &nbsp;&nbsp;&nbsp;used instead.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -90,6 +96,9 @@ public class SimpleEEMReader
 
   /** the X value to use for the 3-way data. */
   protected double m_X;
+
+  /** whether to ignore the wavenumbers in the file and just use column indices. */
+  protected boolean m_IgnoreWaveNumbers;
 
   /**
    * Returns a string describing the object.
@@ -111,6 +120,10 @@ public class SimpleEEMReader
     m_OptionManager.add(
       "x", "X",
       0.0);
+
+    m_OptionManager.add(
+      "ignore-wave-numbers", "ignoreWaveNumbers",
+      false);
   }
 
   /**
@@ -140,6 +153,35 @@ public class SimpleEEMReader
    */
   public String XTipText() {
     return "The value to use for the X axis.";
+  }
+
+  /**
+   * Sets whether to ignore the wave numbers and use row/col indices instead.
+   *
+   * @param value	true if to ignore
+   */
+  public void setIgnoreWaveNumbers(boolean value) {
+    m_IgnoreWaveNumbers = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to ignore the wave numbers and use row/col indices instead.
+   *
+   * @return		true if to ignore
+   */
+  public boolean getIgnoreWaveNumbers() {
+    return m_IgnoreWaveNumbers;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String ignoreWaveNumbersTipText() {
+    return "If enabled, the wave numbers get ignored and column and row indices are used instead.";
   }
 
   /**
@@ -175,6 +217,7 @@ public class SimpleEEMReader
     L2Point 			l2;
     Row				header;
     int				i;
+    int				rowIdx;
 
     data   = new ThreeWayData();
     data.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
@@ -191,15 +234,19 @@ public class SimpleEEMReader
     }
 
     header = sheet.getHeaderRow();
+    rowIdx = 0;
     for (Row row: sheet.rows()) {
       l1 = new L1Point();
-      l1.setX(m_X);                                                               // X is user-defined
-      l1.setY(row.getCell(0).toDouble());                                         // Y
+      l1.setX(m_X);                                                      // X is user-defined
+      l1.setY(m_IgnoreWaveNumbers ? rowIdx : row.getCell(0).toDouble()); // Y
       data.add(l1);
       for (i = 1; i < sheet.getColumnCount(); i++) {
-	l2 = new L2Point(header.getCell(i).toDouble(), row.getCell(i).toDouble());  // Z and value
+	l2 = new L2Point(
+	  m_IgnoreWaveNumbers ? i : header.getCell(i).toDouble(),        // Z
+	  row.getCell(i).toDouble());                                    // value
 	l1.add(l2);
       }
+      rowIdx++;
     }
 
     m_ReadData.add(data);

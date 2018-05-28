@@ -1,6 +1,6 @@
 # Project: adams
 # Modules: adams-core,adams-heatmap,adams-imaging,adams-imaging-boofcv,adams-spectral-3way-core,adams-spreadsheet
-# Date: 2018-05-28 16:22:17
+# Date: 2018-05-28 16:56:30
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Builds PARAFAC on an EEM data file\\nand displays the loading matrices." -flow-execution-listener adams.flow.execution.NullListener
@@ -9,11 +9,11 @@ adams.flow.control.Flow -annotation "Builds PARAFAC on an EEM data file\\nand di
  adams.flow.standalone.SetVariable -var-name x -var-value 0.0
  adams.flow.source.FileSupplier -output-array true -file ${FLOWS}/data/CFF4.dat -file ${FLOWS}/data/CFF5.dat -file ${FLOWS}/data/CFF6.dat -file ${FLOWS}/data/EP4.dat -file ${FLOWS}/data/EP5.dat -file ${FLOWS}/data/EP6.dat -file ${FLOWS}/data/LE4.dat -file ${FLOWS}/data/LE5.dat -file ${FLOWS}/data/LE6.dat -file ${FLOWS}/data/OD4.dat -file ${FLOWS}/data/OD5.dat -file ${FLOWS}/data/OD6.dat -file ${FLOWS}/data/OP4.dat -file ${FLOWS}/data/OP5.dat -file ${FLOWS}/data/OP6.dat -file ${FLOWS}/data/PH4.dat -file ${FLOWS}/data/PH5.dat -file ${FLOWS}/data/PH6.dat -file ${FLOWS}/data/PHP4.dat -file ${FLOWS}/data/PHP5.dat -file ${FLOWS}/data/PHP6.dat
  adams.flow.control.ArrayProcess
-  adams.flow.transformer.ThreeWayDataFileReader -reader "adams.data.io.input.SimpleEEMReader -x @{x}"
+  adams.flow.transformer.ThreeWayDataFileReader -reader "adams.data.io.input.SimpleEEMReader -x @{x} -ignore-wave-numbers true"
   adams.flow.transformer.IncVariable -var-name x -inc-type DOUBLE
  adams.flow.transformer.ThreeWayDataMerge
  adams.flow.transformer.Convert -conversion adams.data.conversion.ThreeWayDataToTensor
- adams.flow.transformer.ThreeWayDataTrain -algorithm "nz.ac.waikato.cms.adams.multiway.algorithm.PARAFAC -init-method SVD -num-components 4 -num-starts 1 -array-stopping-criteria \"nz.ac.waikato.cms.adams.multiway.algorithm.stopping.IterationCriterion -max-iterations 2500\" -array-stopping-criteria \"nz.ac.waikato.cms.adams.multiway.algorithm.stopping.ImprovementCriterion -tol 1.0E-4\""
+ adams.flow.transformer.ThreeWayDataTrain -algorithm "nz.ac.waikato.cms.adams.multiway.algorithm.PARAFAC -debug false -init-method SVD -num-components 4 -num-starts 1 -array-stopping-criteria \"nz.ac.waikato.cms.adams.multiway.algorithm.stopping.IterationCriterion -current-iteration 0 -max-iterations 2500\" -array-stopping-criteria \"nz.ac.waikato.cms.adams.multiway.algorithm.stopping.ImprovementCriterion -tol 1.0E-4\""
  adams.flow.control.Tee -name A
   adams.flow.transformer.SetVariable -var-name entry -var-value A
   adams.flow.transformer.ThreeWayDataLoadingMatrix -matrix A
