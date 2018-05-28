@@ -30,3 +30,7 @@ nz.ac.waikato.cms.adams.multiway.algorithm.api.AbstractAlgorithm=\
 # the multi-way filters
 nz.ac.waikato.cms.adams.multiway.algorithm.api.Filter=\
   nz.ac.waikato.cms.adams.multiway.algorithm
+
+# the multiway stopping criteria
+nz.ac.waikato.cms.adams.multiway.algorithm.stopping.Criterion=\
+  nz.ac.waikato.cms.adams.multiway.algorithm.stopping

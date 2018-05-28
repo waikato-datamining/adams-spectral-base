@@ -7,3 +7,4 @@
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
 
 nz.ac.waikato.cms.adams.multiway.algorithm.api.AbstractAlgorithm=true
+nz.ac.waikato.cms.adams.multiway.algorithm.stopping.Criterion=true
