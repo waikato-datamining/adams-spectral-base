@@ -51,6 +51,9 @@ public class ThreeWayDataTrain
   /** the algorithm to build. */
   protected AbstractAlgorithm m_Algorithm;
 
+  /** the algorithm instance that is currently being trained. */
+  protected AbstractAlgorithm m_CurrentAlgorithm;
+
   /**
    * Returns a string describing the object.
    *
@@ -147,7 +150,6 @@ public class ThreeWayDataTrain
     String		result;
     Tensor		trainUnsuper;
     Tensor[]		trainSuper;
-    AbstractAlgorithm	algorithm;
 
     result = null;
 
@@ -166,14 +168,16 @@ public class ThreeWayDataTrain
 
     if (result == null) {
       try {
-        algorithm = ObjectCopyHelper.copyObject(m_Algorithm);
-	if (algorithm instanceof UnsupervisedAlgorithm) {
-	  ((UnsupervisedAlgorithm) algorithm).build(trainUnsuper);
-	  m_OutputToken = new Token(new ThreeWayDataModelContainer(algorithm, trainUnsuper));
+        m_CurrentAlgorithm = ObjectCopyHelper.copyObject(m_Algorithm);
+	if (m_CurrentAlgorithm instanceof UnsupervisedAlgorithm) {
+	  ((UnsupervisedAlgorithm) m_CurrentAlgorithm).build(trainUnsuper);
+	  if (!isStopped())
+	    m_OutputToken = new Token(new ThreeWayDataModelContainer(m_CurrentAlgorithm, trainUnsuper));
 	}
-	else if (algorithm instanceof SupervisedAlgorithm) {
-	  ((SupervisedAlgorithm) algorithm).build(trainSuper[0], trainSuper[1]);
-	  m_OutputToken = new Token(new ThreeWayDataModelContainer(algorithm, trainSuper));
+	else if (m_CurrentAlgorithm instanceof SupervisedAlgorithm) {
+	  ((SupervisedAlgorithm) m_CurrentAlgorithm).build(trainSuper[0], trainSuper[1]);
+	  if (!isStopped())
+	    m_OutputToken = new Token(new ThreeWayDataModelContainer(m_CurrentAlgorithm, trainSuper));
 	}
 	else {
 	  result = "Unhandled algorithm: " + Utils.classToString(m_Algorithm);
@@ -183,7 +187,19 @@ public class ThreeWayDataTrain
         result = handleException("Failed to build model!", e);
       }
     }
+    m_CurrentAlgorithm  = null;
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_CurrentAlgorithm != null)
+      m_CurrentAlgorithm.stopExecution();
+
+    super.stopExecution();
   }
 }
