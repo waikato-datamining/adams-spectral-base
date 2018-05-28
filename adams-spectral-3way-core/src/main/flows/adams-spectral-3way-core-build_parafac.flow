@@ -1,6 +1,6 @@
 # Project: adams
 # Modules: adams-core,adams-heatmap,adams-imaging,adams-imaging-boofcv,adams-spectral-3way-core,adams-spreadsheet
-# Date: 2018-05-28 15:48:21
+# Date: 2018-05-28 16:22:17
 # User: fracpete
 # Charset: UTF-8
 adams.flow.control.Flow -annotation "Builds PARAFAC on an EEM data file\\nand displays the loading matrices." -flow-execution-listener adams.flow.execution.NullListener
@@ -13,7 +13,7 @@ adams.flow.control.Flow -annotation "Builds PARAFAC on an EEM data file\\nand di
   adams.flow.transformer.IncVariable -var-name x -inc-type DOUBLE
  adams.flow.transformer.ThreeWayDataMerge
  adams.flow.transformer.Convert -conversion adams.data.conversion.ThreeWayDataToTensor
- adams.flow.transformer.ThreeWayDataTrain -algorithm "nz.ac.waikato.cms.adams.multiway.algorithm.PARAFAC -init-method SVD -num-components 3 -num-starts 1"
+ adams.flow.transformer.ThreeWayDataTrain -algorithm "nz.ac.waikato.cms.adams.multiway.algorithm.PARAFAC -init-method SVD -num-components 4 -num-starts 1 -array-stopping-criteria \"nz.ac.waikato.cms.adams.multiway.algorithm.stopping.IterationCriterion -max-iterations 2500\" -array-stopping-criteria \"nz.ac.waikato.cms.adams.multiway.algorithm.stopping.ImprovementCriterion -tol 1.0E-4\""
  adams.flow.control.Tee -name A
   adams.flow.transformer.SetVariable -var-name entry -var-value A
   adams.flow.transformer.ThreeWayDataLoadingMatrix -matrix A
