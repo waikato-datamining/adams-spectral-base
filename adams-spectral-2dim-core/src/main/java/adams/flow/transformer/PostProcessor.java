@@ -15,7 +15,7 @@
 
 /*
  * PostProcessor.java
- * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -103,7 +103,6 @@ import java.util.Hashtable;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class PostProcessor
   extends AbstractTransformer
@@ -447,7 +446,7 @@ public class PostProcessor
    * @return		<!-- flow-accepts-start -->weka.core.Instances.class, weka.core.Instance.class<!-- flow-accepts-end -->
    */
   public Class[] accepts() {
-    return new Class[]{Instances.class, Instance.class};
+    return new Class[]{Instances.class, Instance.class, PostProcessingContainer.class};
   }
 
   /**
@@ -493,11 +492,12 @@ public class PostProcessor
    */
   @Override
   protected String doExecute() {
-    String	result;
-    Instances	data;
-    Instances 	processedData;
-    Instance	inst;
-    Instance	processedInst;
+    String			result;
+    Instances			data;
+    Instances 			processedData;
+    Instance			inst;
+    Instance			processedInst;
+    PostProcessingContainer 	cont;
 
     result = null;
 
@@ -506,21 +506,42 @@ public class PostProcessor
 
     if (result == null) {
       try {
+        data = null;
+        inst = null;
 	if (m_InputToken.getPayload() instanceof Instances) {
 	  data = (Instances) m_InputToken.getPayload();
-	  processedData = m_ActualPostProcessor.postProcess(data);
-	  if (m_OutputContainer)
-	    m_OutputToken = new Token(new PostProcessingContainer(data, processedData, m_ActualPostProcessor));
-	  else
-	    m_OutputToken = new Token(processedData);
 	}
 	else if (m_InputToken.getPayload() instanceof Instance) {
 	  inst = (Instance) m_InputToken.getPayload();
-	  processedInst = m_ActualPostProcessor.postProcess(inst);
-	  if (m_OutputContainer)
-	    m_OutputToken = new Token(new PostProcessingContainer(inst, processedInst, m_ActualPostProcessor));
-	  else
-	    m_OutputToken = new Token(processedInst);
+	}
+	else if (m_InputToken.getPayload() instanceof PostProcessingContainer) {
+	  cont = m_InputToken.getPayload(PostProcessingContainer.class);
+	  if (cont.hasValue(PostProcessingContainer.VALUE_OUTPUT_INSTANCES))
+	    data = cont.getValue(PostProcessingContainer.VALUE_OUTPUT_INSTANCES, Instances.class);
+	  else if (cont.hasValue(PostProcessingContainer.VALUE_OUTPUT_INSTANCE))
+	    inst = cont.getValue(PostProcessingContainer.VALUE_OUTPUT_INSTANCE, Instance.class);
+        }
+        else {
+	  result = m_InputToken.unhandledData();
+	}
+	if (result == null) {
+	  if (data != null) {
+	    processedData = m_ActualPostProcessor.postProcess(data);
+	    if (m_OutputContainer)
+	      m_OutputToken = new Token(new PostProcessingContainer(data, processedData, m_ActualPostProcessor));
+	    else
+	      m_OutputToken = new Token(processedData);
+	  }
+	  else if (inst != null) {
+	    processedInst = m_ActualPostProcessor.postProcess(inst);
+	    if (m_OutputContainer)
+	      m_OutputToken = new Token(new PostProcessingContainer(inst, processedInst, m_ActualPostProcessor));
+	    else
+	      m_OutputToken = new Token(processedInst);
+	  }
+	  else {
+	    result = "Failed to obtain any data from input token!";
+	  }
 	}
       }
       catch (Exception e) {
