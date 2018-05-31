@@ -25,6 +25,8 @@ import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.flow.container.ThreeWayDataModelContainer;
 import adams.flow.core.Token;
+import adams.flow.transformer.threewaydatatrain.AbstractThreeWayDataTrainPostProcessor;
+import adams.flow.transformer.threewaydatatrain.PassThrough;
 import nz.ac.waikato.cms.adams.multiway.algorithm.PARAFAC;
 import nz.ac.waikato.cms.adams.multiway.algorithm.api.AbstractAlgorithm;
 import nz.ac.waikato.cms.adams.multiway.algorithm.api.SupervisedAlgorithm;
@@ -54,6 +56,9 @@ public class ThreeWayDataTrain
   /** the algorithm instance that is currently being trained. */
   protected AbstractAlgorithm m_CurrentAlgorithm;
 
+  /** the post-processor. */
+  protected AbstractThreeWayDataTrainPostProcessor m_PostProcessor;
+
   /**
    * Returns a string describing the object.
    *
@@ -74,6 +79,10 @@ public class ThreeWayDataTrain
     m_OptionManager.add(
       "algorithm", "algorithm",
       new PARAFAC());
+
+    m_OptionManager.add(
+      "post-processor", "postProcessor",
+      new PassThrough());
   }
 
   /**
@@ -106,13 +115,47 @@ public class ThreeWayDataTrain
   }
 
   /**
+   * Sets the post-processor to use on the model.
+   *
+   * @param value	the post-processor
+   */
+  public void setPostProcessor(AbstractThreeWayDataTrainPostProcessor value) {
+    m_PostProcessor = value;
+    reset();
+  }
+
+  /**
+   * Returns the post-processor to use on the model.
+   *
+   * @return		the post-processor
+   */
+  public AbstractThreeWayDataTrainPostProcessor getPostProcessor() {
+    return m_PostProcessor;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String postProcessorTipText() {
+    return "The post-processor to apply to the model.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "algorithm", m_Algorithm.getClass(), "algorithm: ");
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "algorithm", m_Algorithm.getClass(), "algorithm: ");
+    result += QuickInfoHelper.toString(this, "postProcessor", m_PostProcessor, ", post-process: ");
+
+    return result;
   }
 
   /**
@@ -147,14 +190,16 @@ public class ThreeWayDataTrain
    */
   @Override
   protected String doExecute() {
-    String		result;
-    Tensor		trainUnsuper;
-    Tensor[]		trainSuper;
+    String			result;
+    Tensor			trainUnsuper;
+    Tensor[]			trainSuper;
+    ThreeWayDataModelContainer	cont;
 
     result = null;
 
     trainUnsuper = null;
     trainSuper   = new Tensor[0];
+    cont         = null;
     if (m_Algorithm instanceof UnsupervisedAlgorithm) {
       trainUnsuper = m_InputToken.getPayload(Tensor.class);
     }
@@ -172,12 +217,12 @@ public class ThreeWayDataTrain
 	if (m_CurrentAlgorithm instanceof UnsupervisedAlgorithm) {
 	  ((UnsupervisedAlgorithm) m_CurrentAlgorithm).build(trainUnsuper);
 	  if (!isStopped())
-	    m_OutputToken = new Token(new ThreeWayDataModelContainer(m_CurrentAlgorithm, trainUnsuper));
+	    cont = new ThreeWayDataModelContainer(m_CurrentAlgorithm, trainUnsuper);
 	}
 	else if (m_CurrentAlgorithm instanceof SupervisedAlgorithm) {
 	  ((SupervisedAlgorithm) m_CurrentAlgorithm).build(trainSuper[0], trainSuper[1]);
 	  if (!isStopped())
-	    m_OutputToken = new Token(new ThreeWayDataModelContainer(m_CurrentAlgorithm, trainSuper));
+	    cont = new ThreeWayDataModelContainer(m_CurrentAlgorithm, trainSuper);
 	}
 	else {
 	  result = "Unhandled algorithm: " + Utils.classToString(m_Algorithm);
@@ -185,6 +230,13 @@ public class ThreeWayDataTrain
       }
       catch (Exception e) {
         result = handleException("Failed to build model!", e);
+      }
+
+      // post-process and output
+      if (cont != null) {
+        if (m_PostProcessor.canHandle(m_CurrentAlgorithm))
+          m_PostProcessor.postProcess(cont);
+	m_OutputToken = new Token(cont);
       }
     }
     m_CurrentAlgorithm  = null;

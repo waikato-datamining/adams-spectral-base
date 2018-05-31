@@ -34,3 +34,7 @@ nz.ac.waikato.cms.adams.multiway.algorithm.api.Filter=\
 # the multiway stopping criteria
 nz.ac.waikato.cms.adams.multiway.algorithm.stopping.Criterion=\
   nz.ac.waikato.cms.adams.multiway.algorithm.stopping
+
+# the post-processors for the trained 3way model
+adams.flow.transformer.threewaydatatrain.AbstractThreeWayDataTrainPostProcessor=\
+  adams.flow.transformer.threewaydatatrain
