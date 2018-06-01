@@ -20,7 +20,6 @@
 package adams.gui.visualization.threewaydata.heatmapviewer;
 
 import adams.core.Properties;
-import adams.core.base.BaseDouble;
 import adams.data.conversion.Conversion;
 import adams.data.conversion.HeatmapToBufferedImage;
 import adams.data.conversion.MultiConversion;
@@ -28,7 +27,7 @@ import adams.data.conversion.ThreeWayDataToHeatmap;
 import adams.data.image.AbstractImageContainer;
 import adams.data.threeway.L1Point;
 import adams.data.threeway.ThreeWayData;
-import adams.gui.core.BaseObjectTextField;
+import adams.gui.core.BaseList;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseSplitPane;
@@ -48,15 +47,13 @@ import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.set.TDoubleSet;
 import gnu.trove.set.hash.TDoubleHashSet;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.ListSelectionEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -100,17 +97,8 @@ public class ThreeWayDataHeatmapPanel
   /** the color to use for missing values. */
   protected Color m_MissingValueColor;
 
-  /** the X layer minimum. */
-  protected BaseObjectTextField<BaseDouble> m_TextMinX;
-
-  /** the X layer maximum. */
-  protected BaseObjectTextField<BaseDouble> m_TextMaxX;
-
-  /** the combobox with all the X values. */
-  protected JComboBox<Object> m_ComboBoxX;
-
-  /** the button for applying the min/max Z layer. */
-  protected JButton m_ButtonApplyZ;
+  /** the list for selecting the X layer. */
+  protected BaseList m_ListX;
 
   /** the current file. */
   protected File m_CurrentFile;
@@ -158,37 +146,18 @@ public class ThreeWayDataHeatmapPanel
 
     setLayout(new BorderLayout());
 
-    panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    add(panel, BorderLayout.NORTH);
+    panel = new JPanel(new BorderLayout(5, 5));
+    panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+    add(panel, BorderLayout.WEST);
 
     // X layer
-    m_TextMinX = new BaseObjectTextField<>(new BaseDouble(), "0.0");
-    m_TextMinX.setColumns(10);
-    label = new JLabel("Min X");
-    label.setDisplayedMnemonic('i');
-    label.setLabelFor(m_TextMinX);
-    panel.add(label);
-    panel.add(m_TextMinX);
-    
-    m_TextMaxX = new BaseObjectTextField<>(new BaseDouble(), "0.0");
-    m_TextMaxX.setColumns(10);
-    label = new JLabel("Max X");
-    label.setDisplayedMnemonic('a');
-    label.setLabelFor(m_TextMaxX);
-    panel.add(label);
-    panel.add(m_TextMaxX);
-
-    m_ComboBoxX = new JComboBox<>();
-    label = new JLabel("or Select X");
-    label.setDisplayedMnemonic('l');
-    label.setLabelFor(m_TextMaxX);
-    panel.add(label);
-    panel.add(m_ComboBoxX);
-
-    m_ButtonApplyZ = new JButton("Apply");
-    m_ButtonApplyZ.setMnemonic('p');
-    m_ButtonApplyZ.addActionListener((ActionEvent e) -> refresh());
-    panel.add(m_ButtonApplyZ);
+    m_ListX = new BaseList();
+    m_ListX.addListSelectionListener((ListSelectionEvent e) -> refresh());
+    panel.add(new BaseScrollPane(m_ListX), BorderLayout.CENTER);
+    label = new JLabel("X");
+    label.setDisplayedMnemonic('X');
+    label.setLabelFor(m_ListX);
+    panel.add(label, BorderLayout.NORTH);
 
     // main
     m_SplitPane = new BaseSplitPane();
@@ -246,13 +215,13 @@ public class ThreeWayDataHeatmapPanel
     props  = getProperties();
 
     tw2hm = new ThreeWayDataToHeatmap();
-    if (m_ComboBoxX.getSelectedIndex() > 0) {
-      tw2hm.setMinX((Double) m_ComboBoxX.getSelectedItem());
-      tw2hm.setMaxX((Double) m_ComboBoxX.getSelectedItem());
+    if (m_ListX.getSelectedIndex() > 0) {
+      tw2hm.setMinX((Double) m_ListX.getSelectedValue());
+      tw2hm.setMaxX((Double) m_ListX.getSelectedValue());
     }
     else {
-      tw2hm.setMinX(m_TextMinX.getObject().doubleValue());
-      tw2hm.setMaxX(m_TextMaxX.getObject().doubleValue());
+      tw2hm.setMinX(Double.NEGATIVE_INFINITY);
+      tw2hm.setMaxX(Double.POSITIVE_INFINITY);
     }
 
     hm2bi = new HeatmapToBufferedImage();
@@ -288,11 +257,12 @@ public class ThreeWayDataHeatmapPanel
    * @param value	the data to display
    */
   public void setData(ThreeWayData value) {
-    StringBuilder	errors;
-    String		error;
-    TDoubleSet 		setX;
-    TDoubleList 	listX;
-    List<Object> 	valuesX;
+    StringBuilder		errors;
+    String			error;
+    TDoubleSet 			setX;
+    TDoubleList 		listX;
+    List<Object> 		valuesX;
+    DefaultListModel<Double>	model;
 
     if (value == null)
       return;
@@ -309,10 +279,11 @@ public class ThreeWayDataHeatmapPanel
       setX.add(l1.getX());
     listX = new TDoubleArrayList(setX);
     listX.sort();
+    model = new DefaultListModel<>();
     for (double x : listX.toArray())
-      valuesX.add(x);
-    m_ComboBoxX.setModel(new DefaultComboBoxModel<>(valuesX.toArray(new Object[0])));
-    m_ComboBoxX.setSelectedIndex(0);
+      model.addElement(x);
+    m_ListX.setModel(model);
+    m_ListX.setSelectedIndex(0);
 
     // image
     error = refresh();
