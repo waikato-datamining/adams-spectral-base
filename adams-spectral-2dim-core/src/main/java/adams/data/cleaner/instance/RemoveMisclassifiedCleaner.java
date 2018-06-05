@@ -15,7 +15,7 @@
 
 /*
  * RemoveMisclassifiedCleaner.java
- * Copyright (C) 2009-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.cleaner.instance;
@@ -343,7 +343,7 @@ public class RemoveMisclassifiedCleaner
       m_FilteredInitData = Filter.useFilter(m_InitData, m_Filter);
     }
     catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException("Failed to build: " + OptionUtils.getCommandLine(m_Filter), e);
     }
   }
 

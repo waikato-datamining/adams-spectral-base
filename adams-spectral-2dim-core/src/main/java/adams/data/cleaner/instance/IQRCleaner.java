@@ -15,12 +15,13 @@
 
 /*
  * IQRCleaner.java
- * Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.cleaner.instance;
 
 import adams.core.Range;
+import adams.core.option.OptionUtils;
 import adams.data.cleaner.CleanerDetails;
 import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
@@ -312,7 +313,7 @@ public class IQRCleaner
       Filter.useFilter(filtered, m_ActualFilter);
     }
     catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException("Failed to build: " + OptionUtils.getCommandLine(m_ActualFilter), e);
     }
   }
 
