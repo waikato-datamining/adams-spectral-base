@@ -15,7 +15,7 @@
 
 /*
  * MinWaves.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumoutlier;
@@ -50,7 +50,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class MinWaves
   extends AbstractOutlierDetector<Spectrum> {
@@ -123,10 +122,10 @@ public class MinWaves
     List<String>	result;
     String		msg;
 
-    result = new ArrayList<String>();
+    result = new ArrayList<>();
 
     if (data.size() < m_MinWaves) {
-      msg = "Not enough wave numbers: " + data.size() + "<" + m_MinWaves;
+      msg = "Not enough wave numbers: " + data.size() + " < " + m_MinWaves;
       result.add(msg);
       if (isLoggingEnabled())
 	getLogger().info(data.getDatabaseID() + " - " + getClass().getName() + ": " + msg);
