@@ -238,4 +238,14 @@ public class InstanceGenerator
 
     return result;
   }
+
+  /**
+   * Cleans up after the execution has finished.
+   */
+  @Override
+  public void wrapUp() {
+    if (m_Generator != null)
+      m_Generator.cleanUp();
+    super.wrapUp();
+  }
 }
