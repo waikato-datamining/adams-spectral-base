@@ -38,3 +38,7 @@ nz.ac.waikato.cms.adams.multiway.algorithm.stopping.Criterion=\
 # the post-processors for the trained 3way model
 adams.flow.transformer.threewaydatatrain.AbstractThreeWayDataTrainPostProcessor=\
   adams.flow.transformer.threewaydatatrain
+
+# the outlier detector schemes
+adams.data.outlier.AbstractOutlierDetector=\
+  adams.data.threewayoutlier
