@@ -87,7 +87,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  dale (dale at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class RemoveMisclassifiedCleaner
   extends AbstractSerializableCleaner {
@@ -160,11 +159,14 @@ public class RemoveMisclassifiedCleaner
   }
 
   /**
-   * Initializes the members.
+   * Resets the scheme.
    */
   @Override
-  protected void initialize() {
-    super.initialize();
+  protected void reset() {
+    super.reset();
+
+    m_FilteredInitData = null;
+    m_Filter           = null;
   }
 
   /**

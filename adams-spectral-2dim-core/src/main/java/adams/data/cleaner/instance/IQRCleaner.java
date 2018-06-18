@@ -90,7 +90,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  dale (dale at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class IQRCleaner
   extends AbstractSerializableCleaner
@@ -157,6 +156,16 @@ public class IQRCleaner
     super.initialize();
     
     m_Range = new Range();
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_ActualFilter = null;
   }
 
   /**

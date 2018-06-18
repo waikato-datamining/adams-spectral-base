@@ -15,7 +15,7 @@
 
 /*
  * AbstractSerializableCleaner.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.cleaner.instance;
@@ -31,7 +31,6 @@ import weka.core.Instances;
  * from there.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public abstract class AbstractSerializableCleaner
   extends AbstractCleaner
@@ -87,6 +86,8 @@ public abstract class AbstractSerializableCleaner
 
     if (m_SerializableObjectHelper != null)
       m_SerializableObjectHelper.reset();
+
+    m_InitData = null;
   }
 
   /**
