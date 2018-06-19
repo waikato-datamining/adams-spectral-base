@@ -151,7 +151,7 @@ public class ThreeWayDataMerge
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "algorihtm", m_Algorithm, "algorithm: ");
+    return QuickInfoHelper.toString(this, "algorithm", m_Algorithm, "algorithm: ");
   }
 
   /**
