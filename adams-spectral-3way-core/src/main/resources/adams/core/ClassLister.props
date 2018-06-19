@@ -46,3 +46,7 @@ adams.data.outlier.AbstractOutlierDetector=\
 # the threeway feature generators
 adams.data.threewayfeatures.AbstractThreeWayDataFeatureGenerator=\
   adams.data.threewayfeatures
+
+# the threeway filters
+adams.data.filter.Filter=\
+  adams.data.threewayfilter
