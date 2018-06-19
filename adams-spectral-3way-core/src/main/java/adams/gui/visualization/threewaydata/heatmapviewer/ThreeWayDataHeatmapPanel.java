@@ -54,6 +54,7 @@ import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -88,8 +89,11 @@ public class ThreeWayDataHeatmapPanel
   /** the search panel for the data report. */
   protected SearchPanel m_SearchPanel;
 
+  /** the split pane for X-list and split pane on right. */
+  protected BaseSplitPane m_SplitPaneAll;
+
   /** the split pane for image/spreadsheet and report. */
-  protected BaseSplitPane m_SplitPane;
+  protected BaseSplitPane m_SplitPaneRight;
 
   /** the color generator to use. */
   protected AbstractColorGradientGenerator m_ColorGenerator;
@@ -146,13 +150,20 @@ public class ThreeWayDataHeatmapPanel
 
     setLayout(new BorderLayout());
 
+    m_SplitPaneAll = new BaseSplitPane(BaseSplitPane.HORIZONTAL_SPLIT);
+    m_SplitPaneAll.setResizeWeight(0.0);
+    m_SplitPaneAll.setDividerLocation(75);
+    m_SplitPaneAll.setOneTouchExpandable(true);
+    add(m_SplitPaneAll, BorderLayout.CENTER);
+
     panel = new JPanel(new BorderLayout(5, 5));
     panel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-    add(panel, BorderLayout.WEST);
+    m_SplitPaneAll.setLeftComponent(panel);
 
     // X layer
     m_ListX = new BaseList();
     m_ListX.addListSelectionListener((ListSelectionEvent e) -> refresh());
+    m_ListX.setPreferredSize(new Dimension(50, 50));
     panel.add(new BaseScrollPane(m_ListX), BorderLayout.CENTER);
     label = new JLabel("X");
     label.setDisplayedMnemonic('X');
@@ -160,16 +171,16 @@ public class ThreeWayDataHeatmapPanel
     panel.add(label, BorderLayout.NORTH);
 
     // main
-    m_SplitPane = new BaseSplitPane();
-    m_SplitPane.setDividerLocation(props.getInteger("Panel.DividerLocation", 600));
-    add(m_SplitPane, BorderLayout.CENTER);
+    m_SplitPaneRight = new BaseSplitPane();
+    m_SplitPaneRight.setDividerLocation(props.getInteger("Panel.DividerLocation", 600));
+    m_SplitPaneAll.setRightComponent(m_SplitPaneRight);
 
     painter = new RectanglePainter();
     painter.setColor(Color.RED);
     m_DataImage = new ImagePanel();
     m_DataImage.setSelectionEnabled(true);
     m_DataImage.setSelectionShapePainter(painter);
-    m_SplitPane.setLeftComponent(m_DataImage);
+    m_SplitPaneRight.setLeftComponent(m_DataImage);
 
     m_ReportTable = new ReportFactory.Table();
 
@@ -182,7 +193,7 @@ public class ThreeWayDataHeatmapPanel
     panel = new JPanel(new BorderLayout());
     panel.add(new BaseScrollPane(m_ReportTable), BorderLayout.CENTER);
     panel.add(m_SearchPanel, BorderLayout.SOUTH);
-    m_SplitPane.setRightComponent(panel);
+    m_SplitPaneRight.setRightComponent(panel);
   }
 
   /**
@@ -472,7 +483,7 @@ public class ThreeWayDataHeatmapPanel
    * @return		true if visible
    */
   public boolean isReportVisible() {
-    return !m_SplitPane.isRightComponentHidden();
+    return !m_SplitPaneRight.isRightComponentHidden();
   }
 
   /**
@@ -481,6 +492,6 @@ public class ThreeWayDataHeatmapPanel
    * @param value	true if visible
    */
   public void setReportVisible(boolean value) {
-    m_SplitPane.setRightComponentHidden(!value);
+    m_SplitPaneRight.setRightComponentHidden(!value);
   }
 }
