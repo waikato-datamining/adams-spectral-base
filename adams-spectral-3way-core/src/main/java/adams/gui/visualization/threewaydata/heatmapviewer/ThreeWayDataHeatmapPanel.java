@@ -208,7 +208,7 @@ public class ThreeWayDataHeatmapPanel
   /**
    * Regenerates the image of the current heatmap and redisplays it.
    *
-   * @return		null if everything OK, otherwiser error message
+   * @return		null if everything OK, otherwise error message
    */
   protected String refresh() {
     String			result;
@@ -226,7 +226,7 @@ public class ThreeWayDataHeatmapPanel
     props  = getProperties();
 
     tw2hm = new ThreeWayDataToHeatmap();
-    if (m_ListX.getSelectedIndex() > 0) {
+    if (m_ListX.getSelectedIndex() > -1) {
       tw2hm.setMinX((Double) m_ListX.getSelectedValue());
       tw2hm.setMaxX((Double) m_ListX.getSelectedValue());
     }
