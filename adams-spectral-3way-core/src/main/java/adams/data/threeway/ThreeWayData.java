@@ -530,6 +530,7 @@ public class ThreeWayData
     result = new TDoubleArrayList();
     for (L1Point l1: this)
       result.add(l1.getX());
+    result.sort();
 
     return result;
   }
@@ -545,6 +546,7 @@ public class ThreeWayData
     result = new TDoubleArrayList();
     for (L1Point l1: this)
       result.add(l1.getY());
+    result.sort();
 
     return result;
   }
@@ -562,6 +564,7 @@ public class ThreeWayData
       for (L2Point l2: l1)
 	result.add(l2.getZ());
     }
+    result.sort();
 
     return result;
   }
