@@ -20,6 +20,7 @@
 
 package adams.data.io.output;
 
+import adams.core.Properties;
 import adams.core.Utils;
 import adams.data.io.input.SimpleXYZReader;
 import adams.data.spreadsheet.DefaultSpreadSheet;
@@ -30,7 +31,10 @@ import adams.data.threeway.L1Point;
 import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 
+import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
@@ -49,6 +53,17 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: ${TMP}&#47;out.tmp
  * </pre>
  *
+ * <pre>-separator &lt;java.lang.String&gt; (property: separator)
+ * &nbsp;&nbsp;&nbsp;The separator to use for the columns; use '\t' for tab.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-output-sample-data &lt;boolean&gt; (property: outputSampleData)
+ * &nbsp;&nbsp;&nbsp;If set to true, the sample data gets stored in the file as well (as comment
+ * &nbsp;&nbsp;&nbsp;).
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -60,6 +75,9 @@ public class SimpleXYZWriter
 
   /** the column separator. */
   protected String m_Separator;
+
+  /** whether to output the sample data as well. */
+  protected boolean m_OutputSampleData;
 
   /**
    * Returns a string describing the object.
@@ -81,6 +99,10 @@ public class SimpleXYZWriter
     m_OptionManager.add(
       "separator", "separator",
       " ");
+
+    m_OptionManager.add(
+      "output-sample-data", "outputSampleData",
+      false);
   }
 
   /**
@@ -115,6 +137,35 @@ public class SimpleXYZWriter
    */
   public String separatorTipText() {
     return "The separator to use for the columns; use '\\t' for tab.";
+  }
+
+  /**
+   * Sets whether to output the sample data as well.
+   *
+   * @param value	if true then the sample data gets output as well
+   */
+  public void setOutputSampleData(boolean value) {
+    m_OutputSampleData = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to output eh sample data as well.
+   *
+   * @return		true if the sample data is output as well
+   */
+  public boolean getOutputSampleData() {
+    return m_OutputSampleData;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return tip text for this property suitable for displaying in the GUI or
+   *         for listing the options.
+   */
+  public String outputSampleDataTipText() {
+    return "If set to true, the sample data gets stored in the file as well (as comment).";
   }
 
   /**
@@ -160,11 +211,26 @@ public class SimpleXYZWriter
     Row				row;
     HeaderRow 			header;
     CsvSpreadSheetWriter	writer;
+    Properties			props;
+    StringWriter		swriter;
 
     three = data.get(0);
 
     // generate spreadsheet
     sheet = new DefaultSpreadSheet();
+
+    // report as comments
+    if (m_OutputSampleData) {
+      swriter = new StringWriter();
+      props = three.getReport().toProperties();
+      try {
+	props.store(swriter, "");
+	sheet.addComment(Arrays.asList(swriter.toString().split("\n")));
+      }
+      catch (Exception e) {
+        getLogger().log(Level.WARNING, "Failed to store sample data in comments!", e);
+      }
+    }
 
     // header
     header = sheet.getHeaderRow();
@@ -188,7 +254,7 @@ public class SimpleXYZWriter
     writer = new CsvSpreadSheetWriter();
     writer.setQuoteCharacter("");
     writer.setSeparator(m_Separator);
-    writer.setOutputComments(false);
+    writer.setOutputComments(m_OutputSampleData);
     return writer.write(sheet, m_Output);
   }
 }

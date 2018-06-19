@@ -20,16 +20,20 @@
 
 package adams.data.io.input;
 
+import adams.core.Properties;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
+import adams.data.report.Report;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.threeway.L1Point;
 import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
 
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
@@ -74,6 +78,11 @@ import java.util.Map;
  * &nbsp;&nbsp;&nbsp;If enabled the source report field stores the absolute file name rather
  * &nbsp;&nbsp;&nbsp;than just the name.
  * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-separator &lt;java.lang.String&gt; (property: separator)
+ * &nbsp;&nbsp;&nbsp;The separator to use for the columns; use '\t' for tab.
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
  <!-- options-end -->
@@ -180,6 +189,9 @@ public class SimpleXYZReader
     double			y;
     double			z;
     double			d;
+    Report			report;
+    StringReader		sreader;
+    Properties			props;
 
     data   = new ThreeWayData();
     data.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
@@ -190,6 +202,22 @@ public class SimpleXYZReader
     if (sheet.getColumnCount() != 4) {
       getLogger().severe("Requires four columns (x/y/z/data), found: " + sheet.getColumnCount());
       return;
+    }
+
+    // report from comments
+    if (sheet.getComments().size() > 0) {
+      sreader = new StringReader(Utils.flatten(sheet.getComments(), "\n"));
+      props   = new Properties();
+      try {
+	props.load(sreader);
+	report = Report.parseProperties(props);
+      }
+      catch (Exception e) {
+        getLogger().log(Level.SEVERE, "Failed to read sample data from: " + m_Input, e);
+        report = null;
+      }
+      if (report != null)
+        data.getReport().mergeWith(report);
     }
 
     for (Row row: sheet.rows()) {
