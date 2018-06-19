@@ -42,3 +42,7 @@ adams.flow.transformer.threewaydatatrain.AbstractThreeWayDataTrainPostProcessor=
 # the outlier detector schemes
 adams.data.outlier.AbstractOutlierDetector=\
   adams.data.threewayoutlier
+
+# the threeway feature generators
+adams.data.threewayfeatures.AbstractThreeWayDataFeatureGenerator=\
+  adams.data.threewayfeatures
