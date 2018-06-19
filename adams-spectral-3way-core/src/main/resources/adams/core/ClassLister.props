@@ -50,3 +50,7 @@ adams.data.threewayfeatures.AbstractThreeWayDataFeatureGenerator=\
 # the threeway filters
 adams.data.filter.Filter=\
   adams.data.threewayfilter
+
+# the threeway data merge schemes
+adams.flow.transformer.threewaydatamerge.AbstractThreeWayDataMerge=\
+  adams.flow.transformer.threewaydatamerge
