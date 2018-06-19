@@ -20,6 +20,7 @@
 
 package adams.flow.transformer;
 
+import adams.core.QuickInfoHelper;
 import adams.data.threeway.ThreeWayData;
 import adams.flow.core.Token;
 import adams.flow.transformer.threewaydatamerge.AbstractThreeWayDataMerge;
@@ -141,6 +142,16 @@ public class ThreeWayDataMerge
    */
   public String algorithmTipText() {
     return "The merge algorithm to use.";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return QuickInfoHelper.toString(this, "algorihtm", m_Algorithm, "algorithm: ");
   }
 
   /**
