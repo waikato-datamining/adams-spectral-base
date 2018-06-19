@@ -36,6 +36,8 @@ import adams.data.spreadsheet.SpreadSheetSupporter;
 import adams.data.statistics.InformativeStatisticSupporter;
 import adams.data.statistics.ThreeWayDataStatistic;
 import adams.data.threewayreport.ThreeWayReport;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -288,16 +290,17 @@ public class ThreeWayData
    * Returns the level 1 point with the exact X, null if not found.
    *
    * @param x		the X to look for
+   * @param y		the Y to look for
    * @return		the level 1 point or null if not found
-   * @see		#findClosest(double)
+   * @see		#findClosest(double,double)
    */
-  public L1Point find(double x) {
+  public L1Point find(double x, double y) {
     L1Point result;
     int		index;
 
     result = null;
 
-    index = ThreeWayDataUtils.findX(m_Points, x);
+    index = ThreeWayDataUtils.findXY(m_Points, x, y);
     if (index > -1)
       result = m_Points.get(index);
 
@@ -309,15 +312,15 @@ public class ThreeWayData
    *
    * @param x		the X to look for
    * @return		the level 1 point
-   * @see		#find(double)
+   * @see		#find(double,double)
    */
-  public L1Point findClosest(double x) {
+  public L1Point findClosest(double x, double y) {
     L1Point result;
     int		index;
 
     result = null;
 
-    index = ThreeWayDataUtils.findClosestX(m_Points, x);
+    index = ThreeWayDataUtils.findClosestXY(m_Points, x, y);
     if (index > -1)
       result = m_Points.get(index);
 
@@ -491,6 +494,73 @@ public class ThreeWayData
         row.addCell("Z").setContent(l2.getZ());
         row.addCell("D").setContent(l2.getData());
       }
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns the L2 point associated with the given x, y and z.
+   *
+   * @param x		the X of the point to retrieve
+   * @param y		the Y of the point to retrieve
+   * @param z		the Z of the point to retrieve
+   * @return		the point, null if not found for these coordinates
+   */
+  public L2Point get(double x, double y, double z) {
+    L2Point	result;
+    L1Point	point;
+
+    result = null;
+    point  = find(x, y);
+    if (point != null)
+      result = point.find(z);
+
+    return result;
+  }
+
+  /**
+   * Returns all Xs.
+   *
+   * @return		the list of Xs
+   */
+  public TDoubleList getAllX() {
+    TDoubleList		result;
+
+    result = new TDoubleArrayList();
+    for (L1Point l1: this)
+      result.add(l1.getX());
+
+    return result;
+  }
+
+  /**
+   * Returns all Ys.
+   *
+   * @return		the list of Ys
+   */
+  public TDoubleList getAllY() {
+    TDoubleList		result;
+
+    result = new TDoubleArrayList();
+    for (L1Point l1: this)
+      result.add(l1.getY());
+
+    return result;
+  }
+
+  /**
+   * Returns all Zs.
+   *
+   * @return		the list of Zs
+   */
+  public TDoubleList getAllZ() {
+    TDoubleList		result;
+
+    result = new TDoubleArrayList();
+    for (L1Point l1: this) {
+      for (L2Point l2: l1)
+	result.add(l2.getZ());
     }
 
     return result;

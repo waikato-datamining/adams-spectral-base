@@ -22,7 +22,7 @@ package adams.data.threewayfilter;
 
 import adams.data.container.DataContainer;
 import adams.data.threeway.ThreeWayData;
-import adams.data.threeway.ThreeWayDataUtils;
+import adams.flow.transformer.threewaydatamerge.Join;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,10 +149,11 @@ public class MultiFilter
    * @return		the merged dta
    */
   protected ThreeWayData processDataParallel(ThreeWayData data) {
-    ThreeWayData			result;
+    ThreeWayData		result;
     int				i;
     List<DataContainer>		outputs;
     List<ThreeWayData>		outputsC;
+    Join			join;
 
     // filter the data
     outputs = new ArrayList<>();
@@ -163,7 +164,9 @@ public class MultiFilter
     outputsC = new ArrayList<>();
     for (i = 0; i < outputs.size(); i++)
       outputsC.add((ThreeWayData) outputs.get(i));
-    result = ThreeWayDataUtils.merge(outputsC);
+
+    join   = new Join();
+    result = join.merge(outputsC.toArray(new ThreeWayData[0]));
 
     return result;
   }

@@ -33,8 +33,8 @@ public class L2PointComparator
   /** for serialization. */
   private static final long serialVersionUID = -2616612006241389909L;
 
-  /** whether to compare y or x. */
-  protected boolean m_UseY;
+  /** whether to compare data as well as z. */
+  protected boolean m_UseData;
 
   /**
    * The default constructor uses comparison by x in ascending manner.
@@ -47,24 +47,24 @@ public class L2PointComparator
    * This constructor initializes the comparator either with comparison by
    * x or by y as well. Either in ascending manner or descending.
    *
-   * @param useY		if true then y is used for comparison
+   * @param useData		if true then y is used for comparison
    * 				as well as x
    * @param ascending		if true then the ordering is done in ascending
    * 				manner, otherwise descending
    */
-  public L2PointComparator(boolean useY, boolean ascending) {
+  public L2PointComparator(boolean useData, boolean ascending) {
     super(ascending);
 
-    m_UseY = useY;
+    m_UseData = useData;
   }
 
   /**
-   * Returns whether the x or y is used for ordering as well.
+   * Returns whether the data is used for ordering as well.
    *
-   * @return		true if y is used for ordering as well
+   * @return		true if data is used for ordering as well
    */
-  public boolean isUsingY() {
-    return m_UseY;
+  public boolean isUsingData() {
+    return m_UseData;
   }
 
   /**
@@ -83,7 +83,7 @@ public class L2PointComparator
 
     result = Double.compare(o1.getZ(), o2.getZ());
 
-    if ((result == 0) && m_UseY)
+    if ((result == 0) && m_UseData)
       result = Double.compare(o1.getData(), o2.getData());
 
     // flip ordering?

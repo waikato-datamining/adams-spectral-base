@@ -107,7 +107,7 @@ public class L1Point
    * @return		the comparator instance
    */
   public DataPointComparator<L2Point> newComparator() {
-    return new L2PointComparator(true, true);
+    return new L2PointComparator(false, true);
   }
 
   /**
@@ -286,7 +286,7 @@ public class L1Point
   }
 
   /**
-   * Add a LevelTwoPoint.
+   * Add a L2Point.
    *
    * @param x		the x
    * @param y		the y
@@ -296,28 +296,28 @@ public class L1Point
   }
 
   /**
-   * Returns the LevelTwoPoint with the exact x, null if not found.
+   * Returns the L2Point with the exact x, null if not found.
    *
-   * @param x		the x to look for
-   * @return		the LevelTwoPoint or null if not found
+   * @param z		the z to look for
+   * @return		the L2Point or null if not found
    */
-  public L2Point find(double x) {
+  public L2Point find(double z) {
     L2Point result;
 
-    result = findClosest(x);
-    if ((result != null) && (result.getZ() != x))
+    result = findClosest(z);
+    if ((result != null) && (result.getZ() != z))
       result = null;
 
     return result;
   }
 
   /**
-   * Returns the LevelTwoPoint with the x closest to the one provided.
+   * Returns the L2Point with the z closest to the one provided.
    *
-   * @param x		the x to look for
-   * @return		the LevelTwoPoint
+   * @param z		the z to look for
+   * @return		the L2Point
    */
-  public L2Point findClosest(double x) {
+  public L2Point findClosest(double z) {
     L2Point result;
     int			index;
     L2Point currPoint;
@@ -330,7 +330,7 @@ public class L1Point
     if (m_Points.size() == 0)
       return result;
 
-    index = Collections.binarySearch(m_Points, new L2Point(x, 0), m_Comparator);
+    index = Collections.binarySearch(m_Points, new L2Point(z, 0), m_Comparator);
 
     // no exact match -> find closest
     if (index < 0) {
@@ -338,12 +338,12 @@ public class L1Point
       if (index >= m_Points.size())
 	index = m_Points.size() - 1;
       result = m_Points.get(index);
-      dist   = Math.abs(x - result.getZ());
+      dist   = Math.abs(z - result.getZ());
 
       for (i = index - 2; i <= index + 2; i++) {
 	if ((i >= 0) && (i < m_Points.size())) {
 	  currPoint = m_Points.get(i);
-	  currDist  = Math.abs(x - currPoint.getZ());
+	  currDist  = Math.abs(z - currPoint.getZ());
 
 	  if (currDist < dist) {
 	    dist   = currDist;
