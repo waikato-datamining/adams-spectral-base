@@ -38,6 +38,8 @@ import adams.data.statistics.ThreeWayDataStatistic;
 import adams.data.threewayreport.ThreeWayReport;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.set.TDoubleSet;
+import gnu.trove.set.hash.TDoubleHashSet;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -526,10 +528,13 @@ public class ThreeWayData
    */
   public TDoubleList getAllX() {
     TDoubleList		result;
+    TDoubleSet 		set;
 
     result = new TDoubleArrayList();
+    set    = new TDoubleHashSet();
     for (L1Point l1: this)
-      result.add(l1.getX());
+      set.add(l1.getX());
+    result.addAll(set);
     result.sort();
 
     return result;
@@ -542,10 +547,13 @@ public class ThreeWayData
    */
   public TDoubleList getAllY() {
     TDoubleList		result;
+    TDoubleSet 		set;
 
     result = new TDoubleArrayList();
+    set    = new TDoubleHashSet();
     for (L1Point l1: this)
-      result.add(l1.getY());
+      set.add(l1.getY());
+    result.addAll(set);
     result.sort();
 
     return result;
@@ -558,12 +566,15 @@ public class ThreeWayData
    */
   public TDoubleList getAllZ() {
     TDoubleList		result;
+    TDoubleSet 		set;
 
     result = new TDoubleArrayList();
+    set    = new TDoubleHashSet();
     for (L1Point l1: this) {
       for (L2Point l2: l1)
-	result.add(l2.getZ());
+	set.add(l2.getZ());
     }
+    result.addAll(set);
     result.sort();
 
     return result;
