@@ -522,7 +522,7 @@ public class ThreeWayData
   }
 
   /**
-   * Returns all Xs.
+   * Returns all unique Xs.
    *
    * @return		the list of Xs
    */
@@ -541,7 +541,7 @@ public class ThreeWayData
   }
 
   /**
-   * Returns all Ys.
+   * Returns all unique Ys.
    *
    * @return		the list of Ys
    */
@@ -560,7 +560,7 @@ public class ThreeWayData
   }
 
   /**
-   * Returns all Zs.
+   * Returns all unique Zs.
    *
    * @return		the list of Zs
    */
@@ -573,6 +573,27 @@ public class ThreeWayData
     for (L1Point l1: this) {
       for (L2Point l2: l1)
 	set.add(l2.getZ());
+    }
+    result.addAll(set);
+    result.sort();
+
+    return result;
+  }
+
+  /**
+   * Returns all unique data values.
+   *
+   * @return		the list of data values
+   */
+  public TDoubleList getAllData() {
+    TDoubleList		result;
+    TDoubleSet 		set;
+
+    result = new TDoubleArrayList();
+    set    = new TDoubleHashSet();
+    for (L1Point l1: this) {
+      for (L2Point l2: l1)
+	set.add(l2.getData());
     }
     result.addAll(set);
     result.sort();
