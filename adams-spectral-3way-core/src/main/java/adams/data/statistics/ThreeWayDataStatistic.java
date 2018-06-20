@@ -20,10 +20,9 @@
 
 package adams.data.statistics;
 
-import adams.data.threeway.L1Point;
 import adams.data.threeway.ThreeWayData;
-
-import java.util.List;
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.array.TDoubleArrayList;
 
 /**
  * Statistical information specific to a ThreeWayData.
@@ -40,11 +39,17 @@ public class ThreeWayDataStatistic
   /** the key for the database ID. */
   public final static String KEY_DBID = "Database ID";
 
-  /** the key for number of level 1 points. */
-  public final static String KEY_NUM_LEVEL1 = "Number of level 1 points";
+  /** the key for number of unique x values. */
+  public final static String KEY_NUM_X = "Unique x values";
 
-  /** the key for number of level 2 points. */
-  public final static String KEY_NUM_LEVEL2 = "Number of level 2 points";
+  /** the key for number of unique y values. */
+  public final static String KEY_NUM_Y = "Unique y values";
+
+  /** the key for number of unique z values. */
+  public final static String KEY_NUM_Z = "Unique z values";
+
+  /** the key for number of unique data values. */
+  public final static String KEY_NUM_DATA = "Unique data values";
 
   /** the key for first X. */
   public final static String KEY_FIRST_X = "First x";
@@ -67,23 +72,62 @@ public class ThreeWayDataStatistic
   /** the key for median delta X. */
   public final static String KEY_MEDIAN_DELTA_X = "median delta x";
 
-  /** the key for min y. */
-  public final static String KEY_MIN_Y = "min y";
+  /** the key for first Y. */
+  public final static String KEY_FIRST_Y = "First y";
 
-  /** the key for max y. */
-  public final static String KEY_MAX_Y = "max y";
+  /** the key for last Y. */
+  public final static String KEY_LAST_Y = "Last y";
 
-  /** the key for mean y. */
-  public final static String KEY_MEAN_Y = "mean y";
+  /** the key for min delta Y. */
+  public final static String KEY_MIN_DELTA_Y = "min delta y";
 
-  /** the key for stdev y. */
-  public final static String KEY_STDEV_Y = "stdev y";
+  /** the key for max delta Y. */
+  public final static String KEY_MAX_DELTA_Y = "max delta y";
 
-  /** the key for median y. */
-  public final static String KEY_MEDIAN_Y = "median y";
+  /** the key for mean delta Y. */
+  public final static String KEY_MEAN_DELTA_Y = "mean delta y";
 
-  /** the key for sum y. */
-  public final static String KEY_SUM_Y = "sum y";
+  /** the key for stdev delta Y. */
+  public final static String KEY_STDEV_DELTA_Y = "stdev delta y";
+
+  /** the key for median delta Y. */
+  public final static String KEY_MEDIAN_DELTA_Y = "median delta y";
+
+  /** the key for first Z. */
+  public final static String KEY_FIRST_Z = "First z";
+
+  /** the key for last Z. */
+  public final static String KEY_LAST_Z = "Last z";
+
+  /** the key for min delta Z. */
+  public final static String KEY_MIN_DELTA_Z = "min delta z";
+
+  /** the key for max delta Z. */
+  public final static String KEY_MAX_DELTA_Z = "max delta z";
+
+  /** the key for mean delta Z. */
+  public final static String KEY_MEAN_DELTA_Z = "mean delta z";
+
+  /** the key for stdev delta Z. */
+  public final static String KEY_STDEV_DELTA_Z = "stdev delta z";
+
+  /** the key for median delta Z. */
+  public final static String KEY_MEDIAN_DELTA_Z = "median delta z";
+
+  /** the key for min data. */
+  public final static String KEY_MIN_DATA = "min data";
+
+  /** the key for max data. */
+  public final static String KEY_MAX_DATA = "max data";
+
+  /** the key for mean data. */
+  public final static String KEY_MEAN_DATA = "mean data";
+
+  /** the key for stdev data. */
+  public final static String KEY_STDEV_DATA = "stdev data";
+
+  /** the key for median data. */
+  public final static String KEY_MEDIAN_DATA = "median data";
 
 
   /**
@@ -109,7 +153,7 @@ public class ThreeWayDataStatistic
    */
   @Override
   public String globalInfo() {
-    return "Calculates a view statistics for a 3-way data structure.";
+    return "Calculates a few statistics for a 3-way data structure.";
   }
 
   /**
@@ -135,59 +179,79 @@ public class ThreeWayDataStatistic
    */
   @Override
   protected void calculate() {
-    List<L1Point> points;
     int			i;
-    Double[] 		deltaXs;
-    Double[]		ys;
-    double		firstX;
-    double		lastX;
-    double		sumYs;
-    double 		numL2;
+    TDoubleList		x;
+    TDoubleList		y;
+    TDoubleList		z;
+    TDoubleList		d;
+    TDoubleList		xDelta;
+    TDoubleList		yDelta;
+    TDoubleList		zDelta;
 
     super.calculate();
 
     if (m_Data == null)
       return;
 
-    points  = m_Data.toList();
-    firstX  = Double.NaN;
-    lastX   = Double.NaN;
-    deltaXs = new Double[0];
-    ys      = new Double[0];
-    sumYs   = 0.0;
-    numL2   = 0.0;
+    x = m_Data.getAllX();
+    y = m_Data.getAllY();
+    z = m_Data.getAllZ();
+    d = m_Data.getAllData();
 
-    // gather statistics
-    if (points.size() > 0) {
-      firstX = points.get(0).getX();
-      if (points.size() > 1)
-	lastX = points.get(points.size() - 1).getX();
-      deltaXs = new Double[points.size() - 1];
-      ys  = new Double[points.size()];
-      for (i = 0; i < points.size(); i++) {
-	if (i > 0)
-	  deltaXs[i - 1] = points.get(i).getX() - points.get(i - 1).getX();
-	ys[i] = points.get(i).getY();
-	sumYs += points.get(i).getY();
-	numL2 += points.get(i).size();
-      }
-    }
+    xDelta = new TDoubleArrayList();
+    for (i = 1; i < x.size(); i++)
+      xDelta.add(x.get(i) - x.get(i - 1));
+    yDelta = new TDoubleArrayList();
+    for (i = 1; i < y.size(); i++)
+      yDelta.add(y.get(i) - y.get(i - 1));
+    zDelta = new TDoubleArrayList();
+    for (i = 1; i < z.size(); i++)
+      zDelta.add(z.get(i) - z.get(i - 1));
 
     add(KEY_DBID, m_Data.getDatabaseID());
-    add(KEY_NUM_LEVEL1, points.size());
-    add(KEY_NUM_LEVEL2, numL2);
-    add(KEY_FIRST_X, firstX);
-    add(KEY_LAST_X, lastX);
-    add(KEY_MIN_DELTA_X, numberToDouble(StatUtils.min(deltaXs)));
-    add(KEY_MAX_DELTA_X, numberToDouble(StatUtils.max(deltaXs)));
-    add(KEY_MEAN_DELTA_X, numberToDouble(StatUtils.mean(deltaXs)));
-    add(KEY_STDEV_DELTA_X, numberToDouble(StatUtils.stddev(deltaXs, true)));
-    add(KEY_MEDIAN_DELTA_X, numberToDouble(StatUtils.median(deltaXs)));
-    add(KEY_MIN_Y, numberToDouble(StatUtils.min(ys)));
-    add(KEY_MAX_Y, numberToDouble(StatUtils.max(ys)));
-    add(KEY_MEAN_Y, numberToDouble(StatUtils.mean(ys)));
-    add(KEY_MEDIAN_Y, numberToDouble(StatUtils.median(ys)));
-    add(KEY_STDEV_Y, numberToDouble(StatUtils.stddev(ys, true)));
-    add(KEY_SUM_Y, sumYs);
+    
+    // x
+    add(KEY_NUM_X, x.size());
+    add(KEY_FIRST_X, x.get(0));
+    add(KEY_LAST_X, x.get(x.size() - 1));
+    if (x.size() > 1) {
+      add(KEY_MIN_DELTA_X, numberToDouble(StatUtils.min(xDelta.toArray())));
+      add(KEY_MAX_DELTA_X, numberToDouble(StatUtils.max(xDelta.toArray())));
+      add(KEY_MEAN_DELTA_X, numberToDouble(StatUtils.mean(xDelta.toArray())));
+      add(KEY_STDEV_DELTA_X, numberToDouble(StatUtils.stddev(xDelta.toArray(), true)));
+      add(KEY_MEDIAN_DELTA_X, numberToDouble(StatUtils.median(xDelta.toArray())));
+    }
+
+    // y
+    add(KEY_NUM_Y, y.size());
+    add(KEY_FIRST_Y, y.get(0));
+    add(KEY_LAST_Y, y.get(y.size() - 1));
+    if (y.size() > 1) {
+      add(KEY_MIN_DELTA_Y, numberToDouble(StatUtils.min(yDelta.toArray())));
+      add(KEY_MAX_DELTA_Y, numberToDouble(StatUtils.max(yDelta.toArray())));
+      add(KEY_MEAN_DELTA_Y, numberToDouble(StatUtils.mean(yDelta.toArray())));
+      add(KEY_STDEV_DELTA_Y, numberToDouble(StatUtils.stddev(yDelta.toArray(), true)));
+      add(KEY_MEDIAN_DELTA_Y, numberToDouble(StatUtils.median(yDelta.toArray())));
+    }
+
+    // z
+    add(KEY_NUM_Z, z.size());
+    add(KEY_FIRST_Z, z.get(0));
+    add(KEY_LAST_Z, z.get(z.size() - 1));
+    if (z.size() > 1) {
+      add(KEY_MIN_DELTA_Z, numberToDouble(StatUtils.min(zDelta.toArray())));
+      add(KEY_MAX_DELTA_Z, numberToDouble(StatUtils.max(zDelta.toArray())));
+      add(KEY_MEAN_DELTA_Z, numberToDouble(StatUtils.mean(zDelta.toArray())));
+      add(KEY_STDEV_DELTA_Z, numberToDouble(StatUtils.stddev(zDelta.toArray(), true)));
+      add(KEY_MEDIAN_DELTA_Z, numberToDouble(StatUtils.median(zDelta.toArray())));
+    }
+    
+    // data
+    add(KEY_NUM_DATA, d.size());
+    add(KEY_MIN_DATA, numberToDouble(StatUtils.min(d.toArray())));
+    add(KEY_MAX_DATA, numberToDouble(StatUtils.max(d.toArray())));
+    add(KEY_MEAN_DATA, numberToDouble(StatUtils.mean(d.toArray())));
+    add(KEY_STDEV_DATA, numberToDouble(StatUtils.stddev(d.toArray(), true)));
+    add(KEY_MEDIAN_DATA, numberToDouble(StatUtils.median(d.toArray())));
   }
 }
