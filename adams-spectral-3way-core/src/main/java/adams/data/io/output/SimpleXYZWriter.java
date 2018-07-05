@@ -221,7 +221,7 @@ public class SimpleXYZWriter
     // report as comments
     if (m_OutputSampleData) {
       swriter = new StringWriter();
-      lines   = three.getReport().toProperties().toComment().split("\n");
+      lines   = three.getReport().toProperties().toString().split("\n");
       Arrays.sort(lines);
       swriter.write(Utils.flatten(lines, "\n"));
       swriter.write("\n");
