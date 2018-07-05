@@ -20,7 +20,6 @@
 
 package adams.data.io.output;
 
-import adams.core.Properties;
 import adams.core.Utils;
 import adams.data.io.input.SimpleXYZReader;
 import adams.data.spreadsheet.DefaultSpreadSheet;
@@ -211,8 +210,8 @@ public class SimpleXYZWriter
     Row				row;
     HeaderRow 			header;
     CsvSpreadSheetWriter	writer;
-    Properties			props;
     StringWriter		swriter;
+    String[]			lines;
 
     three = data.get(0);
 
@@ -222,9 +221,11 @@ public class SimpleXYZWriter
     // report as comments
     if (m_OutputSampleData) {
       swriter = new StringWriter();
-      props = three.getReport().toProperties();
+      lines   = three.getReport().toProperties().toComment().split("\n");
+      Arrays.sort(lines);
+      swriter.write(Utils.flatten(lines, "\n"));
+      swriter.write("\n");
       try {
-	props.store(swriter, "");
 	sheet.addComment(Arrays.asList(swriter.toString().split("\n")));
       }
       catch (Exception e) {
