@@ -21,6 +21,7 @@
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
+import adams.data.report.Report;
 import adams.data.threeway.ThreeWayData;
 import adams.flow.core.Token;
 import adams.flow.transformer.threewaydatamerge.AbstractThreeWayDataMerge;
@@ -81,6 +82,12 @@ import adams.flow.transformer.threewaydatamerge.Join;
  * &nbsp;&nbsp;&nbsp;default: adams.flow.transformer.threewaydatamerge.Join
  * </pre>
  *
+ * <pre>-merge-reports &lt;boolean&gt; (property: mergeReports)
+ * &nbsp;&nbsp;&nbsp;If enabled, the reports get merged into a single one and used for the outgoing
+ * &nbsp;&nbsp;&nbsp;data.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -92,6 +99,9 @@ public class ThreeWayDataMerge
 
   /** the algorithm to use for merging. */
   protected AbstractThreeWayDataMerge m_Algorithm;
+
+  /** whether to merge the reports. */
+  protected boolean m_MergeReports;
 
   /**
    * Returns a string describing the object.
@@ -113,6 +123,10 @@ public class ThreeWayDataMerge
     m_OptionManager.add(
       "algorithm", "algorithm",
       new Join());
+
+    m_OptionManager.add(
+      "merge-reports", "mergeReports",
+      false);
   }
 
   /**
@@ -142,6 +156,37 @@ public class ThreeWayDataMerge
    */
   public String algorithmTipText() {
     return "The merge algorithm to use.";
+  }
+
+  /**
+   * Sets whether to merge the reports into a single one and use in the
+   * outgoing data.
+   *
+   * @param value	true if to merge
+   */
+  public void setMergeReports(boolean value) {
+    m_MergeReports = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to merge the reports into a single one and use in the
+   * outgoing data.
+   *
+   * @return		true if to merge
+   */
+  public boolean getMergeReports() {
+    return m_MergeReports;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String mergeReportsTipText() {
+    return "If enabled, the reports get merged into a single one and used for the outgoing data.";
   }
 
   /**
@@ -184,6 +229,8 @@ public class ThreeWayDataMerge
     String		result;
     ThreeWayData[]	input;
     ThreeWayData	output;
+    Report		report;
+    int			i;
 
     result = null;
 
@@ -197,7 +244,16 @@ public class ThreeWayDataMerge
         m_OutputToken = new Token(output);
       }
       catch (Exception e) {
+        output = null;
         result = handleException("Failed to merge data!", e);
+      }
+
+      // merge report
+      if (m_MergeReports && (output != null)) {
+	report = input[0].getReport().getClone();
+	for (i = 1; i < input.length; i++)
+	  report.mergeWith(input[i].getReport());
+	output.getReport().assign(report);
       }
     }
 
