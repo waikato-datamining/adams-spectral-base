@@ -383,7 +383,7 @@ public class PostProcessor
     result += QuickInfoHelper.toString(this, "modelFile", getModelFile(), ", model: ");
     result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
     result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
-    result += QuickInfoHelper.toString(this, "outputContainer", (m_OutputContainer ? ", container" : ""));
+    result += QuickInfoHelper.toString(this, "outputContainer", (m_OutputContainer ? "output container" : "output processed data"), ", ");
 
     return result;
   }
