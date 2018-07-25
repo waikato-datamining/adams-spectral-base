@@ -13,13 +13,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectrumDatasetExportDialog.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.spectrum;
 
-import adams.data.instances.AbstractSpectrumInstanceGenerator;
+import adams.data.instances.AbstractInstanceGenerator;
 import adams.data.instances.SimpleInstanceGenerator;
 import adams.gui.dialog.AbstractFileExportDialog;
 import adams.gui.goe.GenericObjectEditorPanel;
@@ -33,7 +33,6 @@ import java.awt.Frame;
  * Export dialog for spectra to a dataset.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2019 $
  */
 public class SpectrumDatasetExportDialog
   extends AbstractFileExportDialog<AbstractFileSaver> {
@@ -92,7 +91,7 @@ public class SpectrumDatasetExportDialog
   protected void initGUI() {
     super.initGUI();
 
-    m_PanelGOEGenerator = new GenericObjectEditorPanel(AbstractSpectrumInstanceGenerator.class, new SimpleInstanceGenerator());
+    m_PanelGOEGenerator = new GenericObjectEditorPanel(AbstractInstanceGenerator.class, new SimpleInstanceGenerator(), true);
     m_PanelParams.addParameter(0, "_Generator", m_PanelGOEGenerator);
   }
 
@@ -117,7 +116,7 @@ public class SpectrumDatasetExportDialog
    * 
    * @param value	the generator
    */
-  public void setGenerator(AbstractSpectrumInstanceGenerator value) {
+  public void setGenerator(AbstractInstanceGenerator value) {
     m_PanelGOEGenerator.setCurrent(value);
   }
   
@@ -126,7 +125,7 @@ public class SpectrumDatasetExportDialog
    * 
    * @return		the generator
    */
-  public AbstractSpectrumInstanceGenerator getGenerator() {
-    return (AbstractSpectrumInstanceGenerator) m_PanelGOEGenerator.getCurrent();
+  public AbstractInstanceGenerator getGenerator() {
+    return (AbstractInstanceGenerator) m_PanelGOEGenerator.getCurrent();
   }
 }

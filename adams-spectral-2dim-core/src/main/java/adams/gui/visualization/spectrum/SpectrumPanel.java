@@ -15,7 +15,7 @@
 
 /*
  * SpectrumPanel.java
- * Copyright (C) 2008-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -24,7 +24,7 @@ import adams.core.Properties;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.OptionUtils;
-import adams.data.instances.AbstractSpectrumInstanceGenerator;
+import adams.data.instances.AbstractInstanceGenerator;
 import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.io.output.MetaFileWriter;
 import adams.data.report.DataType;
@@ -491,11 +491,11 @@ public class SpectrumPanel
    * Exports the visible spectra to an ARFF file.
    */
   public void exportVisibleSpectra() {
-    Instances				data;
-    Instance 				inst;
-    AbstractSpectrumInstanceGenerator	generator;
-    AbstractFileSaver			saver;
-    File				file;
+    Instances			data;
+    Instance 			inst;
+    AbstractInstanceGenerator 	generator;
+    AbstractFileSaver		saver;
+    File			file;
 
     if (m_ExportDatasetDialog == null) {
       if (getParentDialog() != null)
