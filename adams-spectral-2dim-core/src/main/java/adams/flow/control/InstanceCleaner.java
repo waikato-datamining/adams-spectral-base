@@ -15,7 +15,7 @@
 
 /*
  * InstanceCleaner.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.control;
@@ -211,8 +211,13 @@ public class InstanceCleaner
    * Sets the actor to send the rejected tokens to.
    *
    * @param value	the actor
+   * @return		null if everything is fine, otherwise the error
    */
-  public void setRejectedTokensActor(Actor value) {
+  public String setRejectedTokensActor(Actor value) {
+    String	result;
+
+    result = null;
+
     if (value instanceof InputConsumer) {
       m_RejectedTokensActor = value;
       reset();
@@ -220,10 +225,12 @@ public class InstanceCleaner
     }
     else {
       if (value instanceof AbstractDirectedControlActor)
-	throw new IllegalArgumentException("You need to provide a group that processes input, like 'Branch'!");
+	result = "You need to provide a group that processes input, like 'Branch'!";
       else
-	throw new IllegalArgumentException("You need to provide an actor that processes input!");
+	result = "You need to provide an actor that processes input!";
     }
+
+    return result;
   }
 
   /**
@@ -249,8 +256,13 @@ public class InstanceCleaner
    * Sets the actor to send the rejection messages to.
    *
    * @param value	the actor
+   * @return		null if everything is fine, otherwise the error
    */
-  public void setRejectionMessagesActor(Actor value) {
+  public String setRejectionMessagesActor(Actor value) {
+    String	result;
+
+    result = null;
+
     if (value instanceof InputConsumer) {
       m_RejectionMessagesActor = value;
       reset();
@@ -258,10 +270,12 @@ public class InstanceCleaner
     }
     else {
       if (value instanceof AbstractDirectedControlActor)
-	throw new IllegalArgumentException("You need to provide a group that processes input, like 'Branch'!");
+	result = "You need to provide a group that processes input, like 'Branch'!";
       else
-	throw new IllegalArgumentException("You need to provide an actor that processes input!");
+	result = "You need to provide an actor that processes input!";
     }
+
+    return result;
   }
 
   /**
@@ -343,20 +357,26 @@ public class InstanceCleaner
    *
    * @param index	the position
    * @param actor	the actor to set at this position
+   * @return		null if everything is fine, otherwise the error
    */
   @Override
-  public void set(int index, Actor actor) {
+  public String set(int index, Actor actor) {
+    String	result;
+
     if (index == 0) {
-      setRejectedTokensActor(actor);
+      result = setRejectedTokensActor(actor);
       updateParent();
     }
     else if (index == 1) {
-      setRejectionMessagesActor(actor);
+      result = setRejectionMessagesActor(actor);
       updateParent();
     }
     else {
-      getLogger().severe("Index out of range: " + index);
+      result = "Index out of range: " + index;
+      getLogger().severe(result);
     }
+
+    return result;
   }
 
   /**
