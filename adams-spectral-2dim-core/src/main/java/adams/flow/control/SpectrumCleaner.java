@@ -211,13 +211,8 @@ public class SpectrumCleaner
    * Sets the actor to send the rejected tokens to.
    *
    * @param value	the actor
-   * @return		null if everything is fine, otherwise the error
    */
-  public String setRejectedTokensActor(Actor value) {
-    String	result;
-
-    result = null;
-
+  public void setRejectedTokensActor(Actor value) {
     if (value instanceof InputConsumer) {
       m_RejectedTokensActor = value;
       reset();
@@ -225,12 +220,10 @@ public class SpectrumCleaner
     }
     else {
       if (value instanceof AbstractDirectedControlActor)
-	result = "You need to provide a group that processes input, like 'Branch'!";
+	throw new IllegalArgumentException("You need to provide a group that processes input, like 'Branch'!");
       else
-	result = "You need to provide an actor that processes input!";
+	throw new IllegalArgumentException("You need to provide an actor that processes input!");
     }
-
-    return result;
   }
 
   /**
@@ -256,13 +249,8 @@ public class SpectrumCleaner
    * Sets the actor to send the rejection messages to.
    *
    * @param value	the actor
-   * @return		null if everything is fine, otherwise the error
    */
-  public String setRejectionMessagesActor(Actor value) {
-    String	result;
-
-    result = null;
-
+  public void setRejectionMessagesActor(Actor value) {
     if (value instanceof InputConsumer) {
       m_RejectionMessagesActor = value;
       reset();
@@ -270,12 +258,10 @@ public class SpectrumCleaner
     }
     else {
       if (value instanceof AbstractDirectedControlActor)
-	result = "You need to provide a group that processes input, like 'Branch'!";
+	throw new IllegalArgumentException("You need to provide a group that processes input, like 'Branch'!");
       else
-	result = "You need to provide an actor that processes input!";
+	throw new IllegalArgumentException("You need to provide an actor that processes input!");
     }
-
-    return result;
   }
 
   /**
@@ -363,12 +349,14 @@ public class SpectrumCleaner
   public String set(int index, Actor actor) {
     String	result;
 
+    result = null;
+
     if (index == 0) {
-      result = setRejectedTokensActor(actor);
+      setRejectedTokensActor(actor);
       updateParent();
     }
     else if (index == 1) {
-      result = setRejectionMessagesActor(actor);
+      setRejectionMessagesActor(actor);
       updateParent();
     }
     else {
