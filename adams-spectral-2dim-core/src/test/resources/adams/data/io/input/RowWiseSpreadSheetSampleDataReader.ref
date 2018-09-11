@@ -1,0 +1,35 @@
+--> sampledata-rowwise-out0.csv
+#1:
+MUFD1[N]: 0.78
+PUFD1[N]: 12.72
+Sample ID[S]: 244503
+Sample Type[S]: plant
+TFFD1[N]: 17.46
+VFFD1[N]: 3.96
+
+#2:
+MUFD1[N]: 0.88
+PUFD1[N]: 13.44
+Sample ID[S]: 244504
+Sample Type[S]: plant
+TFFD1[N]: 18.45
+VFFD1[N]: 4.12
+
+#3:
+MUFD1[N]: 0.7
+PUFD1[N]: 8.64
+Sample ID[S]: 244505
+Sample Type[S]: plant
+TFFD1[N]: 13.45
+VFFD1[N]: 4.1
+
+#4:
+MUFD1[N]: 16.92
+PUFD1[N]: 12.78
+Sample ID[S]: 244506
+Sample Type[S]: plant
+TFFD1[N]: 33.24
+VFFD1[N]: 3.54
+
+
+

@@ -67,22 +67,22 @@ import java.util.logging.Level;
  *
  * <pre>-col-id &lt;java.lang.String&gt; (property: columnSampleID)
  * &nbsp;&nbsp;&nbsp;The name of the column containing the sample ID.
- * &nbsp;&nbsp;&nbsp;default: SampID
+ * &nbsp;&nbsp;&nbsp;default: ID
  * </pre>
  *
  * <pre>-col-type &lt;java.lang.String&gt; (property: columnSampleType)
  * &nbsp;&nbsp;&nbsp;The name of the column containing the sample type.
- * &nbsp;&nbsp;&nbsp;default: TYPE
+ * &nbsp;&nbsp;&nbsp;default: Type
  * </pre>
  *
  * <pre>-col-measurement &lt;java.lang.String&gt; (property: columnMeasurementName)
  * &nbsp;&nbsp;&nbsp;The name of the column containing the reference value name.
- * &nbsp;&nbsp;&nbsp;default: MEASUREMENT
+ * &nbsp;&nbsp;&nbsp;default: Measurement
  * </pre>
  *
  * <pre>-col-value &lt;java.lang.String&gt; (property: columnMeasurementValue)
  * &nbsp;&nbsp;&nbsp;The name of the column containing the reference value.
- * &nbsp;&nbsp;&nbsp;default: VALUE
+ * &nbsp;&nbsp;&nbsp;default: Value
  * </pre>
  * 
  <!-- options-end -->
@@ -133,19 +133,19 @@ public class RowWiseSpreadSheetSampleDataReader
 
     m_OptionManager.add(
       "col-id", "columnSampleID",
-      "SampID");
+      "ID");
 
     m_OptionManager.add(
       "col-type", "columnSampleType",
-      "TYPE");
+      "Type");
 
     m_OptionManager.add(
       "col-measurement", "columnMeasurementName",
-      "MEASUREMENT");
+      "Measurement");
 
     m_OptionManager.add(
       "col-value", "columnMeasurementValue",
-      "VALUE");
+      "Value");
   }
 
   /**
@@ -156,7 +156,7 @@ public class RowWiseSpreadSheetSampleDataReader
    */
   @Override
   public String getFormatDescription() {
-    return "Sample data spreadsheet file format (row-wise)";
+    return "Sample data in spreadsheet format (row-wise)";
   }
 
   /**
