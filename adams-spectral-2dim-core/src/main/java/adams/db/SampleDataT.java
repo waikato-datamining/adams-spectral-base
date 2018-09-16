@@ -15,7 +15,7 @@
 
 /*
  * SampleDataT.java
- * Copyright (C) 2008-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2018 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -270,12 +270,19 @@ public abstract class SampleDataT
   @Override
   protected Indices getIndices() {
     Indices indices = new Indices();
+
     Index index = new Index();
     index.add(new IndexColumn("ID"));
     indices.add(index);
+
     index = new Index();
     index.add(new IndexColumn("NAME"));
     indices.add(index);
+
+    index = new Index();
+    index.add(new IndexColumn("TYPE"));
+    indices.add(index);
+
     return indices;
   }
 
