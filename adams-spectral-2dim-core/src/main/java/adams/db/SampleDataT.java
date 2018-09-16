@@ -283,6 +283,11 @@ public abstract class SampleDataT
     index.add(new IndexColumn("TYPE"));
     indices.add(index);
 
+    index = new Index();
+    index.add(new IndexColumn("NAME"));
+    index.add(new IndexColumn("TYPE"));
+    indices.add(index);
+
     return indices;
   }
 
