@@ -417,8 +417,6 @@ public abstract class SampleDataT
 	tables += ", " + getTableName() + " sd_end";
       if (hasInstrument)
 	tables += ", " + getTableName() + " sd_instrument";
-      if (hasSampleType)
-	tables += ", " + getTableName() + " sd_sampletype";
       if (conditions.getExcludeDummies() || conditions.getOnlyDummies())
 	tables += ", " + getTableName() + " sd_dummies";
       if (required.length > 0) {
@@ -450,6 +448,9 @@ public abstract class SampleDataT
       if (hasSampleID)
 	where.add("sp.SAMPLEID " + regexp + " " + backquote(conditions.getSampleIDRegExp()));
 
+      if (hasSampleType)
+	where.add("sp.SAMPLETYPE " + regexp + " " + backquote(conditions.getSampleTypeRegExp()));
+
       if (hasFormat)
 	where.add("sp.FORMAT " + regexp + " " + backquote(conditions.getFormat()));
 
@@ -469,12 +470,6 @@ public abstract class SampleDataT
 	where.add("sd_instrument" + ".ID = sp.SAMPLEID");
 	where.add("sd_instrument" + ".NAME = " + backquote(SampleData.INSTRUMENT));
 	where.add("sd_instrument" + ".VALUE " + regexp + " " + backquote(conditions.getInstrument()));
-      }
-
-      if (hasSampleType) {
-	where.add("sd_sampletype" + ".ID = sp.SAMPLEID");
-	where.add("sd_sampletype" + ".NAME = " + backquote(SampleData.SAMPLE_TYPE));
-	where.add("sd_sampletype" + ".VALUE " + regexp + " " + backquote(conditions.getSampleTypeRegExp()));
       }
 
       if (conditions.getExcludeDummies() || conditions.getOnlyDummies()) {

@@ -15,7 +15,7 @@
 
 /*
  * SpectrumIDConditions.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.db;
@@ -53,17 +53,19 @@ import adams.core.base.BaseRegExp;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 11831 $
  */
 public class SpectrumIDConditions
   extends AbstractLimitedConditions
-  implements DataContainerConditions, SampleIDRegExpSupporter {
+  implements DataContainerConditions, SampleIDRegExpSupporter, SampleTypeRegExpSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 132688351123941425L;
 
   /** the regular expression on the name of the spectrum. */
   protected BaseRegExp m_SampleIDRegExp;
+
+  /** the regular expression on the type of the spectrum. */
+  protected BaseRegExp m_SampleTypeRegExp;
 
   /** the regular expression on the format type of the spectrum. */
   protected BaseRegExp m_Format;
@@ -87,6 +89,10 @@ public class SpectrumIDConditions
 
     m_OptionManager.add(
 	    "sampleid", "sampleIDRegExp",
+	    new BaseRegExp(""));
+
+    m_OptionManager.add(
+	    "sampletype", "sampleTypeRegExp",
 	    new BaseRegExp(""));
 
     m_OptionManager.add(
@@ -121,6 +127,35 @@ public class SpectrumIDConditions
    */
   public String sampleIDRegExpTipText() {
     return "The regular expression on the spectrum ID.";
+  }
+
+  /**
+   * Sets the regular expression for the sample type.
+   *
+   * @param value 	the regular expression
+   */
+  public void setSampleTypeRegExp(BaseRegExp value) {
+    m_SampleTypeRegExp = value;
+    reset();
+  }
+
+  /**
+   * Returns the regular expression for the sample type.
+   *
+   * @return 		the regular expression
+   */
+  public BaseRegExp getSampleTypeRegExp() {
+    return m_SampleTypeRegExp;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String sampleTypeRegExpTipText() {
+    return "The regular expression on the sample type.";
   }
 
   /**

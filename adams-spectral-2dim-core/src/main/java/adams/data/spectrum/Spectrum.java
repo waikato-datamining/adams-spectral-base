@@ -345,12 +345,12 @@ public class Spectrum
    * @param value	the data format
    */
   public void setFormat(String value) {
-    if (hasReport()) {
-      if (value == null)
-	getReport().addParameter(SampleData.FORMAT, SampleData.DEFAULT_FORMAT);
-      else
-	getReport().addParameter(SampleData.FORMAT, value.toUpperCase());
-    }
+    if (!hasReport())
+      setReport(new SampleData());
+    if (value == null)
+      getReport().addParameter(SampleData.FORMAT, SampleData.DEFAULT_FORMAT);
+    else
+      getReport().addParameter(SampleData.FORMAT, value.toUpperCase());
   }
 
   /**
@@ -367,6 +367,33 @@ public class Spectrum
       return (String) getReport().getValue(field);
     else
       return SampleData.DEFAULT_FORMAT;
+  }
+
+  /**
+   * Sets the sample type.
+   *
+   * @param value	the type
+   */
+  public void setType(String value) {
+    if (!hasReport())
+      setReport(new SampleData());
+    getReport().addParameter(SampleData.FORMAT, value);
+  }
+
+  /**
+   * Returns the sample type.
+   *
+   * @return		the type
+   */
+  public String getType() {
+    Field	field;
+
+    field = new Field(SampleData.SAMPLE_TYPE, DataType.STRING);
+
+    if (hasReport() && getReport().hasValue(field))
+      return (String) getReport().getValue(field);
+    else
+      return "";
   }
 
   /**

@@ -224,6 +224,7 @@ public class SpectrumT
       result.addAll(list);
       list.clear();
       result.setReport(getSampleDataT().load(result.getID()));
+      result.setType(rs.getString("SAMPLETYPE"));
       result.setFormat(rs.getString("FORMAT"));
     }
 
@@ -376,6 +377,7 @@ public class SpectrumT
     int			i;
     String		line;
     boolean		hasSampleID;
+    boolean		hasSampleType;
     boolean		hasFormat;
     String		regexp;
 
@@ -385,14 +387,22 @@ public class SpectrumT
     if (where == null)
       where = "";
 
-    hasSampleID = !cond.getSampleIDRegExp().isEmpty() && !cond.getSampleIDRegExp().isMatchAll();
-    hasFormat   = !cond.getFormat().isEmpty() && !cond.getFormat().isMatchAll();
+    hasSampleID   = !cond.getSampleIDRegExp().isEmpty() && !cond.getSampleIDRegExp().isMatchAll();
+    hasSampleType = !cond.getSampleTypeRegExp().isEmpty() && !cond.getSampleTypeRegExp().isMatchAll();
+    hasFormat     = !cond.getFormat().isEmpty() && !cond.getFormat().isMatchAll();
 
     // sample name
     if (hasSampleID) {
       if (where.length() > 0)
 	where += " AND";
       where += " SAMPLEID " + regexp + " " + backquote(cond.getSampleIDRegExp());
+    }
+
+    // sample type
+    if (hasSampleType) {
+      if (where.length() > 0)
+	where += " AND";
+      where += " SAMPLETYPE " + regexp + " " + backquote(cond.getSampleTypeRegExp());
     }
 
     // data format
@@ -465,14 +475,23 @@ public class SpectrumT
     return result.toString();
   }
 
+  /**
+   * Generates the query string for adding a spectrum.
+   *
+   * @param sp		the spectrum to turn into query
+   * @return		the generated query
+   */
   protected StringBuilder addQuery(Spectrum sp) {
     StringBuilder 	q;
 
     q = new StringBuilder();
-    q.append("INSERT INTO " + getTableName() + " (SAMPLEID, FORMAT, POINTS) VALUES (");
+    q.append("INSERT INTO " + getTableName() + " (SAMPLEID, SAMPLETYPE, FORMAT, POINTS) VALUES (");
 
     // sample ID
     q.append(backquote(sp.getID()));
+
+    // sample type
+    q.append(backquote(sp.getType()));
 
     // format
     q.append(",");
@@ -554,6 +573,7 @@ public class SpectrumT
     ColumnMapping cm = new ColumnMapping();
     cm.addMapping("AUTO_ID",  new AutoIncrementType());  // auto increment ID
     cm.addMapping("SAMPLEID", new ColumnType(Types.VARCHAR, 255)); // text id
+    cm.addMapping("SAMPLETYPE",   new ColumnType(Types.VARCHAR, 20)); // sample type
     cm.addMapping("FORMAT",   new ColumnType(Types.VARCHAR, 20)); // format of data
     cm.addMapping("POINTS",   new ColumnType(Types.LONGVARCHAR, -1)); // for storing the points as string
     return cm;
@@ -567,13 +587,34 @@ public class SpectrumT
   @Override
   protected Indices getIndices() {
     Indices indices = new Indices();
+
     Index index = new Index();
     index.add(new IndexColumn("AUTO_ID"));
     indices.add(index);
+
+    index = new Index();
+    index.add(new IndexColumn("SAMPLEID"));
+    indices.add(index);
+
+    index = new Index();
+    index.add(new IndexColumn("SAMPLETYPE"));
+    indices.add(index);
+
+    index = new Index();
+    index.add(new IndexColumn("FORMAT"));
+    indices.add(index);
+
     index = new Index();
     index.add(new IndexColumn("SAMPLEID"));
     index.add(new IndexColumn("FORMAT"));
     indices.add(index);
+
+    index = new Index();
+    index.add(new IndexColumn("SAMPLEID"));
+    index.add(new IndexColumn("SAMPLETYPE"));
+    index.add(new IndexColumn("FORMAT"));
+    indices.add(index);
+
     return indices;
   }
 
