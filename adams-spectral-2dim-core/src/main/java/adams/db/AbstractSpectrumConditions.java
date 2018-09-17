@@ -15,19 +15,19 @@
 
 /*
  * AbstractSpectrumConditions.java
- * Copyright (C) 2010-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.db;
 
 import adams.core.base.BaseDateTime;
 import adams.core.base.BaseRegExp;
+import adams.data.sampledata.SampleData;
 
 /**
  * Ancestor for spectrum conditions.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 11831 $
  */
 public abstract class AbstractSpectrumConditions
   extends AbstractLimitedConditions
@@ -62,6 +62,9 @@ public abstract class AbstractSpectrumConditions
 
   /** whether to get latest (= reverse order). */
   protected boolean m_Latest;
+
+  /** whether to sort by insert timestamp. */
+  protected boolean m_SortOnInsertTimestamp;
 
   /**
    * Adds options to the internal list of options.
@@ -104,6 +107,10 @@ public abstract class AbstractSpectrumConditions
 
     m_OptionManager.add(
 	    "latest", "latest",
+	    false);
+
+    m_OptionManager.add(
+	    "sort-on-insert-timestamp", "sortOnInsertTimestamp",
 	    false);
   }
 
@@ -366,6 +373,35 @@ public abstract class AbstractSpectrumConditions
    */
   public String latestTipText() {
     return "If set to true, order is reversed and only latest ones are returned.";
+  }
+
+  /**
+   * Sets whether to sort on {@link SampleData#INSERT_TIMESTAMP} instead of auto ID.
+   *
+   * @param value 	if true then to sort on {@link SampleData#INSERT_TIMESTAMP}
+   */
+  public void setSortOnInsertTimestamp(boolean value) {
+    m_SortOnInsertTimestamp = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to sort on {@link SampleData#INSERT_TIMESTAMP} instead of auto ID.
+   *
+   * @return 		true if to sort on {@link SampleData#INSERT_TIMESTAMP}
+   */
+  public boolean getSortOnInsertTimestamp() {
+    return m_SortOnInsertTimestamp;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String sortOnInsertTimestampTipText() {
+    return "If set to true, sorting is performed on the '" + SampleData.INSERT_TIMESTAMP + "' field instead of the auto ID.";
   }
 
   /**

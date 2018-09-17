@@ -1,12 +1,17 @@
 # Configurations for various table classes and other related classes.
 #
 # Author: FracPete (fracpete at waikato dot ac dot nz)
-# Version: $Revision: 1881 $
 
-# Debugging
-adams.db.SampleDataT.Debug=false
-adams.db.SpectrumT.Debug=false
-
-# Enabled
-adams.db.SampleDataT.Enabled=true
+# Spectrum
 adams.db.SpectrumT.Enabled=true
+adams.db.SpectrumT.Debug=false
+adams.db.SpectrumTMySQL.Debug=false
+adams.db.SpectrumTPostgreSQL.Debug=false
+adams.db.SpectrumTSQLite.Debug=false
+
+# SampleData
+adams.db.SampleDataT.Enabled=true
+adams.db.SampleDataT.Debug=false
+adams.db.SampleDataTMySQL.Debug=false
+adams.db.SampleDataTPostgreSQL.Debug=false
+adams.db.SampleDataTSQLite.Debug=false

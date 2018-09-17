@@ -47,7 +47,6 @@ import java.util.logging.Level;
  * A class for handling the sample data reports table.
  *
  * @author dale
- * @version $Revision: 12453 $
  */
 public abstract class SampleDataT
   extends ReportTableByID<SampleData, Field>
@@ -426,7 +425,8 @@ public abstract class SampleDataT
 	}
       }
       // for sorting by date
-      tables += ", " + getTableName() + " sd_sort_by_date";
+      if (conditions.getSortOnInsertTimestamp())
+	tables += ", " + getTableName() + " sd_sort_by_date";
 
       // WHERE
       if (fields.length > 0) {
@@ -488,9 +488,11 @@ public abstract class SampleDataT
       }
 
       where.add("sd.ID = " + "sp.SAMPLEID");
-      where.add("sd.NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
-      where.add("sd_sort_by_date" + ".ID = sp.SAMPLEID");
-      where.add("sd_sort_by_date" + ".NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
+      if (conditions.getSortOnInsertTimestamp()) {
+	where.add("sd.NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
+	where.add("sd_sort_by_date" + ".ID = sp.SAMPLEID");
+	where.add("sd_sort_by_date" + ".NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
+      }
 
       // generate SQL
       sql = "";
@@ -501,7 +503,10 @@ public abstract class SampleDataT
       }
 
       // ordering
-      sql += " ORDER BY sd_sort_by_date.VALUE";
+      if (conditions.getSortOnInsertTimestamp())
+	sql += " ORDER BY sd_sort_by_date.VALUE";
+      else
+        sql += " ORDER BY sp.AUTO_ID";
       if (conditions.m_Latest)
 	sql += " DESC";
       else
