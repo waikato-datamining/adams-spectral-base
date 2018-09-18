@@ -403,7 +403,9 @@ public abstract class SampleDataT
       }
 
       // FROM
-      tables = getTableName() + " sd, " + getSpectrumT().getTableName() + " sp ";
+      tables = getSpectrumT().getTableName() + " sp";
+      if (conditions.getSortOnInsertTimestamp())
+	tables += ", " + getTableName() + " sd";
       if (fields.length > 0) {
 	for (i = 0; i < fields.length; i++) {
 	  if (fields[i].getName().length() > 0)
@@ -487,8 +489,8 @@ public abstract class SampleDataT
 	}
       }
 
-      where.add("sd.ID = " + "sp.SAMPLEID");
       if (conditions.getSortOnInsertTimestamp()) {
+        where.add("sd.ID = " + "sp.SAMPLEID");
 	where.add("sd.NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
 	where.add("sd_sort_by_date" + ".ID = sp.SAMPLEID");
 	where.add("sd_sort_by_date" + ".NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
