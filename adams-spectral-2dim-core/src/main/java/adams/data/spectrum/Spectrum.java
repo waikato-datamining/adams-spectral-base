@@ -375,9 +375,11 @@ public class Spectrum
    * @param value	the type
    */
   public void setType(String value) {
-    if (!hasReport())
-      setReport(new SampleData());
-    getReport().addParameter(SampleData.FORMAT, value);
+    if (value != null) {
+      if (!hasReport())
+	setReport(new SampleData());
+      getReport().addParameter(SampleData.FORMAT, value);
+    }
   }
 
   /**
