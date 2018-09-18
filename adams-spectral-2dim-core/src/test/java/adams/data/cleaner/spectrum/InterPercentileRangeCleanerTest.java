@@ -20,11 +20,11 @@
 package adams.data.cleaner.spectrum;
 
 import adams.core.base.BaseRegExp;
+import adams.db.SpectrumConditionsMulti;
 import adams.env.Environment;
 import adams.test.TmpFile;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import adams.db.SpectrumConditionsMulti;
 
 /**
  * Test class for the InterPercentileRangeCleaner filter. Run from the command line with: <br><br>
@@ -95,6 +95,7 @@ public class InterPercentileRangeCleanerTest
     cond = new SpectrumConditionsMulti();
     cond.setLimit(100);
     cond.setFormat(new BaseRegExp("NIR"));
+    cond.setSortOnInsertTimestamp(true);
     result[0] = new InterPercentileRangeCleaner();
     result[0].setConditions(cond);
     result[0].setSerializationFile(new TmpFile("iprc"));
