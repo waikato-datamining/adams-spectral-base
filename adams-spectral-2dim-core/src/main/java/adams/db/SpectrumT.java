@@ -491,6 +491,7 @@ public class SpectrumT
     q.append(backquote(sp.getID()));
 
     // sample type
+    q.append(",");
     q.append(backquote(sp.getType()));
 
     // format
