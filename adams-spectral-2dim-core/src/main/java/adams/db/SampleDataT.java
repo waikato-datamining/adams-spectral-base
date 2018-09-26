@@ -23,7 +23,6 @@ package adams.db;
 
 import adams.core.DateFormat;
 import adams.core.DateUtils;
-import adams.core.Utils;
 import adams.core.base.BaseDouble;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
@@ -34,13 +33,16 @@ import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
 import adams.db.types.ColumnType;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -160,9 +162,9 @@ public abstract class SampleDataT
     ResultSet rs = null;
     try {
       rs = select(
-	  "ID, NAME, TYPE, VALUE",
-	  getTableName(),
-	  "ID = " + backquote(id));
+	"ID, NAME, TYPE, VALUE",
+	getTableName(),
+	"ID = " + backquote(id));
       while (rs.next()) {
 	String name = rs.getString("NAME");
 	String type = rs.getString("TYPE");
@@ -208,42 +210,116 @@ public abstract class SampleDataT
     }
 
     Hashtable<AbstractField,Object> table = report.getParams();
-    for (AbstractField key:table.keySet()) {
+    boolean result = true;
+    Set<String> names = new HashSet<>();
+    try {
+      ResultSet rs = select("NAME", "ID = " + backquote(id));
+      while (rs.next())
+	names.add(rs.getString(1));
+      closeAll(rs);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to query existing names for " + id, e);
+      return false;
+    }
+
+    PreparedStatement update;
+    PreparedStatement insert;
+    try {
+      update = getDatabaseConnection().getConnection(false).prepareStatement(
+	"UPDATE " + getTableName() + " SET VALUE = ?, TYPE = ? WHERE ID = ? AND NAME = ?");
+      insert = getDatabaseConnection().getConnection(false).prepareStatement(
+	"INSERT INTO " + getTableName() + "(ID, NAME, TYPE, VALUE) VALUES(?, ?, ?, ?)");
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to prepare statements for " + id, e);
+      return false;
+    }
+
+    boolean updated = false;
+    boolean inserted = false;
+    for (AbstractField key : table.keySet()) {
       // format is stored in spectrum
       if (key.getName().equals(SampleData.FORMAT))
 	continue;
 
-      Object o = table.get(key);
-
-      if (!isThere("ID = " + backquote(id) + " AND NAME = " + backquote(key.getName()))) {
-	q  = "INSERT INTO " + getTableName() + " (ID,NAME,TYPE,VALUE) VALUES (";
-	q += backquote(id) + ",";
-	q += backquote(key.getName()) + ",";
-	q += backquote(DataTypeHelper.typeFor(o)) + ",";
-	q += backquote(DataTypeHelper.convert(o));
-	q += ")";
-      }
-      else {
-	q  = "UPDATE " + getTableName() + " SET ";
-	q += "VALUE = " + backquote(DataTypeHelper.convert(o)) + ", ";
-	q += "TYPE = " + backquote(DataTypeHelper.typeFor(o)) + " ";
-	q += "WHERE ID = " + backquote(id) + " AND NAME = " + backquote(key.getName());
-      }
-
       try {
-	Boolean rs = execute(q);
-	if ((rs == null) || rs) {
-	  getLogger().severe("Some error:\n" + Utils.getStackTrace(-1));
-	  return false;
+	if (names.contains(key.getName())) {
+	  updated = true;
+	  update.setString(2, key.getDataType().toString());
+	  update.setString(3, id);
+	  update.setString(4, key.getName());
+	  switch (key.getDataType()) {
+	    case STRING:
+	    case UNKNOWN:
+	      update.setString(1, table.get(key).toString());
+	      update.addBatch();
+	      break;
+	    case BOOLEAN:
+	      update.setBoolean(1, (Boolean) table.get(key));
+	      update.addBatch();
+	      break;
+	    case NUMERIC:
+	      update.setDouble(1, (Double) table.get(key));
+	      update.addBatch();
+	      break;
+	    default:
+	      throw new IllegalStateException("Unhandled data type for " + id + ": " + key.getDataType());
+	  }
+	}
+	else {
+	  inserted = true;
+	  insert.setString(1, id);
+	  insert.setString(2, key.getName());
+	  insert.setString(3, key.getDataType().toString());
+	  switch (key.getDataType()) {
+	    case STRING:
+	    case UNKNOWN:
+	      insert.setString(4, table.get(key).toString());
+	      insert.addBatch();
+	      break;
+	    case BOOLEAN:
+	      insert.setBoolean(4, (Boolean) table.get(key));
+	      insert.addBatch();
+	      break;
+	    case NUMERIC:
+	      insert.setDouble(4, (Double) table.get(key));
+	      insert.addBatch();
+	      break;
+	    default:
+	      throw new IllegalStateException("Unhandled data type for " + id + ": " + key.getDataType());
+	  }
 	}
       }
       catch (Exception e) {
-	getLogger().log(Level.SEVERE, "Failed to store: " + q, e);
-	return(false);
+	getLogger().log(Level.SEVERE, "Failed to add insert/update statement: " + id, e);
+	return false;
       }
     }
 
-    return true;
+    if (updated) {
+      try {
+	update.executeBatch();
+	update.clearBatch();
+      }
+      catch (Exception e) {
+	getLogger().log(Level.SEVERE, "Failed to update: " + id, e);
+	result = false;
+      }
+    }
+
+    if (inserted) {
+      try {
+	insert.executeBatch();
+	insert.clearBatch();
+      }
+      catch (Exception e) {
+	getLogger().log(Level.SEVERE, "Failed to insert: " + id, e);
+	result = false;
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -490,7 +566,7 @@ public abstract class SampleDataT
       }
 
       if (conditions.getSortOnInsertTimestamp()) {
-        where.add("sd.ID = " + "sp.SAMPLEID");
+	where.add("sd.ID = " + "sp.SAMPLEID");
 	where.add("sd.NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
 	where.add("sd_sort_by_date" + ".ID = sp.SAMPLEID");
 	where.add("sd_sort_by_date" + ".NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
@@ -508,7 +584,7 @@ public abstract class SampleDataT
       if (conditions.getSortOnInsertTimestamp())
 	sql += " ORDER BY sd_sort_by_date.VALUE";
       else
-        sql += " ORDER BY sp.AUTO_ID";
+	sql += " ORDER BY sp.AUTO_ID";
       if (conditions.m_Latest)
 	sql += " DESC";
       else
@@ -602,13 +678,13 @@ public abstract class SampleDataT
       m_TableManager = new TableManager<SampleDataT>(TABLE_NAME, dbcon.getOwner());
     if (!m_TableManager.has(dbcon)) {
       if (JDBC.isMySQL(dbcon))
-        m_TableManager.add(dbcon, new SampleDataTMySQL(dbcon));
+	m_TableManager.add(dbcon, new SampleDataTMySQL(dbcon));
       else if (JDBC.isPostgreSQL(dbcon))
-        m_TableManager.add(dbcon, new SampleDataTPostgreSQL(dbcon));
+	m_TableManager.add(dbcon, new SampleDataTPostgreSQL(dbcon));
       else if (JDBC.isSQLite(dbcon))
-        m_TableManager.add(dbcon, new SampleDataTSQLite(dbcon));
+	m_TableManager.add(dbcon, new SampleDataTSQLite(dbcon));
       else
-        throw new IllegalArgumentException("Unrecognized JDBC URL: " + dbcon.getURL());
+	throw new IllegalArgumentException("Unrecognized JDBC URL: " + dbcon.getURL());
     }
 
     return m_TableManager.get(dbcon);
