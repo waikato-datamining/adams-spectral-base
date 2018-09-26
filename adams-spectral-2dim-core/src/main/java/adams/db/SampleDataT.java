@@ -32,6 +32,7 @@ import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
 import adams.db.types.ColumnType;
+import adams.event.DatabaseConnectionChangeEvent;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,6 +63,12 @@ public abstract class SampleDataT
 
   /** the table manager. */
   protected static TableManager<SampleDataT> m_TableManager;
+
+  /** for speeding up updates. */
+  protected PreparedStatement m_Update;
+
+  /** for speeding up inserts. */
+  protected PreparedStatement m_Insert;
 
   /**
    * Constructor.
@@ -209,6 +216,19 @@ public abstract class SampleDataT
       report.setValue(field, dformat.format(new Date()));
     }
 
+    if (m_Update == null) {
+      try {
+	m_Update = prepareStatement(
+	  "UPDATE " + getTableName() + " SET VALUE = ?, TYPE = ? WHERE ID = ? AND NAME = ?");
+	m_Insert = prepareStatement(
+	  "INSERT INTO " + getTableName() + "(ID, NAME, TYPE, VALUE) VALUES(?, ?, ?, ?)");
+      }
+      catch (Exception e) {
+	getLogger().log(Level.SEVERE, "Failed to prepare update/insert statements for " + getTableName(), e);
+	return false;
+      }
+    }
+
     Hashtable<AbstractField,Object> table = report.getParams();
     boolean result = true;
     Set<String> names;
@@ -217,19 +237,6 @@ public abstract class SampleDataT
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to query existing names for " + id, e);
-      return false;
-    }
-
-    PreparedStatement update;
-    PreparedStatement insert;
-    try {
-      update = getDatabaseConnection().getConnection(false).prepareStatement(
-	"UPDATE " + getTableName() + " SET VALUE = ?, TYPE = ? WHERE ID = ? AND NAME = ?");
-      insert = getDatabaseConnection().getConnection(false).prepareStatement(
-	"INSERT INTO " + getTableName() + "(ID, NAME, TYPE, VALUE) VALUES(?, ?, ?, ?)");
-    }
-    catch (Exception e) {
-      getLogger().log(Level.SEVERE, "Failed to prepare statements for " + id, e);
       return false;
     }
 
@@ -243,22 +250,22 @@ public abstract class SampleDataT
       try {
 	if (names.contains(key.getName())) {
 	  updated = true;
-	  update.setString(2, key.getDataType().toString());
-	  update.setString(3, id);
-	  update.setString(4, key.getName());
+	  m_Update.setString(2, key.getDataType().toString());
+	  m_Update.setString(3, id);
+	  m_Update.setString(4, key.getName());
 	  switch (key.getDataType()) {
 	    case STRING:
 	    case UNKNOWN:
-	      update.setString(1, table.get(key).toString());
-	      update.addBatch();
+	      m_Update.setString(1, table.get(key).toString());
+	      m_Update.addBatch();
 	      break;
 	    case BOOLEAN:
-	      update.setBoolean(1, (Boolean) table.get(key));
-	      update.addBatch();
+	      m_Update.setBoolean(1, (Boolean) table.get(key));
+	      m_Update.addBatch();
 	      break;
 	    case NUMERIC:
-	      update.setDouble(1, (Double) table.get(key));
-	      update.addBatch();
+	      m_Update.setDouble(1, (Double) table.get(key));
+	      m_Update.addBatch();
 	      break;
 	    default:
 	      throw new IllegalStateException("Unhandled data type for " + id + ": " + key.getDataType());
@@ -266,22 +273,22 @@ public abstract class SampleDataT
 	}
 	else {
 	  inserted = true;
-	  insert.setString(1, id);
-	  insert.setString(2, key.getName());
-	  insert.setString(3, key.getDataType().toString());
+	  m_Insert.setString(1, id);
+	  m_Insert.setString(2, key.getName());
+	  m_Insert.setString(3, key.getDataType().toString());
 	  switch (key.getDataType()) {
 	    case STRING:
 	    case UNKNOWN:
-	      insert.setString(4, table.get(key).toString());
-	      insert.addBatch();
+	      m_Insert.setString(4, table.get(key).toString());
+	      m_Insert.addBatch();
 	      break;
 	    case BOOLEAN:
-	      insert.setBoolean(4, (Boolean) table.get(key));
-	      insert.addBatch();
+	      m_Insert.setBoolean(4, (Boolean) table.get(key));
+	      m_Insert.addBatch();
 	      break;
 	    case NUMERIC:
-	      insert.setDouble(4, (Double) table.get(key));
-	      insert.addBatch();
+	      m_Insert.setDouble(4, (Double) table.get(key));
+	      m_Insert.addBatch();
 	      break;
 	    default:
 	      throw new IllegalStateException("Unhandled data type for " + id + ": " + key.getDataType());
@@ -296,8 +303,8 @@ public abstract class SampleDataT
 
     if (updated) {
       try {
-	update.executeBatch();
-	update.clearBatch();
+	m_Update.executeBatch();
+	m_Update.clearBatch();
       }
       catch (Exception e) {
 	getLogger().log(Level.SEVERE, "Failed to update: " + id, e);
@@ -307,8 +314,8 @@ public abstract class SampleDataT
 
     if (inserted) {
       try {
-	insert.executeBatch();
-	insert.clearBatch();
+	m_Insert.executeBatch();
+	m_Insert.clearBatch();
       }
       catch (Exception e) {
 	getLogger().log(Level.SEVERE, "Failed to insert: " + id, e);
@@ -653,6 +660,17 @@ public abstract class SampleDataT
       Collections.sort(result);
 
     return result;
+  }
+
+  /**
+   * A change in the database connection occurred.
+   *
+   * @param e		the event
+   */
+  public void databaseConnectionStateChanged(DatabaseConnectionChangeEvent e) {
+    super.databaseConnectionStateChanged(e);
+    m_Update = null;
+    m_Insert = null;
   }
 
   /**
