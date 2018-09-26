@@ -211,12 +211,9 @@ public abstract class SampleDataT
 
     Hashtable<AbstractField,Object> table = report.getParams();
     boolean result = true;
-    Set<String> names = new HashSet<>();
+    Set<String> names;
     try {
-      ResultSet rs = select("NAME", "ID = " + backquote(id));
-      while (rs.next())
-	names.add(rs.getString(1));
-      closeAll(rs);
+      names = new HashSet<>(selectString(false, "NAME", getTableName(), "ID = " + backquote(id)));
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to query existing names for " + id, e);
