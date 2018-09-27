@@ -391,7 +391,13 @@ public class InstanceCleaner
    */
   @Override
   public ActorHandlerInfo getActorHandlerInfo() {
-    return new ActorHandlerInfo(false, false, ActorExecution.UNDEFINED, true, null, false);
+    return new ActorHandlerInfo()
+      .allowStandalones(false)
+      .allowSource(false)
+      .actorExecution(ActorExecution.UNDEFINED)
+      .forwardsInput(true)
+      .restrictions(null)
+      .allowEncloseActors(false);
   }
 
   /**
