@@ -632,6 +632,50 @@ public abstract class SampleDataT
   }
 
   /**
+   * Returns a list of sample IDs of of sample data without associated spectra.
+   *
+   * @param conditions	the conditions that the sampledata must meet
+   * @return		list of sample IDs
+   */
+  public List<String> getOrphanedIDs(OrphanedSampleDataConditions conditions) {
+    List<String>	result;
+    String		tables;
+    String		where;
+    ResultSet 		rs;
+
+    result = new ArrayList<>();
+    conditions.update();
+
+    tables = getTableName() + " AS sd "
+      + "LEFT OUTER JOIN " + SpectrumT.getSingleton(getDatabaseConnection()).getTableName() + " AS sp "
+      + "ON sp.sampleid = sd.id";
+    where  = "sd.name = '" + SampleData.INSERT_TIMESTAMP + "'"
+      + "and sampleid is null";
+    if (!conditions.getStartDate().isInfinity())
+      where += " and sd.value >= '" + conditions.getStartDate().stringValue() + "'";
+    if (!conditions.getEndDate().isInfinity())
+      where += " and sd.value <= '" + conditions.getEndDate().stringValue() + "'";
+    if (conditions.getLatest())
+      where += " ORDER BY sd.value DESC";
+    else
+      where += " ORDER BY sd.value ASC";
+    if (conditions.getLimit() > -1)
+      where += " LIMIT " + conditions.getLimit();
+
+    try {
+      rs = select("id", tables, where);
+      while (rs.next())
+	result.add(rs.getString(1));
+      closeAll(rs);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to get orphaned IDs: " + conditions, e);
+    }
+
+    return result;
+  }
+
+  /**
    * Returns all the various instruments.
    *
    * @return		the instruments
