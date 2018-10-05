@@ -177,8 +177,16 @@ public abstract class SampleDataT
 	String type = rs.getString("TYPE");
 	String sval = rs.getString("VALUE");
 	Field field = new Field(createField(name, type));
-	result.addField(field);
-	result.setValue(field, parse(field, sval));
+	try {
+	  result.addField(field);
+	  result.setValue(field, parse(field, sval));
+	}
+	catch (Exception e) {
+	  getLogger().warning("Failed to parse #" + id + ": name=" + name + ", type=" + type + ", value=" + sval);
+	  field = new Field(createField(name, "S"));
+	  result.addField(field);
+	  result.setValue(field, parse(field, sval));
+	}
       }
     }
     catch (Exception e) {
