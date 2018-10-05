@@ -378,7 +378,7 @@ public class Spectrum
     if (value != null) {
       if (!hasReport())
 	setReport(new SampleData());
-      getReport().addParameter(SampleData.FORMAT, value);
+      getReport().addParameter(SampleData.SAMPLE_TYPE, value);
     }
   }
 
