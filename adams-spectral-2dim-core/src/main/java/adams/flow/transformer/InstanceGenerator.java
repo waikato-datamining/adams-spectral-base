@@ -15,7 +15,7 @@
 
 /*
  * InstanceGenerator.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -232,8 +232,14 @@ public class InstanceGenerator
 	spectrum.setReport(sd);
       }
 
-      inst = m_Generator.generate(spectrum);
-      m_OutputToken = new Token(inst);
+      try {
+        inst = m_Generator.generate(spectrum);
+        m_OutputToken = new Token(inst);
+      }
+      catch (Exception e) {
+        result = handleException("Failed to generate instance from: " + spectrum, e);
+        m_OutputToken = null;
+      }
     }
 
     return result;
