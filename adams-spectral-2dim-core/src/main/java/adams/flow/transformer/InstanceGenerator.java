@@ -28,6 +28,8 @@ import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
 import weka.core.Instance;
 
+import java.util.logging.Level;
+
 /**
  <!-- globalinfo-start -->
  * Generates weka.core.Instance objects from spectra or reports&#47;sample data.
@@ -37,7 +39,7 @@ import weka.core.Instance;
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;knir.data.spectrum.Spectrum<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.spectrum.Spectrum<br>
  * &nbsp;&nbsp;&nbsp;adams.data.report.Report<br>
  * - generates:<br>
  * &nbsp;&nbsp;&nbsp;weka.core.Instance<br>
@@ -45,13 +47,9 @@ import weka.core.Instance;
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
- * Valid options are: <br><br>
- *
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
  *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
@@ -59,24 +57,39 @@ import weka.core.Instance;
  * &nbsp;&nbsp;&nbsp;default: InstanceGenerator
  * </pre>
  *
- * <pre>-annotation &lt;adams.core.base.BaseText&gt; (property: annotations)
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
  * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
- * <pre>-skip (property: skip)
+ * <pre>-skip &lt;boolean&gt; (property: skip)
  * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
  * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-stop-flow-on-error (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-generator &lt;knir.data.instances.AbstractInstanceGenerator&gt; (property: generator)
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-generator &lt;adams.data.instances.AbstractInstanceGenerator&gt; (property: generator)
  * &nbsp;&nbsp;&nbsp;The generator to use for turning spectra into weka.core.Instance objects.
- * &nbsp;&nbsp;&nbsp;default: knir.data.instances.SimpleInstanceGenerator
+ * &nbsp;&nbsp;&nbsp;default: adams.data.instances.SimpleInstanceGenerator
+ * </pre>
+ *
+ * <pre>-lenient &lt;boolean&gt; (property: lenient)
+ * &nbsp;&nbsp;&nbsp;If enabled, errors only get logged rather than returned (which may cause
+ * &nbsp;&nbsp;&nbsp;the flow to stop).
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
  <!-- options-end -->
@@ -92,6 +105,9 @@ public class InstanceGenerator
 
   /** the generator to use. */
   protected adams.data.instances.AbstractInstanceGenerator m_Generator;
+
+  /** whether to be lenient. */
+  protected boolean m_Lenient;
 
   /** whether the database connection has been updated. */
   protected boolean m_DatabaseConnectionUpdated;
@@ -112,8 +128,12 @@ public class InstanceGenerator
     super.defineOptions();
 
     m_OptionManager.add(
-	    "generator", "generator",
-	    new adams.data.instances.SimpleInstanceGenerator());
+      "generator", "generator",
+      new adams.data.instances.SimpleInstanceGenerator());
+
+    m_OptionManager.add(
+      "lenient", "lenient",
+      false);
   }
 
   /**
@@ -156,6 +176,37 @@ public class InstanceGenerator
   }
 
   /**
+   * Sets whether lenient, ie whether errors only get logged rather than
+   * returned (and possibly causing the flow to stop).
+   *
+   * @param value	true if lenient
+   */
+  public void setLenient(boolean value){
+    m_Lenient = value;
+    reset();
+  }
+
+  /**
+   * Returns whether lenient, ie whether errors only get logged rather than
+   * returned (and possibly causing the flow to stop).
+   *
+   * @return		true if lenient
+   */
+  public boolean getLenient(){
+    return m_Lenient;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String lenientTipText() {
+    return "If enabled, errors only get logged rather than returned (which may cause the flow to stop).";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -176,7 +227,7 @@ public class InstanceGenerator
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->knir.data.spectrum.Spectrum.class, adams.data.report.Report.class<!-- flow-accepts-end -->
+   * @return		<!-- flow-accepts-start -->adams.data.spectrum.Spectrum.class, adams.data.report.Report.class<!-- flow-accepts-end -->
    */
   public Class[] accepts() {
     return new Class[]{Spectrum.class, Report.class};
@@ -237,7 +288,10 @@ public class InstanceGenerator
         m_OutputToken = new Token(inst);
       }
       catch (Exception e) {
-        result = handleException("Failed to generate instance from: " + spectrum, e);
+        if (m_Lenient)
+	  getLogger().log(Level.WARNING, "Failed to generate instance from: " + spectrum, e);
+        else
+	  result = handleException("Failed to generate instance from: " + spectrum, e);
         m_OutputToken = null;
       }
     }
