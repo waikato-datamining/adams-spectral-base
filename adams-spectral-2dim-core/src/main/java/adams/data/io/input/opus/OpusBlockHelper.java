@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * OpusBlockHelper.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input.opus;
@@ -559,6 +559,9 @@ public class OpusBlockHelper {
 
   /** the LXV character sequence. */
   public final static byte[] LXV = new byte[]{'L', 'X', 'V', 0};
+
+  /** the CSF character sequence. */
+  public final static byte[] CSF = new byte[]{'C', 'S', 'F', 0};
 
   /** the INS character sequence. */
   public final static byte[] INS = new byte[]{'I', 'N', 'S', 0};

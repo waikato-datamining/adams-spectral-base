@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * OpusSpectrumReaderExt.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -416,6 +416,7 @@ public class OpusSpectrumReaderExt
     double 			firstX;
     double 			lastX;
     double 			diff;
+    double			scale;
     int 			n;
     Spectrum 			sp;
     SampleData 			sd;
@@ -486,14 +487,16 @@ public class OpusSpectrumReaderExt
 	numPoints = dpf.get(i).getLong(OpusBlockHelper.NPT, 8).intValue();
 	firstX = dpf.get(i).getDouble(OpusBlockHelper.FXV, 8);
 	lastX = dpf.get(i).getDouble(OpusBlockHelper.LXV, 8);
+	scale = dpf.get(i).getDouble(OpusBlockHelper.CSF, 8);
 	diff = (lastX - firstX) / ((double) numPoints - 1.0);
 	if (isLoggingEnabled())
-	  getLogger().info("firstX=" + firstX + ", lastX=" + lastX + ", numPoints=" + numPoints + ", diff=" + diff);
+	  getLogger().info("firstX=" + firstX + ", lastX=" + lastX + ", numPoints=" + numPoints + ", diff=" + diff + ", scale=" + scale);
 	sd = new SampleData();
 	addReportValue(sd, "Opus.FirstX", DataType.NUMERIC, firstX);
 	addReportValue(sd, "Opus.LastX", DataType.NUMERIC, lastX);
 	addReportValue(sd, "Opus.NumPoints", DataType.NUMERIC, numPoints);
 	addReportValue(sd, "Opus.Diff", DataType.NUMERIC, diff);
+	addReportValue(sd, "Opus.Scale", DataType.NUMERIC, scale);
 	addReportValue(sd, "Opus.BlockType.DPF", DataType.STRING, Integer.toHexString(data.get(i).getType()));
 	addReportValue(sd, "Opus.BlockType.Data", DataType.STRING, Integer.toHexString(data.get(i).getType()));
 
@@ -509,7 +512,7 @@ public class OpusSpectrumReaderExt
 	for (n = 0; n < numPoints; n++) {
 	  point = new SpectrumPoint(
 	    (float) (firstX + ((double) n) * diff),
-	    (float) IEEE754.toDouble(data.get(i).getLong(n * 4)));
+	    (float) (IEEE754.toDouble(data.get(i).getLong(n * 4)) * scale));
 	  sp.add(point);
 	}
 
