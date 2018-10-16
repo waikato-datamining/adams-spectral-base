@@ -13,16 +13,15 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectrumRenderer.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.debug.objectrenderer;
 
 import adams.data.spectrum.Spectrum;
-import adams.gui.visualization.spectrum.SpectrumContainer;
-import adams.gui.visualization.spectrum.SpectrumPanel;
+import adams.gui.visualization.spectrum.SpectrumPanelWithSampleData;
 import nz.ac.waikato.cms.locator.ClassLocator;
 
 import javax.swing.JPanel;
@@ -32,7 +31,6 @@ import java.awt.BorderLayout;
  * Renders Spectrum objects.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SpectrumRenderer
   extends AbstractObjectRenderer {
@@ -59,14 +57,12 @@ public class SpectrumRenderer
    */
   @Override
   protected String doRender(Object obj, JPanel panel) {
-    Spectrum 		data;
-    SpectrumPanel spPanel;
-    SpectrumContainer cont;
+    Spectrum 			data;
+    SpectrumPanelWithSampleData spPanel;
 
     data    = (Spectrum) obj;
-    spPanel = new SpectrumPanel();
-    cont    = spPanel.getContainerManager().newContainer(data);
-    spPanel.getContainerManager().add(cont);
+    spPanel = new SpectrumPanelWithSampleData();
+    spPanel.display(data);
     panel.add(spPanel, BorderLayout.CENTER);
 
     return null;

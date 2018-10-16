@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumHandler.java
- * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.previewbrowser;
 
@@ -24,6 +24,7 @@ import adams.core.option.OptionUtils;
 import adams.data.io.input.AbstractSpectrumReader;
 import adams.gui.scripting.AddDataFile;
 import adams.gui.visualization.spectrum.SpectrumPanel;
+import adams.gui.visualization.spectrum.SpectrumPanelWithSampleData;
 import weka.core.Utils;
 
 import javax.swing.JPanel;
@@ -33,7 +34,6 @@ import java.io.File;
  * Ancestor for spectrum handlers.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1905 $
  */
 public abstract class AbstractSpectrumHandler
   extends AbstractContentHandler 
@@ -68,15 +68,12 @@ public abstract class AbstractSpectrumHandler
    */
   @Override
   protected PreviewPanel createPreview(File file) {
-    SpectrumPanel result;
+    SpectrumPanelWithSampleData result;
     AbstractSpectrumReader	reader;
 
-    result = new SpectrumPanel();
+    result = new SpectrumPanelWithSampleData();
     reader = getReader(file);
-    reader.setInput(new PlaceholderFile(file));
-    result.getScriptingEngine().add(
-	  result,
-	  AddDataFile.ACTION + " " + OptionUtils.getCommandLine(reader));
+    result.display(reader, file);
 
     return new PreviewPanel(result);
   }
