@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * MultiSpectrumViewerPanel.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+/*
+ * MultiSpectrumPanel.java
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.spectrum;
 
@@ -26,9 +26,9 @@ import adams.data.io.output.AbstractSpectrumWriter;
 import adams.data.spectrum.Spectrum;
 import adams.gui.chooser.SpectrumFileChooser;
 import adams.gui.core.BasePanel;
-import adams.gui.core.BaseTabbedPane;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MenuBarProvider;
+import adams.gui.core.MultiPagePane;
 import adams.gui.goe.GenericObjectEditorDialog;
 
 import javax.swing.JMenu;
@@ -43,10 +43,9 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 /**
- * A panel for viewing spectra in tabs.
+ * A panel for viewing spectra in pages.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1969 $
  */
 public class MultiSpectrumPanel
   extends BasePanel
@@ -59,7 +58,7 @@ public class MultiSpectrumPanel
   protected SpectrumFileChooser m_FileChooser;
 
   /** for displaying the spectra in tabs. */
-  protected BaseTabbedPane m_TabbedPane;
+  protected MultiPagePane m_MultiPagePane;
 
   /** for choosing an appropriate reader. */
   protected GenericObjectEditorDialog m_GOEDialog;
@@ -104,9 +103,8 @@ public class MultiSpectrumPanel
 
     setLayout(new BorderLayout());
 
-    m_TabbedPane = new BaseTabbedPane();
-    m_TabbedPane.setCloseTabsWithMiddleMouseButton(true);
-    add(m_TabbedPane, BorderLayout.CENTER);
+    m_MultiPagePane = new MultiPagePane();
+    add(m_MultiPagePane, BorderLayout.CENTER);
   }
 
   /**
@@ -277,7 +275,7 @@ public class MultiSpectrumPanel
     SpectrumContainerManager	manager;
     SpectrumContainer		cont;
 
-    if (m_TabbedPane.getTabCount() == 0)
+    if (m_MultiPagePane.getPageCount() == 0)
       newTab();
     panel   = getSelectedPanel();
     spectra = reader.read();
@@ -322,8 +320,8 @@ public class MultiSpectrumPanel
     panel = new SpectrumPanel();
     panel.getContainerManager().setReloadable(false);
     m_TabCounter++;
-    m_TabbedPane.addTab("View" + m_TabCounter, panel);
-    m_TabbedPane.setSelectedIndex(m_TabbedPane.getTabCount() - 1);
+    m_MultiPagePane.addPage("View" + m_TabCounter, panel);
+    m_MultiPagePane.setSelectedIndex(m_MultiPagePane.getPageCount() - 1);
   }
 
   /**
@@ -332,11 +330,11 @@ public class MultiSpectrumPanel
   protected void closeTab() {
     int		index;
 
-    index = m_TabbedPane.getSelectedIndex();
+    index = m_MultiPagePane.getSelectedIndex();
     if (index == -1)
       return;
 
-    m_TabbedPane.remove(index);
+    m_MultiPagePane.remove(index);
   }
 
   /**
@@ -357,11 +355,11 @@ public class MultiSpectrumPanel
 
     result = null;
 
-    index = m_TabbedPane.getSelectedIndex();
+    index = m_MultiPagePane.getSelectedIndex();
     if (index == -1)
       return result;
 
-    result = (SpectrumPanel) m_TabbedPane.getComponent(index);
+    result = (SpectrumPanel) m_MultiPagePane.getComponent(index);
 
     return result;
   }
