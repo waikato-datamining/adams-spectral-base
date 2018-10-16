@@ -14,19 +14,19 @@
  */
 
 /*
- * NIRSpectrumHandler.java
- * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
+ * CALSpectrumHandler.java
+ * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.previewbrowser;
 
 import adams.data.io.input.AbstractSpectrumReader;
-import adams.data.io.input.NIRSpectrumReader;
+import adams.data.io.input.CMLSpectrumReader;
 
 import java.io.File;
 
 /**
  <!-- globalinfo-start -->
- * Displays the following spectrum types: nir
+ * Displays the following spectrum types: cal
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -43,12 +43,13 @@ import java.io.File;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
+ * @version $Revision: 2242 $
  */
-public class NIRSpectrumHandler
+public class CMLSpectrumHandler
   extends AbstractSpectrumHandler {
 
   /** for serialization. */
-  private static final long serialVersionUID = 4355980649685117194L;
+  private static final long serialVersionUID = -6121851494039541075L;
 
   /**
    * Returns the list of extensions (without dot) that this handler can
@@ -57,7 +58,7 @@ public class NIRSpectrumHandler
    * @return		the list of extensions (no dot)
    */
   public String[] getExtensions() {
-    return new NIRSpectrumReader().getFormatExtensions();
+    return new CMLSpectrumReader().getFormatExtensions();
   }
 
   /**
@@ -67,6 +68,6 @@ public class NIRSpectrumHandler
    * @return		the reader
    */
   protected AbstractSpectrumReader getReader(File file) {
-    return new NIRSpectrumReader();
+    return new CMLSpectrumReader();
   }
 }

@@ -81,8 +81,7 @@ public abstract class AbstractSpectrumHandler
   /**
    * Creates the actual view.
    *
-   * @param files	the files to       table = null;
-create the view for
+   * @param files	the files to create the view for
    * @return		the view
    */
   protected PreviewPanel createPreview(File[] files) {
@@ -118,7 +117,10 @@ create the view for
 	return new NoPreviewAvailablePanel();
       }
     }
-    
-    return createPreview(files);
+
+    if (files.length == 1)
+      return createPreview(files[0]);
+    else
+      return createPreview(files);
   }
 }

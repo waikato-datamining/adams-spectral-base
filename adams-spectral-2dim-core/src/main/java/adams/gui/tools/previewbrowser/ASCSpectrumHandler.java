@@ -15,7 +15,7 @@
 
 /*
  * ASCSpectrumHandler.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.previewbrowser;
 
@@ -43,7 +43,6 @@ import java.io.File;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class ASCSpectrumHandler
   extends AbstractSpectrumHandler {
@@ -58,7 +57,7 @@ public class ASCSpectrumHandler
    * @return		the list of extensions (no dot)
    */
   public String[] getExtensions() {
-    return new String[]{"asc"};
+    return new ASCSpectrumReader().getFormatExtensions();
   }
 
   /**

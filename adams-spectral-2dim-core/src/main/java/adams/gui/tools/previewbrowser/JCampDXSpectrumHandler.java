@@ -14,19 +14,19 @@
  */
 
 /*
- * NIRSpectrumHandler.java
- * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
+ * JCampDXSpectrumHandler.java
+ * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.previewbrowser;
 
 import adams.data.io.input.AbstractSpectrumReader;
-import adams.data.io.input.NIRSpectrumReader;
+import adams.data.io.input.JCampDXSpectrumReader;
 
 import java.io.File;
 
 /**
  <!-- globalinfo-start -->
- * Displays the following spectrum types: nir
+ * Displays the following spectrum types: jdx, dx
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -44,11 +44,11 @@ import java.io.File;
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class NIRSpectrumHandler
+public class JCampDXSpectrumHandler
   extends AbstractSpectrumHandler {
 
   /** for serialization. */
-  private static final long serialVersionUID = 4355980649685117194L;
+  private static final long serialVersionUID = -5432094091273134639L;
 
   /**
    * Returns the list of extensions (without dot) that this handler can
@@ -57,7 +57,7 @@ public class NIRSpectrumHandler
    * @return		the list of extensions (no dot)
    */
   public String[] getExtensions() {
-    return new NIRSpectrumReader().getFormatExtensions();
+    return new JCampDXSpectrumReader().getFormatExtensions();
   }
 
   /**
@@ -67,6 +67,6 @@ public class NIRSpectrumHandler
    * @return		the reader
    */
   protected AbstractSpectrumReader getReader(File file) {
-    return new NIRSpectrumReader();
+    return new JCampDXSpectrumReader();
   }
 }
