@@ -66,6 +66,7 @@ public class SpectrumPanelWithSampleData
     add(m_TabbedPane, BorderLayout.CENTER);
 
     m_PanelSpectrum = new SpectrumPanel();
+    m_PanelSpectrum.setSidePanelVisible(false);
     m_TabbedPane.addTab("Spectrum", m_PanelSpectrum);
 
     m_TableSampleData = new Table();
