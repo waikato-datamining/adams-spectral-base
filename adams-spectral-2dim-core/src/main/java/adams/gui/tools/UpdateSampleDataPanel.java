@@ -43,6 +43,7 @@ import adams.gui.core.BasePanel;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTable;
+import adams.gui.core.BaseTextField;
 import adams.gui.core.CheckableTableModel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MouseUtils;
@@ -58,7 +59,6 @@ import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
@@ -190,13 +190,13 @@ public class UpdateSampleDataPanel
   protected SearchPanel m_SearchSampleData;
 
   /** the text field for the field name. */
-  protected JTextField m_TextName;
+  protected BaseTextField m_TextName;
 
   /** the combobox for the field data type. */
   protected BaseComboBox<DataType> m_ComboBoxType;
 
   /** the text field for the field value. */
-  protected JTextField m_TextValue;
+  protected BaseTextField m_TextValue;
 
   /** the button for updating the sample data. */
   protected BaseButton m_ButtonApply;
@@ -358,7 +358,7 @@ public class UpdateSampleDataPanel
     panel2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
     panel.add(panel2, BorderLayout.SOUTH);
 
-    m_TextName = new JTextField(10);
+    m_TextName = new BaseTextField(10);
     m_TextName.setText(field.getName());
     m_TextName.getDocument().addDocumentListener(new DocumentListener() {
       @Override
@@ -384,7 +384,7 @@ public class UpdateSampleDataPanel
     m_ComboBoxType.setSelectedItem(field.getDataType());
     panel2.add(m_ComboBoxType);
 
-    m_TextValue = new JTextField(10);
+    m_TextValue = new BaseTextField(10);
     m_TextValue.setText(props.getProperty("Value", ""));
     m_TextValue.getDocument().addDocumentListener(new DocumentListener() {
       @Override
