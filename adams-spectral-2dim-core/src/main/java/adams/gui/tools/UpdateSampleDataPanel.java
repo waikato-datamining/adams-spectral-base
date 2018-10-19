@@ -38,6 +38,7 @@ import adams.db.SpectrumConditionsMulti;
 import adams.env.Environment;
 import adams.gui.chooser.DateChooserPanel;
 import adams.gui.core.BaseButton;
+import adams.gui.core.BaseComboBox;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
@@ -55,7 +56,6 @@ import adams.gui.visualization.spectrum.SampleDataFactory;
 import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -193,7 +193,7 @@ public class UpdateSampleDataPanel
   protected JTextField m_TextName;
 
   /** the combobox for the field data type. */
-  protected JComboBox<DataType> m_ComboBoxType;
+  protected BaseComboBox<DataType> m_ComboBoxType;
 
   /** the text field for the field value. */
   protected JTextField m_TextValue;
@@ -380,7 +380,7 @@ public class UpdateSampleDataPanel
     panel2.add(label);
     panel2.add(m_TextName);
 
-    m_ComboBoxType = new JComboBox<>(DataType.values());
+    m_ComboBoxType = new BaseComboBox<>(DataType.values());
     m_ComboBoxType.setSelectedItem(field.getDataType());
     panel2.add(m_ComboBoxType);
 
