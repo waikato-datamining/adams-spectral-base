@@ -21,10 +21,10 @@ package adams.gui.visualization.spectrum;
 
 import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.io.output.SimpleSpectrumWriter;
+import adams.gui.core.BaseCheckBox;
 import adams.gui.dialog.AbstractDirectoryExportDialog;
 import adams.gui.goe.GenericObjectEditorPanel;
 
-import javax.swing.JCheckBox;
 import java.awt.Dialog;
 import java.awt.Frame;
 
@@ -41,7 +41,7 @@ public class SpectrumExportDialog
   private static final long serialVersionUID = 6635283474671937011L;
 
   /** whether the timeseries should be saved in the same file, if possible. */
-  protected JCheckBox m_CheckBoxCombine;
+  protected BaseCheckBox m_CheckBoxCombine;
 
   /**
    * Creates a modeless dialog without a title with the specified Dialog as
@@ -91,7 +91,7 @@ public class SpectrumExportDialog
   protected void initGUI() {
     super.initGUI();
     
-    m_CheckBoxCombine = new JCheckBox();
+    m_CheckBoxCombine = new BaseCheckBox();
     m_PanelParams.addParameter("_Combine (if possible)", m_CheckBoxCombine);
   }
 
