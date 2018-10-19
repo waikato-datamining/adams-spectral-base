@@ -22,6 +22,7 @@ package adams.gui.tools;
 
 import adams.core.Utils;
 import adams.db.DatabaseConnection;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MenuBarProvider;
@@ -31,7 +32,6 @@ import adams.gui.scripting.ScriptingCommandCode;
 import adams.gui.scripting.SpectralScriptingEngine;
 import adams.gui.selection.SelectSpectrumPanel;
 
-import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -59,10 +59,10 @@ public class DeleteSpectrumPanel
   protected SelectSpectrumPanel m_PanelSpectrum;
 
   /** the button for executing the deletion. */
-  protected JButton m_ButtonDelete;
+  protected BaseButton m_ButtonDelete;
 
   /** the button for closing the dialog/frame. */
-  protected JButton m_ButtonClose;
+  protected BaseButton m_ButtonClose;
 
   /**
    * Initializes the widgets.
@@ -85,7 +85,7 @@ public class DeleteSpectrumPanel
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     add(panel, BorderLayout.SOUTH);
 
-    m_ButtonDelete = new JButton("Delete");
+    m_ButtonDelete = new BaseButton("Delete");
     m_ButtonDelete.setMnemonic('D');
     m_ButtonDelete.addActionListener(e -> {
       delete();
@@ -93,7 +93,7 @@ public class DeleteSpectrumPanel
     });
     panel.add(m_ButtonDelete);
 
-    m_ButtonClose = new JButton("Close");
+    m_ButtonClose = new BaseButton("Close");
     m_ButtonClose.setMnemonic('l');
     m_ButtonClose.addActionListener(e -> closeParent());
     panel.add(m_ButtonClose);

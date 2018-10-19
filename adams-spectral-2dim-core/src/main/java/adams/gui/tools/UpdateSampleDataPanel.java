@@ -37,6 +37,7 @@ import adams.db.SampleDataT;
 import adams.db.SpectrumConditionsMulti;
 import adams.env.Environment;
 import adams.gui.chooser.DateChooserPanel;
+import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
@@ -54,7 +55,6 @@ import adams.gui.visualization.spectrum.SampleDataFactory;
 import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -157,10 +157,10 @@ public class UpdateSampleDataPanel
   protected DateChooserPanel m_TextTo;
 
   /** the button for the options. */
-  protected JButton m_ButtonConditions;
+  protected BaseButton m_ButtonConditions;
 
   /** the button for the search. */
-  protected JButton m_ButtonSearch;
+  protected BaseButton m_ButtonSearch;
 
   /** the split pane. */
   protected BaseSplitPane m_SplitPane;
@@ -172,13 +172,13 @@ public class UpdateSampleDataPanel
   protected SortableAndSearchableTableWithButtons m_TableIDs;
 
   /** the button for selecting all. */
-  protected JButton m_ButtonSelectAll;
+  protected BaseButton m_ButtonSelectAll;
 
   /** the button for selecting none. */
-  protected JButton m_ButtonSelectNone;
+  protected BaseButton m_ButtonSelectNone;
 
   /** the button for inverting the selection. */
-  protected JButton m_ButtonSelectInvert;
+  protected BaseButton m_ButtonSelectInvert;
 
   /** the search panel for the IDs. */
   protected SearchPanel m_SearchIDs;
@@ -199,10 +199,10 @@ public class UpdateSampleDataPanel
   protected JTextField m_TextValue;
 
   /** the button for updating the sample data. */
-  protected JButton m_ButtonApply;
+  protected BaseButton m_ButtonApply;
 
   /** the button for closing the dialog. */
-  protected JButton m_ButtonClose;
+  protected BaseButton m_ButtonClose;
 
   /** the conditions to use in the search. */
   protected SpectrumConditionsMulti m_Conditions;
@@ -285,13 +285,13 @@ public class UpdateSampleDataPanel
     panel.add(m_TextTo);
 
     // options
-    m_ButtonConditions = new JButton("Options");
+    m_ButtonConditions = new BaseButton("Options");
     m_ButtonConditions.setMnemonic('O');
     m_ButtonConditions.addActionListener((ActionEvent e) -> showConditions());
     panel.add(m_ButtonConditions);
 
     // search
-    m_ButtonSearch = new JButton("Search");
+    m_ButtonSearch = new BaseButton("Search");
     m_ButtonSearch.setMnemonic('S');
     m_ButtonSearch.addActionListener((ActionEvent e) -> search());
     panel.add(m_ButtonSearch);
@@ -313,13 +313,13 @@ public class UpdateSampleDataPanel
     m_TableIDs.setAutoResizeMode(BaseTable.AUTO_RESIZE_OFF);
     m_TableIDs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     m_TableIDs.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> showReport());
-    m_ButtonSelectAll = new JButton("All");
+    m_ButtonSelectAll = new BaseButton("All");
     m_ButtonSelectAll.addActionListener((ActionEvent e) -> m_Model.selectAll());
     m_TableIDs.addToButtonsPanel(m_ButtonSelectAll);
-    m_ButtonSelectNone = new JButton("None");
+    m_ButtonSelectNone = new BaseButton("None");
     m_ButtonSelectNone.addActionListener((ActionEvent e) -> m_Model.selectNone());
     m_TableIDs.addToButtonsPanel(m_ButtonSelectNone);
-    m_ButtonSelectInvert = new JButton("Invert");
+    m_ButtonSelectInvert = new BaseButton("Invert");
     m_ButtonSelectInvert.addActionListener((ActionEvent e) -> m_Model.invertSelection());
     m_TableIDs.addToButtonsPanel(m_ButtonSelectInvert);
 
@@ -408,12 +408,12 @@ public class UpdateSampleDataPanel
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     panelAll.add(panel, BorderLayout.SOUTH);
 
-    m_ButtonApply = new JButton("Apply");
+    m_ButtonApply = new BaseButton("Apply");
     m_ButtonApply.setMnemonic('A');
     m_ButtonApply.addActionListener((ActionEvent e) -> apply());
     panel.add(m_ButtonApply);
 
-    m_ButtonClose = new JButton("Close");
+    m_ButtonClose = new BaseButton("Close");
     m_ButtonClose.setMnemonic('l');
     m_ButtonClose.addActionListener((ActionEvent e) -> closeParent());
     panel.add(m_ButtonClose);
