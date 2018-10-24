@@ -15,7 +15,7 @@
 
 /*
  * SpectrumExplorer.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -30,6 +30,7 @@ import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.data.spectrum.SpectrumUtils;
+import adams.data.spectrumanalysis.FastICA;
 import adams.data.spectrumanalysis.PCA;
 import adams.data.spectrumanalysis.PLS;
 import adams.db.AbstractDatabaseConnection;
@@ -156,6 +157,9 @@ public class SpectrumExplorer
   /** the filter menu item. */
   protected JMenuItem m_MenuItemProcessFilter;
 
+  /** the ica menu item. */
+  protected JMenuItem m_MenuItemProcessICA;
+
   /** the pca menu item. */
   protected JMenuItem m_MenuItemProcessPCA;
 
@@ -201,6 +205,9 @@ public class SpectrumExplorer
   /** the current PCA analysis. */
   protected PCA m_CurrentPCA;
 
+  /** the current ICA analysis. */
+  protected FastICA m_CurrentICA;
+
   /** the current PLS analysis. */
   protected PLS m_CurrentPLS;
 
@@ -212,6 +219,9 @@ public class SpectrumExplorer
 
   /** the PCA dialog. */
   protected GenericObjectEditorDialog m_DialogPCA;
+
+  /** the ICA dialog. */
+  protected GenericObjectEditorDialog m_DialogICA;
 
   /** the PLS dialog. */
   protected GenericObjectEditorDialog m_DialogPLS;
@@ -267,8 +277,10 @@ public class SpectrumExplorer
     m_SpectrumFileChooser = new SpectrumFileChooser();
     m_SpectrumFileChooser.setMultiSelectionEnabled(true);
     m_CurrentFilter       = new PassThrough();
+    m_CurrentICA          = new FastICA();
     m_CurrentPCA          = new PCA();
     m_CurrentPLS          = new PLS();
+    m_DialogICA           = null;
     m_DialogPCA           = null;
     m_DialogPLS           = null;
     m_RecentFilesHandler  = null;
@@ -767,6 +779,14 @@ public class SpectrumExplorer
       menuitem.addActionListener(e -> filter());
       m_MenuItemProcessFilter = menuitem;
 
+      // Process/ICA
+      menuitem = new JMenuItem("ICA...");
+      menu.add(menuitem);
+      menuitem.setMnemonic('I');
+      menuitem.setIcon(GUIHelper.getIcon("scatterplot.gif"));
+      menuitem.addActionListener(e -> ica());
+      m_MenuItemProcessICA = menuitem;
+
       // Process/PCA
       menuitem = new JMenuItem("PCA...");
       menu.add(menuitem);
@@ -1087,6 +1107,82 @@ public class SpectrumExplorer
   }
 
   /**
+   * Performs ICA on the visible spectra.
+   */
+  public void ica() {
+    SwingWorker		worker;
+
+    if (m_DialogICA == null) {
+      if (getParentDialog() != null)
+	m_DialogICA = new GenericObjectEditorDialog(getParentDialog(), ModalityType.DOCUMENT_MODAL);
+      else
+	m_DialogICA = new GenericObjectEditorDialog(getParentFrame(), true);
+      m_DialogICA.setTitle("ICA");
+      m_DialogICA.getGOEEditor().setCanChangeClassInDialog(false);
+      m_DialogICA.getGOEEditor().setClassType(FastICA.class);
+      m_DialogICA.setCurrent(m_CurrentICA);
+      m_DialogICA.pack();
+      m_DialogICA.setLocationRelativeTo(this);
+    }
+    m_DialogICA.setCurrent(m_CurrentICA);
+    m_DialogICA.setVisible(true);
+    if (m_DialogICA.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
+      return;
+    m_CurrentICA = (FastICA) m_DialogICA.getCurrent();
+
+    worker = new SwingWorker() {
+      protected FastICA m_ICA;
+      @Override
+      protected Object doInBackground() throws Exception {
+	m_ICA = (FastICA) OptionUtils.shallowCopy(m_CurrentICA);
+	List<Spectrum> list = new ArrayList<>();
+	for (SpectrumContainer cont: getContainerManager().getAllVisible())
+	  list.add(cont.getData());
+	String result = m_ICA.analyze(list);
+	if (result != null) {
+	  GUIHelper.showErrorMessage(SpectrumExplorer.this, result);
+	  m_ICA = null;
+	}
+	return null;
+      }
+      @Override
+      protected void done() {
+	super.done();
+	if (m_ICA != null) {
+	  ApprovalDialog dialog;
+	  if (getParentDialog() != null)
+	    dialog = new ApprovalDialog(getParentDialog(), ModalityType.MODELESS);
+	  else
+	    dialog = new ApprovalDialog(getParentFrame(), false);
+	  dialog.setDefaultCloseOperation(ApprovalDialog.DISPOSE_ON_CLOSE);
+	  dialog.setTitle("ICA");
+	  BaseTabbedPane tabbedPane = new BaseTabbedPane();
+	  // components
+	  ScatterPlot plot = new ScatterPlot();
+	  plot.setData(m_ICA.getComponents());
+	  plot.setMouseClickAction(new ViewDataClickAction());
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.reset();
+	  tabbedPane.addTab("Components", plot);
+	  // sources
+	  plot = new ScatterPlot();
+	  plot.setData(m_ICA.getSources());
+	  plot.setMouseClickAction(new ViewDataClickAction());
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.reset();
+	  tabbedPane.addTab("Sources", plot);
+	  // display dialog
+	  dialog.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+	  dialog.setSize(GUIHelper.getDefaultLargeDialogDimension());
+	  dialog.setLocationRelativeTo(SpectrumExplorer.this);
+	  dialog.setVisible(true);
+	}
+      }
+    };
+    worker.execute();
+  }
+
+  /**
    * Performs PCA on the visible spectra.
    */
   public void pca() {
@@ -1395,6 +1491,10 @@ public class SpectrumExplorer
     if (m_DialogPaintlet != null) {
       m_DialogPaintlet.dispose();
       m_DialogPaintlet = null;
+    }
+    if (m_DialogICA != null) {
+      m_DialogICA.dispose();
+      m_DialogICA = null;
     }
     if (m_DialogPCA != null) {
       m_DialogPCA.dispose();

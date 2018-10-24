@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractWekaSpectrumAnalysis.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2018 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.spectrumanalysis;
@@ -33,7 +33,6 @@ import java.util.List;
  * {@link Instances} as basis.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public abstract class AbstractWekaSpectrumAnalysis
   extends AbstractSpectrumAnalysis {
@@ -82,6 +81,16 @@ public abstract class AbstractWekaSpectrumAnalysis
    */
   public String generatorTipText() {
     return "The generator to use for generating Weka data from the spectra.";
+  }
+
+  /**
+   * Hook method for checks.
+   *
+   * @param data	the data to check
+   */
+  protected void check(Instances data) {
+    if (data == null)
+      throw new IllegalStateException("No data provided!");
   }
 
   /**
