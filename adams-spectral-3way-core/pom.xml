@@ -105,57 +105,8 @@
 
     <dependency>
       <groupId>org.nd4j</groupId>
-      <artifactId>nd4j-native</artifactId>
+      <artifactId>nd4j-native-platform</artifactId>
       <version>${nd4j.version}</version>
-      <type>jar</type>
-    </dependency>
-
-    <dependency>
-      <groupId>org.nd4j</groupId>
-      <artifactId>nd4j-native</artifactId>
-      <version>${nd4j.version}</version>
-      <scope>package</scope>
-      <classifier>linux-x86_64</classifier>
-    </dependency>
-
-    <dependency>
-      <groupId>org.nd4j</groupId>
-      <artifactId>nd4j-native</artifactId>
-      <version>${nd4j.version}</version>
-      <scope>package</scope>
-      <classifier>macosx-x86_64</classifier>
-    </dependency>
-
-    <dependency>
-      <groupId>org.nd4j</groupId>
-      <artifactId>nd4j-native</artifactId>
-      <version>${nd4j.version}</version>
-      <scope>package</scope>
-      <classifier>windows-x86_64</classifier>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bytedeco.javacpp-presets</groupId>
-      <artifactId>openblas</artifactId>
-      <version>${openblas.version}</version>
-      <scope>package</scope>
-      <classifier>linux-x86_64</classifier>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bytedeco.javacpp-presets</groupId>
-      <artifactId>openblas</artifactId>
-      <version>${openblas.version}</version>
-      <scope>package</scope>
-      <classifier>macosx-x86_64</classifier>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bytedeco.javacpp-presets</groupId>
-      <artifactId>openblas</artifactId>
-      <version>${openblas.version}</version>
-      <scope>package</scope>
-      <classifier>windows-x86_64</classifier>
     </dependency>
   </dependencies>
 
