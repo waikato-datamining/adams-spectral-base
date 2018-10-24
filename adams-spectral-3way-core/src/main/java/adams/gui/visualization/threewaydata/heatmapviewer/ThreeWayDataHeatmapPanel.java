@@ -35,6 +35,7 @@ import adams.gui.core.ColorHelper;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
+import adams.gui.core.UISettings;
 import adams.gui.event.SearchEvent;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
@@ -152,7 +153,8 @@ public class ThreeWayDataHeatmapPanel
 
     m_SplitPaneAll = new BaseSplitPane(BaseSplitPane.HORIZONTAL_SPLIT);
     m_SplitPaneAll.setResizeWeight(0.0);
-    m_SplitPaneAll.setDividerLocation(75);
+    m_SplitPaneAll.setDividerLocation(UISettings.get(getClass(), "DividerAll", 75));
+    m_SplitPaneAll.setUISettingsParameters(getClass(), "DividerAll");
     m_SplitPaneAll.setOneTouchExpandable(true);
     add(m_SplitPaneAll, BorderLayout.CENTER);
 
@@ -172,7 +174,8 @@ public class ThreeWayDataHeatmapPanel
 
     // main
     m_SplitPaneRight = new BaseSplitPane();
-    m_SplitPaneRight.setDividerLocation(props.getInteger("Panel.DividerLocation", 600));
+    m_SplitPaneRight.setDividerLocation(UISettings.get(getClass(), "DividerRight", props.getInteger("Panel.DividerLocation", 600)));
+    m_SplitPaneRight.setUISettingsParameters(getClass(), "DividerRight");
     m_SplitPaneAll.setRightComponent(m_SplitPaneRight);
 
     painter = new RectanglePainter();
