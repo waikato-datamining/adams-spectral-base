@@ -218,6 +218,7 @@ public class ThreeWayDataToHeatmap
 	setZ.add(l2.getZ());
     }
     result = new Heatmap(setZ.size(), setY.size());
+    result.setReport(input.getReport().getClone());
 
     listY = new TDoubleArrayList(setY);
     listY.sort();

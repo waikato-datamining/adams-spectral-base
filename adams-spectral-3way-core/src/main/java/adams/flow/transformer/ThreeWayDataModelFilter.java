@@ -26,6 +26,7 @@ import adams.core.Utils;
 import adams.core.VariableName;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
+import adams.data.container.TensorContainer;
 import adams.event.VariableChangeEvent;
 import adams.flow.control.StorageName;
 import adams.flow.core.AbstractModelLoader.ModelLoadingType;
@@ -328,7 +329,7 @@ public class ThreeWayDataModelFilter
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{Tensor.class};
+    return new Class[]{TensorContainer.class};
   }
 
   /**
@@ -338,7 +339,7 @@ public class ThreeWayDataModelFilter
    */
   @Override
   public Class[] generates() {
-    return new Class[]{Tensor.class};
+    return new Class[]{TensorContainer.class};
   }
 
   /**
@@ -458,10 +459,11 @@ public class ThreeWayDataModelFilter
    */
   @Override
   protected String doExecute() {
-    String	result;
-    Tensor	data;
-    Filter	filter;
-    Tensor	filtered;
+    String		result;
+    TensorContainer	data;
+    Filter		filter;
+    Tensor		filtered;
+    TensorContainer	cont;
 
     result = null;
 
@@ -469,17 +471,21 @@ public class ThreeWayDataModelFilter
       result = setUpModel();
 
     data = null;
-    if (m_InputToken.hasPayload(Tensor.class))
-      data = m_InputToken.getPayload(Tensor.class);
+    if (m_InputToken.hasPayload(TensorContainer.class))
+      data = m_InputToken.getPayload(TensorContainer.class);
     else
       result = m_InputToken.unhandledData();
 
     if (result == null) {
       try {
         filter   = (Filter) m_ActualModel;
-        filtered = filter.filter(data);
-        if (filtered != null)
-          m_OutputToken = new Token(filtered);
+        filtered = filter.filter(data.getContent());
+        if (filtered != null) {
+          cont = (TensorContainer) data.getHeader();
+          cont.setContent(filtered);
+          cont.getNotes().addProcessInformation(this);
+	  m_OutputToken = new Token(cont);
+	}
       }
       catch (Exception e) {
         result = handleException("Failed to filter data!", e);

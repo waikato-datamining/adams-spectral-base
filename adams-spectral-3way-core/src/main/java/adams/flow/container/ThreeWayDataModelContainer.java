@@ -20,8 +20,8 @@
 
 package adams.flow.container;
 
+import adams.data.container.TensorContainer;
 import nz.ac.waikato.cms.adams.multiway.algorithm.api.AbstractAlgorithm;
-import nz.ac.waikato.cms.adams.multiway.data.tensor.Tensor;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,7 +49,7 @@ public class ThreeWayDataModelContainer
    * Only used for generating help information.
    */
   public ThreeWayDataModelContainer() {
-    this(null, (Tensor) null);
+    this(null, (TensorContainer) null);
   }
 
   /**
@@ -58,7 +58,7 @@ public class ThreeWayDataModelContainer
    * @param model	the model
    * @param train	the dataset, can be null
    */
-  public ThreeWayDataModelContainer(AbstractAlgorithm model, Tensor train) {
+  public ThreeWayDataModelContainer(AbstractAlgorithm model, TensorContainer train) {
     super();
     store(VALUE_MODEL, model);
     store(VALUE_TRAIN, train);
@@ -70,7 +70,7 @@ public class ThreeWayDataModelContainer
    * @param model	the model
    * @param train	the dataset, can be null
    */
-  public ThreeWayDataModelContainer(AbstractAlgorithm model, Tensor[] train) {
+  public ThreeWayDataModelContainer(AbstractAlgorithm model, TensorContainer[] train) {
     super();
     store(VALUE_MODEL, model);
     store(VALUE_TRAIN, train);
@@ -81,7 +81,7 @@ public class ThreeWayDataModelContainer
    */
   protected void initFilterHelp() {
     addHelp(VALUE_MODEL, "model object", AbstractAlgorithm.class);
-    addHelp(VALUE_TRAIN, "train data", new Class[]{Tensor.class, Tensor[].class});
+    addHelp(VALUE_TRAIN, "train data", new Class[]{TensorContainer.class, TensorContainer[].class});
   }
 
   /**

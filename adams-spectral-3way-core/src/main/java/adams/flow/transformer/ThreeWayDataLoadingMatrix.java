@@ -22,6 +22,7 @@ package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.data.container.TensorContainer;
 import adams.flow.container.ThreeWayDataModelContainer;
 import adams.flow.core.Token;
 import nz.ac.waikato.cms.adams.multiway.algorithm.api.LoadingMatrixAccessor;
@@ -125,7 +126,7 @@ public class ThreeWayDataLoadingMatrix
    */
   @Override
   public Class[] generates() {
-    return new Class[]{Tensor.class};
+    return new Class[]{TensorContainer.class};
   }
 
   /**
@@ -139,6 +140,7 @@ public class ThreeWayDataLoadingMatrix
     ThreeWayDataModelContainer	cont;
     LoadingMatrixAccessor	model;
     Tensor			matrix;
+    TensorContainer		matrixCont;
 
     result = null;
 
@@ -160,10 +162,14 @@ public class ThreeWayDataLoadingMatrix
     if (result == null) {
       if (model != null) {
 	matrix = model.getLoadingMatrices().get(m_Matrix);
-	if (matrix != null)
-	  m_OutputToken = new Token(matrix);
-	else
+	if (matrix != null) {
+	  matrixCont = new TensorContainer();
+	  matrixCont.setContent(matrix);
+	  m_OutputToken = new Token(matrixCont);
+	}
+	else {
 	  result = "Loading matrix not present: " + m_Matrix;
+	}
       }
       else {
         result = "No model available?";

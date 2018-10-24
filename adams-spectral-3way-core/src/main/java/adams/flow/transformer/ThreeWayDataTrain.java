@@ -23,6 +23,7 @@ package adams.flow.transformer;
 import adams.core.ObjectCopyHelper;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.data.container.TensorContainer;
 import adams.flow.container.ThreeWayDataModelContainer;
 import adams.flow.core.Token;
 import adams.flow.transformer.threewaydatatrain.AbstractThreeWayDataTrainPostProcessor;
@@ -166,9 +167,9 @@ public class ThreeWayDataTrain
   @Override
   public Class[] accepts() {
     if (m_Algorithm instanceof UnsupervisedAlgorithm)
-      return new Class[]{Tensor.class};
+      return new Class[]{TensorContainer.class};
     else if (m_Algorithm instanceof SupervisedAlgorithm)
-      return new Class[]{Tensor[].class};
+      return new Class[]{TensorContainer[].class};
     else
       throw new IllegalStateException("Unhandled algorithm: " + Utils.classToString(m_Algorithm));
   }
@@ -191,22 +192,33 @@ public class ThreeWayDataTrain
   @Override
   protected String doExecute() {
     String			result;
-    Tensor			trainUnsuper;
-    Tensor[]			trainSuper;
+    TensorContainer		trainUnsuper;
+    TensorContainer[]		trainSuper;
+    Tensor			tensorUnsuper;
+    Tensor[]			tensorSuper;
     ThreeWayDataModelContainer	cont;
 
     result = null;
 
-    trainUnsuper = null;
-    trainSuper   = new Tensor[0];
-    cont         = null;
+    trainUnsuper  = null;
+    trainSuper    = new TensorContainer[0];
+    tensorUnsuper = null;
+    tensorSuper   = new Tensor[0];
+    cont          = null;
     if (m_Algorithm instanceof UnsupervisedAlgorithm) {
-      trainUnsuper = m_InputToken.getPayload(Tensor.class);
+      trainUnsuper = m_InputToken.getPayload(TensorContainer.class);
+      tensorUnsuper = trainUnsuper.getContent();
     }
     else if (m_Algorithm instanceof SupervisedAlgorithm) {
-      trainSuper = m_InputToken.getPayload(Tensor[].class);
-      if (trainSuper.length != 2)
-        result = "Supervised training requires 2 Tensor objects as input!";
+      trainSuper = m_InputToken.getPayload(TensorContainer[].class);
+      if (trainSuper.length != 2) {
+	result = "Supervised training requires 2 Tensor objects as input!";
+      }
+      else {
+	tensorSuper    = new Tensor[2];
+	tensorSuper[0] = trainSuper[0].getContent();
+	tensorSuper[1] = trainSuper[1].getContent();
+      }
     }
     else
       result = "Unhandled algorithm: " + Utils.classToString(m_Algorithm);
@@ -215,12 +227,12 @@ public class ThreeWayDataTrain
       try {
         m_CurrentAlgorithm = ObjectCopyHelper.copyObject(m_Algorithm);
 	if (m_CurrentAlgorithm instanceof UnsupervisedAlgorithm) {
-	  ((UnsupervisedAlgorithm) m_CurrentAlgorithm).build(trainUnsuper);
+	  ((UnsupervisedAlgorithm) m_CurrentAlgorithm).build(tensorUnsuper);
 	  if (!isStopped())
 	    cont = new ThreeWayDataModelContainer(m_CurrentAlgorithm, trainUnsuper);
 	}
 	else if (m_CurrentAlgorithm instanceof SupervisedAlgorithm) {
-	  ((SupervisedAlgorithm) m_CurrentAlgorithm).build(trainSuper[0], trainSuper[1]);
+	  ((SupervisedAlgorithm) m_CurrentAlgorithm).build(tensorSuper[0], tensorSuper[1]);
 	  if (!isStopped())
 	    cont = new ThreeWayDataModelContainer(m_CurrentAlgorithm, trainSuper);
 	}

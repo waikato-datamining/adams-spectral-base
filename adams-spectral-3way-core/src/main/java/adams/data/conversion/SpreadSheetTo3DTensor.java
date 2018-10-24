@@ -20,6 +20,7 @@
 
 package adams.data.conversion;
 
+import adams.data.container.TensorContainer;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
@@ -255,7 +256,7 @@ public class SpreadSheetTo3DTensor
    */
   @Override
   public Class generates() {
-    return Tensor.class;
+    return TensorContainer.class;
   }
 
   /**
@@ -266,7 +267,7 @@ public class SpreadSheetTo3DTensor
    */
   @Override
   protected Object doConvert() throws Exception {
-    Tensor		result;
+    TensorContainer	result;
     SpreadSheet		sheet;
     int			colX;
     int			colY;
@@ -323,7 +324,8 @@ public class SpreadSheetTo3DTensor
       z = listY.indexOf(row.getCell(colZ).toDouble());
       tdata[x][y][z] = row.getCell(colD).toDouble();
     }
-    result = Tensor.create(tdata);
+    result = new TensorContainer();
+    result.setContent(Tensor.create(tdata));
 
     return result;
   }

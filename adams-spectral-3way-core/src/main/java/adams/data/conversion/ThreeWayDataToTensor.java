@@ -20,6 +20,7 @@
 
 package adams.data.conversion;
 
+import adams.data.container.TensorContainer;
 import adams.data.threeway.L1Point;
 import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
@@ -77,7 +78,7 @@ public class ThreeWayDataToTensor
    */
   @Override
   public Class generates() {
-    return Tensor.class;
+    return TensorContainer.class;
   }
 
   /**
@@ -88,7 +89,7 @@ public class ThreeWayDataToTensor
    */
   @Override
   protected Object doConvert() throws Exception {
-    Tensor		result;
+    TensorContainer	result;
     ThreeWayData	data;
     TDoubleSet 		setX;
     TDoubleSet 		setY;
@@ -128,7 +129,10 @@ public class ThreeWayDataToTensor
         tdata[x][y][z] = l2.getData();
       }
     }
-    result = Tensor.create(tdata);
+    result = new TensorContainer();
+    result.setReport(data.getReport().getClone());
+    result.getNotes().addProcessInformation(this);
+    result.setContent(Tensor.create(tdata));
 
     return result;
   }

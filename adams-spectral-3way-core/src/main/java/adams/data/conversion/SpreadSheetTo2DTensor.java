@@ -20,6 +20,7 @@
 
 package adams.data.conversion;
 
+import adams.data.container.TensorContainer;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
 import nz.ac.waikato.cms.adams.multiway.data.tensor.Tensor;
@@ -122,7 +123,7 @@ public class SpreadSheetTo2DTensor
    */
   @Override
   public Class generates() {
-    return Tensor.class;
+    return TensorContainer.class;
   }
 
   /**
@@ -133,7 +134,7 @@ public class SpreadSheetTo2DTensor
    */
   @Override
   protected Object doConvert() throws Exception {
-    Tensor		result;
+    TensorContainer	result;
     SpreadSheet		sheet;
     int[]		cols;
     double[][]		tdata;
@@ -151,7 +152,8 @@ public class SpreadSheetTo2DTensor
       for (x = 0; x < cols.length; x++)
 	tdata[y][x] = sheet.getCell(y, x).toDouble();
     }
-    result = Tensor.create(tdata);
+    result = new TensorContainer();
+    result.setContent(Tensor.create(tdata));
 
     return result;
   }

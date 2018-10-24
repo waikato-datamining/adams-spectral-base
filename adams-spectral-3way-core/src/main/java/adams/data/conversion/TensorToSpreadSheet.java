@@ -20,6 +20,7 @@
 
 package adams.data.conversion;
 
+import adams.data.container.TensorContainer;
 import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
@@ -69,7 +70,7 @@ public class TensorToSpreadSheet
    */
   @Override
   public Class accepts() {
-    return Tensor.class;
+    return TensorContainer.class;
   }
 
   /**
@@ -176,7 +177,7 @@ public class TensorToSpreadSheet
     SpreadSheet		result;
     Tensor		tensor;
 
-    tensor = (Tensor) m_Input;
+    tensor = ((TensorContainer) m_Input).getContent();
     switch (tensor.order()) {
       case 1:
         result = convert(tensor.toArray1d());
