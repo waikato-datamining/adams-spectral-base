@@ -1,0 +1,191 @@
+/*
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * TensorToThreeWayData.java
+ * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ */
+
+package adams.data.conversion;
+
+import adams.data.container.TensorContainer;
+import adams.data.threeway.L1Point;
+import adams.data.threeway.L2Point;
+import adams.data.threeway.ThreeWayData;
+import nz.ac.waikato.cms.adams.multiway.data.tensor.Tensor;
+
+/**
+ <!-- globalinfo-start -->
+ * Turns a Tensor data structure into a ThreeWayData one.
+ * <br><br>
+ <!-- globalinfo-end -->
+ *
+ <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * </pre>
+ *
+ <!-- options-end -->
+ *
+ * @author FracPete (fracpete at waikato dot ac dot nz)
+ */
+public class TensorToThreeWayData
+  extends AbstractConversion {
+
+  private static final long serialVersionUID = 2147610596038601776L;
+
+  /**
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
+   */
+  @Override
+  public String globalInfo() {
+    return "Turns a Tensor data structure into a ThreeWayData one.";
+  }
+
+  /**
+   * Returns the class that is accepted as input.
+   *
+   * @return		the class
+   */
+  @Override
+  public Class accepts() {
+    return TensorContainer.class;
+  }
+
+  /**
+   * Returns the class that is generated as output.
+   *
+   * @return		the class
+   */
+  @Override
+  public Class generates() {
+    return ThreeWayData.class;
+  }
+
+  /**
+   * Converts the 1-D tensor data.
+   *
+   * @param data	the tensor data
+   * @return		the generated 3-way data
+   */
+  protected ThreeWayData convert(double[] data) {
+    ThreeWayData	result;
+    int 		x;
+    L1Point		l1;
+    L2Point		l2;
+
+    result = new ThreeWayData();
+    l1 = new L1Point(0, 0);
+    result.add(l1);
+    for (x = 0; x < data.length; x++) {
+      l2 = new L2Point(x, data[x]);
+      l1.add(l2);
+    }
+
+    return result;
+  }
+
+  /**
+   * Converts the 2-D tensor data.
+   *
+   * @param data	the tensor data
+   * @return		the generated 3-way data
+   */
+  protected ThreeWayData convert(double[][] data) {
+    ThreeWayData	result;
+    int 		x;
+    int 		y;
+    L1Point		l1;
+    L2Point		l2;
+
+    // TODO swap x and y?
+    result = new ThreeWayData();
+    if (data.length > 0) {
+      for (y = 0; y < data.length; y++) {
+	l1 = new L1Point(0, y);
+	result.add(l1);
+	for (x = 0; x < data[y].length; x++) {
+	  l2 = new L2Point(x, data[y][x]);
+	  l1.add(l2);
+	}
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Converts the 3-D tensor data.
+   *
+   * @param data	the tensor data
+   * @return		the generated 3-way data
+   */
+  protected ThreeWayData convert(double[][][] data) {
+    ThreeWayData	result;
+    int 		x;
+    int 		y;
+    int 		z;
+    L1Point		l1;
+    L2Point		l2;
+
+    result = new ThreeWayData();
+    for (x = 0; x < data.length; x++) {
+      for (y = 0; y < data[x].length; y++) {
+        l1 = new L1Point(x, y);
+        result.add(l1);
+	for (z = 0; z < data[x][y].length; x++) {
+	  l2 = new L2Point(z, data[x][y][z]);
+	  l1.add(l2);
+	}
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Performs the actual conversion.
+   *
+   * @return		the converted data
+   * @throws Exception	if something goes wrong with the conversion
+   */
+  @Override
+  protected Object doConvert() throws Exception {
+    ThreeWayData	result;
+    Tensor		tensor;
+
+    tensor = ((TensorContainer) m_Input).getContent();
+    switch (tensor.order()) {
+      case 1:
+        result = convert(tensor.toArray1d());
+        break;
+      case 2:
+        result = convert(tensor.toArray2d());
+        break;
+      case 3:
+        result = convert(tensor.toArray3d());
+        break;
+      default:
+        throw new IllegalStateException("Unhandled tensor order: " + tensor.order());
+    }
+
+    result.getReport().mergeWith(((TensorContainer) m_Input).getReport());
+
+    return result;
+  }
+}
