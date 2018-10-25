@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumFeatureGenerator.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrum;
@@ -34,12 +34,12 @@ import adams.data.report.Report;
 
 import java.lang.reflect.Array;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Abstract base class for {@link Spectrum} feature generation.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 9700 $
  */
 public abstract class AbstractSpectrumFeatureGenerator
   extends AbstractOptionHandler
@@ -354,17 +354,23 @@ public abstract class AbstractSpectrumFeatureGenerator
     report = spectrum.getReport();
     for (i = 0; i < m_Fields.length; i++) {
       if (report.hasValue(m_Fields[i])) {
-	switch (m_Fields[i].getDataType()) {
-	  case NUMERIC:
-	    data.add(report.getDoubleValue(m_Fields[i]));
-	    break;
-	  case BOOLEAN:
-	    data.add(report.getBooleanValue(m_Fields[i]));
-	    break;
-	  default:
-	    data.add(report.getStringValue(m_Fields[i]));
-	    break;
-	}
+        try {
+          switch (m_Fields[i].getDataType()) {
+            case NUMERIC:
+              data.add(report.getDoubleValue(m_Fields[i]));
+              break;
+            case BOOLEAN:
+              data.add(report.getBooleanValue(m_Fields[i]));
+              break;
+            default:
+              data.add(report.getStringValue(m_Fields[i]));
+              break;
+          }
+        }
+        catch (Exception e) {
+          getLogger().log(Level.SEVERE, "Failed to retrieve field '" + m_Fields[i] + "'!", e);
+          data.add(null);
+        }
       }
       else {
 	data.add(null);
