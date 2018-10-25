@@ -35,6 +35,7 @@ import adams.data.threeway.ThreeWayData;
 
 import java.lang.reflect.Array;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Abstract base class for ThreeWayData feature generation.
@@ -308,16 +309,22 @@ public abstract class AbstractThreeWayDataFeatureGenerator
     report = data.getReport();
     for (i = 0; i < m_Fields.length; i++) {
       if (report.hasValue(m_Fields[i])) {
-        switch (m_Fields[i].getDataType()) {
-          case NUMERIC:
-            generated.add(report.getDoubleValue(m_Fields[i]));
-            break;
-          case BOOLEAN:
-            generated.add(report.getBooleanValue(m_Fields[i]));
-            break;
-          default:
-            generated.add(report.getStringValue(m_Fields[i]));
-            break;
+        try {
+          switch (m_Fields[i].getDataType()) {
+            case NUMERIC:
+              generated.add(report.getDoubleValue(m_Fields[i]));
+              break;
+            case BOOLEAN:
+              generated.add(report.getBooleanValue(m_Fields[i]));
+              break;
+            default:
+              generated.add(report.getStringValue(m_Fields[i]));
+              break;
+          }
+        }
+        catch (Exception e) {
+          getLogger().log(Level.SEVERE, "Failed to retrieve field '" + m_Fields[i] + "'!", e);
+          generated.add(null);
         }
       }
       else {
