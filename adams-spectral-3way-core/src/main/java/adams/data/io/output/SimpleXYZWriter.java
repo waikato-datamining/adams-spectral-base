@@ -21,6 +21,8 @@
 package adams.data.io.output;
 
 import adams.core.Utils;
+import adams.core.io.PlaceholderFile;
+import adams.data.CompressionSupporter;
 import adams.data.io.input.SimpleXYZReader;
 import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.HeaderRow;
@@ -68,7 +70,8 @@ import java.util.logging.Level;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SimpleXYZWriter
-  extends AbstractThreeWayDataWriter {
+  extends AbstractThreeWayDataWriter
+  implements CompressionSupporter {
 
   private static final long serialVersionUID = 5576166671141967708L;
 
@@ -77,6 +80,9 @@ public class SimpleXYZWriter
 
   /** whether to output the sample data as well. */
   protected boolean m_OutputSampleData;
+
+  /** whether to use compression. */
+  protected boolean m_UseCompression;
 
   /**
    * Returns a string describing the object.
@@ -101,6 +107,10 @@ public class SimpleXYZWriter
 
     m_OptionManager.add(
       "output-sample-data", "outputSampleData",
+      false);
+
+    m_OptionManager.add(
+      "use-compression", "useCompression",
       false);
   }
 
@@ -165,6 +175,35 @@ public class SimpleXYZWriter
    */
   public String outputSampleDataTipText() {
     return "If set to true, the sample data gets stored in the file as well (as comment).";
+  }
+
+  /**
+   * Sets whether to use compression.
+   *
+   * @param value	true if to use compression
+   */
+  public void setUseCompression(boolean value) {
+    m_UseCompression = value;
+    reset();
+  }
+
+  /**
+   * Returns whether compression is in use.
+   *
+   * @return 		true if compression is used
+   */
+  public boolean getUseCompression() {
+    return m_UseCompression;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return tip text for this property suitable for displaying in the GUI or
+   *         for listing the options.
+   */
+  public String useCompressionTipText() {
+    return "If enabled, the spectrum is compressed using GZIP and appending '.gz' to the filename.";
   }
 
   /**
@@ -256,6 +295,8 @@ public class SimpleXYZWriter
     writer.setQuoteCharacter("");
     writer.setSeparator(m_Separator);
     writer.setOutputComments(m_OutputSampleData);
+    if (m_UseCompression && !m_Output.getName().toLowerCase().endsWith(".gz"))
+      m_Output = new PlaceholderFile(m_Output.getAbsolutePath() + ".gz");
     return writer.write(sheet, m_Output);
   }
 }
