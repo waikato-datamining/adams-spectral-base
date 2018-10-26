@@ -13,21 +13,21 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectrumFeatureGenerator.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2018 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
+import adams.data.spectrum.AbstractSpectrumFeatureGenerator;
+import adams.data.spectrum.Amplitudes;
+import adams.data.spectrum.Spectrum;
 import adams.flow.core.Token;
 import adams.flow.provenance.ActorType;
 import adams.flow.provenance.Provenance;
 import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
-import adams.data.spectrum.AbstractSpectrumFeatureGenerator;
-import adams.data.spectrum.Amplitudes;
-import adams.data.spectrum.Spectrum;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,10 +84,10 @@ import java.util.Hashtable;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 7306 $
  */
 public class SpectrumFeatureGenerator
-  extends AbstractTransformer {
+  extends AbstractTransformer
+  implements FeatureGenerator<AbstractSpectrumFeatureGenerator> {
 
   /** for serialization. */
   private static final long serialVersionUID = -7637423921443102660L;

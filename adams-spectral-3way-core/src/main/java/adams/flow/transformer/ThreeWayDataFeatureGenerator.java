@@ -28,7 +28,6 @@ import adams.flow.provenance.ActorType;
 import adams.flow.provenance.Provenance;
 import adams.flow.provenance.ProvenanceContainer;
 import adams.flow.provenance.ProvenanceInformation;
-import adams.flow.provenance.ProvenanceSupporter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,7 +94,7 @@ import java.util.Hashtable;
  */
 public class ThreeWayDataFeatureGenerator
   extends AbstractTransformer
-  implements ProvenanceSupporter {
+  implements FeatureGenerator<AbstractThreeWayDataFeatureGenerator> {
 
   /** for serialization. */
   private static final long serialVersionUID = -1998955116780561587L;
