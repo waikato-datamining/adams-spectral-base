@@ -20,9 +20,13 @@
 
 package adams.flow.transformer;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.QuickInfoHelper;
+import adams.core.VariableName;
 import adams.data.threeway.ThreeWayData;
 import adams.data.threewayfeatures.AbstractThreeWayDataFeatureGenerator;
+import adams.event.VariableChangeEvent;
+import adams.event.VariableChangeEvent.Type;
 import adams.flow.core.Token;
 import adams.flow.provenance.ActorType;
 import adams.flow.provenance.Provenance;
@@ -102,8 +106,17 @@ public class ThreeWayDataFeatureGenerator
   /** the key for storing the current objects in the backup. */
   public final static String BACKUP_QUEUE = "queue";
 
+  /** the key for storing the current algorithm in the backup. */
+  public final static String BACKUP_ALGORITHM = "algorithm";
+
   /** the algorithm to apply to the image. */
   protected AbstractThreeWayDataFeatureGenerator m_Algorithm;
+
+  /** the actual algorithm to apply to the image. */
+  protected transient AbstractThreeWayDataFeatureGenerator m_ActualAlgorithm;
+
+  /** the variable to listen to. */
+  protected VariableName m_VariableName;
 
   /** the generated objects. */
   protected ArrayList m_Queue;
@@ -130,6 +143,10 @@ public class ThreeWayDataFeatureGenerator
     m_OptionManager.add(
       "algorithm", "algorithm",
       new adams.data.threewayfeatures.Min());
+
+    m_OptionManager.add(
+      "var-name", "variableName",
+      new VariableName());
   }
 
   /**
@@ -150,6 +167,7 @@ public class ThreeWayDataFeatureGenerator
     super.reset();
 
     m_Queue.clear();
+    m_ActualAlgorithm = null;
   }
 
   /**
@@ -182,13 +200,47 @@ public class ThreeWayDataFeatureGenerator
   }
 
   /**
+   * Sets the name of the variable to monitor.
+   *
+   * @param value	the name
+   */
+  public void setVariableName(VariableName value) {
+    m_VariableName = value;
+    reset();
+  }
+
+  /**
+   * Returns the name of the variable to monitor.
+   *
+   * @return		the name
+   */
+  public VariableName getVariableName() {
+    return m_VariableName;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String variableNameTipText() {
+    return "The variable to monitor for resetting trainable batch filters.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "algorithm", m_Algorithm);
+    String  	result;
+
+    result = QuickInfoHelper.toString(this, "algorithm", m_Algorithm, "algorithm: ");
+    result += QuickInfoHelper.toString(this, "variableName", m_VariableName.paddedValue(), ", monitor: ");
+
+    return result;
   }
 
   /**
@@ -199,6 +251,7 @@ public class ThreeWayDataFeatureGenerator
     super.pruneBackup();
 
     pruneBackup(BACKUP_QUEUE);
+    pruneBackup(BACKUP_ALGORITHM);
   }
 
   /**
@@ -213,6 +266,8 @@ public class ThreeWayDataFeatureGenerator
     result = super.backupState();
 
     result.put(BACKUP_QUEUE, m_Queue);
+    if (m_ActualAlgorithm != null)
+      result.put(BACKUP_ALGORITHM, m_ActualAlgorithm);
 
     return result;
   }
@@ -228,8 +283,29 @@ public class ThreeWayDataFeatureGenerator
       m_Queue = (ArrayList) state.get(BACKUP_QUEUE);
       state.remove(BACKUP_QUEUE);
     }
+    if (state.containsKey(BACKUP_ALGORITHM)) {
+      m_ActualAlgorithm = (AbstractThreeWayDataFeatureGenerator) state.get(BACKUP_ALGORITHM);
+      state.remove(BACKUP_ALGORITHM);
+    }
 
     super.restoreState(state);
+  }
+
+  /**
+   * Gets triggered when a variable changed (added, modified, removed).
+   *
+   * @param e		the event
+   */
+  @Override
+  public void variableChanged(VariableChangeEvent e) {
+    super.variableChanged(e);
+    if ((e.getType() == Type.MODIFIED) || (e.getType() == Type.ADDED)) {
+      if (e.getName().equals(m_VariableName.getValue())) {
+	m_ActualAlgorithm = null;
+	if (isLoggingEnabled())
+	  getLogger().info("Reset 'algorithm'");
+      }
+    }
   }
 
   /**
@@ -268,7 +344,9 @@ public class ThreeWayDataFeatureGenerator
     m_Queue.clear();
     try {
       data = m_InputToken.getPayload(ThreeWayData.class);
-      m_Queue.addAll(Arrays.asList(m_Algorithm.generate(data)));
+      if (m_ActualAlgorithm == null)
+        m_ActualAlgorithm = ObjectCopyHelper.copyObject(m_Algorithm);
+      m_Queue.addAll(Arrays.asList(m_ActualAlgorithm.generate(data)));
     }
     catch (Exception e) {
       result = handleException("Failed to generate features: ", e);

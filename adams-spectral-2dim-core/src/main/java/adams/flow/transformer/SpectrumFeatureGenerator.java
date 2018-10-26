@@ -19,10 +19,14 @@
  */
 package adams.flow.transformer;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.QuickInfoHelper;
+import adams.core.VariableName;
 import adams.data.spectrum.AbstractSpectrumFeatureGenerator;
 import adams.data.spectrum.Amplitudes;
 import adams.data.spectrum.Spectrum;
+import adams.event.VariableChangeEvent;
+import adams.event.VariableChangeEvent.Type;
 import adams.flow.core.Token;
 import adams.flow.provenance.ActorType;
 import adams.flow.provenance.Provenance;
@@ -95,8 +99,17 @@ public class SpectrumFeatureGenerator
   /** the key for storing the current objects in the backup. */
   public final static String BACKUP_QUEUE = "queue";
 
+  /** the key for storing the current algorithm in the backup. */
+  public final static String BACKUP_ALGORITHM = "algorithm";
+
   /** the feature generator to use. */
   protected AbstractSpectrumFeatureGenerator m_Algorithm;
+
+  /** the actual algorithm to apply to the image. */
+  protected transient AbstractSpectrumFeatureGenerator m_ActualAlgorithm;
+
+  /** the variable to listen to. */
+  protected VariableName m_VariableName;
 
   /** the generated objects. */
   protected ArrayList m_Queue;
@@ -121,8 +134,12 @@ public class SpectrumFeatureGenerator
     super.defineOptions();
 
     m_OptionManager.add(
-	    "algorithm", "algorithm",
-	    new Amplitudes());
+      "algorithm", "algorithm",
+      new Amplitudes());
+
+    m_OptionManager.add(
+      "var-name", "variableName",
+      new VariableName());
   }
 
   /**
@@ -143,6 +160,7 @@ public class SpectrumFeatureGenerator
     super.reset();
     
     m_Queue.clear();
+    m_ActualAlgorithm = null;
   }
 
   /**
@@ -175,13 +193,47 @@ public class SpectrumFeatureGenerator
   }
 
   /**
+   * Sets the name of the variable to monitor.
+   *
+   * @param value	the name
+   */
+  public void setVariableName(VariableName value) {
+    m_VariableName = value;
+    reset();
+  }
+
+  /**
+   * Returns the name of the variable to monitor.
+   *
+   * @return		the name
+   */
+  public VariableName getVariableName() {
+    return m_VariableName;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String variableNameTipText() {
+    return "The variable to monitor for resetting trainable batch filters.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   @Override
   public String getQuickInfo() {
-    return QuickInfoHelper.toString(this, "algorithm", m_Algorithm);
+    String  	result;
+
+    result = QuickInfoHelper.toString(this, "algorithm", m_Algorithm, "algorithm: ");
+    result += QuickInfoHelper.toString(this, "variableName", m_VariableName.paddedValue(), ", monitor: ");
+
+    return result;
   }
 
   /**
@@ -192,6 +244,7 @@ public class SpectrumFeatureGenerator
     super.pruneBackup();
 
     pruneBackup(BACKUP_QUEUE);
+    pruneBackup(BACKUP_ALGORITHM);
   }
 
   /**
@@ -206,6 +259,8 @@ public class SpectrumFeatureGenerator
     result = super.backupState();
 
     result.put(BACKUP_QUEUE, m_Queue);
+    if (m_ActualAlgorithm != null)
+      result.put(BACKUP_ALGORITHM, m_ActualAlgorithm);
 
     return result;
   }
@@ -221,8 +276,29 @@ public class SpectrumFeatureGenerator
       m_Queue = (ArrayList) state.get(BACKUP_QUEUE);
       state.remove(BACKUP_QUEUE);
     }
+    if (state.containsKey(BACKUP_ALGORITHM)) {
+      m_ActualAlgorithm = (AbstractSpectrumFeatureGenerator) state.get(BACKUP_ALGORITHM);
+      state.remove(BACKUP_ALGORITHM);
+    }
 
     super.restoreState(state);
+  }
+
+  /**
+   * Gets triggered when a variable changed (added, modified, removed).
+   *
+   * @param e		the event
+   */
+  @Override
+  public void variableChanged(VariableChangeEvent e) {
+    super.variableChanged(e);
+    if ((e.getType() == Type.MODIFIED) || (e.getType() == Type.ADDED)) {
+      if (e.getName().equals(m_VariableName.getValue())) {
+	m_ActualAlgorithm = null;
+	if (isLoggingEnabled())
+	  getLogger().info("Reset 'algorithm'");
+      }
+    }
   }
 
   /**
@@ -259,7 +335,9 @@ public class SpectrumFeatureGenerator
 
     m_Queue.clear();
     try {
-      m_Queue.addAll(Arrays.asList(m_Algorithm.generate((Spectrum) m_InputToken.getPayload())));
+      if (m_ActualAlgorithm == null)
+        m_ActualAlgorithm = ObjectCopyHelper.copyObject(m_Algorithm);
+      m_Queue.addAll(Arrays.asList(m_ActualAlgorithm.generate((Spectrum) m_InputToken.getPayload())));
     }
     catch (Exception e) {
       result = handleException("Failed to generate features: ", e);
