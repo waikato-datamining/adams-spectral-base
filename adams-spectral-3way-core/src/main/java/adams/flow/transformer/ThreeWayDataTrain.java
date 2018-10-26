@@ -226,6 +226,8 @@ public class ThreeWayDataTrain
     if (result == null) {
       try {
         m_CurrentAlgorithm = (AbstractAlgorithm) OptionUtils.shallowCopy(m_Algorithm);
+        if (isLoggingEnabled())
+          getLogger().info("Algorithm: " + OptionUtils.getCommandLine(m_CurrentAlgorithm));
 	if (m_CurrentAlgorithm instanceof UnsupervisedAlgorithm) {
 	  ((UnsupervisedAlgorithm) m_CurrentAlgorithm).build(tensorUnsuper);
 	  if (!isStopped())
