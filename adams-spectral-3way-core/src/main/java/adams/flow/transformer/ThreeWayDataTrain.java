@@ -20,9 +20,9 @@
 
 package adams.flow.transformer;
 
-import adams.core.ObjectCopyHelper;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.core.option.OptionUtils;
 import adams.data.container.TensorContainer;
 import adams.flow.container.ThreeWayDataModelContainer;
 import adams.flow.core.Token;
@@ -225,7 +225,7 @@ public class ThreeWayDataTrain
 
     if (result == null) {
       try {
-        m_CurrentAlgorithm = ObjectCopyHelper.copyObject(m_Algorithm);
+        m_CurrentAlgorithm = (AbstractAlgorithm) OptionUtils.shallowCopy(m_Algorithm);
 	if (m_CurrentAlgorithm instanceof UnsupervisedAlgorithm) {
 	  ((UnsupervisedAlgorithm) m_CurrentAlgorithm).build(tensorUnsuper);
 	  if (!isStopped())
