@@ -422,6 +422,11 @@ public class ThreeWayDataModelFilter
     String		result;
     MessageCollection errors;
 
+    if (m_ResetModel) {
+      m_ModelLoader.reset();
+      m_ResetModel = false;
+    }
+
     result = null;
     errors = new MessageCollection();
     m_ActualModel = m_ModelLoader.getModel(errors);
@@ -435,8 +440,6 @@ public class ThreeWayDataModelFilter
         result = "Model is not an instance of " + Utils.classToString(Filter.class);
     }
 
-    m_ResetModel = false;
-
     return result;
   }
 
@@ -448,8 +451,11 @@ public class ThreeWayDataModelFilter
   @Override
   public void variableChanged(VariableChangeEvent e) {
     super.variableChanged(e);
-    if (e.getName().equals(m_ModelResetVariable.getValue()))
+    if (e.getName().equals(m_ModelResetVariable.getValue())) {
       m_ResetModel = true;
+      if (isLoggingEnabled())
+        getLogger().info("Reset 'model'");
+    }
   }
 
   /**
