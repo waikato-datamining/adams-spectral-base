@@ -55,6 +55,17 @@
 %\listoftables
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+The \textit{adams-spectral-3way-core} provides a framework for reading,
+viewing, processing and saving multiway data, such as 3D fluorescence spectra.
+
+In order to process 3-dimensional data, it makes use of the
+\textit{multiway-algorithms} library\cite{multiway}. This library offers
+algorithms like PARAFAC\footnote{\url{https://www.sciencedirect.com/science/article/pii/S0169743997000324}{}}
+and Multi-linear PLS\footnote{\url{https://onlinelibrary.wiley.com/doi/abs/10.1002/\%28SICI\%291099-128X\%28199601\%2910\%3A1\%3C47\%3A\%3AAID-CEM400\%3E3.0.CO\%3B2-C}{}}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Flow}
 The following transformers are available:
 \begin{tight_itemize}
@@ -94,8 +105,7 @@ The following transformers are available:
 \section{Heatmap Viewer}
 The \textit{3-way data heatmap viewer} allows you to explore 3-way data files,
 by loading and filtering them. The displayed view is a heatmap generated from
-the summed data values of the Z layers that are defined by the supplied min
-and max values. See Figure \ref{heatmapviewer}.
+the selected X layer. See Figure \ref{heatmapviewer}.
 
 \begin{figure}[htb]
   \centering
