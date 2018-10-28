@@ -171,7 +171,7 @@ public class SimpleXYZReader
    */
   @Override
   public String[] getFormatExtensions() {
-    return new String[]{"csv"};
+    return new String[]{"csv", "csv.gz"};
   }
 
   /**
