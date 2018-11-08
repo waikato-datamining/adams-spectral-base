@@ -112,6 +112,9 @@ public class SpectrumPanel
   /** the maximum number of columns for the tooltip. */
   protected int m_ToolTipMaxColumns;
 
+  /** the maximum number of rows for the tooltip. */
+  protected int m_ToolTipMaxRows;
+
   /** the zoom overview panel. */
   protected SpectrumZoomOverviewPanel m_PanelZoomOverview;
 
@@ -210,6 +213,7 @@ public class SpectrumPanel
     props = getProperties();
 
     m_ToolTipMaxColumns = props.getInteger("Plot.ToolTip.MaxColumns", 80);
+    m_ToolTipMaxRows = props.getInteger("Plot.ToolTip.MaxRows", 40);
 
     panel = new JPanel();
     panel.setMinimumSize(new Dimension(1, props.getInteger("Axis.Bottom.Width", 0)));
@@ -554,11 +558,11 @@ public class SpectrumPanel
 			0,
 			false);
 
-    hit = (String) m_SpectrumPointHitDetector.detect(event);
+    hit = m_SpectrumPointHitDetector.detect(event);
     if (hit != null)
       result += hit;
 
-    result = GUIHelper.processTipText(result, m_ToolTipMaxColumns);
+    result = GUIHelper.processTipText(result, m_ToolTipMaxColumns, m_ToolTipMaxRows);
 
     return result;
   }
