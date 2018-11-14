@@ -83,6 +83,11 @@ import adams.data.threeway.ThreeWayData;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
+ * <pre>-denormalize &lt;boolean&gt; (property: denormalize)
+ * &nbsp;&nbsp;&nbsp;If enabled, the amplitudes get denormalized using the 'Normalized by ' value.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -94,11 +99,16 @@ public class SimpleEEMReader
 
   public static final String PREFIX_INFO = "Info-";
 
+  public static final String PREFIX_NORMALIZED_BY = "Normalized by ";
+
   /** the X value to use for the 3-way data. */
   protected double m_X;
 
   /** whether to ignore the wavenumbers in the file and just use column indices. */
   protected boolean m_IgnoreWaveNumbers;
+
+  /** whether to denormalize the data using the "Normalized by " value. */
+  protected boolean m_Denormalize;
 
   /**
    * Returns a string describing the object.
@@ -123,6 +133,10 @@ public class SimpleEEMReader
 
     m_OptionManager.add(
       "ignore-wave-numbers", "ignoreWaveNumbers",
+      false);
+
+    m_OptionManager.add(
+      "denormalize", "denormalize",
       false);
   }
 
@@ -185,6 +199,35 @@ public class SimpleEEMReader
   }
 
   /**
+   * Sets whether to denormalize the amplitudes using the 'Normalized by ' value.
+   *
+   * @param value	true if to denormalize
+   */
+  public void setDenormalize(boolean value) {
+    m_Denormalize = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to denormalize the amplitudes using the 'Normalized by ' value.
+   *
+   * @return		true if to denormalize
+   */
+  public boolean getDenormalize() {
+    return m_Denormalize;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String denormalizeTipText() {
+    return "If enabled, the amplitudes get denormalized using the 'Normalized by ' value.";
+  }
+
+  /**
    * Returns a string describing the format (used in the file chooser).
    *
    * @return 			a description suitable for displaying in the
@@ -218,6 +261,9 @@ public class SimpleEEMReader
     Row				header;
     int				i;
     int				rowIdx;
+    String			content;
+    double			denorm;
+    double			value;
 
     data   = new ThreeWayData();
     data.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
@@ -227,9 +273,19 @@ public class SimpleEEMReader
 
     // remove "nm" and "Normalized by ..." -- TODO in report?
     i = 0;
+    denorm = 1.0;
     while (!sheet.getCell(0, 0).isNumeric()) {
       i++;
-      data.getReport().setStringValue(PREFIX_INFO + i, sheet.getCell(0, 0).getContent());
+      content = sheet.getCell(0, 0).getContent();
+      if (content.startsWith(PREFIX_NORMALIZED_BY)) {
+	denorm = Double.parseDouble(content.substring(PREFIX_NORMALIZED_BY.length()));
+	data.getReport().setNumericValue(PREFIX_NORMALIZED_BY.trim(), denorm);
+	if (isLoggingEnabled())
+	  getLogger().info("Denormalizing factor: " + denorm);
+      }
+      else {
+	data.getReport().setStringValue(PREFIX_INFO + i, content);
+      }
       sheet.removeRow(0);
     }
 
@@ -241,9 +297,12 @@ public class SimpleEEMReader
       l1.setY(m_IgnoreWaveNumbers ? rowIdx : row.getCell(0).toDouble()); // Y
       data.add(l1);
       for (i = 1; i < sheet.getColumnCount(); i++) {
+        value = row.getCell(i).toDouble();
+        if (m_Denormalize)
+          value = value * denorm;
 	l2 = new L2Point(
-	  m_IgnoreWaveNumbers ? i : header.getCell(i).toDouble(),        // Z
-	  row.getCell(i).toDouble());                                    // value
+	  m_IgnoreWaveNumbers ? i : header.getCell(i).toDouble(),       // Z
+	  value);                                    			// value
 	l1.add(l2);
       }
       rowIdx++;
