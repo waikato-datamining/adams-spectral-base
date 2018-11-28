@@ -124,7 +124,8 @@ public class FieldInstanceGeneratorWithClass
     Instance		result;
     double[]		values;
     int			index;
-    SampleData report;
+    SampleData 		report;
+    Object		obj;
 
     values = new double[m_OutputHeader.numAttributes()];
     report = data.getReport();
@@ -135,12 +136,19 @@ public class FieldInstanceGeneratorWithClass
 	index = m_OutputHeader.attribute(ArffUtils.getFieldName(target)).index();
 	values[index] = weka.core.Utils.missingValue();
 	if (report.hasValue(target)) {
-	  if (target.getDataType() == DataType.NUMERIC)
-	    values[index] = report.getDoubleValue(target);
-	  else if (target.getDataType() == DataType.BOOLEAN)
-	    values[index] = m_OutputHeader.attribute(index).indexOfValue((report.getBooleanValue(target) ? LABEL_TRUE : LABEL_FALSE));
-	  else
+	  if (target.getDataType() == DataType.NUMERIC) {
+	    obj = report.getDoubleValue(target);
+	    if (obj != null)
+	      values[index] = (Double) obj;
+	  }
+	  else if (target.getDataType() == DataType.BOOLEAN) {
+	    obj = report.getBooleanValue(target);
+	    if (obj != null)
+	      values[index] = m_OutputHeader.attribute(index).indexOfValue(((Boolean) obj ? LABEL_TRUE : LABEL_FALSE));
+	  }
+	  else {
 	    values[index] = m_OutputHeader.attribute(index).addStringValue("" + report.getValue(target));
+	  }
 	}
       }
     }

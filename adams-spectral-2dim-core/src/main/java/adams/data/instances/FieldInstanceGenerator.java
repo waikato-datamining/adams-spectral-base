@@ -15,7 +15,7 @@
 
 /*
  * SampleDataInstanceGenerator.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -80,7 +80,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class FieldInstanceGenerator
   extends AbstractFieldInstanceGenerator {
@@ -109,7 +108,7 @@ public class FieldInstanceGenerator
     ArrayList<String>		attValues;
     StringBuilder		name;
 
-    atts = new ArrayList<Attribute>();
+    atts = new ArrayList<>();
 
     // fields
     name = new StringBuilder();
@@ -118,7 +117,7 @@ public class FieldInstanceGenerator
 	atts.add(new Attribute(ArffUtils.getFieldName(field)));
       }
       else if (field.getDataType() == DataType.BOOLEAN) {
-	attValues = new ArrayList<String>();
+	attValues = new ArrayList<>();
 	attValues.add(LABEL_FALSE);
 	attValues.add(LABEL_TRUE);
 	atts.add(new Attribute(ArffUtils.getFieldName(field), attValues));
@@ -145,6 +144,7 @@ public class FieldInstanceGenerator
     double[]		values;
     int			index;
     SampleData		report;
+    Object		obj;
 
     values = new double[m_OutputHeader.numAttributes()];
     report = data.getReport();
@@ -155,12 +155,19 @@ public class FieldInstanceGenerator
 	index = m_OutputHeader.attribute(ArffUtils.getFieldName(target)).index();
 	values[index] = weka.core.Utils.missingValue();
 	if (report.hasValue(target)) {
-	  if (target.getDataType() == DataType.NUMERIC)
-	    values[index] = report.getDoubleValue(target);
-	  else if (target.getDataType() == DataType.BOOLEAN)
-	    values[index] = m_OutputHeader.attribute(index).indexOfValue((report.getBooleanValue(target) ? LABEL_TRUE : LABEL_FALSE));
-	  else
+	  if (target.getDataType() == DataType.NUMERIC) {
+	    obj = report.getDoubleValue(target);
+	    if (obj != null)
+	      values[index] = (Double) obj;
+	  }
+	  else if (target.getDataType() == DataType.BOOLEAN) {
+	    obj = report.getBooleanValue(target);
+	    if (obj != null)
+	      values[index] = m_OutputHeader.attribute(index).indexOfValue(((Boolean) obj ? LABEL_TRUE : LABEL_FALSE));
+	  }
+	  else {
 	    values[index] = m_OutputHeader.attribute(index).addStringValue("" + report.getValue(target));
+	  }
 	}
       }
     }
