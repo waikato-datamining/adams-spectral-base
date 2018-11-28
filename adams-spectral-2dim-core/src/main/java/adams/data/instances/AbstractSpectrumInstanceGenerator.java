@@ -329,6 +329,7 @@ public abstract class AbstractSpectrumInstanceGenerator
     int		index;
     SampleData	sampledata;
     String	prefix;
+    Object	obj;
 
     values     = inst.toDoubleArray();
     sampledata = data.getReport();
@@ -342,12 +343,19 @@ public abstract class AbstractSpectrumInstanceGenerator
       index         = m_OutputHeader.attribute(prefix + m_AdditionalFields[i].getName()).index();
       values[index] = weka.core.Utils.missingValue();
       if ((sampledata != null) && sampledata.hasValue(m_AdditionalFields[i])) {
-	if (m_AdditionalFields[i].getDataType() == DataType.NUMERIC)
-	  values[index] = sampledata.getDoubleValue(m_AdditionalFields[i]);
-	else if (m_AdditionalFields[i].getDataType() == DataType.BOOLEAN)
-	  values[index] = m_OutputHeader.attribute(index).indexOfValue(sampledata.getBooleanValue(m_AdditionalFields[i]) ? LABEL_TRUE : LABEL_FALSE);
-	else
-	  values[index] = m_OutputHeader.attribute(index).addStringValue("" + sampledata.getValue(m_AdditionalFields[i]));
+	if (m_AdditionalFields[i].getDataType() == DataType.NUMERIC) {
+	  obj = sampledata.getDoubleValue(m_AdditionalFields[i]);
+	  if (obj != null)
+	    values[index] = (Double) obj;
+        }
+	else if (m_AdditionalFields[i].getDataType() == DataType.BOOLEAN) {
+	  obj = sampledata.getBooleanValue(m_AdditionalFields[i]);
+	  if (obj != null)
+	    values[index] = m_OutputHeader.attribute(index).indexOfValue(((Boolean) obj) ? LABEL_TRUE : LABEL_FALSE);
+        }
+	else {
+          values[index] = m_OutputHeader.attribute(index).addStringValue("" + sampledata.getValue(m_AdditionalFields[i]));
+        }
       }
     }
 

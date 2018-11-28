@@ -299,6 +299,7 @@ public class SimpleInstanceGenerator
     int			index;
     SampleData		report;
     float		waveno;
+    Object		obj;
 
     values = new double[m_OutputHeader.numAttributes()];
     report = data.getReport();
@@ -320,10 +321,14 @@ public class SimpleInstanceGenerator
       values[values.length - 1] = weka.core.Utils.missingValue();
       if (report.hasValue(m_Field)) {
 	if (m_Field.getDataType() == DataType.NUMERIC) {
-          values[values.length - 1] = report.getDoubleValue(m_Field);
+	  obj = report.getDoubleValue(m_Field);
+	  if (obj != null)
+	    values[values.length - 1] = (Double) obj;
         }
 	else if (m_Field.getDataType() == DataType.BOOLEAN) {
-          values[values.length - 1] = m_OutputHeader.classAttribute().indexOfValue((report.getBooleanValue(m_Field) ? LABEL_TRUE : LABEL_FALSE));
+	  obj = report.getBooleanValue(m_Field);
+	  if (obj != null)
+	    values[values.length - 1] = m_OutputHeader.classAttribute().indexOfValue(((Boolean) obj ? LABEL_TRUE : LABEL_FALSE));
         }
 	else {
 	  if (m_ClassLabels.length == 0)
