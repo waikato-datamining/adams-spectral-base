@@ -23,6 +23,7 @@ package adams.db;
 
 import adams.core.DateFormat;
 import adams.core.DateUtils;
+import adams.core.Utils;
 import adams.core.base.BaseDouble;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
@@ -254,6 +255,21 @@ public abstract class SampleDataT
       // format is stored in spectrum
       if (key.getName().equals(SampleData.FORMAT))
 	continue;
+
+      // check numeric
+      if (key.getDataType() == DataType.NUMERIC) {
+        if (!Utils.isDouble("" + table.get(key))) {
+          getLogger().warning(id + ": '" + key.getName() + "' is not numeric: " + table.get(key));
+	  continue;
+	}
+      }
+      // check boolean
+      if (key.getDataType() == DataType.BOOLEAN) {
+        if (!Utils.isBoolean("" + table.get(key))) {
+          getLogger().warning(id + ": '" + key.getName() + "' is not boolean: " + table.get(key));
+	  continue;
+	}
+      }
 
       try {
 	if (names.contains(key.getName())) {
