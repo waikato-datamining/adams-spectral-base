@@ -33,6 +33,7 @@ import adams.gui.core.ClearableModel;
 import adams.gui.core.CustomSearchTableModel;
 import adams.gui.core.SearchParameters;
 
+import javax.swing.SwingUtilities;
 import java.util.List;
 
 /**
@@ -352,8 +353,10 @@ public class SelectSpectrumPanel
       new String[]{"sp.AUTO_ID", "sp.SAMPLEID", "sp.FORMAT"}, m_Conditions);
     m_TableDataModel.removeTableModelListener(m_TableData);
     m_TableDataModel = new TableModel(ids);
-    m_TableDataModel.addTableModelListener(m_TableData);
-    m_TableData.setModel(m_TableDataModel);
+    SwingUtilities.invokeLater(() -> {
+      m_TableDataModel.addTableModelListener(m_TableData);
+      m_TableData.setModel(m_TableDataModel);
+    });
   }
 
   /**
