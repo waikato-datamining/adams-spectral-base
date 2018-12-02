@@ -2,7 +2,7 @@
 # Format=NIR
 # Format\tDataType=S
 # Insert\ Timestamp=2000-01-01 00\:00\:00
-# Insert\ Timestamp\tDataType=U
+# Insert\ Timestamp\tDataType=S
 # Instrument=unknown
 # Instrument\tDataType=U
 # Parent\ ID=282
@@ -37,7 +37,7 @@ waveno,amplitude
 # Format=NIR
 # Format\tDataType=S
 # Insert\ Timestamp=2000-01-01 00\:00\:00
-# Insert\ Timestamp\tDataType=U
+# Insert\ Timestamp\tDataType=S
 # Instrument=unknown
 # Instrument\tDataType=U
 # Parent\ ID=282
@@ -72,7 +72,7 @@ waveno,amplitude
 # Format=NIR
 # Format\tDataType=S
 # Insert\ Timestamp=2000-01-01 00\:00\:00
-# Insert\ Timestamp\tDataType=U
+# Insert\ Timestamp\tDataType=S
 # Instrument=unknown
 # Instrument\tDataType=U
 # Parent\ ID=282
@@ -107,7 +107,7 @@ waveno,amplitude
 # Format=NIR
 # Format\tDataType=S
 # Insert\ Timestamp=2000-01-01 00\:00\:00
-# Insert\ Timestamp\tDataType=U
+# Insert\ Timestamp\tDataType=S
 # Instrument=unknown
 # Instrument\tDataType=U
 # Parent\ ID=282
