@@ -52,6 +52,7 @@ public class ThreeWayDataHeatmapViewerMultiPagePane
   protected void initGUI() {
     super.initGUI();
 
+    setMaxPageCloseUndo(10);
     setToolTipCustomizer(new ToolTipCustomizer() {
       @Override
       public String customizeToolTip(int index, String toolTip) {
