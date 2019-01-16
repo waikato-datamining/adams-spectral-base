@@ -15,7 +15,7 @@
 
 /*
  * SpectrumExplorer.java
- * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -545,6 +545,7 @@ public class SpectrumExplorer
       m_MenuItemRedo.setToolTipText(null);
     }
     m_MenuItemProcessFilter.setEnabled(dataLoaded);
+    m_MenuItemProcessICA.setEnabled(dataLoaded);
     m_MenuItemProcessPCA.setEnabled(dataLoaded);
     m_MenuItemProcessPLS.setEnabled(dataLoaded);
 
