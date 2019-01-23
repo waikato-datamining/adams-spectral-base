@@ -15,7 +15,7 @@
 
 /*
  * Evaluator.java
- * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -743,13 +743,15 @@ public class Evaluator
 	}
 
 	// process data
-	eval = null;
-	if (data != null) {
-	  m_ActualEvaluator.build(data);
-	}
-	else if (inst != null) {
-	  eval = m_ActualEvaluator.evaluate(inst);
-	}
+        synchronized(m_ActualEvaluator) {
+          eval = null;
+          if (data != null) {
+            m_ActualEvaluator.build(data);
+          }
+          else if (inst != null) {
+            eval = m_ActualEvaluator.evaluate(inst);
+          }
+        }
 
 	// generate output
 	if (cont != null) {
