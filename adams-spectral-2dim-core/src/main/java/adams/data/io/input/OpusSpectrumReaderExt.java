@@ -15,7 +15,7 @@
 
 /*
  * OpusSpectrumReaderExt.java
- * Copyright (C) 2016-2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -24,8 +24,6 @@ import adams.core.IEEE754;
 import adams.core.MessageCollection;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
-import adams.core.io.PlaceholderFile;
-import adams.core.logging.LoggingLevel;
 import adams.data.io.input.opus.OpusBlockHelper;
 import adams.data.io.input.opus.OpusBlockHelper.Block;
 import adams.data.io.input.opus.OpusBlockHelper.BlockDefinition;
@@ -35,7 +33,6 @@ import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
-import adams.env.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,6 +123,24 @@ import java.util.logging.Level;
  */
 public class OpusSpectrumReaderExt
   extends AbstractSpectrumReader {
+
+  public static final String FIELD_OPUS_FIRST_X = "Opus.FirstX";
+
+  public static final String FIELD_OPUS_LAST_X = "Opus.LastX";
+
+  public static final String FIELD_OPUS_NUM_POINTS = "Opus.NumPoints";
+
+  public static final String FIELD_OPUS_DIFF = "Opus.Diff";
+
+  public static final String FIELD_OPUS_SCALE = "Opus.Scale";
+
+  public static final String FIELD_OPUS_BLOCK_TYPE_DPF = "Opus.BlockType.DPF";
+
+  public static final String FIELD_OPUS_BLOCK_TYPE_HEX = "Opus.BlockType.Hex";
+
+  public static final String FIELD_OPUS_LOG = "Opus.Log";
+
+  public static final String PREFIX_OPUS = "Opus.";
 
   /** the hex mask for the spectrum to extract. */
   protected String m_SpectrumBlockType;
@@ -236,7 +251,8 @@ public class OpusSpectrumReaderExt
   public String spectrumBlockTypeTipText() {
     return
       "The block type of the spectrum to extract, in hex notation; e.g.: "
-	+ Integer.toHexString(OpusBlockHelper.BLOCKTYPE_MAIN_MASK);
+	+ Integer.toHexString(OpusBlockHelper.BLOCKTYPE_MAIN_MASK) + "; "
+	+ "the following report field contains this hex code: " + FIELD_OPUS_BLOCK_TYPE_HEX;
   }
 
   /**
@@ -492,13 +508,13 @@ public class OpusSpectrumReaderExt
 	if (isLoggingEnabled())
 	  getLogger().info("firstX=" + firstX + ", lastX=" + lastX + ", numPoints=" + numPoints + ", diff=" + diff + ", scale=" + scale);
 	sd = new SampleData();
-	addReportValue(sd, "Opus.FirstX", DataType.NUMERIC, firstX);
-	addReportValue(sd, "Opus.LastX", DataType.NUMERIC, lastX);
-	addReportValue(sd, "Opus.NumPoints", DataType.NUMERIC, numPoints);
-	addReportValue(sd, "Opus.Diff", DataType.NUMERIC, diff);
-	addReportValue(sd, "Opus.Scale", DataType.NUMERIC, scale);
-	addReportValue(sd, "Opus.BlockType.DPF", DataType.STRING, Integer.toHexString(data.get(i).getType()));
-	addReportValue(sd, "Opus.BlockType.Data", DataType.STRING, Integer.toHexString(data.get(i).getType()));
+	addReportValue(sd, FIELD_OPUS_FIRST_X, DataType.NUMERIC, firstX);
+	addReportValue(sd, FIELD_OPUS_LAST_X, DataType.NUMERIC, lastX);
+	addReportValue(sd, FIELD_OPUS_NUM_POINTS, DataType.NUMERIC, numPoints);
+	addReportValue(sd, FIELD_OPUS_DIFF, DataType.NUMERIC, diff);
+	addReportValue(sd, FIELD_OPUS_SCALE, DataType.NUMERIC, scale);
+	addReportValue(sd, FIELD_OPUS_BLOCK_TYPE_DPF, DataType.STRING, Integer.toHexString(data.get(i).getType()));
+	addReportValue(sd, FIELD_OPUS_BLOCK_TYPE_HEX, DataType.STRING, Integer.toHexString(data.get(i).getType() & OpusBlockHelper.BLOCKTYPE_SPEC_MASK));
 
 	if (hfl != null) {
 	  instrument = hfl.getText(OpusBlockHelper.INS, 8);
@@ -564,7 +580,7 @@ public class OpusSpectrumReaderExt
 	    index = (cmdline.getOperation().equals(m_Operation) ? "" : (i + 1) + ".");
 	    addReportValue(
 	      spec.getReport(),
-	      "Opus." + index + cmdline.getOperation() + "." + cmdline.getType() + "." + key,
+	      PREFIX_OPUS + index + cmdline.getOperation() + "." + cmdline.getType() + "." + key,
 	      (numeric ? DataType.NUMERIC : DataType.STRING),
 	      value);
 	  }
@@ -572,7 +588,7 @@ public class OpusSpectrumReaderExt
       }
       // log
       if (m_AddLog)
-	addReportValue(spec.getReport(), "Opus.Log", DataType.STRING, Utils.flatten(log, "\n"));
+	addReportValue(spec.getReport(), FIELD_OPUS_LOG, DataType.STRING, Utils.flatten(log, "\n"));
     }
   }
 
@@ -615,20 +631,5 @@ public class OpusSpectrumReaderExt
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to read '" + m_Input + "'!", e);
     }
-  }
-
-  public static void main(String[] args) {
-    Environment.setEnvironmentClass(Environment.class);
-    OpusSpectrumReaderExt reader = new OpusSpectrumReaderExt();
-    reader.setLoggingLevel(LoggingLevel.FINE);
-    String file;
-    //file = "/storm/research/backup/ravensdown/nir/data/2016-04-11/_TN/331776_P06_1107.0";
-    //file = "/storm/research/backup/ravensdown/nir/data/2016-04-11/_TN/P_253733.0";
-    file = "/storm/research/backup/ravensdown/nir/data/2016-04-11/_TN/482371_P08_0406.0";
-    //file = "/home/fracpete/temp/opus_nonsense/694_5459.0";
-    reader.setInput(new PlaceholderFile(file));
-    List<Spectrum> data = reader.read();
-    for (int i = 0; i < data.size(); i++)
-      System.out.println(i + ". " + data.get(i));
   }
 }
