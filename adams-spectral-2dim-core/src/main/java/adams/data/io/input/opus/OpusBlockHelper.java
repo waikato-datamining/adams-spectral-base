@@ -15,7 +15,7 @@
 
 /*
  * OpusBlockHelper.java
- * Copyright (C) 2016-2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input.opus;
@@ -40,7 +40,6 @@ import java.util.logging.Level;
  * Analyzer for Opus file blocks in the header.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class OpusBlockHelper {
 
@@ -48,10 +47,11 @@ public class OpusBlockHelper {
    * Container class for Opus block definitions in the header.
    *
    * @author FracPete (fracpete at waikato dot ac dot nz)
-   * @version $Revision$
    */
   public static class BlockDefinition
     implements Serializable {
+
+    private static final long serialVersionUID = 6868278200452543266L;
 
     /** the type of the block. */
     public int type;
@@ -80,10 +80,11 @@ public class OpusBlockHelper {
    * Convenience class for handling blocks.
    *
    * @author FracPete (fracpete at waikato dot ac dot nz)
-   * @version $Revision$
    */
   public static class Block
     extends LoggingObject {
+
+    private static final long serialVersionUID = -4560242675276674381L;
 
     /** the content of the file. */
     protected byte[] m_Buffer;
@@ -338,7 +339,7 @@ public class OpusBlockHelper {
      */
     @Override
     public String toString() {
-      return "definition=" + m_Definition + ", type=" + m_Type + ", name=" + m_Name + ", start=" + m_Start + ", end=" + m_End;
+      return "definition=" + m_Definition + ", type=" + m_Type + ", maskedTypeHex=" + Integer.toHexString(m_Type & BLOCKTYPE_SPEC_MASK) + ", name=" + m_Name + ", start=" + m_Start + ", end=" + m_End;
     }
   }
 
@@ -346,10 +347,11 @@ public class OpusBlockHelper {
    * Encapsulates and parses a commandline string.
    *
    * @author FracPete (fracpete at waikato dot ac dot nz)
-   * @version $Revision$
    */
   public static class CommandlineData
     extends LoggingObject {
+
+    private static final long serialVersionUID = -6105972232801231505L;
 
     /** the raw string. */
     protected String m_Raw;
