@@ -15,7 +15,7 @@
 
 /*
  * MPSSpectrumReader.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -157,6 +157,9 @@ public class MPSSpectrumReader
     zeroFit = 0.0;
     gainFit = 0.0;
     for (String line: lines) {
+      // empty?
+      if (line.trim().isEmpty())
+        continue;
       // meta-data?
       if (line.contains(SEPARATOR)) {
         parts = line.split(SEPARATOR);
