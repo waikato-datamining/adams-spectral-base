@@ -15,7 +15,7 @@
 
 /*
  * UpdateSampleDataPanel.java
- * Copyright (C) 2016-2017 FracPete (fracpete at gmail dot com)
+ * Copyright (C) 2016-2019 FracPete (fracpete at gmail dot com)
  *
  */
 
@@ -24,12 +24,14 @@ package adams.gui.tools;
 import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Properties;
+import adams.core.Utils;
 import adams.core.base.BaseDate;
 import adams.core.base.BaseDateTime;
 import adams.core.option.OptionUtils;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
+import adams.data.report.Report;
 import adams.data.sampledata.SampleData;
 import adams.db.AbstractSpectrumConditions;
 import adams.db.DatabaseConnection;
@@ -68,6 +70,7 @@ import javax.swing.event.TableModelEvent;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -186,6 +189,12 @@ public class UpdateSampleDataPanel
   /** the sample data table. */
   protected SampleDataFactory.Table m_TableSampleData;
 
+  /** the panel for the buttons for the sampledata table. */
+  protected JPanel m_PanelSampleDataButtons;
+
+  /** the button for removing sample data reference values. */
+  protected BaseButton m_ButtonRemoveReferenceValue;
+
   /** the search panel for the sample data. */
   protected SearchPanel m_SearchSampleData;
 
@@ -244,6 +253,7 @@ public class UpdateSampleDataPanel
     JPanel		panelAll;
     JPanel		panel;
     JPanel		panel2;
+    JPanel		panel3;
     JPanel		panelTable;
     JLabel		label;
     BaseDate		bdate;
@@ -336,9 +346,19 @@ public class UpdateSampleDataPanel
 
     // report
     m_TableSampleData = new SampleDataFactory.Table();
+    m_TableSampleData.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> updateButtons());
+    m_TableSampleData.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     panel2 = new JPanel(new BorderLayout());
     panel2.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
     panel2.add(new BaseScrollPane(m_TableSampleData));
+
+    m_PanelSampleDataButtons = new JPanel(new GridLayout(0, 1));
+    panel3 = new JPanel(new BorderLayout());
+    panel3.add(m_PanelSampleDataButtons, BorderLayout.NORTH);
+
+    m_ButtonRemoveReferenceValue = new BaseButton("Remove");
+    m_ButtonRemoveReferenceValue.addActionListener((ActionEvent e) -> removeReferenceValues());
+    m_PanelSampleDataButtons.add(m_ButtonRemoveReferenceValue);
 
     m_SearchSampleData = new SearchPanel(LayoutType.HORIZONTAL, true);
     m_SearchSampleData.setButtonCaption("Search");
@@ -348,6 +368,7 @@ public class UpdateSampleDataPanel
 
     panelTable = new JPanel(new BorderLayout(5, 5));
     panelTable.add(panel2, BorderLayout.CENTER);
+    panelTable.add(panel3, BorderLayout.EAST);
     panelTable.add(m_SearchSampleData, BorderLayout.SOUTH);
     m_SplitPane.setRightComponent(panelTable);
 
@@ -591,6 +612,43 @@ public class UpdateSampleDataPanel
   }
 
   /**
+   * Removes any selected reference values from the database.
+   */
+  protected void removeReferenceValues() {
+    Report		report;
+    String		msg;
+    SampleDataT		samplet;
+    String		id;
+
+    if (m_TableSampleData.getSelectedRowCount() == 0)
+      return;
+
+    report = m_TableSampleData.getSelectionAsReport();
+
+    msg = "Do you want to delete the following reference values?\n"
+      + Utils.flatten(report.getFields(), ", ");
+    if (GUIHelper.showConfirmMessage(this, msg) != GUIHelper.APPROVE_OPTION)
+      return;
+
+    m_ButtonRemoveReferenceValue.setEnabled(false);
+
+    id      = m_Model.getSampleIdAt(m_TableIDs.getActualRow(m_TableIDs.getSelectedRow()));
+    samplet = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
+    for (AbstractField field: report.getFields()) {
+      if (!samplet.remove(id, field)) {
+        GUIHelper.showErrorMessage(this, "Failed to remove field '" + field + "' for ID '" + id + "'!");
+        break;
+      }
+      else {
+        m_TableSampleData.getReport().removeValue(field);
+        m_TableSampleData.setReport(m_TableSampleData.getReport());
+      }
+    }
+
+    m_TableSampleData.setSelectedRows(new int[0]);
+  }
+
+  /**
    * Updates the state of the buttons.
    */
   protected void updateButtons() {
@@ -601,6 +659,7 @@ public class UpdateSampleDataPanel
     m_ButtonApply.setEnabled(!m_Searching && (selCount > 0) && !m_TextName.getText().isEmpty() && !m_TextValue.getText().isEmpty());
     m_ButtonConditions.setEnabled(!m_Searching);
     m_ButtonSearch.setEnabled(!m_Searching);
+    m_ButtonRemoveReferenceValue.setEnabled(m_TableSampleData.getSelectedRowCount() > 0);
   }
 
   /**
