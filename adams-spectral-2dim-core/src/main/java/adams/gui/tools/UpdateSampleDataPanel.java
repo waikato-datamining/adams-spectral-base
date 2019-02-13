@@ -21,24 +21,16 @@
 
 package adams.gui.tools;
 
-import adams.core.DateFormat;
-import adams.core.DateUtils;
 import adams.core.Properties;
 import adams.core.Utils;
-import adams.core.base.BaseDate;
-import adams.core.base.BaseDateTime;
-import adams.core.option.OptionUtils;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.report.Report;
 import adams.data.sampledata.SampleData;
-import adams.db.AbstractSpectrumConditions;
 import adams.db.DatabaseConnection;
 import adams.db.SampleDataT;
-import adams.db.SpectrumConditionsMulti;
 import adams.env.Environment;
-import adams.gui.chooser.DateChooserPanel;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseComboBox;
 import adams.gui.core.BasePanel;
@@ -46,15 +38,18 @@ import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTable;
 import adams.gui.core.BaseTextField;
-import adams.gui.core.CheckableTableModel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MouseUtils;
 import adams.gui.core.SearchPanel;
 import adams.gui.core.SearchPanel.LayoutType;
 import adams.gui.core.SortableAndSearchableTableWithButtons;
 import adams.gui.event.SearchEvent;
-import adams.gui.goe.GenericObjectEditorDialog;
 import adams.gui.selection.SelectSpectrumPanel;
+import adams.gui.tools.idprovider.AbstractIDProviderPanel;
+import adams.gui.tools.idprovider.DatabaseSearchPanel;
+import adams.gui.tools.idprovider.IDConsumer;
+import adams.gui.tools.idprovider.SpreadSheetIDPanel;
+import adams.gui.tools.idprovider.TableModel;
 import adams.gui.visualization.spectrum.SampleDataFactory;
 import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 
@@ -68,12 +63,14 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import java.awt.BorderLayout;
-import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Allows the user to update/set values in selected spectra.
@@ -81,71 +78,10 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class UpdateSampleDataPanel
-  extends BasePanel {
+  extends BasePanel
+  implements IDConsumer {
 
   private static final long serialVersionUID = 1116436734033322299L;
-
-  /**
-   * Table model for displaying the database IDs, IDs, formats and selected
-   * state of spectra.
-   *
-   * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision$
-   */
-  public static class TableModel
-    extends CheckableTableModel<SelectSpectrumPanel.TableModel> {
-
-    /** for serialization. */
-    private static final long serialVersionUID = 2776199413402687115L;
-
-    /**
-     * default constructor.
-     */
-    public TableModel() {
-      this(new SelectSpectrumPanel.TableModel());
-    }
-
-    /**
-     * the constructor.
-     *
-     * @param model	model to display
-     */
-    public TableModel(SelectSpectrumPanel.TableModel model) {
-      super(model, "Update");
-    }
-
-    /**
-     * Returns the selected items (sample IDs).
-     *
-     * @return		the selected items
-     */
-    public String[] getSelectedSampleIDs() {
-      List<String>	result;
-      int		i;
-
-      result = new ArrayList<>();
-
-      for (i = 0; i < getRowCount(); i++) {
-	if (getSelectedAt(i))
-	  result.add("" + getModel().getValueAt(i, 1));
-      }
-
-      return result.toArray(new String[result.size()]);
-    }
-
-    /**
-     * Returns the sample ID at the specified location.
-     *
-     * @param row	the (actual, not visible) position of the spectrum
-     * @return		the sample ID, null if failed to retrieve
-     */
-    public String getSampleIdAt(int row) {
-      if ((row >= 0) && (row < getRowCount()))
-	return "" + getModel().getValueAt(row, 1);
-      else
-	return null;
-    }
-  }
 
   /** the name of the session file. */
   public final static String SESSION_FILENAME = "UpdateSampleDataSession.props";
@@ -153,17 +89,14 @@ public class UpdateSampleDataPanel
   /** the properties. */
   protected static Properties m_Properties;
 
-  /** the from date. */
-  protected DateChooserPanel m_TextFrom;
+  /** the panel for the ID provider panels. */
+  protected JPanel m_PanelIDProvider;
 
-  /** the to date. */
-  protected DateChooserPanel m_TextTo;
+  /** the comboboxes for the ID panels. */
+  protected BaseComboBox<String> m_ComboBoxIDPanels;
 
-  /** the button for the options. */
-  protected BaseButton m_ButtonConditions;
-
-  /** the button for the search. */
-  protected BaseButton m_ButtonSearch;
+  /** the ID panels. */
+  protected Map<String,AbstractIDProviderPanel> m_IDPanels;
 
   /** the split pane. */
   protected BaseSplitPane m_SplitPane;
@@ -213,36 +146,27 @@ public class UpdateSampleDataPanel
   /** the button for closing the dialog. */
   protected BaseButton m_ButtonClose;
 
-  /** the conditions to use in the search. */
-  protected SpectrumConditionsMulti m_Conditions;
-
   /** the status bar. */
   protected BaseStatusBar m_StatusBar;
 
-  /** whether the search is currently happening. */
-  protected boolean m_Searching;
-
-  /** the formatter to use. */
-  protected DateFormat m_Formatter;
+  /** the current panel. */
+  protected AbstractIDProviderPanel m_CurrentIDProvider;
 
   /**
    * Initializes the members.
    */
   @Override
   protected void initialize() {
-    Properties	props;
+    AbstractIDProviderPanel	panel;
 
     super.initialize();
 
-    m_Formatter = DateUtils.getDateFormatter();
-    props       = getProperties();
-    m_Searching = false;
-    try {
-      m_Conditions = (SpectrumConditionsMulti) OptionUtils.forCommandLine(SpectrumConditionsMulti.class, props.getProperty("Conditions", new SpectrumConditionsMulti().toCommandLine()));
-    }
-    catch (Exception e) {
-      m_Conditions = new SpectrumConditionsMulti();
-    }
+    m_CurrentIDProvider = null;
+    m_IDPanels = new HashMap<>();
+    panel = new DatabaseSearchPanel(this);
+    m_IDPanels.put(panel.getPanelName(), panel);
+    panel = new SpreadSheetIDPanel(this);
+    m_IDPanels.put(panel.getPanelName(), panel);
   }
 
   /**
@@ -256,9 +180,9 @@ public class UpdateSampleDataPanel
     JPanel		panel3;
     JPanel		panelTable;
     JLabel		label;
-    BaseDate		bdate;
     Properties		props;
     AbstractField 	field;
+    List<String> 	panelNames;
 
     super.initGUI();
 
@@ -269,42 +193,20 @@ public class UpdateSampleDataPanel
     panelAll = new JPanel(new BorderLayout());
     add(panelAll, BorderLayout.CENTER);
 
-    // 1. search
+    // 1. panels
     panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+    m_PanelIDProvider = new JPanel(new BorderLayout());
     panelAll.add(panel, BorderLayout.NORTH);
 
-    bdate = new BaseDate(BaseDate.NOW);
-
-    // from
-    m_TextFrom = new DateChooserPanel();
-    m_TextFrom.setCurrent(props.getDate("From", bdate.dateValue()));
-    m_TextFrom.setTextColumns(10);
-    label = new JLabel("From");
-    label.setDisplayedMnemonic('F');
-    label.setLabelFor(m_TextFrom);
-    panel.add(label);
-    panel.add(m_TextFrom);
-
-    // to
-    m_TextTo = new DateChooserPanel();
-    m_TextTo.setCurrent(props.getDate("To", bdate.dateValue()));
-    m_TextTo.setTextColumns(10);
-    label = new JLabel("To");
-    label.setLabelFor(m_TextTo);
-    panel.add(label);
-    panel.add(m_TextTo);
-
-    // options
-    m_ButtonConditions = new BaseButton("Options");
-    m_ButtonConditions.setMnemonic('O');
-    m_ButtonConditions.addActionListener((ActionEvent e) -> showConditions());
-    panel.add(m_ButtonConditions);
-
-    // search
-    m_ButtonSearch = new BaseButton("Search");
-    m_ButtonSearch.setMnemonic('S');
-    m_ButtonSearch.addActionListener((ActionEvent e) -> search());
-    panel.add(m_ButtonSearch);
+    panelNames = new ArrayList<>(m_IDPanels.keySet());
+    Collections.sort(panelNames);
+    m_ComboBoxIDPanels = new BaseComboBox<>(panelNames);
+    m_ComboBoxIDPanels.setSelectedIndex(0);
+    m_ComboBoxIDPanels.addActionListener((ActionEvent e) -> updateIDPanel());
+    panel.add(m_ComboBoxIDPanels);
+    panel.add(m_PanelIDProvider);
+    m_CurrentIDProvider = m_IDPanels.get(m_ComboBoxIDPanels.getSelectedItem());
+    m_PanelIDProvider.add(m_CurrentIDProvider, BorderLayout.CENTER);
 
     // 2. tables
     panel = new JPanel(new BorderLayout());
@@ -454,84 +356,20 @@ public class UpdateSampleDataPanel
   }
 
   /**
-   * Transfers the fields to the conditions object.
+   * Updates the model with the specified IDs.
    */
-  protected void fieldsToConditions() {
-    m_Conditions.setStartDate(new BaseDateTime(m_Formatter.format(m_TextFrom.getCurrent()) + " 00:00:00"));
-    m_Conditions.setEndDate(new BaseDateTime(m_Formatter.format(m_TextTo.getCurrent()) + " 23:59:59"));
-  }
-
-  /**
-   * Transfers the conditions to the fields.
-   */
-  protected void conditionsToFields() {
-    m_TextFrom.setCurrent(m_Conditions.getStartDate().dateValue());
-    m_TextTo.setCurrent(m_Conditions.getEndDate().dateValue());
-  }
-
-  /**
-   * Shows GOE dialog with the conditions.
-   */
-  protected void showConditions() {
-    GenericObjectEditorDialog	dialog;
-
-    fieldsToConditions();
-
-    if (getParentDialog() != null)
-      dialog = new GenericObjectEditorDialog(getParentDialog(), Dialog.ModalityType.DOCUMENT_MODAL);
-    else
-      dialog = new GenericObjectEditorDialog(getParentFrame(), true);
-    dialog.setTitle("Sample data conditions");
-    dialog.getGOEEditor().setCanChangeClassInDialog(false);
-    dialog.getGOEEditor().setClassType(AbstractSpectrumConditions.class);
-    dialog.setCurrent(m_Conditions);
-    dialog.setLocationRelativeTo(this);
-    dialog.setVisible(true);
-    if (dialog.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
-      return;
-
-    m_Conditions = (SpectrumConditionsMulti) dialog.getCurrent();
-    conditionsToFields();
-  }
-
-  /**
-   * Performs the search and updates the table.
-   */
-  protected void search() {
-    SwingWorker		worker;
-
-    fieldsToConditions();
-
-    worker = new SwingWorker() {
-      protected List<String> ids;
-      @Override
-      protected Object doInBackground() throws Exception {
-	MouseUtils.setWaitCursor(UpdateSampleDataPanel.this);
-	m_Searching = true;
-	updateButtons();
-	SampleDataT sdt = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
-	ids = sdt.getIDs(new String[]{"sp.AUTO_ID", "sp.SAMPLEID", "sp.FORMAT"}, m_Conditions);
-	return null;
-      }
-      @Override
-      protected void done() {
-	super.done();
-	m_Model = new TableModel(new SelectSpectrumPanel.TableModel(ids));
-	m_Model.addTableModelListener((TableModelEvent e) -> updateButtons());
-	m_TableIDs.setModel(m_Model);
-	MouseUtils.setDefaultCursor(UpdateSampleDataPanel.this);
-	m_Searching = false;
-	updateButtons();
-	if (ids.size() == 0) {
-	  GUIHelper.showErrorMessage(
-	    UpdateSampleDataPanel.this, "Failed to retrieve any IDs from database, check console for potential errors!");
-	}
-	else {
-	  updateProperties();
-	}
-      }
-    };
-    worker.execute();
+  public void setIDs(String[] ids) {
+    m_Model = new TableModel(new SelectSpectrumPanel.TableModel(ids));
+    m_Model.addTableModelListener((TableModelEvent e) -> updateButtons());
+    m_TableIDs.setModel(m_Model);
+    updateButtons();
+    if (ids.length == 0) {
+      GUIHelper.showErrorMessage(
+	UpdateSampleDataPanel.this, "No IDs found, check console for potential errors!");
+    }
+    else {
+      updateProperties();
+    }
   }
 
   /**
@@ -656,10 +494,24 @@ public class UpdateSampleDataPanel
 
     selCount = m_Model.getSelectedCount();
 
-    m_ButtonApply.setEnabled(!m_Searching && (selCount > 0) && !m_TextName.getText().isEmpty() && !m_TextValue.getText().isEmpty());
-    m_ButtonConditions.setEnabled(!m_Searching);
-    m_ButtonSearch.setEnabled(!m_Searching);
+    m_ButtonApply.setEnabled(!m_CurrentIDProvider.isWorking() && (selCount > 0) && !m_TextName.getText().isEmpty() && !m_TextValue.getText().isEmpty());
     m_ButtonRemoveReferenceValue.setEnabled(m_TableSampleData.getSelectedRowCount() > 0);
+    m_CurrentIDProvider.updateButtons();
+  }
+
+  /**
+   * Updates the panel to be displayed for determining the IDs.
+   */
+  protected void updateIDPanel() {
+    if (m_ComboBoxIDPanels.getSelectedIndex() == -1)
+      return;
+
+    m_CurrentIDProvider = m_IDPanels.get(m_ComboBoxIDPanels.getSelectedItem());
+    m_PanelIDProvider.removeAll();
+    m_PanelIDProvider.add(m_CurrentIDProvider, BorderLayout.CENTER);
+    m_PanelIDProvider.invalidate();
+    m_PanelIDProvider.revalidate();
+    m_PanelIDProvider.doLayout();
   }
 
   /**
@@ -667,13 +519,11 @@ public class UpdateSampleDataPanel
    *
    * @return		if successfully saved
    */
-  protected boolean updateProperties() {
+  public boolean updateProperties() {
     Properties		props;
 
     props = getProperties();
-    props.setDate("From", m_TextFrom.getCurrent());
-    props.setDate("To", m_TextTo.getCurrent());
-    props.setProperty("Conditions", m_Conditions.toCommandLine());
+    props.add(m_CurrentIDProvider.getPanelProperties());
     props.setProperty("Field", getField().toParseableString());
     props.setProperty("Value", m_TextValue.getText());
 
@@ -685,7 +535,7 @@ public class UpdateSampleDataPanel
    *
    * @return		the properties
    */
-  protected synchronized Properties getProperties() {
+  public synchronized Properties getProperties() {
     if (m_Properties == null) {
       try {
 	m_Properties = Properties.read(SESSION_FILENAME);
