@@ -99,6 +99,10 @@ adams.data.report.AbstractReportFilter=\
 adams.data.smoothing.AbstractSmoother=\
   adams.data.spectrumsmoothing
 
+# the ID provider panels
+adams.gui.tools.idprovider.AbstractIDProviderPanel=\
+  adams.gui.tools.idprovider
+
 # the paintlets for visualizing spectra
 adams.gui.visualization.spectrum.AbstractSpectrumPaintlet=\
   adams.gui.visualization.spectrum

@@ -21,6 +21,7 @@
 
 package adams.gui.tools;
 
+import adams.core.ClassLister;
 import adams.core.Properties;
 import adams.core.Utils;
 import adams.data.report.AbstractField;
@@ -38,6 +39,7 @@ import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTable;
 import adams.gui.core.BaseTextField;
+import adams.gui.core.ConsolePanel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MouseUtils;
 import adams.gui.core.SearchPanel;
@@ -46,9 +48,7 @@ import adams.gui.core.SortableAndSearchableTableWithButtons;
 import adams.gui.event.SearchEvent;
 import adams.gui.selection.SelectSpectrumPanel;
 import adams.gui.tools.idprovider.AbstractIDProviderPanel;
-import adams.gui.tools.idprovider.DatabaseSearchPanel;
 import adams.gui.tools.idprovider.IDConsumer;
-import adams.gui.tools.idprovider.SpreadSheetIDPanel;
 import adams.gui.tools.idprovider.TableModel;
 import adams.gui.visualization.spectrum.SampleDataFactory;
 import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
@@ -66,6 +66,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -158,15 +159,22 @@ public class UpdateSampleDataPanel
   @Override
   protected void initialize() {
     AbstractIDProviderPanel	panel;
+    Constructor			constr;
 
     super.initialize();
 
     m_CurrentIDProvider = null;
     m_IDPanels = new HashMap<>();
-    panel = new DatabaseSearchPanel(this);
-    m_IDPanels.put(panel.getPanelName(), panel);
-    panel = new SpreadSheetIDPanel(this);
-    m_IDPanels.put(panel.getPanelName(), panel);
+    for (Class cls: ClassLister.getSingleton().getClasses(AbstractIDProviderPanel.class)) {
+      try {
+        constr = cls.getConstructor(IDConsumer.class);
+        panel  = (AbstractIDProviderPanel) constr.newInstance(this);
+	m_IDPanels.put(panel.getPanelName(), panel);
+      }
+      catch (Exception e) {
+	ConsolePanel.getSingleton().append("Failed to instantiate: " + cls.getName(), e);
+      }
+    }
   }
 
   /**
