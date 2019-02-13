@@ -66,7 +66,7 @@ public class TableModel
     result = new ArrayList<>();
 
     for (i = 0; i < getRowCount(); i++) {
-      if (getSelectedAt(i))
+      if (getCheckedAt(i))
 	result.add("" + getModel().getValueAt(i, 1));
     }
 

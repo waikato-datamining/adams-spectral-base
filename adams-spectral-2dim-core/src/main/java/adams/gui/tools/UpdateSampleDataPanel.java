@@ -234,13 +234,13 @@ public class UpdateSampleDataPanel
     m_TableIDs.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     m_TableIDs.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> showReport());
     m_ButtonSelectAll = new BaseButton("All");
-    m_ButtonSelectAll.addActionListener((ActionEvent e) -> m_Model.selectAll());
+    m_ButtonSelectAll.addActionListener((ActionEvent e) -> m_Model.checkAll());
     m_TableIDs.addToButtonsPanel(m_ButtonSelectAll);
     m_ButtonSelectNone = new BaseButton("None");
-    m_ButtonSelectNone.addActionListener((ActionEvent e) -> m_Model.selectNone());
+    m_ButtonSelectNone.addActionListener((ActionEvent e) -> m_Model.checkNone());
     m_TableIDs.addToButtonsPanel(m_ButtonSelectNone);
     m_ButtonSelectInvert = new BaseButton("Invert");
-    m_ButtonSelectInvert.addActionListener((ActionEvent e) -> m_Model.invertSelection());
+    m_ButtonSelectInvert.addActionListener((ActionEvent e) -> m_Model.invertChecked());
     m_TableIDs.addToButtonsPanel(m_ButtonSelectInvert);
 
     m_SearchIDs = new SearchPanel(LayoutType.HORIZONTAL, true);
@@ -500,7 +500,7 @@ public class UpdateSampleDataPanel
   protected void updateButtons() {
     int		selCount;
 
-    selCount = m_Model.getSelectedCount();
+    selCount = m_Model.getCheckedCount();
 
     m_ButtonApply.setEnabled(!m_CurrentIDProvider.isWorking() && (selCount > 0) && !m_TextName.getText().isEmpty() && !m_TextValue.getText().isEmpty());
     m_ButtonRemoveReferenceValue.setEnabled(m_TableSampleData.getSelectedRowCount() > 0);
