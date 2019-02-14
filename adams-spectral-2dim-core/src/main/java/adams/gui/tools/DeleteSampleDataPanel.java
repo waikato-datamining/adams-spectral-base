@@ -195,7 +195,7 @@ public class DeleteSampleDataPanel
     panel.add(m_SplitPane, BorderLayout.CENTER);
 
     // IDs
-    m_Model = new TableModel();
+    m_Model = new TableModel("Delete");
     m_Model.addTableModelListener((TableModelEvent e) -> updateButtons());
     m_TableIDs = new SortableAndSearchableTableWithButtons(m_Model);
     m_TableIDs.setAutoResizeMode(BaseTable.AUTO_RESIZE_OFF);
@@ -274,7 +274,7 @@ public class DeleteSampleDataPanel
    * Updates the model with the specified IDs.
    */
   public void setIDs(String[] ids) {
-    m_Model = new TableModel(new SelectSpectrumPanel.TableModel(ids));
+    m_Model = new TableModel(new SelectSpectrumPanel.TableModel(ids), "Delete");
     m_Model.addTableModelListener((TableModelEvent e) -> updateButtons());
     m_TableIDs.setModel(m_Model);
     updateButtons();

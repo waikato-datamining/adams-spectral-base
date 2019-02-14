@@ -40,18 +40,21 @@ public class TableModel
 
   /**
    * default constructor.
+   *
+   * @param checkColumnHeader   header to use for the check column
    */
-  public TableModel() {
-    this(new SelectSpectrumPanel.TableModel());
+  public TableModel(String checkColumnHeader) {
+    this(new SelectSpectrumPanel.TableModel(), checkColumnHeader);
   }
 
   /**
    * the constructor.
    *
-   * @param model	model to display
+   * @param model		model to display
+   * @param checkColumnHeader   header to use for the check column
    */
-  public TableModel(SelectSpectrumPanel.TableModel model) {
-    super(model, "Update");
+  public TableModel(SelectSpectrumPanel.TableModel model, String checkColumnHeader) {
+    super(model, checkColumnHeader);
   }
 
   /**
