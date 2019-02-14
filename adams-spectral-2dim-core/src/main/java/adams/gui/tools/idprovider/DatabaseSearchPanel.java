@@ -190,9 +190,9 @@ public class DatabaseSearchPanel
     Properties		props;
 
     props = new Properties();
-    props.setDate("From", m_TextFrom.getCurrent());
-    props.setDate("To", m_TextTo.getCurrent());
-    props.setProperty("Conditions", m_Conditions.toCommandLine());
+    props.setDate("Spreadsheet.From", m_TextFrom.getCurrent());
+    props.setDate("Spreadsheet.To", m_TextTo.getCurrent());
+    props.setProperty("Spreadsheet.Conditions", m_Conditions.toCommandLine());
 
     return props;
   }
