@@ -210,7 +210,7 @@ public class SpreadSheetIDPanel
    */
   @Override
   public void updateButtons() {
-    m_ButtonLoad.setEnabled(!m_PanelFile.getCurrent().isDirectory() && m_PanelFile.getCurrent().exists());
+    m_ButtonLoad.setEnabled(!m_PanelFile.getCurrent().isDirectory() && m_PanelFile.getCurrent().exists() && !m_TextFormat.getText().isEmpty());
   }
 
   /**
