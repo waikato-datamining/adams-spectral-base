@@ -105,7 +105,7 @@ public class ManualListPanel
 
     m_PanelList = new GenericArrayEditorPanel(new BaseString[0]);
     m_PanelList.setCurrent(new BaseString[0]);
-    m_PanelList.addChangeListener((ChangeEvent e) -> load());
+    m_PanelList.addChangeListener((ChangeEvent e) -> updateButtons());
     add(m_PanelList);
 
     m_TextFormat = new BaseTextField(props.getProperty(MANUAL_FORMAT, "NIR"));
