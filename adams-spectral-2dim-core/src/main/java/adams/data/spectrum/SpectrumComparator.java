@@ -15,41 +15,27 @@
 
 /*
  * SpectrumComparator.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrum;
 
-import adams.data.container.DataPointComparator;
-
 /**
- * A comparator for Spectrum points.
+ * A comparator for Spectrum objects.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 11831 $
  */
 public class SpectrumComparator
-  extends DataPointComparator<Spectrum> {
+  extends AbstractSpectrumComparator {
 
   /** for serialization. */
   private static final long serialVersionUID = -8837304326357509992L;
 
-  /**
-   * The default constructor uses comparison in ascending manner.
-   */
-  public SpectrumComparator() {
-    this(true);
-  }
-
-  /**
-   * This constructor initializes the comparator either in ascending 
-   * manner or descending.
-   *
-   * @param ascending		if true then the ordering is done in ascending
-   * 				manner, otherwise descending
-   */
-  public SpectrumComparator(boolean ascending) {
-    super(ascending);
+  @Override
+  public String globalInfo() {
+    return "Default comparator, comparison order:\n"
+      + "- header (ID, format, report)\n"
+      + "- data points";
   }
 
   /**
@@ -69,7 +55,7 @@ public class SpectrumComparator
 
     // header
     result = o1.compareToHeader(o2);
-    
+
     // data points
     if (result == 0)
       result = o1.compareTo(o2);

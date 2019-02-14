@@ -15,16 +15,19 @@
 
 /*
  * SpectrumFileReader.java
- * Copyright (C) 2009 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.core.ObjectCopyHelper;
 import adams.data.conversion.SpectraToMultiSpectrum;
+import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.io.input.SimpleSpectrumReader;
+import adams.data.spectrum.AbstractSpectrumComparator;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
+import adams.data.spectrum.SpectrumComparator;
 
 /**
  <!-- globalinfo-start -->
@@ -83,7 +86,6 @@ import adams.data.spectrum.Spectrum;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SpectrumFileReader
   extends AbstractDataContainerFileReader<Spectrum> {
@@ -93,6 +95,12 @@ public class SpectrumFileReader
 
   /** whether to generate a MultiSpectrum instead. */
   protected boolean m_OutputMultiSpectrum;
+
+  /** whether to use a custom comparator. */
+  protected boolean m_UseCustomComparator;
+
+  /** the custom comparator to use. */
+  protected AbstractSpectrumComparator m_CustomComparator;
 
   /**
    * Returns a string describing the object.
@@ -114,8 +122,16 @@ public class SpectrumFileReader
     super.defineOptions();
 
     m_OptionManager.add(
-	    "output-multispectrum", "outputMultiSpectrum",
-	    false);
+      "output-multispectrum", "outputMultiSpectrum",
+      false);
+
+    m_OptionManager.add(
+      "use-custom-comparator", "useCustomComparator",
+      false);
+
+    m_OptionManager.add(
+      "custom-comparator", "customComparator",
+      new SpectrumComparator());
   }
 
   /**
@@ -158,6 +174,64 @@ public class SpectrumFileReader
   }
 
   /**
+   * Sets whether to use a custom comparator.
+   *
+   * @param value 	true if to use custom comparator
+   */
+  public void setUseCustomComparator(boolean value) {
+    m_UseCustomComparator = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use a custom comparator.
+   *
+   * @return 		true if to use a custom comparator
+   */
+  public boolean getUseCustomComparator() {
+    return m_UseCustomComparator;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useCustomComparatorTipText() {
+    return "If enabled, the specified custom comparator is used for sorting the spectra in the generated MultiSpectrum.";
+  }
+
+  /**
+   * Sets the custom comparator.
+   *
+   * @param value 	the custom comparator
+   */
+  public void setCustomComparator(AbstractSpectrumComparator value) {
+    m_CustomComparator = value;
+    reset();
+  }
+
+  /**
+   * Returns the custom comparator.
+   *
+   * @return 		the custom comparator
+   */
+  public AbstractSpectrumComparator getCustomComparator() {
+    return m_CustomComparator;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String customComparatorTipText() {
+    return "The custom comparator to use for sorting the spectra in the generated MultiSpectrum.";
+  }
+
+  /**
    * Returns the class of objects that it generates.
    *
    * @return		the data type
@@ -190,6 +264,8 @@ public class SpectrumFileReader
       for (i = 0; i < m_Containers.size(); i++)
 	spectra[i] = (Spectrum) m_Containers.get(i);
       conv = new SpectraToMultiSpectrum();
+      conv.setUseCustomComparator(m_UseCustomComparator);
+      conv.setCustomComparator(ObjectCopyHelper.copyObject(m_CustomComparator));
       conv.setInput(spectra);
       result = conv.convert();
       m_Containers.clear();

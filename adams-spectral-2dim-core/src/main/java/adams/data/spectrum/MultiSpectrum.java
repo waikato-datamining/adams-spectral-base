@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * MultiSpectrum.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.spectrum;
 
@@ -32,7 +32,6 @@ import adams.data.sampledata.SampleData;
  * For storing multiple spectra.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class MultiSpectrum
   extends AbstractDataContainer<Spectrum>
@@ -53,6 +52,9 @@ public class MultiSpectrum
   /** the notes for the chromatogram. */
   protected Notes m_Notes;
 
+  /** a custom comparator. */
+  protected AbstractSpectrumComparator m_CustomComparator;
+
   /**
    * Default constructor.
    */
@@ -63,6 +65,7 @@ public class MultiSpectrum
     m_Notes      = new Notes();
     if (m_Comparator == null)
       m_Comparator = newComparator();
+    m_CustomComparator = null;
   }
   
   /**
@@ -76,13 +79,34 @@ public class MultiSpectrum
   }
 
   /**
-   * Returns the comparator in use.
+   * Returns the comparator in use (custom one if defined, otherwise the default one).
    *
    * @return		the comparator in use
    */
   @Override
   public DataPointComparator<Spectrum> getComparator() {
-    return m_Comparator;
+    if (m_CustomComparator != null)
+      return m_CustomComparator;
+    else
+      return m_Comparator;
+  }
+
+  /**
+   * Sets the custom comparator to use.
+   *
+   * @param value	the comparator to use, null to unset
+   */
+  public void setCustomComparator(AbstractSpectrumComparator value) {
+    m_CustomComparator = value;
+  }
+
+  /**
+   * Returns the custom comparaor in use.
+   *
+   * @return		the custom comparator, null if none set
+   */
+  public AbstractSpectrumComparator getCustomComparator() {
+    return m_CustomComparator;
   }
 
   /**
@@ -93,7 +117,6 @@ public class MultiSpectrum
   @Override
   public void setParent(DataContainer value) {
     m_Parent = value;
-
   }
 
   /**

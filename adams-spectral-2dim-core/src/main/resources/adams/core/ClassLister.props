@@ -99,6 +99,10 @@ adams.data.report.AbstractReportFilter=\
 adams.data.smoothing.AbstractSmoother=\
   adams.data.spectrumsmoothing
 
+# the spectrum comparators (used by MultiSpectrum)
+adams.data.spectrum.AbstractSpectrumComparator=\
+  adams.data.spectrum
+
 # the ID provider panels
 adams.gui.tools.idprovider.AbstractIDProviderPanel=\
   adams.gui.tools.idprovider

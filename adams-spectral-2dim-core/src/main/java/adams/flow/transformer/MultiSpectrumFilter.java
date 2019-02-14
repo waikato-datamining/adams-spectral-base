@@ -20,8 +20,10 @@
 
 package adams.flow.transformer;
 
+import adams.core.ClassCrossReference;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseRegExp;
+import adams.data.conversion.SpectraToMultiSpectrum;
 import adams.data.multifilter.AbstractMultiSpectrumFilter;
 import adams.data.report.AbstractField;
 import adams.data.report.Field;
@@ -39,16 +41,21 @@ import adams.flow.provenance.ProvenanceInformation;
 
 /**
  <!-- globalinfo-start -->
- * Generates a single spectrum from a multi-spectrum using the specified filter.
+ * Generates a single spectrum from a multi-spectrum using the specified filter.<br>
+ * For some filters that use several spectra, the order of the spectra is important. The internal order of the MultiSpectrum is used to pick the spectra, which can be influenced via custom spectrum comparators.<br>
+ * <br>
+ * See also:<br>
+ * adams.data.conversion.SpectraToMultiSpectrum<br>
+ * adams.flow.transformer.SpectrumFileReader
  * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
  * Input&#47;output:<br>
  * - accepts:<br>
- * &nbsp;&nbsp;&nbsp;knir.data.spectrum.MultiSpectrum<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.spectrum.MultiSpectrum<br>
  * - generates:<br>
- * &nbsp;&nbsp;&nbsp;knir.data.spectrum.Spectrum<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.spectrum.Spectrum<br>
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -57,48 +64,57 @@ import adams.flow.provenance.ProvenanceInformation;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
  * &nbsp;&nbsp;&nbsp;default: MultiSpectrumFilter
  * </pre>
- * 
+ *
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
  * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
- * &nbsp;&nbsp;&nbsp;default: 
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
- * 
+ *
  * <pre>-skip &lt;boolean&gt; (property: skip)
- * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded 
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
  * &nbsp;&nbsp;&nbsp;as it is.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
- * &nbsp;&nbsp;&nbsp;If set to true, the flow gets stopped in case this actor encounters an error;
- * &nbsp;&nbsp;&nbsp; useful for critical actors.
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
- * <pre>-filter &lt;knir.data.multifilter.AbstractMultiSpectrumFilter&gt; (property: filter)
- * &nbsp;&nbsp;&nbsp;The filter to use.
- * &nbsp;&nbsp;&nbsp;default: knir.data.multifilter.PickByIndex
+ *
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
+ * <pre>-filter &lt;adams.data.multifilter.AbstractMultiSpectrumFilter&gt; (property: filter)
+ * &nbsp;&nbsp;&nbsp;The filter to use.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.multifilter.PickByIndex
+ * </pre>
+ *
  * <pre>-transfer-report &lt;boolean&gt; (property: transferReport)
- * &nbsp;&nbsp;&nbsp;If enabled, the report values from the multi-spectrum get transferred into 
+ * &nbsp;&nbsp;&nbsp;If enabled, the report values from the multi-spectrum get transferred into
  * &nbsp;&nbsp;&nbsp;the sub-spectra.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-transfer-prefix &lt;java.lang.String&gt; (property: transferPrefix)
  * &nbsp;&nbsp;&nbsp;The (optional) prefix for report fields that get transferred.
- * &nbsp;&nbsp;&nbsp;default: 
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
- * 
+ *
  * <pre>-transfer-regexp &lt;adams.core.base.BaseRegExp&gt; (property: transferRegExp)
  * &nbsp;&nbsp;&nbsp;The regular expression that the field names must match in order to get transferred.
  * &nbsp;&nbsp;&nbsp;default: .*
+ * &nbsp;&nbsp;&nbsp;more: https:&#47;&#47;docs.oracle.com&#47;javase&#47;tutorial&#47;essential&#47;regex&#47;
+ * &nbsp;&nbsp;&nbsp;https:&#47;&#47;docs.oracle.com&#47;javase&#47;8&#47;docs&#47;api&#47;java&#47;util&#47;regex&#47;Pattern.html
  * </pre>
  * 
  <!-- options-end -->
@@ -107,7 +123,7 @@ import adams.flow.provenance.ProvenanceInformation;
  */
 public class MultiSpectrumFilter
   extends AbstractTransformer
-  implements DatabaseConnectionUser {
+  implements DatabaseConnectionUser, ClassCrossReference {
 
   /** for serialization. */
   private static final long serialVersionUID = -8678582872628608282L;
@@ -134,7 +150,19 @@ public class MultiSpectrumFilter
    */
   @Override
   public String globalInfo() {
-    return "Generates a single spectrum from a multi-spectrum using the specified filter.";
+    return "Generates a single spectrum from a multi-spectrum using the specified filter.\n"
+      + "For some filters that use several spectra, the order of the spectra is important. "
+      + "The internal order of the MultiSpectrum is used to pick the spectra, which can "
+      + "be influenced via custom spectrum comparators.";
+  }
+
+  /**
+   * Returns the cross-referenced classes.
+   *
+   * @return		the classes
+   */
+  public Class[] getClassCrossReferences() {
+    return new Class[]{SpectraToMultiSpectrum.class, SpectrumFileReader.class};
   }
 
   /**
