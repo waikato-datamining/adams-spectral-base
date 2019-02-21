@@ -22,7 +22,6 @@ package adams.db.mysql;
 
 import adams.db.AbstractDatabaseConnection;
 import adams.db.SpectrumIDConditions;
-import adams.db.SpectrumT;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -34,8 +33,8 @@ import java.util.logging.Level;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SpectrumTMySQL
-  extends SpectrumT {
+public class SpectrumT
+  extends adams.db.SpectrumT {
 
   private static final long serialVersionUID = -1371114857113756774L;
 
@@ -44,7 +43,7 @@ public class SpectrumTMySQL
    *
    * @param dbcon the database context this table is used in
    */
-  public SpectrumTMySQL(AbstractDatabaseConnection dbcon) {
+  public SpectrumT(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 

@@ -14,31 +14,30 @@
  */
 
 /*
- * SpectrumTPostgreSQL.java
+ * SampleDataTSQLite.java
  * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.db.postgresql;
+package adams.db.sqlite;
 
 import adams.db.AbstractDatabaseConnection;
-import adams.db.SpectrumT;
 
 /**
- * PostgreSQL implementation.
+ * SQLite implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SpectrumTPostgreSQL
-  extends SpectrumT {
+public class SampleDataT
+  extends adams.db.SampleDataT {
 
-  private static final long serialVersionUID = 7003479237078308491L;
+  private static final long serialVersionUID = 5905403844404856859L;
 
   /**
-   * Constructor - initalise with database connection.
+   * Constructor.
    *
    * @param dbcon the database context this table is used in
    */
-  public SpectrumTPostgreSQL(AbstractDatabaseConnection dbcon) {
+  public SampleDataT(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 }

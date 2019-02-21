@@ -15,7 +15,7 @@
 
 /*
  * SampleDataT.java
- * Copyright (C) 2008-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2019 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -32,9 +32,6 @@ import adams.data.sampledata.SampleData;
 import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
-import adams.db.mysql.SampleDataTMySQL;
-import adams.db.postgresql.SampleDataTPostgreSQL;
-import adams.db.sqlite.SampleDataTSQLite;
 import adams.db.types.ColumnType;
 
 import java.sql.PreparedStatement;
@@ -748,14 +745,14 @@ public abstract class SampleDataT
    */
   public static synchronized SampleDataT getSingleton(AbstractDatabaseConnection dbcon) {
     if (m_TableManager == null)
-      m_TableManager = new TableManager<SampleDataT>(TABLE_NAME, dbcon.getOwner());
+      m_TableManager = new TableManager<>(TABLE_NAME, dbcon.getOwner());
     if (!m_TableManager.has(dbcon)) {
       if (JDBC.isMySQL(dbcon))
-	m_TableManager.add(dbcon, new SampleDataTMySQL(dbcon));
+	m_TableManager.add(dbcon, new adams.db.mysql.SampleDataT(dbcon));
       else if (JDBC.isPostgreSQL(dbcon))
-	m_TableManager.add(dbcon, new SampleDataTPostgreSQL(dbcon));
+	m_TableManager.add(dbcon, new adams.db.postgresql.SampleDataT(dbcon));
       else if (JDBC.isSQLite(dbcon))
-	m_TableManager.add(dbcon, new SampleDataTSQLite(dbcon));
+	m_TableManager.add(dbcon, new adams.db.sqlite.SampleDataT(dbcon));
       else
 	throw new IllegalArgumentException("Unrecognized JDBC URL: " + dbcon.getURL());
     }

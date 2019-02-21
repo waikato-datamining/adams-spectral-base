@@ -21,15 +21,14 @@
 package adams.db.postgresql;
 
 import adams.db.AbstractDatabaseConnection;
-import adams.db.SampleDataT;
 
 /**
  * MySQL implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SampleDataTPostgreSQL
-  extends SampleDataT {
+public class SampleDataT
+  extends adams.db.SampleDataT {
 
   private static final long serialVersionUID = 5345945766136653603L;
 
@@ -38,7 +37,7 @@ public class SampleDataTPostgreSQL
    *
    * @param dbcon the database context this table is used in
    */
-  public SampleDataTPostgreSQL(AbstractDatabaseConnection dbcon) {
+  public SampleDataT(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 }

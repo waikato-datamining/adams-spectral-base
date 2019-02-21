@@ -14,31 +14,30 @@
  */
 
 /*
- * SampleDataTMySQL.java
+ * SpectrumTPostgreSQL.java
  * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.db.mysql;
+package adams.db.postgresql;
 
 import adams.db.AbstractDatabaseConnection;
-import adams.db.SampleDataT;
 
 /**
- * MySQL implementation.
+ * PostgreSQL implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SampleDataTMySQL
-  extends SampleDataT {
+public class SpectrumT
+  extends adams.db.SpectrumT {
 
-  private static final long serialVersionUID = -1839495793460017595L;
+  private static final long serialVersionUID = 7003479237078308491L;
 
   /**
-   * Constructor.
+   * Constructor - initalise with database connection.
    *
    * @param dbcon the database context this table is used in
    */
-  public SampleDataTMySQL(AbstractDatabaseConnection dbcon) {
+  public SpectrumT(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 }

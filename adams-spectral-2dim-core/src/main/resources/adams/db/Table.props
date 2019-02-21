@@ -5,13 +5,13 @@
 # Spectrum
 adams.db.SpectrumT.Enabled=true
 adams.db.SpectrumT.Debug=false
-adams.db.SpectrumTMySQL.Debug=false
-adams.db.SpectrumTPostgreSQL.Debug=false
-adams.db.SpectrumTSQLite.Debug=false
+adams.db.mysql.SpectrumT.Debug=false
+adams.db.postgresql.SpectrumT.Debug=false
+adams.db.sqlite.SpectrumT.Debug=false
 
 # SampleData
 adams.db.SampleDataT.Enabled=true
 adams.db.SampleDataT.Debug=false
-adams.db.SampleDataTMySQL.Debug=false
-adams.db.SampleDataTPostgreSQL.Debug=false
-adams.db.SampleDataTSQLite.Debug=false
+adams.db.mysql.SampleDataT.Debug=false
+adams.db.postgresql.SampleDataT.Debug=false
+adams.db.sqlite.SampleDataT.Debug=false

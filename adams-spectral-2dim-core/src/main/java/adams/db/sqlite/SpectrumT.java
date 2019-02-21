@@ -23,7 +23,6 @@ package adams.db.sqlite;
 import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
 import adams.db.AbstractDatabaseConnection;
-import adams.db.SpectrumT;
 
 import java.sql.ResultSet;
 import java.util.logging.Level;
@@ -33,8 +32,8 @@ import java.util.logging.Level;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SpectrumTSQLite
-  extends SpectrumT {
+public class SpectrumT
+  extends adams.db.SpectrumT {
 
   private static final long serialVersionUID = -7283681599103306270L;
 
@@ -43,7 +42,7 @@ public class SpectrumTSQLite
    *
    * @param dbcon the database context this table is used in
    */
-  public SpectrumTSQLite(AbstractDatabaseConnection dbcon) {
+  public SpectrumT(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 

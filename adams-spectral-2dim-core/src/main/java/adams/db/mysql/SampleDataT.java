@@ -14,31 +14,30 @@
  */
 
 /*
- * SampleDataTSQLite.java
+ * SampleDataTMySQL.java
  * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.db.sqlite;
+package adams.db.mysql;
 
 import adams.db.AbstractDatabaseConnection;
-import adams.db.SampleDataT;
 
 /**
- * SQLite implementation.
+ * MySQL implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SampleDataTSQLite
-  extends SampleDataT {
+public class SampleDataT
+  extends adams.db.SampleDataT {
 
-  private static final long serialVersionUID = 5905403844404856859L;
+  private static final long serialVersionUID = -1839495793460017595L;
 
   /**
    * Constructor.
    *
    * @param dbcon the database context this table is used in
    */
-  public SampleDataTSQLite(AbstractDatabaseConnection dbcon) {
+  public SampleDataT(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 }

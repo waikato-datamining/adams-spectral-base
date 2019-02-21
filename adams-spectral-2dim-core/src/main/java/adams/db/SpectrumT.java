@@ -15,7 +15,7 @@
 
 /*
  * SpectrumT.java
- * Copyright (C) 2008-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2019 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -29,9 +29,6 @@ import adams.data.spectrum.SpectrumPoint;
 import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
-import adams.db.mysql.SpectrumTMySQL;
-import adams.db.postgresql.SpectrumTPostgreSQL;
-import adams.db.sqlite.SpectrumTSQLite;
 import adams.db.types.AutoIncrementType;
 import adams.db.types.ColumnType;
 
@@ -68,7 +65,7 @@ public class SpectrumT
    * @param dbcon	the database context this table is used in
    */
   protected SpectrumT(AbstractDatabaseConnection dbcon) {
-    super(dbcon, SpectrumT.TABLE_NAME);
+    super(dbcon, adams.db.SpectrumT.TABLE_NAME);
   }
 
   /**
@@ -720,11 +717,11 @@ public class SpectrumT
       m_TableManager = new TableManager<>(TABLE_NAME, dbcon.getOwner());
     if (!m_TableManager.has(dbcon)) {
       if (JDBC.isMySQL(dbcon))
-        m_TableManager.add(dbcon, new SpectrumTMySQL(dbcon));
+        m_TableManager.add(dbcon, new adams.db.mysql.SpectrumT(dbcon));
       else if (JDBC.isPostgreSQL(dbcon))
-        m_TableManager.add(dbcon, new SpectrumTPostgreSQL(dbcon));
+        m_TableManager.add(dbcon, new adams.db.postgresql.SpectrumT(dbcon));
       else if (JDBC.isSQLite(dbcon))
-        m_TableManager.add(dbcon, new SpectrumTSQLite(dbcon));
+        m_TableManager.add(dbcon, new adams.db.sqlite.SpectrumT(dbcon));
       else
         throw new IllegalArgumentException("Unrecognized JDBC URL: " + dbcon.getURL());
     }
