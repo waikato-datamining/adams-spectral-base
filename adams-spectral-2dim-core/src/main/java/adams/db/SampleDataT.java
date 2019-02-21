@@ -32,6 +32,9 @@ import adams.data.sampledata.SampleData;
 import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
+import adams.db.mysql.SampleDataTMySQL;
+import adams.db.postgresql.SampleDataTPostgreSQL;
+import adams.db.sqlite.SampleDataTSQLite;
 import adams.db.types.ColumnType;
 
 import java.sql.PreparedStatement;

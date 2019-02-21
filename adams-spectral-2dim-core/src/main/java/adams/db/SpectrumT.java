@@ -29,6 +29,9 @@ import adams.data.spectrum.SpectrumPoint;
 import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
+import adams.db.mysql.SpectrumTMySQL;
+import adams.db.postgresql.SpectrumTPostgreSQL;
+import adams.db.sqlite.SpectrumTSQLite;
 import adams.db.types.AutoIncrementType;
 import adams.db.types.ColumnType;
 

@@ -13,12 +13,16 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectrumTMySQL.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.db;
+package adams.db.mysql;
+
+import adams.db.AbstractDatabaseConnection;
+import adams.db.SpectrumIDConditions;
+import adams.db.SpectrumT;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -29,7 +33,6 @@ import java.util.logging.Level;
  * MySQL implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SpectrumTMySQL
   extends SpectrumT {
@@ -41,7 +44,7 @@ public class SpectrumTMySQL
    *
    * @param dbcon the database context this table is used in
    */
-  protected SpectrumTMySQL(AbstractDatabaseConnection dbcon) {
+  public SpectrumTMySQL(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 

@@ -13,30 +13,32 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * SampleDataTSQLite.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+/*
+ * SampleDataTPostgreSQL.java
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.db;
+package adams.db.postgresql;
+
+import adams.db.AbstractDatabaseConnection;
+import adams.db.SampleDataT;
 
 /**
- * SQLite implementation.
+ * MySQL implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
-public class SampleDataTSQLite
+public class SampleDataTPostgreSQL
   extends SampleDataT {
 
-  private static final long serialVersionUID = 5905403844404856859L;
+  private static final long serialVersionUID = 5345945766136653603L;
 
   /**
    * Constructor.
    *
    * @param dbcon the database context this table is used in
    */
-  protected SampleDataTSQLite(AbstractDatabaseConnection dbcon) {
+  public SampleDataTPostgreSQL(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 }

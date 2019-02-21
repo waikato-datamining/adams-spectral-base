@@ -13,15 +13,17 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectrumTSQLite.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.db;
+package adams.db.sqlite;
 
 import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
+import adams.db.AbstractDatabaseConnection;
+import adams.db.SpectrumT;
 
 import java.sql.ResultSet;
 import java.util.logging.Level;
@@ -30,7 +32,6 @@ import java.util.logging.Level;
  * SQLite implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SpectrumTSQLite
   extends SpectrumT {
@@ -42,7 +43,7 @@ public class SpectrumTSQLite
    *
    * @param dbcon the database context this table is used in
    */
-  protected SpectrumTSQLite(AbstractDatabaseConnection dbcon) {
+  public SpectrumTSQLite(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 
