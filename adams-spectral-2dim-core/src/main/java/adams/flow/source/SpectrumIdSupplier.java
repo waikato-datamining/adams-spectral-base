@@ -15,7 +15,7 @@
 
 /*
  * SpectrumIdSupplier.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.source;
@@ -24,10 +24,10 @@ import adams.db.AbstractConditions;
 import adams.db.Conditions;
 import adams.db.DataContainerConditions;
 import adams.db.ReportConditions;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.db.SpectrumConditionsMulti;
+import adams.db.SpectrumF;
 import adams.db.SpectrumIDConditions;
-import adams.db.SpectrumT;
 import adams.flow.core.ActorUtils;
 
 import java.util.ArrayList;
@@ -88,7 +88,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SpectrumIdSupplier
   extends AbstractConditionalIdSupplier 
@@ -209,7 +208,7 @@ public class SpectrumIdSupplier
       else
 	column = "sp.AUTO_ID";
 
-      ids = SampleDataT.getSingleton(m_DatabaseConnection).getIDs(
+      ids = SampleDataF.getSingleton(m_DatabaseConnection).getIDs(
         new String[]{column}, m_Conditions);
     }
     else {
@@ -218,7 +217,7 @@ public class SpectrumIdSupplier
       else
 	column = "AUTO_ID";
 
-      ids = SpectrumT.getSingleton(m_DatabaseConnection).getValues(
+      ids = SpectrumF.getSingleton(m_DatabaseConnection).getValues(
         new String[]{column}, (SpectrumIDConditions) m_Conditions);
     }
 

@@ -21,11 +21,11 @@
 package adams.data.spectrumfilter;
 
 import adams.data.filter.AbstractDatabaseConnectionFilter;
-import adams.db.AbstractDatabaseConnection;
 import adams.data.spectrum.Spectrum;
+import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
-import adams.db.SampleDataT;
-import adams.db.SpectrumT;
+import adams.db.SampleDataF;
+import adams.db.SpectrumF;
 
 /**
  * Abstract superclass for filters that operate on the database.
@@ -93,8 +93,8 @@ public abstract class AbstractDatabaseFilter
    *
    * @return		the table object
    */
-  protected SpectrumT getSpectrumTable() {
-    return SpectrumT.getSingleton(getDatabaseConnection());
+  protected SpectrumF getSpectrumTable() {
+    return SpectrumF.getSingleton(getDatabaseConnection());
   }
 
   /**
@@ -102,7 +102,7 @@ public abstract class AbstractDatabaseFilter
    *
    * @return		the table object
    */
-  protected SampleDataT getSampleDataTable() {
-    return SampleDataT.getSingleton(getDatabaseConnection());
+  protected SampleDataF getSampleDataTable() {
+    return SampleDataF.getSingleton(getDatabaseConnection());
   }
 }

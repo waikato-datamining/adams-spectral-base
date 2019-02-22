@@ -15,7 +15,7 @@
 
 /*
  * DeleteSpectrum.java
- * Copyright (C) 2012-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
@@ -25,7 +25,8 @@ import adams.data.spectrum.Spectrum;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DataProvider;
 import adams.db.DatabaseConnection;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
+import adams.db.SpectrumIntf;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
 
@@ -211,7 +212,7 @@ public class DeleteSpectrum
    */
   @Override
   protected DataProvider<Spectrum> getDataProvider() {
-    return SpectrumT.getSingleton(m_DatabaseConnection);
+    return SpectrumF.getSingleton(m_DatabaseConnection);
   }
 
   /**
@@ -222,9 +223,9 @@ public class DeleteSpectrum
    */
   @Override
   protected boolean remove(Token input) {
-    SpectrumT		spec;
+    SpectrumIntf		spec;
 
-    spec = (SpectrumT) getDataProvider();
+    spec = (SpectrumIntf) getDataProvider();
     if (m_InputToken.getPayload() instanceof Integer)
       return spec.remove((Integer) m_InputToken.getPayload(), m_KeepReport);
     else

@@ -15,7 +15,7 @@
 
 /*
  * ExportValidationSets.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2019 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -29,7 +29,7 @@ import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.report.Report;
 import adams.db.DatabaseConnection;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.db.SpectrumConditionsSingle;
 import adams.gui.application.AbstractApplicationFrame;
 import adams.gui.application.AbstractBasicMenuItemDefinition;
@@ -192,7 +192,7 @@ public class ExportValidationSets
 	}
 
 	getLogger().info("Searching database...");
-	SampleDataT sdt = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
+	SampleDataF sdt = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
 	List<String> ids = sdt.getIDs(cond);
 	numIDs = ids.size();
 

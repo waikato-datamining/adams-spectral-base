@@ -24,7 +24,7 @@ import adams.core.Properties;
 import adams.core.base.BaseObject;
 import adams.core.base.BaseString;
 import adams.db.DatabaseConnection;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseTextField;
 import adams.gui.core.GUIHelper;
@@ -193,7 +193,7 @@ public class ManualListPanel
         error = null;
         m_Loading = true;
 	String[] items = BaseObject.toStringArray((BaseString[]) m_PanelList.getCurrent());
-	SpectrumT spt = SpectrumT.getSingleton(DatabaseConnection.getSingleton());
+	SpectrumF spt = SpectrumF.getSingleton(DatabaseConnection.getSingleton());
 	String format = m_TextFormat.getText();
 	for (String item: items) {
 	  if (spt.exists(item, format))

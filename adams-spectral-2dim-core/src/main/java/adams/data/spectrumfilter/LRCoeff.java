@@ -15,23 +15,23 @@
 
 /*
  * LRCoeff.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
 
 import adams.data.filter.AbstractDatabaseConnectionFilter;
-import adams.db.AbstractConditions;
-import adams.db.AbstractDatabaseConnection;
 import adams.data.instances.AbstractInstanceGenerator;
 import adams.data.instances.SimpleInstanceGenerator;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.db.AbstractConditions;
+import adams.db.AbstractDatabaseConnection;
 import adams.db.AbstractSpectrumConditions;
 import adams.db.DatabaseConnection;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.db.SpectrumConditionsMulti;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 import weka.classifiers.functions.LinearRegressionJ;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -61,7 +61,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class LRCoeff
   extends AbstractDatabaseConnectionFilter<Spectrum> {
@@ -349,9 +348,9 @@ public class LRCoeff
     double min=Double.POSITIVE_INFINITY;
     double max=Double.NEGATIVE_INFINITY;
     Instances header=null;
-    List<Integer> ids=SampleDataT.getSingleton(getDatabaseConnection()).getDBIDs(m_Conditions);
+    List<Integer> ids=SampleDataF.getSingleton(getDatabaseConnection()).getDBIDs(m_Conditions);
     for (Integer id:ids) {
-      Spectrum sp=SpectrumT.getSingleton(getDatabaseConnection()).load(id);
+      Spectrum sp=SpectrumF.getSingleton(getDatabaseConnection()).load(id);
       Instance inst  = m_Generator.generate(sp);
       if (header == null) {
 	header=new Instances(m_Generator.getOutputHeader());

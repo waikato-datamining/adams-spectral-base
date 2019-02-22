@@ -33,7 +33,7 @@ import java.util.logging.Level;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SpectrumT
-  extends adams.db.SpectrumT {
+  extends adams.db.generic.SpectrumT {
 
   private static final long serialVersionUID = -7283681599103306270L;
 
@@ -78,7 +78,7 @@ public class SpectrumT
 
 	  // store report (never overwrites, just adds additional fields)
 	  if (sp.hasReport())
-	    getSampleDataT().store(sp.getID(), sp.getReport(), false, true, new Field[0]);
+	    getSampleDataHandler().store(sp.getID(), sp.getReport(), false, true, new Field[0]);
         }
 	else {
 	  getLogger().severe("no last_insert_rowid");

@@ -15,7 +15,7 @@
 
 /*
  * SampleDataDbReader.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -24,7 +24,7 @@ import adams.data.sampledata.SampleData;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
 import adams.db.ReportProviderByID;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.flow.core.ActorUtils;
 
 /**
@@ -72,7 +72,6 @@ import adams.flow.core.ActorUtils;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2390 $
  */
 public class SampleDataDbReader
   extends AbstractReportDbReader<SampleData,String>
@@ -131,7 +130,7 @@ public class SampleDataDbReader
    */
   @Override
   protected ReportProviderByID<SampleData> getReportProvider() {
-    return SampleDataT.getSingleton(m_DatabaseConnection);
+    return SampleDataF.getSingleton(m_DatabaseConnection);
   }
 
   /**

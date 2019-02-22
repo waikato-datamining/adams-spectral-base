@@ -25,7 +25,8 @@ import adams.data.spectrum.Spectrum;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DataProvider;
 import adams.db.DatabaseConnection;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
+import adams.db.SpectrumIntf;
 import adams.flow.core.ActorUtils;
 
 /**
@@ -174,7 +175,7 @@ public class SpectrumDbWriter
    */
   @Override
   public DataProvider<Spectrum> getDataProvider(Spectrum cont) {
-    return SpectrumT.getSingleton(m_DatabaseConnection);
+    return SpectrumF.getSingleton(m_DatabaseConnection);
   }
 
   /**
@@ -186,7 +187,7 @@ public class SpectrumDbWriter
    */
   @Override
   public boolean exists(DataProvider provider, Spectrum cont) {
-    return ((SpectrumT) provider).exists(cont.getID(), cont.getFormat());
+    return ((SpectrumIntf) provider).exists(cont.getID(), cont.getFormat());
   }
 
   /**
@@ -198,7 +199,7 @@ public class SpectrumDbWriter
    */
   @Override
   public boolean remove(DataProvider provider, Spectrum cont) {
-    return ((SpectrumT) provider).remove(cont.getID(), cont.getFormat(), m_KeepReport);
+    return ((SpectrumIntf) provider).remove(cont.getID(), cont.getFormat(), m_KeepReport);
   }
 
   /**
@@ -210,6 +211,6 @@ public class SpectrumDbWriter
    */
   @Override
   public Spectrum load(DataProvider provider, Spectrum cont) {
-    return ((SpectrumT) provider).load(cont.getID(), cont.getFormat());
+    return ((SpectrumIntf) provider).load(cont.getID(), cont.getFormat());
   }
 }

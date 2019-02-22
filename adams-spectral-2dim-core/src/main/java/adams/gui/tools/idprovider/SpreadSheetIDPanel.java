@@ -30,7 +30,7 @@ import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetUtils;
 import adams.db.DatabaseConnection;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 import adams.gui.chooser.SpreadSheetFileChooserPanel;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseTextField;
@@ -239,7 +239,7 @@ public class SpreadSheetIDPanel
 	}
 	else {
 	  String[] items = SpreadSheetUtils.getColumn(sheet, column, true, true);
-	  SpectrumT spt = SpectrumT.getSingleton(DatabaseConnection.getSingleton());
+	  SpectrumF spt = SpectrumF.getSingleton(DatabaseConnection.getSingleton());
 	  String format = m_TextFormat.getText();
 	  for (String item: items) {
 	    if (spt.exists(item, format))

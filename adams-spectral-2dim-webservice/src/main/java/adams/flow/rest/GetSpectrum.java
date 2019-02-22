@@ -15,7 +15,7 @@
 
 /*
  * GetSpectrum.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
@@ -23,7 +23,7 @@ package adams.flow.rest;
 import adams.data.conversion.SpectrumToJson;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumJsonUtils;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -69,7 +69,7 @@ public class GetSpectrum
     String		msg;
 
     initDatabase();
-    sp = SpectrumT.getSingleton(m_DatabaseConnection).load(id, format);
+    sp = SpectrumF.getSingleton(m_DatabaseConnection).load(id, format);
     if (sp == null) {
       return Response.serverError().entity("Spectrum not found: " + id + "/" + format).build();
     }

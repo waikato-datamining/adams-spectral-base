@@ -19,13 +19,23 @@
  *
  */
 
-package adams.db;
+package adams.db.generic;
 
 import adams.core.Constants;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.db.AbstractDatabaseConnection;
+import adams.db.AbstractIndexedTable;
+import adams.db.AbstractSpectralDbBackend;
+import adams.db.ColumnMapping;
+import adams.db.JDBC;
+import adams.db.SampleDataF;
+import adams.db.SampleDataIntf;
+import adams.db.SpectrumIDConditions;
+import adams.db.SpectrumIntf;
+import adams.db.TableManager;
 import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
@@ -46,15 +56,10 @@ import java.util.logging.Level;
  */
 public class SpectrumT
   extends AbstractIndexedTable
-  implements DataProvider<Spectrum> {
+  implements SpectrumIntf {
 
   /** for serialization. */
   private static final long serialVersionUID = 8400767916698176690L;
-
-  /** the table names. */
-  public final static String TABLE_NAME = "spectrum";
-
-  public static final String MAX_NUM_SPECTRUMS_CACHED = "maxNumSpectrumsCached";
 
   /** the table manager. */
   protected static TableManager<SpectrumT> m_TableManager;
@@ -65,16 +70,16 @@ public class SpectrumT
    * @param dbcon	the database context this table is used in
    */
   protected SpectrumT(AbstractDatabaseConnection dbcon) {
-    super(dbcon, adams.db.SpectrumT.TABLE_NAME);
+    super(dbcon, TABLE_NAME);
   }
 
   /**
-   * Returns the corresponding SampleDataT table.
+   * Returns the corresponding SampleData handler.
    *
-   * @return		the corresponding table
+   * @return		the corresponding handler
    */
-  public SampleDataT getSampleDataT() {
-    return SampleDataT.getSingleton(getDatabaseConnection());
+  public SampleDataIntf getSampleDataHandler() {
+    return AbstractSpectralDbBackend.getSingleton().getSampleData(getDatabaseConnection());
   }
 
   /**
@@ -93,7 +98,7 @@ public class SpectrumT
         return false;
     }
 
-    if (!getSampleDataT().init())
+    if (!getSampleDataHandler().init())
       return false;
 
     return true;
@@ -223,7 +228,7 @@ public class SpectrumT
       }
       result.addAll(list);
       list.clear();
-      result.setReport(getSampleDataT().load(result.getID()));
+      result.setReport(getSampleDataHandler().load(result.getID()));
       result.setType(rs.getString("SAMPLETYPE"));
       result.setFormat(rs.getString("FORMAT"));
     }
@@ -541,7 +546,7 @@ public class SpectrumT
 
 	  // store report (never overwrites, just adds additional fields)
 	  if (sp.hasReport())
-	    getSampleDataT().store(sp.getID(), sp.getReport(), false, true, new Field[0]);
+	    getSampleDataHandler().store(sp.getID(), sp.getReport(), false, true, new Field[0]);
         }
 	else {
 	  getLogger().severe("no gen keys");
@@ -626,7 +631,7 @@ public class SpectrumT
    * @param sample_id	the sample ID of the spectrum
    * @param keepReport	if true does not delete associated report
    * @return		true if no error
-   * @see		SpectrumT#remove(String, String, boolean)
+   * @see		#remove(String, String, boolean)
    */
   public boolean remove(String sample_id, boolean keepReport) {
     return remove(sample_id, SampleData.FORMAT, keepReport);
@@ -692,7 +697,7 @@ public class SpectrumT
 
     if (result && (sp != null) && !keepReport)
       // delete sample data
-      result = SampleDataT.getSingleton(getDatabaseConnection()).remove(sp.getID());
+      result = SampleDataF.getSingleton(getDatabaseConnection()).remove(sp.getID());
 
     return result;
   }

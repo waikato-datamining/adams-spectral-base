@@ -15,7 +15,7 @@
 
 /*
  * SampleDataDbReportDbWriter.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -25,7 +25,7 @@ import adams.data.spectrum.Spectrum;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
 import adams.db.ReportProvider;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.flow.core.ActorUtils;
 
 /**
@@ -87,7 +87,6 @@ import adams.flow.core.ActorUtils;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2390 $
  */
 public class SampleDataDbWriter
   extends AbstractReportDbWriterByID<SampleData>
@@ -138,7 +137,7 @@ public class SampleDataDbWriter
    */
   @Override
   protected ReportProvider<SampleData,String> getReportProvider() {
-    return SampleDataT.getSingleton(m_DatabaseConnection);
+    return SampleDataF.getSingleton(m_DatabaseConnection);
   }
 
   /**

@@ -15,7 +15,7 @@
 
 /*
  * SpectrumDbReader.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -26,7 +26,8 @@ import adams.data.spectrum.Spectrum;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DataProvider;
 import adams.db.DatabaseConnection;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
+import adams.db.SpectrumIntf;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
 
@@ -90,7 +91,6 @@ import adams.flow.core.Token;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2357 $
  */
 public class SpectrumDbReader
   extends AbstractDataContainerDbReader<Spectrum>
@@ -190,7 +190,7 @@ public class SpectrumDbReader
    */
   @Override
   public DataProvider<Spectrum> getDataProvider() {
-    return SpectrumT.getSingleton(m_DatabaseConnection);
+    return SpectrumF.getSingleton(m_DatabaseConnection);
   }
 
   /**
@@ -231,9 +231,9 @@ public class SpectrumDbReader
 
     if (useSampleID) {
       if (m_Raw)
-	cont = ((SpectrumT) getDataProvider()).loadRaw((String) m_InputToken.getPayload(), m_Format);
+	cont = ((SpectrumIntf) getDataProvider()).loadRaw((String) m_InputToken.getPayload(), m_Format);
       else
-	cont = ((SpectrumT) getDataProvider()).load((String) m_InputToken.getPayload(), m_Format);
+	cont = ((SpectrumIntf) getDataProvider()).load((String) m_InputToken.getPayload(), m_Format);
       if (cont == null)
 	result = "No container loaded for sample ID (format=" + m_Format + "): " + m_InputToken;
       else

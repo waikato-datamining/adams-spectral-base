@@ -15,12 +15,12 @@
 
 /*
  * DeleteSpectrum.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
 
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -58,10 +58,10 @@ public class DeleteSpectrum
   @Path("/spectrum/delete/{id}/{format}")
   @Produces("text/plain")
   public String delete(@PathParam("id") String id, @PathParam("format") String format) {
-    SpectrumT	spt;
+    SpectrumF spt;
 
     initDatabase();
-    spt = SpectrumT.getSingleton(m_DatabaseConnection);
+    spt = SpectrumF.getSingleton(m_DatabaseConnection);
     if (spt.exists(id, format))
       return "" + spt.remove(id, format, false);
     else

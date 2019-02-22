@@ -15,13 +15,13 @@
 
 /*
  * SpectralCommandProcessor.java
- * Copyright (C) 2016-2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.scripting;
 
 import adams.data.spectrum.Spectrum;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 import adams.gui.visualization.container.DataContainerPanel;
 import adams.gui.visualization.spectrum.SpectrumExplorer;
 import adams.gui.visualization.spectrum.SpectrumPanel;
@@ -30,7 +30,6 @@ import adams.gui.visualization.spectrum.SpectrumPanel;
  * Command processor for the spectral module.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SpectralCommandProcessor
   extends CommandProcessor {
@@ -129,6 +128,6 @@ public class SpectralCommandProcessor
    */
   protected void setupScriptlet(AbstractScriptlet scriptlet) {
     super.setupScriptlet(scriptlet);
-    scriptlet.setDataProvider(SpectrumT.getSingleton(getDatabaseConnection()));
+    scriptlet.setDataProvider(SpectrumF.getSingleton(getDatabaseConnection()));
   }
 }

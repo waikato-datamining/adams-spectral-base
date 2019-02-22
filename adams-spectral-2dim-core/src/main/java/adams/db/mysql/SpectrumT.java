@@ -34,7 +34,7 @@ import java.util.logging.Level;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SpectrumT
-  extends adams.db.SpectrumT {
+  extends adams.db.generic.SpectrumT {
 
   private static final long serialVersionUID = -1371114857113756774L;
 

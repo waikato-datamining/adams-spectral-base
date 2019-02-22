@@ -28,7 +28,7 @@ import adams.core.base.BaseDateTime;
 import adams.core.option.OptionUtils;
 import adams.db.AbstractSpectrumConditions;
 import adams.db.DatabaseConnection;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.db.SpectrumConditionsMulti;
 import adams.gui.chooser.DateChooserPanel;
 import adams.gui.core.BaseButton;
@@ -230,7 +230,7 @@ public class DatabaseSearchPanel
 	  MouseUtils.setWaitCursor((Component) m_Owner);
 	m_Searching = true;
 	updateButtons();
-	SampleDataT sdt = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
+	SampleDataF sdt = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
 	ids = sdt.getIDs(new String[]{"sp.AUTO_ID", "sp.SAMPLEID", "sp.FORMAT"}, m_Conditions);
 	return null;
       }

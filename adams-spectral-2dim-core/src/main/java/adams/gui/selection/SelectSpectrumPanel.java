@@ -15,7 +15,7 @@
 
 /*
  * SelectSpectrumPanel.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.selection;
@@ -25,10 +25,12 @@ import adams.db.AbstractDatabaseConnection;
 import adams.db.AbstractSpectrumConditions;
 import adams.db.Conditions;
 import adams.db.DatabaseConnection;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
+import adams.db.SampleDataIntf;
 import adams.db.SpectrumConditionsMulti;
+import adams.db.SpectrumF;
 import adams.db.SpectrumIDConditions;
-import adams.db.SpectrumT;
+import adams.db.SpectrumIntf;
 import adams.gui.core.ClearableModel;
 import adams.gui.core.CustomSearchTableModel;
 import adams.gui.core.SearchParameters;
@@ -40,7 +42,6 @@ import java.util.List;
  * A panel that lists all the spectrums currently in the database.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1556 $
  */
 public class SelectSpectrumPanel
   extends AbstractConditionalDatabaseSelectionPanel<Integer,AbstractConditions> {
@@ -319,8 +320,8 @@ public class SelectSpectrumPanel
    *
    * @return		the table object
    */
-  protected SpectrumT getSpectrumTable() {
-    return SpectrumT.getSingleton(getDatabaseConnection());
+  protected SpectrumIntf getSpectrumTable() {
+    return SpectrumF.getSingleton(getDatabaseConnection());
   }
 
   /**
@@ -329,8 +330,8 @@ public class SelectSpectrumPanel
    *
    * @return		the table object
    */
-  protected SampleDataT getSampleDataTable() {
-    return SampleDataT.getSingleton(getDatabaseConnection());
+  protected SampleDataIntf getSampleDataTable() {
+    return SampleDataF.getSingleton(getDatabaseConnection());
   }
 
   /**

@@ -103,6 +103,13 @@ adams.data.smoothing.AbstractSmoother=\
 adams.data.spectrum.AbstractSpectrumComparator=\
   adams.data.spectrum
 
+# the spectral DB backends
+adams.db.SpectralDbBackend=\
+  adams.db,\
+  adams.db.mysql,\
+  adams.db.postgresql,\
+  adams.db.sqlite
+
 # the ID provider panels
 adams.gui.tools.idprovider.AbstractIDProviderPanel=\
   adams.gui.tools.idprovider

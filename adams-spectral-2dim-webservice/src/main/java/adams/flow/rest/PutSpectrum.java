@@ -15,7 +15,7 @@
 
 /*
  * PutSpectrum.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
@@ -23,7 +23,7 @@ package adams.flow.rest;
 import adams.data.conversion.JsonToSpectrum;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumJsonUtils;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -68,7 +68,7 @@ public class PutSpectrum
     Spectrum 		sp;
     JsonToSpectrum 	conv;
     String		msg;
-    SpectrumT		spt;
+    SpectrumF 		spt;
 
     initDatabase();
     conv = new JsonToSpectrum();
@@ -78,7 +78,7 @@ public class PutSpectrum
       sp = (Spectrum) conv.getOutput();
       sp.setID(id);
       sp.setFormat(format);
-      spt = SpectrumT.getSingleton(m_DatabaseConnection);
+      spt = SpectrumF.getSingleton(m_DatabaseConnection);
       if (spt.exists(id, format))
         spt.remove(id, format, false);
       return "" + spt.add(sp);

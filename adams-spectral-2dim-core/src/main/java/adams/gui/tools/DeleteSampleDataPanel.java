@@ -25,7 +25,7 @@ import adams.core.ClassLister;
 import adams.core.Properties;
 import adams.data.report.Field;
 import adams.db.DatabaseConnection;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.env.Environment;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseComboBox;
@@ -303,7 +303,7 @@ public class DeleteSampleDataPanel
       protected Object doInBackground() throws Exception {
 	successful = true;
 	MouseUtils.setWaitCursor(DeleteSampleDataPanel.this);
-	SampleDataT sdt = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
+	SampleDataF sdt = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
 	for (int i = 0; i < sel.length; i++) {
 	  m_StatusBar.showStatus("Deleting: " + (i+1) + "/" + sel.length + "...");
 	  for (Field field: fields)

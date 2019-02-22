@@ -15,7 +15,7 @@
 
 /*
  * SimpleSpectralService.java
- * Copyright (C) 2013-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.webservice;
@@ -23,7 +23,7 @@ package adams.flow.webservice;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.spectrum.Spectrum;
 import adams.db.DatabaseConnectionUser;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.GetSpectrumHelper;
 import nz.ac.waikato.adams.webservice.spectral.get.GetRequest;
@@ -116,7 +116,7 @@ public class SimpleSpectralGetService
 
     result = new GetResponse();
     
-    sp = SpectrumT.getSingleton(m_DatabaseConnection).load(parameters.getId(), parameters.getFormat());
+    sp = SpectrumF.getSingleton(m_DatabaseConnection).load(parameters.getId(), parameters.getFormat());
     result.setId(parameters.getId());
     result.setFormat(parameters.getFormat());
     result.setSuccess(sp != null);

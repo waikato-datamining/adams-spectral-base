@@ -21,7 +21,7 @@ package adams.flow.transformer.datacontainer;
 
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
-import adams.db.SpectrumT;
+import adams.db.SpectrumIntf;
 
 /**
  * Obtains the reference data from the spectrum with the same sample ID
@@ -101,9 +101,9 @@ public class LoadSampleData
   @Override
   protected Spectrum doPostProcess(Spectrum data) {
     Spectrum		temp;
-    SpectrumT provider;
+    SpectrumIntf provider;
 
-    provider = (SpectrumT) getOwner().getDataProvider();
+    provider = (SpectrumIntf) getOwner().getDataProvider();
     temp     = provider.load(data.getID(), m_Format);
     if (temp == null) {
       getLogger().warning("Failed to load: " + data.getID() + "/" + m_Format);

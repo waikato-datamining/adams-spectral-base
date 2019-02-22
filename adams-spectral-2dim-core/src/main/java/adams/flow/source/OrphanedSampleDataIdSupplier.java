@@ -15,7 +15,7 @@
 
 /*
  * OrphanedSampleDataIdSupplier.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.source;
@@ -23,7 +23,7 @@ package adams.flow.source;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.Conditions;
 import adams.db.OrphanedSampleDataConditions;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.flow.core.ActorUtils;
 
 import java.util.List;
@@ -215,7 +215,7 @@ public class OrphanedSampleDataIdSupplier
     m_Queue.clear();
 
     try {
-      ids = SampleDataT.getSingleton(m_DatabaseConnection).getOrphanedIDs(m_Conditions);
+      ids = SampleDataF.getSingleton(m_DatabaseConnection).getOrphanedIDs(m_Conditions);
       if (isLoggingEnabled())
         getLogger().info("# orphaned IDs: " + ids.size());
       m_Queue.addAll(ids);

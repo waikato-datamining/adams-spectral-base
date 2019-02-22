@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * UpdateDatabaseID.java
- * Copyright (C) 2015-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer.report;
 
@@ -24,7 +24,7 @@ import adams.data.sampledata.SampleData;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
 import adams.db.DatabaseConnectionUser;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 import adams.flow.core.ActorUtils;
 import adams.flow.transformer.AbstractReportDbWriter;
 
@@ -156,7 +156,7 @@ public class UpdateDatabaseID
       m_DatabaseConnection = getDatabaseConnection();
 
     if (getOwner() instanceof AbstractReportDbWriter) {
-      dbid = SpectrumT.getSingleton(m_DatabaseConnection).getDatabaseID(data.getID(), m_Format);
+      dbid = SpectrumF.getSingleton(m_DatabaseConnection).getDatabaseID(data.getID(), m_Format);
       if (dbid != Constants.NO_ID)
         data.setDatabaseID(dbid);
     }

@@ -21,7 +21,7 @@ package adams.flow.source;
 
 import adams.db.AbstractDatabaseConnection;
 import adams.db.InstrumentProvider;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.flow.core.ActorUtils;
 
 /**
@@ -96,7 +96,7 @@ public class InstrumentSupplier
    * @return		the instrument provider
    */
   protected InstrumentProvider getProvider() {
-    return SampleDataT.getSingleton(m_DatabaseConnection);
+    return SampleDataF.getSingleton(m_DatabaseConnection);
   }
 
   /**

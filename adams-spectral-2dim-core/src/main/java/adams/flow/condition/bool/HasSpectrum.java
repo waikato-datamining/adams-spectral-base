@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * HasSpectrum.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.condition.bool;
@@ -23,7 +23,7 @@ package adams.flow.condition.bool;
 import adams.core.QuickInfoHelper;
 import adams.data.id.IDHandler;
 import adams.data.sampledata.SampleData;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 import adams.flow.core.Actor;
 import adams.flow.core.Token;
 import adams.flow.core.Unknown;
@@ -55,7 +55,6 @@ import adams.flow.core.Unknown;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class HasSpectrum
   extends AbstractBooleanDatabaseCondition {
@@ -222,7 +221,7 @@ public class HasSpectrum
       format = SampleData.DEFAULT_FORMAT;
 
     if (id != null)
-      result = SpectrumT.getSingleton(getDatabaseConnection()).exists(id, format);
+      result = SpectrumF.getSingleton(getDatabaseConnection()).exists(id, format);
     else
       getLogger().warning("Neither ID specified nor ID obtained from token: " + token);
 

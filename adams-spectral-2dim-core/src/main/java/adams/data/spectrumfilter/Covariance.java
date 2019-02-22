@@ -15,7 +15,7 @@
 
 /*
  * Covariance.java
- * Copyright (C) 2008-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -34,9 +34,9 @@ import adams.db.AbstractDatabaseConnection;
 import adams.db.AbstractSpectrumConditions;
 import adams.db.DatabaseConnection;
 import adams.db.DatabaseConnectionHandler;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.db.SpectrumConditionsMulti;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 
 import java.util.List;
 
@@ -77,7 +77,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class Covariance
   extends AbstractDatabaseConnectionFilter<Spectrum> {
@@ -357,9 +356,9 @@ public class Covariance
     }
     double min=Double.POSITIVE_INFINITY;
     double max=Double.NEGATIVE_INFINITY;
-    List<Integer> ids=SampleDataT.getSingleton(getDatabaseConnection()).getDBIDs(m_Conditions);
+    List<Integer> ids=SampleDataF.getSingleton(getDatabaseConnection()).getDBIDs(m_Conditions);
     for (Integer id:ids) {
-      Spectrum sp=SpectrumT.getSingleton(getDatabaseConnection()).load(id);
+      Spectrum sp=SpectrumF.getSingleton(getDatabaseConnection()).load(id);
       Spectrum filtered=m_filter.filter(sp);
       int count=0;
       for (SpectrumPoint spoint:filtered.toList()) {
@@ -374,7 +373,7 @@ public class Covariance
     }
 
     for (Integer id:ids) {
-      Spectrum sp=SpectrumT.getSingleton(getDatabaseConnection()).load(id);
+      Spectrum sp=SpectrumF.getSingleton(getDatabaseConnection()).load(id);
       Spectrum filtered=m_filter.filter(sp);
       int count=0;
       for (SpectrumPoint spoint:filtered.toList()) {

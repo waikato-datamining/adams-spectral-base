@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractSampleDataReader.java
- * Copyright (C) 2009-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.input;
 
@@ -25,14 +25,13 @@ import adams.data.sampledata.SampleData;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
 import adams.db.DatabaseConnectionHandler;
-import adams.db.SampleDataT;
-import adams.db.SpectrumT;
+import adams.db.SampleDataF;
+import adams.db.SpectrumF;
 
 /**
  * Ancestor for sample data readers.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1919 $
  */
 public abstract class AbstractSampleDataReader
   extends AbstractReportReader<SampleData>
@@ -158,8 +157,8 @@ public abstract class AbstractSampleDataReader
    *
    * @return		the table object
    */
-  protected SampleDataT getSampleData() {
-    return SampleDataT.getSingleton(getDatabaseConnection());
+  protected SampleDataF getSampleData() {
+    return SampleDataF.getSingleton(getDatabaseConnection());
   }
 
   /**
@@ -167,8 +166,8 @@ public abstract class AbstractSampleDataReader
    *
    * @return		the table object
    */
-  protected SpectrumT getSpectrum() {
-    return SpectrumT.getSingleton(getDatabaseConnection());
+  protected SpectrumF getSpectrum() {
+    return SpectrumF.getSingleton(getDatabaseConnection());
   }
 
   /**

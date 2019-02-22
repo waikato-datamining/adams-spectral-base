@@ -15,7 +15,7 @@
 
 /*
  * InterPercentileRangeCleaner.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.cleaner.spectrum;
@@ -36,9 +36,9 @@ import adams.db.AbstractSpectrumConditions;
 import adams.db.Conditions;
 import adams.db.DatabaseConnection;
 import adams.db.DatabaseConnectionHandler;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.db.SpectrumConditionsMulti;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -56,7 +56,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1913 $
  */
 public class InterPercentileRangeCleaner
   extends AbstractSerializableCleaner
@@ -304,8 +303,8 @@ public class InterPercentileRangeCleaner
      *
      * @return		the table singleton to use
      */
-    protected SpectrumT getSpectrumT() {
-      return SpectrumT.getSingleton(m_DatabaseConnection);
+    protected SpectrumF getSpectrumF() {
+      return SpectrumF.getSingleton(m_DatabaseConnection);
     }
 
     /**
@@ -321,7 +320,7 @@ public class InterPercentileRangeCleaner
       Spectrum						sp;
       int						i;
       int						n;
-      SpectrumT						table;
+      SpectrumF						table;
       List<SpectrumPoint>				points;
       SpectrumPoint					point;
       List<AbstractField>				fields;
@@ -330,7 +329,7 @@ public class InterPercentileRangeCleaner
       Hashtable<AbstractField,Percentile<Float>>	rangesField;
 
       result      = new Object[2];
-      table       = getSpectrumT();
+      table       = getSpectrumF();
       rangesAmpl  = null;
       rangesField = null;
 
@@ -600,7 +599,7 @@ public class InterPercentileRangeCleaner
 
     collector = new DataCollector(
 			getDatabaseConnection(),
-			getSampleDataT().getDBIDs(m_Conditions),
+			getSampleDataF().getDBIDs(m_Conditions),
 			m_LowerPercentile,
 			m_UpperPercentile,
 			m_ChunkSize);
@@ -817,8 +816,8 @@ public class InterPercentileRangeCleaner
    *
    * @return		the table singleton to use
    */
-  protected SampleDataT getSampleDataT() {
-    return SampleDataT.getSingleton(getDatabaseConnection());
+  protected SampleDataF getSampleDataF() {
+    return SampleDataF.getSingleton(getDatabaseConnection());
   }
 
   /**
@@ -826,8 +825,8 @@ public class InterPercentileRangeCleaner
    *
    * @return		the table singleton to use
    */
-  protected SpectrumT getSpectrumT() {
-    return SpectrumT.getSingleton(getDatabaseConnection());
+  protected SpectrumF getSpectrumF() {
+    return SpectrumF.getSingleton(getDatabaseConnection());
   }
 
   /**

@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumBasedInstanceGenerator.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -27,7 +27,7 @@ import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -42,7 +42,6 @@ import java.util.logging.Level;
  * weka.core.Instance objects.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public abstract class AbstractSpectrumBasedInstanceGenerator
   extends AbstractInstanceGenerator<Spectrum>
@@ -187,7 +186,7 @@ public abstract class AbstractSpectrumBasedInstanceGenerator
    */
   @Override
   protected void checkInput(Spectrum data) {
-    SpectrumT	table;
+    SpectrumF	table;
     Spectrum	sp;
     String	sampleID;
 
@@ -195,7 +194,7 @@ public abstract class AbstractSpectrumBasedInstanceGenerator
 
     if (!m_Offline) {
       if (data.hasReport() && data.getReport().isDummyReport() && m_LoadSampleData) {
-        table = SpectrumT.getSingleton(getDatabaseConnection());
+        table = SpectrumF.getSingleton(getDatabaseConnection());
 	sampleID = data.getReport().getStringValue(new Field(SampleData.SAMPLE_ID, DataType.STRING));
 	if (sampleID != null) {
 	  sp = table.load(sampleID, SampleData.DEFAULT_FORMAT);

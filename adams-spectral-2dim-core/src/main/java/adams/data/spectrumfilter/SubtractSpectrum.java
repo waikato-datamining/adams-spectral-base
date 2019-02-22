@@ -27,7 +27,7 @@ import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.DatabaseConnection;
-import adams.db.SpectrumT;
+import adams.db.SpectrumF;
 
 import java.util.List;
 
@@ -123,23 +123,16 @@ public class SubtractSpectrum
    */
   protected Spectrum processData(Spectrum data) {
     Spectrum		result;
-    List<SpectrumPoint>	list;
-    double		min;
-    double		max;
-    double		scale;
     int			i;
    
-
-
     Spectrum f1=m_Filter.filter(data);
-    Spectrum sp=SpectrumT.getSingleton(getDatabaseConnection()).load(new Integer(m_id));
+    Spectrum sp=SpectrumF.getSingleton(getDatabaseConnection()).load(new Integer(m_id));
     Spectrum f2=m_Filter.filter(sp);
    
     result = data.getHeader();
     List<SpectrumPoint> list1 = f1.toList();
     List<SpectrumPoint> list2 = f2.toList();
-    
-   
+
     for (i = 0; i < list1.size(); i++) {
       // scale point
       SpectrumPoint point1    = list1.get(i);

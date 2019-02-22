@@ -28,7 +28,7 @@ import adams.db.AbstractDatabaseConnection;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SampleDataT
-  extends adams.db.SampleDataT {
+  extends adams.db.generic.SampleDataT {
 
   private static final long serialVersionUID = 5345945766136653603L;
 

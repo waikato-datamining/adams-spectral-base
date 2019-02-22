@@ -23,7 +23,7 @@ package adams.gui.visualization.spectrum;
 import adams.data.report.Report;
 import adams.data.sampledata.SampleData;
 import adams.db.ReportProvider;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.gui.chooser.AbstractReportFileChooser;
 import adams.gui.chooser.SampleDataFileChooser;
 import adams.gui.core.BasePanel;
@@ -106,7 +106,7 @@ public class SampleDataFactory {
      */
     @Override
     public ReportProvider<?,?> getReportProvider() {
-      return SampleDataT.getSingleton(m_DatabaseConnection);
+      return SampleDataF.getSingleton(m_DatabaseConnection);
     }
 
     /**

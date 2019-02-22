@@ -28,7 +28,7 @@ import adams.db.AbstractDatabaseConnection;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SpectrumT
-  extends adams.db.SpectrumT {
+  extends adams.db.generic.SpectrumT {
 
   private static final long serialVersionUID = 7003479237078308491L;
 

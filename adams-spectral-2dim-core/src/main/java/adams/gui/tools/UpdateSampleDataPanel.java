@@ -30,7 +30,7 @@ import adams.data.report.Field;
 import adams.data.report.Report;
 import adams.data.sampledata.SampleData;
 import adams.db.DatabaseConnection;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.env.Environment;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseComboBox;
@@ -408,7 +408,7 @@ public class UpdateSampleDataPanel
       protected Object doInBackground() throws Exception {
 	successful = true;
 	MouseUtils.setWaitCursor(UpdateSampleDataPanel.this);
-	SampleDataT sdt = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
+	SampleDataF sdt = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
 	for (int i = 0; i < sel.length; i++) {
 	  m_StatusBar.showStatus("Updating: " + (i+1) + "/" + sel.length + "...");
 	  SampleData sd = sdt.load(sel[i]);
@@ -439,7 +439,7 @@ public class UpdateSampleDataPanel
    * Loads the associated report and displays it.
    */
   protected void showReport() {
-    SampleDataT 	sdt;
+    SampleDataF 	sdt;
     String		id;
     SampleData		sd;
 
@@ -449,7 +449,7 @@ public class UpdateSampleDataPanel
     }
 
     id  = m_Model.getSampleIdAt(m_TableIDs.getActualRow(m_TableIDs.getSelectedRow()));
-    sdt = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
+    sdt = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
     sd  = sdt.load(id);
     if (sd != null)
       m_TableSampleData.setModel(SampleDataFactory.getModel(sd));
@@ -463,7 +463,7 @@ public class UpdateSampleDataPanel
   protected void removeReferenceValues() {
     Report		report;
     String		msg;
-    SampleDataT		samplet;
+    SampleDataF		samplet;
     String		id;
 
     if (m_TableSampleData.getSelectedRowCount() == 0)
@@ -479,7 +479,7 @@ public class UpdateSampleDataPanel
     m_ButtonRemoveReferenceValue.setEnabled(false);
 
     id      = m_Model.getSampleIdAt(m_TableIDs.getActualRow(m_TableIDs.getSelectedRow()));
-    samplet = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
+    samplet = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
     for (AbstractField field: report.getFields()) {
       if (!samplet.remove(id, field)) {
         GUIHelper.showErrorMessage(this, "Failed to remove field '" + field + "' for ID '" + id + "'!");

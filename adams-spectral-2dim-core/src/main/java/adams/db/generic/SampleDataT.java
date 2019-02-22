@@ -19,7 +19,7 @@
  *
  */
 
-package adams.db;
+package adams.db.generic;
 
 import adams.core.DateFormat;
 import adams.core.DateUtils;
@@ -29,6 +29,21 @@ import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
+import adams.db.AbstractConditions;
+import adams.db.AbstractDatabaseConnection;
+import adams.db.AbstractSpectralDbBackend;
+import adams.db.AbstractSpectrumConditions;
+import adams.db.ColumnMapping;
+import adams.db.JDBC;
+import adams.db.OrphanedSampleDataConditions;
+import adams.db.ReportTableByID;
+import adams.db.SQL;
+import adams.db.SampleDataIntf;
+import adams.db.SpectrumConditionsMulti;
+import adams.db.SpectrumConditionsSingle;
+import adams.db.SpectrumF;
+import adams.db.SpectrumIntf;
+import adams.db.TableManager;
 import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
@@ -53,13 +68,10 @@ import java.util.logging.Level;
  */
 public abstract class SampleDataT
   extends ReportTableByID<SampleData, Field>
-  implements InstrumentProvider {
+  implements SampleDataIntf {
 
   /** for serialization. */
   private static final long serialVersionUID = 8386415021395089076L;
-
-  /** this table name. */
-  public final static String TABLE_NAME = "sampledata";
 
   /** the table manager. */
   protected static TableManager<SampleDataT> m_TableManager;
@@ -74,12 +86,12 @@ public abstract class SampleDataT
   }
 
   /**
-   * Returns the corresponding SpectrumT table.
+   * Returns the corresponding Spectrum handler.
    *
-   * @return		the corresponding table
+   * @return		the corresponding handler
    */
-  public SpectrumT getSpectrumT() {
-    return SpectrumT.getSingleton(getDatabaseConnection());
+  public SpectrumIntf getSpectrumHandler() {
+    return AbstractSpectralDbBackend.getSingleton().getSpectrum(getDatabaseConnection());
   }
 
   /**
@@ -456,7 +468,7 @@ public abstract class SampleDataT
     boolean			hasSampleID;
     boolean			hasFormat;
     boolean			hasSampleType;
-    AbstractSpectrumConditions	conditions;
+    AbstractSpectrumConditions conditions;
     BaseDouble[]		minValues;
     BaseDouble[]		maxValues;
     Field[]			fields;
@@ -505,7 +517,7 @@ public abstract class SampleDataT
       }
 
       // FROM
-      tables = getSpectrumT().getTableName() + " sp";
+      tables = getSpectrumHandler().getTableName() + " sp";
       if (conditions.getSortOnInsertTimestamp())
 	tables += ", " + getTableName() + " sd";
       if (fields.length > 0) {
@@ -611,7 +623,7 @@ public abstract class SampleDataT
 	sql += " ORDER BY sd_sort_by_date.VALUE";
       else
 	sql += " ORDER BY sp.AUTO_ID";
-      if (conditions.m_Latest)
+      if (conditions.getLatest())
 	sql += " DESC";
       else
 	sql += " ASC";
@@ -669,7 +681,7 @@ public abstract class SampleDataT
     conditions.update();
 
     tables = getTableName() + " AS sd "
-      + "LEFT OUTER JOIN " + SpectrumT.getSingleton(getDatabaseConnection()).getTableName() + " AS sp "
+      + "LEFT OUTER JOIN " + SpectrumF.getSingleton(getDatabaseConnection()).getTableName() + " AS sp "
       + "ON sp.sampleid = sd.id";
     where  = "sd.name = '" + SampleData.INSERT_TIMESTAMP + "'"
       + "and sampleid is null";

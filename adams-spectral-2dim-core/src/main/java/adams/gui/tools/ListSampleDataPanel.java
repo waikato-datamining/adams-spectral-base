@@ -31,7 +31,7 @@ import adams.data.spreadsheet.DefaultSpreadSheet;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.db.DatabaseConnection;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 import adams.env.Environment;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseComboBox;
@@ -329,7 +329,7 @@ public class ListSampleDataPanel
 	// collect sampledata
 	Set<String> namesSet = new HashSet<>();
 	Map<String,SampleData> all = new HashMap<>();
-	SampleDataT sdt = SampleDataT.getSingleton(DatabaseConnection.getSingleton());
+	SampleDataF sdt = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
 	for (int i = 0; i < sel.length; i++) {
 	  m_StatusBar.showStatus("Loading: " + (i+1) + "/" + sel.length + "...");
 	  SampleData sd = sdt.load(sel[i]);

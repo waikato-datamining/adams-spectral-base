@@ -15,7 +15,7 @@
 
 /*
  * PutSampleData.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
@@ -25,7 +25,7 @@ import adams.data.report.Field;
 import adams.data.report.Report;
 import adams.data.report.ReportJsonUtils;
 import adams.data.sampledata.SampleData;
-import adams.db.SampleDataT;
+import adams.db.SampleDataF;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -70,7 +70,7 @@ public class PutSampleData
     SampleData		sd;
     JsonToReport 	conv;
     String		msg;
-    SampleDataT 	sdt;
+    SampleDataF sdt;
 
     initDatabase();
     conv = new JsonToReport();
@@ -80,7 +80,7 @@ public class PutSampleData
       rep = (Report) conv.getOutput();
       sd  = new SampleData();
       sd.mergeWith(rep);
-      sdt = SampleDataT.getSingleton(m_DatabaseConnection);
+      sdt = SampleDataF.getSingleton(m_DatabaseConnection);
       if (!sdt.store(id, sd, true, true, (Field[]) sd.getFields().toArray()))
         return "Failed to store sample data under ID '" + id + "':\n" + sd;
       else
