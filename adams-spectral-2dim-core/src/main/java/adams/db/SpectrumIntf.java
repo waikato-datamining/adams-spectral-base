@@ -33,19 +33,12 @@ import java.util.List;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public interface SpectrumIntf
-  extends DataProvider<Spectrum> {
+  extends TableInterface, DataProvider<Spectrum> {
 
   /** the table names. */
   public final static String TABLE_NAME = "spectrum";
 
   public static final String MAX_NUM_SPECTRUMS_CACHED = "maxNumSpectrumsCached";
-
-  /**
-   * Get name of table.
-   *
-   * @return	table name
-   */
-  public String getTableName();
 
   /**
    * Returns the corresponding SampleData handler.

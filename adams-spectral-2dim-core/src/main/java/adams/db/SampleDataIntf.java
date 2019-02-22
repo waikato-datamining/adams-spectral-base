@@ -33,7 +33,7 @@ import java.util.List;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public interface SampleDataIntf
-  extends FieldProvider<Field>, ReportProviderByID<SampleData>, InstrumentProvider {
+  extends TableInterface, FieldProvider<Field>, ReportProviderByID<SampleData>, InstrumentProvider {
 
   /** this table name. */
   public final static String TABLE_NAME = "sampledata";
