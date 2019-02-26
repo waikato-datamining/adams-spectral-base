@@ -23,6 +23,7 @@ package adams.db;
 import adams.core.ClassLister;
 import adams.core.Properties;
 import adams.core.Utils;
+import adams.core.logging.LoggingLevel;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.OptionUtils;
 import adams.env.Environment;
@@ -81,6 +82,8 @@ public abstract class AbstractSpectralDbBackend
 	      + "Available: " + Utils.classesToString(available));
 	try {
 	  m_Singleton = (SpectralDbBackend) OptionUtils.forCommandLine(SpectralDbBackend.class, cmdline);
+	  m_Singleton.setLoggingLevel(LoggingLevel.INFO);
+	  m_Singleton.getLogger().info("Using Spectral DB Backend: " + m_Singleton.toCommandLine());
 	}
 	catch (Exception e) {
 	  m_Singleton = null;

@@ -265,7 +265,7 @@ public class SpectrumF
 
   /**
    * Adds a spectrum to the database. Returns the created auto-id, and sets in
-   * Spectrum.
+   * Spectrum. Wave numbers get stored.
    *
    * @param sp  	spectrum Header
    * @return  	new ID, or null if fail
@@ -273,6 +273,18 @@ public class SpectrumF
   @Override
   public Integer add(Spectrum sp) {
     return m_DB.add(sp);
+  }
+
+  /**
+   * Adds a spectrum to the database. Returns the created auto-id, and sets in
+   * Spectrum.
+   *
+   * @param sp  	spectrum Header
+   * @param storeWaveNo   whether to store the wave numbers as well
+   * @return  	new ID, or null if fail
+   */
+  public Integer add(Spectrum sp, boolean storeWaveNo) {
+    return m_DB.add(sp, storeWaveNo);
   }
 
   /**

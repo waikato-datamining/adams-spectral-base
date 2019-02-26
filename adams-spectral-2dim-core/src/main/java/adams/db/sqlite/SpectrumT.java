@@ -23,6 +23,10 @@ package adams.db.sqlite;
 import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
 import adams.db.AbstractDatabaseConnection;
+import adams.db.SQLUtils;
+import adams.db.SampleDataIntf;
+import adams.db.SpectrumIntf;
+import adams.db.TableManager;
 
 import java.sql.ResultSet;
 import java.util.logging.Level;
@@ -47,13 +51,22 @@ public class SpectrumT
   }
 
   /**
+   * Returns the corresponding SampleData handler.
+   *
+   * @return		the corresponding handler
+   */
+  public SampleDataIntf getSampleDataHandler() {
+    return SampleDataT.getSingleton(getDatabaseConnection());
+  }
+
+  /**
    * Adds a spectrum to the database. Returns the created auto-id, and sets in
    * Spectrum.
    *
    * @param sp  	spectrum Header
    * @return  	new ID, or null if fail
    */
-  public synchronized Integer add(Spectrum sp) {
+  public synchronized Integer add(Spectrum sp, boolean storeWaveNo) {
     Integer 		result;
     StringBuilder 	q;
     ResultSet 		rs;
@@ -63,7 +76,7 @@ public class SpectrumT
     if (getDebug())
       getLogger().info("Entered add");
 
-    q  = addQuery(sp);
+    q  = addQuery(sp, storeWaveNo);
     rs = null;
     try {
       execute(q.toString());
@@ -95,9 +108,33 @@ public class SpectrumT
       result = null;
     }
     finally {
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
 
     return result;
+  }
+
+  /**
+   * Initializes the table. Used by the "InitializeTables" tool.
+   *
+   * @param dbcon	the database context
+   */
+  public static synchronized void initTable(AbstractDatabaseConnection dbcon) {
+    getSingleton(dbcon).init();
+  }
+
+  /**
+   * Returns the singleton of the table (active).
+   *
+   * @param dbcon	the database connection to get the singleton for
+   * @return		the singleton
+   */
+  public static synchronized SpectrumIntf getSingleton(AbstractDatabaseConnection dbcon) {
+    if (m_TableManager == null)
+      m_TableManager = new TableManager<>(TABLE_NAME, dbcon.getOwner());
+    if (!m_TableManager.has(dbcon))
+      m_TableManager.add(dbcon, new SpectrumT(dbcon));
+
+    return m_TableManager.get(dbcon);
   }
 }

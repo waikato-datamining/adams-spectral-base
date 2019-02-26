@@ -14,45 +14,80 @@
  */
 
 /*
- * SpectrumIntf.java
- * Copyright (C) 2019 University of Waikato, Hamilton, New Zealand
- *
+ * SpectrumT.java
+ * Copyright (C) 2019 University of Waikato, Hamilton, NZ
  */
 
-package adams.db;
+package adams.db.mirrored;
 
 import adams.core.Constants;
+import adams.core.UniqueIDs;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
+import adams.db.AbstractDatabaseConnection;
+import adams.db.AbstractSpectralDbBackend;
+import adams.db.SampleDataIntf;
+import adams.db.SpectrumIDConditions;
+import adams.db.SpectrumIntf;
+import adams.db.wrapper.AbstractWrapper;
+import adams.db.wrapper.WrapperManager;
 
 import java.util.List;
 
 /**
- * Interface for spectrum tables.
+ * Allows mirroring to another database.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public interface SpectrumIntf
-  extends TableInterface, DataProvider<Spectrum> {
+public class SpectrumT
+  extends AbstractWrapper<SpectrumIntf>
+  implements SpectrumIntf {
 
-  /** the table names. */
-  public final static String TABLE_NAME = "spectrum";
+  private static final long serialVersionUID = -979406390402187979L;
 
-  public static final String MAX_NUM_SPECTRUMS_CACHED = "maxNumSpectrumsCached";
+  /** the table manager. */
+  protected static WrapperManager<SpectrumT> m_TableManager;
+
+  /** the non-mirrored backend. */
+  protected SpectrumIntf m_DB;
+
+  /** object for blocking polling/removal of fully processed. */
+  protected final Long m_Updating;
+
+  /**
+   * Initializes the mirroring.
+   *
+   * @param dbcon	the database connection
+   * @param wrapped	the mirror
+   */
+  protected SpectrumT(AbstractDatabaseConnection dbcon, SpectrumIntf wrapped) {
+    super(dbcon, wrapped);
+    m_DB       = ((SpectralDbBackend) AbstractSpectralDbBackend.getSingleton()).getNonMirroredBackend().getSpectrum(dbcon);
+    m_Updating = UniqueIDs.nextLong();
+  }
 
   /**
    * Returns the corresponding SampleData handler.
    *
    * @return		the corresponding handler
    */
-  public SampleDataIntf getSampleDataHandler();
+  @Override
+  public SampleDataIntf getSampleDataHandler() {
+    return SpectralDbBackend.getSingleton().getSampleData(getDatabaseConnection());
+  }
 
   /**
    * Initialise table & sub-tables.
    *
    * @return success?
    */
-  public boolean init();
+  @Override
+  public boolean init() {
+    synchronized(m_Updating) {
+      getWrapped().init();
+      return m_DB.init();
+    }
+  }
 
   /**
    * Checks whether the container exists in the database.
@@ -60,7 +95,10 @@ public interface SpectrumIntf
    * @param id		the database ID of the data container
    * @return		true if the container exists
    */
-  public boolean exists(int id);
+  @Override
+  public boolean exists(int id) {
+    return m_DB.exists(id);
+  }
 
   /**
    * Checks whether the container exists in the database.
@@ -70,7 +108,10 @@ public interface SpectrumIntf
    * @return		true if the container exists
    * @see		#exists(String, String)
    */
-  public boolean exists(String id);
+  @Override
+  public boolean exists(String id) {
+    return m_DB.exists(id);
+  }
 
   /**
    * Checks whether the container exists in the database.
@@ -78,7 +119,10 @@ public interface SpectrumIntf
    * @param id		the ID of the data container
    * @return		true if the container exists
    */
-  public boolean exists(String id, String format);
+  @Override
+  public boolean exists(String id, String format) {
+    return m_DB.exists(id, format);
+  }
 
   /**
    * Load a spectrum with given database ID. Get from cache if available
@@ -86,7 +130,10 @@ public interface SpectrumIntf
    * @param auto_id	the database ID
    * @return 		Spectrum, or null if not found
    */
-  public Spectrum load(int auto_id);
+  @Override
+  public Spectrum load(int auto_id) {
+    return m_DB.load(auto_id);
+  }
 
   /**
    * Load a spectrum with given ID. Get from cache if available
@@ -96,7 +143,10 @@ public interface SpectrumIntf
    * @return 		Spectrum, or null if not found
    * @see		#load(String, String)
    */
-  public Spectrum load(String id);
+  @Override
+  public Spectrum load(String id) {
+    return m_DB.load(id);
+  }
 
   /**
    * Load a spectrum with given sample ID and type. Get from cache if available
@@ -105,7 +155,10 @@ public interface SpectrumIntf
    * @param format	the format
    * @return 		Spectrum, or null if not found
    */
-  public Spectrum load(String sample_id, String format);
+  @Override
+  public Spectrum load(String sample_id, String format) {
+    return m_DB.load(sample_id, format);
+  }
 
   /**
    * Load a data container with given auto_id, without passing it through
@@ -114,7 +167,10 @@ public interface SpectrumIntf
    * @param auto_id	the databae ID
    * @return 		the data container, or null if not found
    */
-  public Spectrum loadRaw(int auto_id);
+  @Override
+  public Spectrum loadRaw(int auto_id) {
+    return m_DB.loadRaw(auto_id);
+  }
 
   /**
    * Load a spectrum with given sample ID and type, without filtering through
@@ -124,7 +180,10 @@ public interface SpectrumIntf
    * @param format	the format
    * @return 		Spectrum, or null if not found
    */
-  public Spectrum loadRaw(String sample_id, String format);
+  @Override
+  public Spectrum loadRaw(String sample_id, String format) {
+    return m_DB.loadRaw(sample_id, format);
+  }
 
   /**
    * Load a spectrum from DB with given auto_id.
@@ -135,7 +194,10 @@ public interface SpectrumIntf
    * 			through the global container filter
    * @return 		Spectrum, or null if not found
    */
-  public Spectrum loadFromDB(int auto_id, String rlike, boolean raw);
+  @Override
+  public Spectrum loadFromDB(int auto_id, String rlike, boolean raw) {
+    return m_DB.loadFromDB(auto_id, rlike, raw);
+  }
 
   /**
    * Load a spectrum from DB with given sample_id and format.
@@ -146,7 +208,10 @@ public interface SpectrumIntf
    * 			through the global container filter
    * @return 		Spectrum, or null if not found
    */
-  public Spectrum loadFromDB(String sample_id, String format, boolean raw);
+  @Override
+  public Spectrum loadFromDB(String sample_id, String format, boolean raw) {
+    return m_DB.loadFromDB(sample_id, format, raw);
+  }
 
   /**
    * Returns the database ID for given spectrum ID. Get from cache if available
@@ -156,7 +221,10 @@ public interface SpectrumIntf
    * @return 		Spectrum, or null if not found
    * @see		#load(String, String)
    */
-  public int getDatabaseID(String id);
+  @Override
+  public int getDatabaseID(String id) {
+    return m_DB.getDatabaseID(id);
+  }
 
   /**
    * Returns the database ID for given sample ID and type. Get from cache if available
@@ -165,7 +233,10 @@ public interface SpectrumIntf
    * @param format	the format
    * @return 		the database ID, {@link Constants#NO_ID}
    */
-  public int getDatabaseID(String sample_id, String format);
+  @Override
+  public int getDatabaseID(String sample_id, String format) {
+    return m_DB.getDatabaseID(sample_id, format);
+  }
 
   /**
    * returns all the specified fields in the database, separated by TABs.
@@ -174,7 +245,10 @@ public interface SpectrumIntf
    * @param cond	the conditions for the retrieval
    * @return		list of tab-separated values
    */
-  public List<String> getValues(String[] fields, SpectrumIDConditions cond);
+  @Override
+  public List<String> getValues(String[] fields, SpectrumIDConditions cond) {
+    return m_DB.getValues(fields, cond);
+  }
 
   /**
    * returns all the specified fields in the database, separated by TABs.
@@ -184,7 +258,10 @@ public interface SpectrumIntf
    * @param cond	the conditions for the retrieval
    * @return		list of tab-separated values
    */
-  public List<String> getValues(String[] fields, String where, SpectrumIDConditions cond);
+  @Override
+  public List<String> getValues(String[] fields, String where, SpectrumIDConditions cond) {
+    return m_DB.getValues(fields, where, cond);
+  }
 
   /**
    * returns all the specified fields in the database, separated by TABs.
@@ -195,16 +272,25 @@ public interface SpectrumIntf
    * @param cond	the conditions for the retrieval
    * @return		list of tab-separated values
    */
-  public List<String> getValues(String[] fields, String tables, String where, SpectrumIDConditions cond);
+  @Override
+  public List<String> getValues(String[] fields, String tables, String where, SpectrumIDConditions cond) {
+    return m_DB.getValues(fields, tables, where, cond);
+  }
 
   /**
    * Adds a spectrum to the database. Returns the created auto-id, and sets in
-   * Spectrum. Wave numbers get stored.
+   * Spectrum.
    *
    * @param sp  	spectrum Header
    * @return  	new ID, or null if fail
    */
-  public Integer add(Spectrum sp);
+  @Override
+  public Integer add(Spectrum sp) {
+    synchronized(m_Updating) {
+      getWrapped().add(sp);
+      return m_DB.add(sp);
+    }
+  }
 
   /**
    * Adds a spectrum to the database. Returns the created auto-id, and sets in
@@ -214,7 +300,12 @@ public interface SpectrumIntf
    * @param storeWaveNo   whether to store the wave numbers as well
    * @return  	new ID, or null if fail
    */
-  public Integer add(Spectrum sp, boolean storeWaveNo);
+  public Integer add(Spectrum sp, boolean storeWaveNo) {
+    synchronized(m_Updating) {
+      getWrapped().add(sp, storeWaveNo);
+      return m_DB.add(sp, storeWaveNo);
+    }
+  }
 
   /**
    * Removes the spectrum and its sample data.
@@ -225,7 +316,13 @@ public interface SpectrumIntf
    * @return		true if no error
    * @see		SpectrumIntf#remove(String, String, boolean)
    */
-  public boolean remove(String sample_id, boolean keepReport);
+  @Override
+  public boolean remove(String sample_id, boolean keepReport) {
+    synchronized(m_Updating) {
+      getWrapped().remove(sample_id, keepReport);
+      return m_DB.remove(sample_id, keepReport);
+    }
+  }
 
   /**
    * Removes the spectrum and its sample data.
@@ -235,7 +332,13 @@ public interface SpectrumIntf
    * @param keepReport	if true does not delete associated report
    * @return		true if no error
    */
-  public boolean remove(String sample_id, String format, boolean keepReport);
+  @Override
+  public boolean remove(String sample_id, String format, boolean keepReport) {
+    synchronized(m_Updating) {
+      getWrapped().remove(sample_id, format, keepReport);
+      return m_DB.remove(sample_id, format, keepReport);
+    }
+  }
 
   /**
    * Removes the spectrum and its sample data.
@@ -244,5 +347,27 @@ public interface SpectrumIntf
    * @param keepReport	if true does not delete associated report
    * @return		true if no error
    */
-  public boolean remove(int id, boolean keepReport);
+  @Override
+  public boolean remove(int id, boolean keepReport) {
+    synchronized(m_Updating) {
+      getLogger().severe("Cannot remove spectrum via AUTO_ID on mirror: " + id);
+      return m_DB.remove(id, keepReport);
+    }
+  }
+
+  /**
+   * Returns the singleton of the table.
+   *
+   * @param dbcon	the database connection to get the singleton for
+   * @param mirror 	the mirror
+   * @return		the singleton
+   */
+  public static synchronized SpectrumT getSingleton(AbstractDatabaseConnection dbcon, SpectrumIntf mirror) {
+    if (m_TableManager == null)
+      m_TableManager = new WrapperManager<>(TABLE_NAME, dbcon.getOwner());
+    if (!m_TableManager.has(dbcon))
+      m_TableManager.add(dbcon, new SpectrumT(dbcon, mirror));
+
+    return m_TableManager.get(dbcon);
+  }
 }

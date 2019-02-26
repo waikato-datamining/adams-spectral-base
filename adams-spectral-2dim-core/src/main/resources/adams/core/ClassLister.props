@@ -5,7 +5,6 @@
 # class.name=package1,package2,...
 #
 # Author:  FracPete (fracpete at waikato dot ac dot nz)
-# Version: $Revision: 10634 $
 
 # the spectrum readers
 adams.data.io.input.AbstractSpectrumReader=\
@@ -106,6 +105,7 @@ adams.data.spectrum.AbstractSpectrumComparator=\
 # the spectral DB backends
 adams.db.SpectralDbBackend=\
   adams.db,\
+  adams.db.mirrored,\
   adams.db.mysql,\
   adams.db.postgresql,\
   adams.db.sqlite

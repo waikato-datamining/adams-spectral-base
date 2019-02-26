@@ -21,6 +21,9 @@
 package adams.db.postgresql;
 
 import adams.db.AbstractDatabaseConnection;
+import adams.db.SampleDataIntf;
+import adams.db.SpectrumIntf;
+import adams.db.TableManager;
 
 /**
  * PostgreSQL implementation.
@@ -39,5 +42,38 @@ public class SpectrumT
    */
   public SpectrumT(AbstractDatabaseConnection dbcon) {
     super(dbcon);
+  }
+
+  /**
+   * Returns the corresponding SampleData handler.
+   *
+   * @return		the corresponding handler
+   */
+  public SampleDataIntf getSampleDataHandler() {
+    return SampleDataT.getSingleton(getDatabaseConnection());
+  }
+
+  /**
+   * Initializes the table. Used by the "InitializeTables" tool.
+   *
+   * @param dbcon	the database context
+   */
+  public static synchronized void initTable(AbstractDatabaseConnection dbcon) {
+    getSingleton(dbcon).init();
+  }
+
+  /**
+   * Returns the singleton of the table (active).
+   *
+   * @param dbcon	the database connection to get the singleton for
+   * @return		the singleton
+   */
+  public static synchronized SpectrumIntf getSingleton(AbstractDatabaseConnection dbcon) {
+    if (m_TableManager == null)
+      m_TableManager = new TableManager<>(TABLE_NAME, dbcon.getOwner());
+    if (!m_TableManager.has(dbcon))
+      m_TableManager.add(dbcon, new SpectrumT(dbcon));
+
+    return m_TableManager.get(dbcon);
   }
 }

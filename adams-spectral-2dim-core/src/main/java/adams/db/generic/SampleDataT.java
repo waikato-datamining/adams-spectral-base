@@ -31,18 +31,16 @@ import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.db.AbstractConditions;
 import adams.db.AbstractDatabaseConnection;
-import adams.db.AbstractSpectralDbBackend;
 import adams.db.AbstractSpectrumConditions;
 import adams.db.ColumnMapping;
 import adams.db.JDBC;
 import adams.db.OrphanedSampleDataConditions;
 import adams.db.ReportTableByID;
-import adams.db.SQL;
+import adams.db.SQLUtils;
 import adams.db.SampleDataIntf;
 import adams.db.SpectrumConditionsMulti;
 import adams.db.SpectrumConditionsSingle;
 import adams.db.SpectrumF;
-import adams.db.SpectrumIntf;
 import adams.db.TableManager;
 import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
@@ -86,15 +84,6 @@ public abstract class SampleDataT
   }
 
   /**
-   * Returns the corresponding Spectrum handler.
-   *
-   * @return		the corresponding handler
-   */
-  public SpectrumIntf getSpectrumHandler() {
-    return AbstractSpectralDbBackend.getSingleton().getSpectrum(getDatabaseConnection());
-  }
-
-  /**
    * Returns all available fields.
    *
    * @param dtype	the type to limit the search to, use "null" for all
@@ -125,7 +114,7 @@ public abstract class SampleDataT
 	tables     = getTableName() + " sd";
 
 	if (dtype != null)
-	  whereParts.add("sd.TYPE = " + backquote(dtype.toString()));
+	  whereParts.add("sd.TYPE = " + SQLUtils.backquote(dtype.toString()));
 
 	if (whereParts.size() > 0) {
 	  where = "";
@@ -147,7 +136,7 @@ public abstract class SampleDataT
 	getLogger().log(Level.SEVERE, "Failed to get fields: " + dtype, e);
       }
       finally {
-	closeAll(rs);
+	SQLUtils.closeAll(rs);
       }
     }
 
@@ -161,7 +150,7 @@ public abstract class SampleDataT
    * @return		true if the report exists
    */
   public boolean exists(String id) {
-    return isThere("ID = " + backquote(id));
+    return isThere("ID = " + SQLUtils.backquote(id));
   }
 
   /**
@@ -177,7 +166,7 @@ public abstract class SampleDataT
       rs = select(
 	"ID, NAME, TYPE, VALUE",
 	getTableName(),
-	"ID = " + backquote(id));
+	"ID = " + SQLUtils.backquote(id));
       while (rs.next()) {
 	String name = rs.getString("NAME");
 	String type = rs.getString("TYPE");
@@ -199,7 +188,7 @@ public abstract class SampleDataT
       getLogger().log(Level.SEVERE, "Failed to load: " + id, e);
     }
     finally {
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
 
     return result;
@@ -236,7 +225,7 @@ public abstract class SampleDataT
     boolean result = true;
     Set<String> names;
     try {
-      names = new HashSet<>(selectString(false, "NAME", getTableName(), "ID = " + backquote(id)));
+      names = new HashSet<>(selectString(false, "NAME", getTableName(), "ID = " + SQLUtils.backquote(id)));
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to query existing names for " + id, e);
@@ -326,8 +315,8 @@ public abstract class SampleDataT
       }
       catch (Exception e) {
 	getLogger().log(Level.SEVERE, "Failed to add insert/update statement: " + id, e);
-	SQL.close(stmtInsert);
-	SQL.close(stmtUpdate);
+	SQLUtils.close(stmtInsert);
+	SQLUtils.close(stmtUpdate);
 	return false;
       }
     }
@@ -354,8 +343,8 @@ public abstract class SampleDataT
       }
     }
 
-    SQL.close(stmtInsert);
-    SQL.close(stmtUpdate);
+    SQLUtils.close(stmtInsert);
+    SQLUtils.close(stmtUpdate);
 
     return result;
   }
@@ -549,7 +538,7 @@ public abstract class SampleDataT
 	for (i = 0; i < fields.length; i++) {
 	  if (fields[i].getName().length() > 0) {
 	    where.add("sd" + i + ".ID = sp.SAMPLEID");
-	    where.add("sd" + i + ".NAME = " + backquote(fields[i].getName()));
+	    where.add("sd" + i + ".NAME = " + SQLUtils.backquote(fields[i].getName()));
 	  }
 	}
       }
@@ -562,52 +551,52 @@ public abstract class SampleDataT
       }
 
       if (hasSampleID)
-	where.add("sp.SAMPLEID " + regexp + " " + backquote(conditions.getSampleIDRegExp()));
+	where.add("sp.SAMPLEID " + regexp + " " + SQLUtils.backquote(conditions.getSampleIDRegExp()));
 
       if (hasSampleType)
-	where.add("sp.SAMPLETYPE " + regexp + " " + backquote(conditions.getSampleTypeRegExp()));
+	where.add("sp.SAMPLETYPE " + regexp + " " + SQLUtils.backquote(conditions.getSampleTypeRegExp()));
 
       if (hasFormat)
-	where.add("sp.FORMAT " + regexp + " " + backquote(conditions.getFormat()));
+	where.add("sp.FORMAT " + regexp + " " + SQLUtils.backquote(conditions.getFormat()));
 
       if (!conditions.getStartDate().isInfinity()) {
 	where.add("sd_start" + ".ID = sp.SAMPLEID");
-	where.add("sd_start" + ".NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
-	where.add("sd_start" + ".VALUE >= " + backquote(conditions.getStartDate().stringValue()));
+	where.add("sd_start" + ".NAME = " + SQLUtils.backquote(SampleData.INSERT_TIMESTAMP));
+	where.add("sd_start" + ".VALUE >= " + SQLUtils.backquote(conditions.getStartDate().stringValue()));
       }
 
       if (!conditions.getEndDate().isInfinity()) {
 	where.add("sd_end" + ".ID = sp.SAMPLEID");
-	where.add("sd_end" + ".NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
-	where.add("sd_end" + ".VALUE <= " + backquote(conditions.getEndDate().stringValue()));
+	where.add("sd_end" + ".NAME = " + SQLUtils.backquote(SampleData.INSERT_TIMESTAMP));
+	where.add("sd_end" + ".VALUE <= " + SQLUtils.backquote(conditions.getEndDate().stringValue()));
       }
 
       if (hasInstrument) {
 	where.add("sd_instrument" + ".ID = sp.SAMPLEID");
-	where.add("sd_instrument" + ".NAME = " + backquote(SampleData.INSTRUMENT));
-	where.add("sd_instrument" + ".VALUE " + regexp + " " + backquote(conditions.getInstrument()));
+	where.add("sd_instrument" + ".NAME = " + SQLUtils.backquote(SampleData.INSTRUMENT));
+	where.add("sd_instrument" + ".VALUE " + regexp + " " + SQLUtils.backquote(conditions.getInstrument()));
       }
 
       if (conditions.getExcludeDummies() || conditions.getOnlyDummies()) {
 	where.add("sd_dummies.ID = sp.SAMPLEID");
-	where.add("sd_dummies.NAME = " + backquote(SampleData.FIELD_DUMMYREPORT));
-	where.add("sd_dummies.VALUE = " + backquote("" + conditions.getOnlyDummies()));
+	where.add("sd_dummies.NAME = " + SQLUtils.backquote(SampleData.FIELD_DUMMYREPORT));
+	where.add("sd_dummies.VALUE = " + SQLUtils.backquote("" + conditions.getOnlyDummies()));
       }
 
       if (required.length > 0) {
 	for (i = 0; i < required.length; i++) {
 	  if (required[i].getName().length() > 0) {
 	    where.add("sd_req" + i + ".ID = sp.SAMPLEID");
-	    where.add("sd_req" + i + ".NAME = " + backquote(required[i].getName()));
+	    where.add("sd_req" + i + ".NAME = " + SQLUtils.backquote(required[i].getName()));
 	  }
 	}
       }
 
       if (conditions.getSortOnInsertTimestamp()) {
 	where.add("sd.ID = " + "sp.SAMPLEID");
-	where.add("sd.NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
+	where.add("sd.NAME = " + SQLUtils.backquote(SampleData.INSERT_TIMESTAMP));
 	where.add("sd_sort_by_date" + ".ID = sp.SAMPLEID");
-	where.add("sd_sort_by_date" + ".NAME = " + backquote(SampleData.INSERT_TIMESTAMP));
+	where.add("sd_sort_by_date" + ".NAME = " + SQLUtils.backquote(SampleData.INSERT_TIMESTAMP));
       }
 
       // generate SQL
@@ -654,7 +643,7 @@ public abstract class SampleDataT
 	  }
 	}
       }
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to get IDs: " + conditions, e);
@@ -700,7 +689,7 @@ public abstract class SampleDataT
       rs = select("id", tables, where);
       while (rs.next())
 	result.add(rs.getString(1));
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to get orphaned IDs: " + conditions, e);
@@ -722,7 +711,7 @@ public abstract class SampleDataT
 
     rs = null;
     try {
-      rs = selectDistinct("VALUE", "NAME = " + backquote(SampleData.INSTRUMENT));
+      rs = selectDistinct("VALUE", "NAME = " + SQLUtils.backquote(SampleData.INSTRUMENT));
       while (rs.next())
 	result.add(rs.getString(1));
     }
@@ -731,44 +720,12 @@ public abstract class SampleDataT
       getLogger().log(Level.SEVERE, "Failed to get instruments", e);
     }
     finally {
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
 
     if (result.size() > 1)
       Collections.sort(result);
 
     return result;
-  }
-
-  /**
-   * Initializes the table. Used by the "InitializeTables" tool.
-   *
-   * @param dbcon	the database context
-   */
-  public static synchronized void initTable(AbstractDatabaseConnection dbcon) {
-    getSingleton(dbcon).init();
-  }
-
-  /**
-   * Returns the singleton of the table (active).
-   *
-   * @param dbcon	the database connection to get the singleton for
-   * @return		the singleton
-   */
-  public static synchronized SampleDataT getSingleton(AbstractDatabaseConnection dbcon) {
-    if (m_TableManager == null)
-      m_TableManager = new TableManager<>(TABLE_NAME, dbcon.getOwner());
-    if (!m_TableManager.has(dbcon)) {
-      if (JDBC.isMySQL(dbcon))
-	m_TableManager.add(dbcon, new adams.db.mysql.SampleDataT(dbcon));
-      else if (JDBC.isPostgreSQL(dbcon))
-	m_TableManager.add(dbcon, new adams.db.postgresql.SampleDataT(dbcon));
-      else if (JDBC.isSQLite(dbcon))
-	m_TableManager.add(dbcon, new adams.db.sqlite.SampleDataT(dbcon));
-      else
-	throw new IllegalArgumentException("Unrecognized JDBC URL: " + dbcon.getURL());
-    }
-
-    return m_TableManager.get(dbcon);
   }
 }

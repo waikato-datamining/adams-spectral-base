@@ -20,8 +20,6 @@
 
 package adams.db;
 
-import adams.core.option.OptionHandler;
-
 /**
  * Interface for classes that return actual implementations of the
  * processing database interfaces.
@@ -29,7 +27,7 @@ import adams.core.option.OptionHandler;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public interface SpectralDbBackend
-  extends OptionHandler {
+  extends BackendManager {
 
   /** the properties file containing the setup. */
   public final static String FILENAME = "SpectralDbBackend.props";

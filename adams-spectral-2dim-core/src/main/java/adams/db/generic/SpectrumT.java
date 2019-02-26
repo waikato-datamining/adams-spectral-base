@@ -28,11 +28,10 @@ import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.AbstractIndexedTable;
-import adams.db.AbstractSpectralDbBackend;
 import adams.db.ColumnMapping;
 import adams.db.JDBC;
+import adams.db.SQLUtils;
 import adams.db.SampleDataF;
-import adams.db.SampleDataIntf;
 import adams.db.SpectrumIDConditions;
 import adams.db.SpectrumIntf;
 import adams.db.TableManager;
@@ -54,7 +53,7 @@ import java.util.logging.Level;
  *
  * @author dale
  */
-public class SpectrumT
+public abstract class SpectrumT
   extends AbstractIndexedTable
   implements SpectrumIntf {
 
@@ -71,15 +70,6 @@ public class SpectrumT
    */
   protected SpectrumT(AbstractDatabaseConnection dbcon) {
     super(dbcon, TABLE_NAME);
-  }
-
-  /**
-   * Returns the corresponding SampleData handler.
-   *
-   * @return		the corresponding handler
-   */
-  public SampleDataIntf getSampleDataHandler() {
-    return AbstractSpectralDbBackend.getSingleton().getSampleData(getDatabaseConnection());
   }
 
   /**
@@ -133,7 +123,7 @@ public class SpectrumT
    * @return		true if the container exists
    */
   public boolean exists(String id, String format) {
-    return isThere("SAMPLEID = " + backquote(id) + " AND FORMAT = " + backquote(format));
+    return isThere("SAMPLEID = " + SQLUtils.backquote(id) + " AND FORMAT = " + SQLUtils.backquote(format));
   }
 
   /**
@@ -220,10 +210,13 @@ public class SpectrumT
       points = rs.getString("POINTS").split(",");
       list   = new ArrayList<>(points.length + 1);
       for (i = 0; i < points.length; i++) {
-        if (points[i].indexOf(':') == -1)
-          continue;
-        point = points[i].split(":");
-        sp    = new SpectrumPoint(Float.parseFloat(point[0]), Float.parseFloat(point[1]));
+        if (points[i].indexOf(':') == -1) {
+	  sp = new SpectrumPoint(i, Float.parseFloat(points[i]));
+	}
+	else {
+	  point = points[i].split(":");
+	  sp = new SpectrumPoint(Float.parseFloat(point[0]), Float.parseFloat(point[1]));
+	}
         list.add(sp);
       }
       result.addAll(list);
@@ -257,7 +250,7 @@ public class SpectrumT
       if (rlike.equals(""))
 	rs = select("*", "AUTO_ID=" + auto_id);
       else
-	rs = select("*", "AUTO_ID=" + auto_id + " AND SAMPLEID " + regexp + " " + backquote(rlike));
+	rs = select("*", "AUTO_ID=" + auto_id + " AND SAMPLEID " + regexp + " " + SQLUtils.backquote(rlike));
 
       result = resultsetToSpectrum(rs, raw);
     }
@@ -266,7 +259,7 @@ public class SpectrumT
       getLogger().log(Level.SEVERE, "Failed to process DB ID " + auto_id, e);
     }
     finally{
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
 
     return result;
@@ -288,7 +281,7 @@ public class SpectrumT
     result = null;
     rs     = null;
     try {
-      rs     = select("*", "SAMPLEID = " + backquote(sample_id) + " AND FORMAT = " + backquote(format));
+      rs     = select("*", "SAMPLEID = " + SQLUtils.backquote(sample_id) + " AND FORMAT = " + SQLUtils.backquote(format));
       result = resultsetToSpectrum(rs, raw);
     }
     catch (Exception e) {
@@ -296,7 +289,7 @@ public class SpectrumT
       getLogger().log(Level.SEVERE, "Failed to process Sample ID " + sample_id, e);
     }
     finally{
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
 
     return result;
@@ -329,7 +322,7 @@ public class SpectrumT
 
     rs = null;
     try {
-      rs = select("AUTO_ID", "SAMPLEID = " + backquote(sample_id) + " AND FORMAT = " + backquote(format));
+      rs = select("AUTO_ID", "SAMPLEID = " + SQLUtils.backquote(sample_id) + " AND FORMAT = " + SQLUtils.backquote(format));
       if (rs.next())
         result = rs.getInt(1);
     }
@@ -337,7 +330,7 @@ public class SpectrumT
       getLogger().log(Level.SEVERE, "Failed to determine databse ID: " + sample_id + "/" + format, e);
     }
     finally {
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
 
     return result;
@@ -400,21 +393,21 @@ public class SpectrumT
     if (hasSampleID) {
       if (where.length() > 0)
 	where += " AND";
-      where += " SAMPLEID " + regexp + " " + backquote(cond.getSampleIDRegExp());
+      where += " SAMPLEID " + regexp + " " + SQLUtils.backquote(cond.getSampleIDRegExp());
     }
 
     // sample type
     if (hasSampleType) {
       if (where.length() > 0)
 	where += " AND";
-      where += " SAMPLETYPE " + regexp + " " + backquote(cond.getSampleTypeRegExp());
+      where += " SAMPLETYPE " + regexp + " " + SQLUtils.backquote(cond.getSampleTypeRegExp());
     }
 
     // data format
     if (hasFormat) {
       if (where.length() > 0)
 	where += " AND";
-      where += " FORMAT " + regexp + " " + backquote(cond.getFormat());
+      where += " FORMAT " + regexp + " " + SQLUtils.backquote(cond.getFormat());
     }
 
     // limit
@@ -451,7 +444,7 @@ public class SpectrumT
       getLogger().log(Level.SEVERE, "Failed to get values", e);
     }
     finally{
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
 
     return result;
@@ -462,9 +455,10 @@ public class SpectrumT
    * Format: wave1:ampltd1,wave2:ampltd2,...
    *
    * @param sp		the spectrum to convert
+   * @param storeWaveNo 	whether to store the wave numbers as well
    * @return		the generated string
    */
-  protected String pointsToString(Spectrum sp) {
+  protected String pointsToString(Spectrum sp, boolean storeWaveNo) {
     StringBuilder	result;
 
     result = new StringBuilder();
@@ -472,8 +466,10 @@ public class SpectrumT
     for (SpectrumPoint point: sp.toList()) {
       if (result.length() > 0)
 	result.append(",");
-      result.append(Float.toString(point.getWaveNumber()));
-      result.append(":");
+      if (storeWaveNo) {
+	result.append(Float.toString(point.getWaveNumber()));
+	result.append(":");
+      }
       result.append(Float.toString(point.getAmplitude()));
     }
 
@@ -484,29 +480,30 @@ public class SpectrumT
    * Generates the query string for adding a spectrum.
    *
    * @param sp		the spectrum to turn into query
+   * @param storeWaveNo 	whether to store the wave numbers as well
    * @return		the generated query
    */
-  protected StringBuilder addQuery(Spectrum sp) {
+  protected StringBuilder addQuery(Spectrum sp, boolean storeWaveNo) {
     StringBuilder 	q;
 
     q = new StringBuilder();
     q.append("INSERT INTO " + getTableName() + " (SAMPLEID, SAMPLETYPE, FORMAT, POINTS) VALUES (");
 
     // sample ID
-    q.append(backquote(sp.getID()));
+    q.append(SQLUtils.backquote(sp.getID()));
 
     // sample type
     q.append(",");
-    q.append(backquote(sp.getType()));
+    q.append(SQLUtils.backquote(sp.getType()));
 
     // format
     q.append(",");
-    q.append(backquote(sp.getFormat()));
+    q.append(SQLUtils.backquote(sp.getFormat()));
 
     // spectrum points (if points table disabled)
     q.append(",");
     q.append("'");
-    q.append(pointsToString(sp));
+    q.append(pointsToString(sp, storeWaveNo));
     q.append("'");
     q.append(")");
 
@@ -515,12 +512,24 @@ public class SpectrumT
 
   /**
    * Adds a spectrum to the database. Returns the created auto-id, and sets in
-   * Spectrum.
+   * Spectrum. Wave numbers get stored.
    *
    * @param sp  	spectrum Header
    * @return  	new ID, or null if fail
    */
   public synchronized Integer add(Spectrum sp) {
+    return add(sp, true);
+  }
+
+  /**
+   * Adds a spectrum to the database. Returns the created auto-id, and sets in
+   * Spectrum.
+   *
+   * @param sp  	spectrum Header
+   * @param storeWaveNo   whether to store the wave numbers as well
+   * @return  	new ID, or null if fail
+   */
+  public Integer add(Spectrum sp, boolean storeWaveNo) {
     Integer 		result;
     StringBuilder 	q;
     ResultSet 		rs;
@@ -530,7 +539,7 @@ public class SpectrumT
     if (getDebug())
       getLogger().info("Entered add");
 
-    q  = addQuery(sp);
+    q  = addQuery(sp, storeWaveNo);
     rs = null;
     try {
       if (getDebug())
@@ -563,7 +572,7 @@ public class SpectrumT
       result = null;
     }
     finally {
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
 
     return result;
@@ -652,7 +661,7 @@ public class SpectrumT
    
     rs = null;
     try {
-      rs = select("AUTO_ID", "SAMPLEID = " + backquote(sample_id) + " AND FORMAT = " + backquote(format));
+      rs = select("AUTO_ID", "SAMPLEID = " + SQLUtils.backquote(sample_id) + " AND FORMAT = " + SQLUtils.backquote(format));
       if (rs.next()) {
 	return remove(rs.getInt(1), keepReport);
       }
@@ -666,7 +675,7 @@ public class SpectrumT
       return false;
     }
     finally {
-      closeAll(rs);
+      SQLUtils.closeAll(rs);
     }
   }
 
@@ -700,37 +709,5 @@ public class SpectrumT
       result = SampleDataF.getSingleton(getDatabaseConnection()).remove(sp.getID());
 
     return result;
-  }
-
-  /**
-   * Initializes the table. Used by the "InitializeTables" tool.
-   *
-   * @param dbcon	the database context
-   */
-  public static synchronized void initTable(AbstractDatabaseConnection dbcon) {
-    getSingleton(dbcon).init();
-  }
-
-  /**
-   * Returns the singleton of the table (active).
-   *
-   * @param dbcon	the database connection to get the singleton for
-   * @return		the singleton
-   */
-  public static synchronized SpectrumT getSingleton(AbstractDatabaseConnection dbcon) {
-    if (m_TableManager == null)
-      m_TableManager = new TableManager<>(TABLE_NAME, dbcon.getOwner());
-    if (!m_TableManager.has(dbcon)) {
-      if (JDBC.isMySQL(dbcon))
-        m_TableManager.add(dbcon, new adams.db.mysql.SpectrumT(dbcon));
-      else if (JDBC.isPostgreSQL(dbcon))
-        m_TableManager.add(dbcon, new adams.db.postgresql.SpectrumT(dbcon));
-      else if (JDBC.isSQLite(dbcon))
-        m_TableManager.add(dbcon, new adams.db.sqlite.SpectrumT(dbcon));
-      else
-        throw new IllegalArgumentException("Unrecognized JDBC URL: " + dbcon.getURL());
-    }
-
-    return m_TableManager.get(dbcon);
   }
 }
