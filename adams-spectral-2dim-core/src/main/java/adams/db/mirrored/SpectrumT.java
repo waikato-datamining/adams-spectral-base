@@ -349,8 +349,14 @@ public class SpectrumT
    */
   @Override
   public boolean remove(int id, boolean keepReport) {
+    Spectrum 	sp;
+
     synchronized(m_Updating) {
-      getLogger().severe("Cannot remove spectrum via AUTO_ID on mirror: " + id);
+      if (exists(id)) {
+        sp = m_DB.load(id);
+        if (sp != null)
+	  getWrapped().remove(sp.getID(), sp.getFormat(), keepReport);
+      }
       return m_DB.remove(id, keepReport);
     }
   }
