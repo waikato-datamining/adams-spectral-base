@@ -710,4 +710,28 @@ public abstract class SpectrumT
 
     return result;
   }
+
+  /**
+   * Initializes the table. Used by the "InitializeTables" tool.
+   *
+   * @param dbcon	the database context
+   */
+  public static synchronized void initTable(AbstractDatabaseConnection dbcon) {
+    getSingleton(dbcon).init();
+  }
+
+  /**
+   * Returns the singleton of the table (active).
+   *
+   * @param dbcon	the database connection to get the singleton for
+   * @return		the singleton
+   */
+  public static synchronized SpectrumIntf getSingleton(AbstractDatabaseConnection dbcon) {
+    if (m_TableManager == null)
+      m_TableManager = new TableManager<>(TABLE_NAME, dbcon.getOwner());
+    if (!m_TableManager.has(dbcon))
+      m_TableManager.add(dbcon, new adams.db.mysql.SpectrumT(dbcon));
+
+    return m_TableManager.get(dbcon);
+  }
 }

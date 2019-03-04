@@ -35,6 +35,9 @@ public class SampleDataT
 
   private static final long serialVersionUID = 5905403844404856859L;
 
+  /** the table manager. */
+  protected static TableManager<SampleDataT> m_TableManager;
+
   /**
    * Constructor.
    *

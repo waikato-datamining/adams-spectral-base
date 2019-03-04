@@ -41,6 +41,9 @@ public class SpectrumT
 
   private static final long serialVersionUID = -7283681599103306270L;
 
+  /** the table manager. */
+  protected static TableManager<SpectrumT> m_TableManager;
+
   /**
    * Constructor - initalise with database connection.
    *
