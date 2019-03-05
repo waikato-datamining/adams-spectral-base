@@ -249,6 +249,9 @@ public abstract class SampleDataT
       // format is stored in spectrum
       if (key.getName().equals(SampleData.FORMAT))
 	continue;
+      // we don't want to store the dummy report flag
+      if (key.getName().equals(SampleData.FIELD_DUMMYREPORT))
+	continue;
 
       // check numeric
       if (key.getDataType() == DataType.NUMERIC) {
