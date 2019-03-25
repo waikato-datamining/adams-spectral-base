@@ -688,14 +688,17 @@ public abstract class SampleDataT
     if (conditions.getLimit() > -1)
       where += " LIMIT " + conditions.getLimit();
 
+    rs = null;
     try {
       rs = select("id", tables, where);
       while (rs.next())
 	result.add(rs.getString(1));
-      SQLUtils.closeAll(rs);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to get orphaned IDs: " + conditions, e);
+    }
+    finally {
+      SQLUtils.closeAll(rs);
     }
 
     return result;

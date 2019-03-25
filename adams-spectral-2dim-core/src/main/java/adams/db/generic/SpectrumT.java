@@ -656,9 +656,7 @@ public abstract class SpectrumT
    */
   public synchronized boolean remove(String sample_id, String format, boolean keepReport) {
     ResultSet	rs;
-    String	id;
-    String	form;
-   
+
     rs = null;
     try {
       rs = select("AUTO_ID", "SAMPLEID = " + SQLUtils.backquote(sample_id) + " AND FORMAT = " + SQLUtils.backquote(format));
