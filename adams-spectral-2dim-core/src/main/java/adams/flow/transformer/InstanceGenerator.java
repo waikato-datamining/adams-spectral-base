@@ -15,11 +15,13 @@
 
 /*
  * InstanceGenerator.java
- * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
+import adams.core.QuickInfoHelper;
+import adams.data.instance.WekaInstanceContainer;
 import adams.data.report.Report;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
@@ -109,6 +111,9 @@ public class InstanceGenerator
   /** whether to be lenient. */
   protected boolean m_Lenient;
 
+  /** whether to output a container. */
+  protected boolean m_OutputContainer;
+
   /** whether the database connection has been updated. */
   protected boolean m_DatabaseConnectionUpdated;
 
@@ -133,6 +138,10 @@ public class InstanceGenerator
 
     m_OptionManager.add(
       "lenient", "lenient",
+      false);
+
+    m_OptionManager.add(
+      "output-container", "outputContainer",
       false);
   }
 
@@ -207,21 +216,51 @@ public class InstanceGenerator
   }
 
   /**
+   * Sets whether to output a container with the instance alongside the
+   * report or just the instance.
+   *
+   * @param value 	true if to output the container
+   */
+  public void setOutputContainer(boolean value) {
+    m_OutputContainer = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to output a container with the instance alongside the
+   *    * report or just the instance.
+   *
+   * @return 		true if to output the container
+   */
+  public boolean getOutputContainer() {
+    return m_OutputContainer;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String outputContainerTipText() {
+    return
+      "If enabled, a " + WekaInstanceContainer.class.getName()
+	+ " is output with the instance and the report.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
    */
   public String getQuickInfo() {
-    String	variable;
+    String	result;
 
-    variable = getOptionManager().getVariableForProperty("generator");
+    result = QuickInfoHelper.toString(this, "generator", m_Generator);
+    result += QuickInfoHelper.toString(this, "lenient", m_Lenient, "lenient", ", ");
+    result += QuickInfoHelper.toString(this, "outputContainer", m_OutputContainer, "container", ", ");
 
-    if (variable != null)
-      return variable;
-    else if (m_Generator != null)
-      return m_Generator.getClass().getName();
-    else
-      return null;
+    return result;
   }
 
   /**
@@ -236,10 +275,13 @@ public class InstanceGenerator
   /**
    * Returns the class of objects that it generates.
    *
-   * @return		<!-- flow-generates-start -->weka.core.Instance.class<!-- flow-generates-end -->
+   * @return		the generated classes
    */
   public Class[] generates() {
-    return new Class[]{Instance.class};
+    if (m_OutputContainer)
+      return new Class[]{WekaInstanceContainer.class};
+    else
+      return new Class[]{Instance.class};
   }
 
   /**
@@ -248,10 +290,11 @@ public class InstanceGenerator
    * @return		null if everything is fine, otherwise error message
    */
   protected String doExecute() {
-    String	result;
-    Spectrum	spectrum;
-    SampleData	sd;
-    Instance	inst;
+    String			result;
+    Spectrum			spectrum;
+    SampleData			sd;
+    Instance			inst;
+    WekaInstanceContainer	cont;
 
     result = null;
 
@@ -285,7 +328,15 @@ public class InstanceGenerator
 
       try {
         inst = m_Generator.generate(spectrum);
-        m_OutputToken = new Token(inst);
+        if (m_OutputContainer) {
+          cont = new WekaInstanceContainer();
+          cont.setContent(inst);
+          cont.setReport(spectrum.getReport().getClone());
+	  m_OutputToken = new Token(cont);
+	}
+        else {
+	  m_OutputToken = new Token(inst);
+	}
       }
       catch (Exception e) {
         if (m_Lenient)
