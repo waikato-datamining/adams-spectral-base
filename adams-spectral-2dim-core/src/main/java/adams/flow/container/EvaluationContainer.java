@@ -15,12 +15,13 @@
 
 /*
  * EvaluationContainer.java
- * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.container;
 
 import adams.core.Utils;
 import adams.data.evaluator.instance.AbstractEvaluator;
+import adams.data.report.Report;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -34,10 +35,10 @@ import java.util.Map;
  * Container for evaluations.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2391 $
  */
 public class EvaluationContainer
-  extends AbstractContainer {
+  extends AbstractContainer
+  implements ContainerWithReport {
 
   /** for serialization. */
   private static final long serialVersionUID = -7431411279172104723L;
@@ -130,6 +131,7 @@ public class EvaluationContainer
     addHelp(VALUE_COMPONENT, "component name", String.class);
     addHelp(VALUE_VERSION, "version", String.class);
     addHelp(VALUE_ID, "(optional) ID", String.class);
+    addHelp(VALUE_REPORT, "report for storing meta-data", Report.class);
   }
 
   /**
@@ -153,6 +155,7 @@ public class EvaluationContainer
     result.add(VALUE_COMPONENT);
     result.add(VALUE_VERSION);
     result.add(VALUE_ID);
+    result.add(VALUE_REPORT);
 
     return result.iterator();
   }

@@ -20,6 +20,7 @@
 package adams.flow.container;
 
 import adams.data.postprocessor.instances.AbstractPostProcessor;
+import adams.data.report.Report;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -72,6 +73,7 @@ public class PostProcessingContainer
     addHelp(VALUE_INPUT_INSTANCE, "input data row", Instance.class);
     addHelp(VALUE_INPUT_INSTANCES, "input dataset", Instances.class);
     addHelp(VALUE_POSTPROCESSOR, "post-processor", AbstractPostProcessor.class);
+    addHelp(VALUE_REPORT, "report for storing meta-data", Report.class);
   }
 
   /**
