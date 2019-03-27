@@ -15,11 +15,12 @@
 
 /*
  * PostProcessingContainer.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.container;
 
 import adams.data.postprocessor.instances.AbstractPostProcessor;
+import adams.data.report.Report;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -31,7 +32,6 @@ import java.util.List;
  * Container used by post-processors.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2391 $
  */
 public class PostProcessingContainer
   extends AbstractContainer {
@@ -51,8 +51,11 @@ public class PostProcessingContainer
   /** the identifier for the input instances. */
   public final static String VALUE_INPUT_INSTANCES = "Input Instances";
 
-  /** the identifier for the cleaner. */
+  /** the identifier for the post-processor. */
   public final static String VALUE_POSTPROCESSOR = "Post-processor";
+
+  /** the identifier for the report. */
+  public final static String VALUE_REPORT = "Report";
 
   /**
    * Default constructor.
@@ -72,6 +75,7 @@ public class PostProcessingContainer
     addHelp(VALUE_INPUT_INSTANCE, "input data row", Instance.class);
     addHelp(VALUE_INPUT_INSTANCES, "input dataset", Instances.class);
     addHelp(VALUE_POSTPROCESSOR, "post-processor", AbstractPostProcessor.class);
+    addHelp(VALUE_REPORT, "report", Report.class);
   }
 
   /**
@@ -118,6 +122,7 @@ public class PostProcessingContainer
     result.add(VALUE_OUTPUT_INSTANCE);
     result.add(VALUE_OUTPUT_INSTANCES);
     result.add(VALUE_POSTPROCESSOR);
+    result.add(VALUE_REPORT);
 
     return result.iterator();
   }

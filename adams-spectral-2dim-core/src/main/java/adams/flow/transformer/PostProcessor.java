@@ -15,7 +15,7 @@
 
 /*
  * PostProcessor.java
- * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -24,7 +24,9 @@ import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
+import adams.data.instance.WekaInstanceContainer;
 import adams.data.postprocessor.instances.AbstractPostProcessor;
+import adams.data.report.Report;
 import adams.flow.container.PostProcessingContainer;
 import adams.flow.control.StorageName;
 import adams.flow.core.AbstractModelLoader.ModelLoadingType;
@@ -443,16 +445,16 @@ public class PostProcessor
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->weka.core.Instances.class, weka.core.Instance.class<!-- flow-accepts-end -->
+   * @return		the accepted classes
    */
   public Class[] accepts() {
-    return new Class[]{Instances.class, Instance.class, PostProcessingContainer.class};
+    return new Class[]{Instances.class, Instance.class, PostProcessingContainer.class, WekaInstanceContainer.class};
   }
 
   /**
    * Returns the class of objects that it generates.
    *
-   * @return		<!-- flow-generates-start -->weka.core.Instances.class, weka.core.Instance.class<!-- flow-generates-end -->
+   * @return		the generated classes
    */
   public Class[] generates() {
     if (m_OutputContainer)
@@ -497,6 +499,7 @@ public class PostProcessor
     Instances 			processedData;
     Instance			inst;
     Instance			processedInst;
+    Report			report;
     PostProcessingContainer 	cont;
 
     result = null;
@@ -506,13 +509,18 @@ public class PostProcessor
 
     if (result == null) {
       try {
-        data = null;
-        inst = null;
+        data   = null;
+        inst   = null;
+        report = null;
 	if (m_InputToken.getPayload() instanceof Instances) {
-	  data = (Instances) m_InputToken.getPayload();
+	  data = m_InputToken.getPayload(Instances.class);
 	}
 	else if (m_InputToken.getPayload() instanceof Instance) {
-	  inst = (Instance) m_InputToken.getPayload();
+	  inst = m_InputToken.getPayload(Instance.class);
+	}
+	else if (m_InputToken.getPayload() instanceof WekaInstanceContainer) {
+	  inst   = m_InputToken.getPayload(WekaInstanceContainer.class).getContent();
+	  report = m_InputToken.getPayload(WekaInstanceContainer.class).getReport();
 	}
 	else if (m_InputToken.getPayload() instanceof PostProcessingContainer) {
 	  cont = m_InputToken.getPayload(PostProcessingContainer.class);
@@ -520,6 +528,8 @@ public class PostProcessor
 	    data = cont.getValue(PostProcessingContainer.VALUE_OUTPUT_INSTANCES, Instances.class);
 	  else if (cont.hasValue(PostProcessingContainer.VALUE_OUTPUT_INSTANCE))
 	    inst = cont.getValue(PostProcessingContainer.VALUE_OUTPUT_INSTANCE, Instance.class);
+	  if (cont.hasValue(PostProcessingContainer.VALUE_REPORT))
+	    report = cont.getValue(PostProcessingContainer.VALUE_REPORT, Report.class);
         }
         else {
 	  result = m_InputToken.unhandledData();
@@ -542,6 +552,9 @@ public class PostProcessor
 	  else {
 	    result = "Failed to obtain any data from input token!";
 	  }
+	  // store report, if available
+	  if (m_OutputContainer && (result == null) && (report != null))
+	    m_OutputToken.getPayload(PostProcessingContainer.class).setValue(PostProcessingContainer.VALUE_REPORT, report.getClone());
 	}
       }
       catch (Exception e) {
