@@ -20,7 +20,6 @@
 package adams.flow.container;
 
 import adams.data.postprocessor.instances.AbstractPostProcessor;
-import adams.data.report.Report;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -34,7 +33,8 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class PostProcessingContainer
-  extends AbstractContainer {
+  extends AbstractContainer
+  implements ContainerWithReport {
 
   /** for serialization. */
   private static final long serialVersionUID = -7431411279172104723L;
@@ -54,9 +54,6 @@ public class PostProcessingContainer
   /** the identifier for the post-processor. */
   public final static String VALUE_POSTPROCESSOR = "Post-processor";
 
-  /** the identifier for the report. */
-  public final static String VALUE_REPORT = "Report";
-
   /**
    * Default constructor.
    */
@@ -75,7 +72,6 @@ public class PostProcessingContainer
     addHelp(VALUE_INPUT_INSTANCE, "input data row", Instance.class);
     addHelp(VALUE_INPUT_INSTANCES, "input dataset", Instances.class);
     addHelp(VALUE_POSTPROCESSOR, "post-processor", AbstractPostProcessor.class);
-    addHelp(VALUE_REPORT, "report", Report.class);
   }
 
   /**
