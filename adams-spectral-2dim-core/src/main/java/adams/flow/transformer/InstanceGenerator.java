@@ -256,7 +256,7 @@ public class InstanceGenerator
   public String getQuickInfo() {
     String	result;
 
-    result = QuickInfoHelper.toString(this, "generator", m_Generator);
+    result = QuickInfoHelper.toString(this, "generator", m_Generator, "generator: ");
     result += QuickInfoHelper.toString(this, "lenient", m_Lenient, "lenient", ", ");
     result += QuickInfoHelper.toString(this, "outputContainer", m_OutputContainer, "container", ", ");
 
