@@ -22,12 +22,11 @@ package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
 import adams.core.TechnicalInformation;
-import adams.core.TechnicalInformation.Field;
-import adams.core.TechnicalInformation.Type;
 import adams.core.TechnicalInformationHandler;
 import adams.core.base.BaseString;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.data.statistics.SpectralAngleMapperUtils;
 import adams.flow.control.Storage;
 import adams.flow.control.StorageName;
 import adams.flow.control.StorageUser;
@@ -37,7 +36,13 @@ import java.util.Iterator;
 
 /**
  <!-- globalinfo-start -->
- * Performs Spectral Angle Mapping on a set of spectra. Each spectrum is treated as a vector in band-space (where each spectral band is considered a basis), and the angle between the input and reference spectra is calculated to determine similarity. Emits an array of angles, one for each reference spectrum provided.
+ * Performs Spectral Angle Mapping on a set of spectra. Each spectrum is treated as a vector in band-space (where each spectral band is considered a basis), and the angle between the input and reference spectra is calculated to determine similarity. Emits an array of angles, one for each reference spectrum provided.<br>
+ * <br>
+ * For more information see:<br>
+ * <br>
+ * Kruse, Fred A, Lefkoff, AB, Boardman, JW, Heidebrecht, KB, Shapiro, AT, Barloon, PJ, Goetz, AFH (1993). The spectral image processing system (SIPS)—interactive visualization and analysis of imaging spectrometer data. Remote sensing of environment. 44(2-3):145--163.<br>
+ * <br>
+ * Oshigami, Shoko, Yamaguchi, Yasushi, Uezato, Tatsumi, Momose, Atsushi, Arvelyna, Yessy, Kawakami, Yuu, Yajima, Taro, Miyatake, Shuichi, Nguno, Anna (2013). Mineralogical mapping of southern Namibia by application of continuum-removal MSAM method to the HyMap data. International journal of remote sensing. 34(15):5282--5295.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -52,6 +57,17 @@ import java.util.Iterator;
  *    title = {The spectral image processing system (SIPS)—interactive visualization and analysis of imaging spectrometer data},
  *    volume = {44},
  *    year = {1993}
+ * }
+ *
+ * &#64;article{Oshigami2013,
+ *    author = {Oshigami, Shoko and Yamaguchi, Yasushi and Uezato, Tatsumi and Momose, Atsushi and Arvelyna, Yessy and Kawakami, Yuu and Yajima, Taro and Miyatake, Shuichi and Nguno, Anna},
+ *    journal = {International journal of remote sensing},
+ *    number = {15},
+ *    pages = {5282--5295},
+ *    publisher = {Taylor &amp; Francis},
+ *    title = {Mineralogical mapping of southern Namibia by application of continuum-removal MSAM method to the HyMap data},
+ *    volume = {34},
+ *    year = {2013}
  * }
  * </pre>
  * <br><br>
@@ -139,7 +155,9 @@ public class SpectralAngleMapper
       "is treated as a vector in band-space (where each spectral band is considered a " +
       "basis), and the angle between the input and reference spectra is calculated to " +
       "determine similarity. Emits an array of angles, one for each reference spectrum " +
-      "provided.";
+      "provided.\n\n"
+      + "For more information see:\n\n"
+      + getTechnicalInformation().toString();
   }
 
   /**
@@ -267,18 +285,7 @@ public class SpectralAngleMapper
    */
   @Override
   public TechnicalInformation getTechnicalInformation() {
-    TechnicalInformation tech = new TechnicalInformation(Type.ARTICLE);
-
-    tech.setValue(Field.TITLE, "The spectral image processing system (SIPS)—interactive visualization and analysis of imaging spectrometer data");
-    tech.setValue(Field.AUTHOR, "Kruse, Fred A and Lefkoff, AB and Boardman, JW and Heidebrecht, KB and Shapiro, AT and Barloon, PJ and Goetz, AFH");
-    tech.setValue(Field.JOURNAL, "Remote sensing of environment");
-    tech.setValue(Field.VOLUME, "44");
-    tech.setValue(Field.NUMBER, "2-3");
-    tech.setValue(Field.PAGES, "145--163");
-    tech.setValue(Field.YEAR, "1993");
-    tech.setValue(Field.PUBLISHER, "Elsevier");
-
-    return tech;
+    return SpectralAngleMapperUtils.getTechnicalInformation();
   }
 
   /**
@@ -436,44 +443,40 @@ public class SpectralAngleMapper
    * @return  An array of angles, one for each reference spectrum.
    */
   protected double[] calculateSpectralAngles(Spectrum input, Spectrum[] references) {
-    // Get the iterators to all spectra
-    Iterator<SpectrumPoint> inputIterator = input.iterator();
-    Iterator<SpectrumPoint>[] referenceIterators = new Iterator[references.length];
+    // Convert the input into a double array
+    double[] inputArray = toDoubleArray(input);
+
+    // Convert the references into a double array
+    double[][] referenceArrays = new double[references.length][];
     for (int i = 0; i < references.length; i++) {
-      referenceIterators[i] = references[i].iterator();
+      referenceArrays[i] = toDoubleArray(references[i]);
     }
 
-    // Initialise the sigma accumulators
-    double[] dotProductSums = new double[references.length];
-    double[] referenceLengthSums = new double[references.length];
-    double[] testLengthSums = new double[references.length];
+    // Defer to the utility class
+    return SpectralAngleMapperUtils.sam(inputArray, referenceArrays, false);
+  }
 
-    // Perform the sums
-    while (inputIterator.hasNext()) {
-      // Get the amplitude of the next wave-number
-      double t_i = inputIterator.next().getAmplitude();
+  /**
+   * Converts a spectrum into a double array of its wave amplitudes.
+   *
+   * @param spectrum  The spectrum to convert.
+   * @return  The array of amplitudes.
+   */
+  protected double[] toDoubleArray(Spectrum spectrum) {
+    // Get the iterator over the spectral data
+    Iterator<SpectrumPoint> iterator = spectrum.iterator();
 
-      for (int i = 0; i < references.length; i++) {
-        // Get the amplitude of the next wave-number
-        double r_i = referenceIterators[i].next().getAmplitude();
+    // Create the return array
+    double[] result = new double[spectrum.size()];
 
-        // Update the sigma accumulators
-        dotProductSums[i] += t_i * r_i;
-        referenceLengthSums[i] += r_i * r_i;
-        testLengthSums[i] += t_i * t_i;
-      }
+    // Add each amplitude to the return array
+    int i = 0;
+    while (iterator.hasNext()) {
+      result[i] = iterator.next().getAmplitude();
+      i++;
     }
 
-    // Calculate the spectral angles from the accumulated values
-    double[] angles = new double[references.length];
-    for (int i = 0; i < references.length; i++) {
-      angles[i] = Math.acos(
-        dotProductSums[i] /
-          (Math.sqrt(referenceLengthSums[i]) * Math.sqrt(testLengthSums[i]))
-      );
-    }
-
-    return angles;
+    return result;
   }
 
   /**
