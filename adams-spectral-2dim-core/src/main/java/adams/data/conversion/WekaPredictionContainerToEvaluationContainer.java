@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * WekaPredictionContainerToEvaluationContainer.java
- * Copyright (C) 2012-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
 
@@ -43,7 +43,6 @@ import weka.core.Instance;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2362 $
  */
 public class WekaPredictionContainerToEvaluationContainer
   extends AbstractConversion {
@@ -237,6 +236,10 @@ public class WekaPredictionContainerToEvaluationContainer
       result.setValue(EvaluationContainer.VALUE_ABSTENTION_CLASSIFICATION, input.getValue(WekaPredictionContainer.VALUE_ABSTENTION_CLASSIFICATION));
     else if (input.hasValue(WekaPredictionContainer.VALUE_ABSTENTION_CLASSIFICATION_LABEL))
       result.setValue(EvaluationContainer.VALUE_ABSTENTION_CLASSIFICATION, input.getValue(WekaPredictionContainer.VALUE_ABSTENTION_CLASSIFICATION_LABEL));
+
+    // report
+    if (input.hasValue(WekaPredictionContainer.VALUE_REPORT))
+      result.setValue(EvaluationContainer.VALUE_REPORT, input.getValue(WekaPredictionContainer.VALUE_REPORT));
 
     if (!m_Component.isEmpty())
       result.setValue(EvaluationContainer.VALUE_COMPONENT, m_Component);
