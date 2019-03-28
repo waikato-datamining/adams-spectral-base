@@ -124,6 +124,11 @@ import java.util.Iterator;
  * &nbsp;&nbsp;&nbsp;default: true
  * </pre>
  *
+ * <pre>-modified &lt;boolean&gt; (property: modified)
+ * &nbsp;&nbsp;&nbsp;Whether to use the modified algorithm described in Oshigami et al.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author Corey Sterling (csterlin at waikato dot ac dot nz)
@@ -143,6 +148,9 @@ public class SpectralAngleMapper
 
   /** Whether to check wave-numbers match between spectra. */
   protected boolean m_CheckWaveNumberAlignment;
+
+  /** Whether to use the modified algorithm described in Oshigami et al. */
+  protected boolean m_UseModifiedAlgorithm;
 
   /**
    * Returns a string describing the object.
@@ -173,6 +181,8 @@ public class SpectralAngleMapper
 
     m_OptionManager.add("check-wave-number-alignment",
       "checkWaveNumberAlignment", true);
+
+    m_OptionManager.add("modified", "modified", false);
   }
 
   /**
@@ -261,6 +271,34 @@ public class SpectralAngleMapper
   }
 
   /**
+   * Gets whether to use the modified algorithm.
+   *
+   * @return Whether to use the modified algorithm.
+   */
+  public boolean getModified() {
+    return m_UseModifiedAlgorithm;
+  }
+
+  /**
+   * Sets whether to use the modified algorithm.
+   *
+   * @param value Whether to use the modified algorithm.
+   */
+  public void setModified(boolean value) {
+    m_UseModifiedAlgorithm = value;
+    reset();
+  }
+
+  /**
+   * Gets the tip-text for the modified option.
+   *
+   * @return  The tip-text as a string.
+   */
+  public String modifiedTipText() {
+    return "Whether to use the modified algorithm described in Oshigami et al.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    * <br><br>
    * Default implementation returns null.
@@ -272,6 +310,8 @@ public class SpectralAngleMapper
     String info = QuickInfoHelper.toString(this, "references", m_ReferencesStorage, "references: ");
 
     if (m_Cache.length() != 0) info += QuickInfoHelper.toString(this, "cache", m_Cache, ", cache: ");
+
+    if (m_UseModifiedAlgorithm) info += QuickInfoHelper.toString(this, "modified", m_UseModifiedAlgorithm, "modified", ", ");
 
     return info;
   }
@@ -453,7 +493,7 @@ public class SpectralAngleMapper
     }
 
     // Defer to the utility class
-    return SpectralAngleMapperUtils.sam(inputArray, referenceArrays, false);
+    return SpectralAngleMapperUtils.sam(inputArray, referenceArrays, m_UseModifiedAlgorithm);
   }
 
   /**
