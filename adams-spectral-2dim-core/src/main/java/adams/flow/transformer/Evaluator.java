@@ -28,6 +28,8 @@ import adams.core.logging.LoggingLevel;
 import adams.data.InPlaceProcessing;
 import adams.data.evaluator.instance.AbstractEvaluator;
 import adams.data.evaluator.instance.NullEvaluator;
+import adams.data.instance.WekaInstanceContainer;
+import adams.data.report.Report;
 import adams.event.VariableChangeEvent;
 import adams.flow.container.EvaluationContainer;
 import adams.flow.control.StorageName;
@@ -642,17 +644,17 @@ public class Evaluator
   /**
    * Returns the class that the consumer accepts.
    *
-   * @return		<!-- flow-accepts-start -->weka.core.Instances.class, weka.core.Instance.class, adams.flow.container.EvaluationContainer.class<!-- flow-accepts-end -->
+   * @return		the accepted classes
    */
   @Override
   public Class[] accepts() {
-    return new Class[]{Instances.class, Instance.class, EvaluationContainer.class};
+    return new Class[]{Instances.class, Instance.class, WekaInstanceContainer.class, EvaluationContainer.class};
   }
 
   /**
    * Returns the class of objects that it generates.
    *
-   * @return		<!-- flow-generates-start -->adams.flow.container.EvaluationContainer.class<!-- flow-generates-end -->
+   * @return		the generated classes
    */
   @Override
   public Class[] generates() {
@@ -706,6 +708,7 @@ public class Evaluator
     String			result;
     Instances			data;
     Instance			inst;
+    Report			report;
     EvaluationContainer		cont;
     EvaluationContainer		newCont;
     Map<String,Object> 		evals;
@@ -719,23 +722,30 @@ public class Evaluator
     if (result == null) {
       try {
 	// get data
-	data = null;
-	inst = null;
-	cont = null;
-	evals = new HashMap<>();
-	if (m_InputToken.getPayload() instanceof EvaluationContainer) {
-	  cont = (EvaluationContainer) m_InputToken.getPayload();
+	data   = null;
+	inst   = null;
+	cont   = null;
+	report = null;
+	evals  = new HashMap<>();
+	if (m_InputToken.hasPayload(EvaluationContainer.class)) {
+	  cont = m_InputToken.getPayload(EvaluationContainer.class);
 	  if (cont.hasValue(EvaluationContainer.VALUE_INSTANCES))
-	    data = (Instances) cont.getValue(EvaluationContainer.VALUE_INSTANCES);
+	    data = cont.getValue(EvaluationContainer.VALUE_INSTANCES, Instances.class);
 	  else if (cont.hasValue(EvaluationContainer.VALUE_INSTANCE))
-	    inst = (Instance) cont.getValue(EvaluationContainer.VALUE_INSTANCE);
+	    inst = cont.getValue(EvaluationContainer.VALUE_INSTANCE, Instance.class);
 	  evals = (Map<String, Object>) cont.getValue(EvaluationContainer.VALUE_EVALUATIONS);
+	  if (cont.hasValue(EvaluationContainer.VALUE_REPORT))
+	    report = cont.getValue(EvaluationContainer.VALUE_REPORT, Report.class);
 	}
-	else if (m_InputToken.getPayload() instanceof Instances) {
-	  data = (Instances) m_InputToken.getPayload();
+	else if (m_InputToken.hasPayload(Instances.class)) {
+	  data = m_InputToken.getPayload(Instances.class);
 	}
-	else if (m_InputToken.getPayload() instanceof Instance) {
-	  inst = (Instance) m_InputToken.getPayload();
+	else if (m_InputToken.hasPayload(Instance.class)) {
+	  inst = m_InputToken.getPayload(Instance.class);
+	}
+	else if (m_InputToken.getPayload() instanceof WekaInstanceContainer) {
+	  inst   = m_InputToken.getPayload(WekaInstanceContainer.class).getContent();
+	  report = m_InputToken.getPayload(WekaInstanceContainer.class).getReport();
 	}
 	else {
 	  throw new IllegalArgumentException(
@@ -778,6 +788,8 @@ public class Evaluator
 	  }
 	}
 	newCont.setValue(EvaluationContainer.VALUE_EVALUATIONS, evals);
+	if (report != null)
+	  newCont.setValue(EvaluationContainer.VALUE_REPORT, report.getClone());
 	if (!m_Component.isEmpty())
           newCont.setValue(EvaluationContainer.VALUE_COMPONENT, m_Component);
 	if (!m_Version.isEmpty())
