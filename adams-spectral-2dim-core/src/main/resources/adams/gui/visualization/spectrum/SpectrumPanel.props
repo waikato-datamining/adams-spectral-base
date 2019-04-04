@@ -1,7 +1,6 @@
 # Setup for the SpectrumPanel visualization panel.
 #
 # Author: FracPete (fracpete at waikato dot ac dot nz)
-# Version: $Revision: 2001 $
 
 ###########
 # General #
@@ -32,6 +31,7 @@ Title=Spectra
 # - .ShowGridLines=bool
 # - .Type=DEFAULT|PERCENTAGE|LOG10|LOG2|LOG|DATE|TIME|DATETIME
 # - .NumberFormat=<positive>;<negative>  see java.text.DecimalFormat/java.text.SimpleDateFormat
+# - .Flipped=bool
 
 # Top axis
 Axis.Top.Visibility=INVISIBLE
@@ -53,6 +53,7 @@ Axis.Left.BottomMargin=0.05
 Axis.Left.ShowGridLines=true
 Axis.Left.Type=DEFAULT
 Axis.Left.NumberFormat=0.0000;-0.0000
+Axis.Left.Flipped=false
 
 # Bottom axis
 Axis.Bottom.Visibility=VISIBLE
@@ -68,6 +69,7 @@ Axis.Bottom.BottomMargin=0.0
 Axis.Bottom.ShowGridLines=true
 Axis.Bottom.Type=DEFAULT
 Axis.Bottom.NumberFormat=0.0;-0.0
+Axis.Bottom.Flipped=false
 
 ##############
 # Plot panel #
