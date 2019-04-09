@@ -21,6 +21,7 @@
 
 package adams.data.chromatogram;
 
+import adams.core.CompareUtils;
 import adams.core.Constants;
 import adams.core.DateFormat;
 import adams.core.DateTime;
@@ -585,13 +586,13 @@ public class Chromatogram
     c = (Chromatogram) o;
 
     if (result == 0)
-      result = Utils.compare(getDate(), c.getDate());
+      result = CompareUtils.compare(getDate(), c.getDate());
 
     if (result == 0)
       result = new Integer(getDatabaseID()).compareTo(new Integer(c.getDatabaseID()));
 
     if (result == 0)
-      result = Utils.compare(getReport(), c.getReport());
+      result = CompareUtils.compare(getReport(), c.getReport());
 
     if (result == 0)
       result = new Integer(getDilutionFactor()).compareTo(new Integer(c.getDilutionFactor()));
@@ -603,7 +604,7 @@ public class Chromatogram
       result = new Boolean(getIsStandard()).compareTo(new Boolean(c.getIsStandard()));
 
     if (result == 0)
-      result = Utils.compare(getInstrument(), c.getInstrument());
+      result = CompareUtils.compare(getInstrument(), c.getInstrument());
 
     return result;
   }

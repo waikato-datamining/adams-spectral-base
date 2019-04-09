@@ -21,8 +21,8 @@
 
 package adams.data.threeway;
 
+import adams.core.CompareUtils;
 import adams.core.Constants;
-import adams.core.Utils;
 import adams.data.DatabaseNotesHandler;
 import adams.data.Notes;
 import adams.data.container.AbstractDataContainer;
@@ -411,7 +411,7 @@ public class ThreeWayData
     result = Integer.compare(getDatabaseID(), c.getDatabaseID());
 
     if (result == 0)
-      result = Utils.compare(getReport(), c.getReport());
+      result = CompareUtils.compare(getReport(), c.getReport());
 
     return result;
   }

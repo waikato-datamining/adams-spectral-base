@@ -20,6 +20,7 @@
 
 package adams.data.spectrum;
 
+import adams.core.CompareUtils;
 import adams.core.Constants;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
@@ -468,13 +469,13 @@ public class Spectrum
 
     sp = (Spectrum) o;
 
-    result = Utils.compare(getFormat(), sp.getFormat());
+    result = CompareUtils.compare(getFormat(), sp.getFormat());
 
     if (result == 0)
       result = new Integer(getDatabaseID()).compareTo(sp.getDatabaseID());
 
     if (result == 0)
-      result = Utils.compare(getReport(), sp.getReport());
+      result = CompareUtils.compare(getReport(), sp.getReport());
 
     return result;
   }
