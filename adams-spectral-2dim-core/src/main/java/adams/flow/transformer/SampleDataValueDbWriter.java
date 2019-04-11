@@ -33,7 +33,7 @@ import adams.flow.core.ActorUtils;
 
 /**
  <!-- globalinfo-start -->
- *
+ * Stores the specified values from the sample data passing through in the database.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -99,9 +99,14 @@ public class SampleDataValueDbWriter
 
   private static final long serialVersionUID = 1688669671731516545L;
 
+  /**
+   * Returns a string describing the object.
+   *
+   * @return 			a description suitable for displaying in the gui
+   */
   @Override
   public String globalInfo() {
-    return null;
+    return "Stores the specified values from the sample data passing through in the database.";
   }
 
   /**
