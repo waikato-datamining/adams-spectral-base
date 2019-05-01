@@ -15,7 +15,7 @@
 
 /*
  * SpectrumPanel.java
- * Copyright (C) 2008-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -27,6 +27,7 @@ import adams.core.option.OptionUtils;
 import adams.data.instances.AbstractInstanceGenerator;
 import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.io.output.MetaFileWriter;
+import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
@@ -82,7 +83,6 @@ import java.util.List;
  * Special panel for displaying the spectral data.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2289 $
  */
 public class SpectrumPanel
   extends DataContainerPanelWithContainerList<Spectrum, SpectrumContainerManager, SpectrumContainer>
@@ -596,6 +596,35 @@ public class SpectrumPanel
       cont.getData().getReport().addField(field);
       cont.getData().getReport().setValue(field, ColorHelper.toHex(cont.getColor()));
     }
+  }
+
+  /**
+   * Returns true if storing a value in the report of container's data object
+   * is supported.
+   *
+   * @return		true if supported
+   */
+  public boolean supportsStoreValueInReport() {
+    return true;
+  }
+
+  /**
+   * Stores the value in the report of container's data object.
+   *
+   * @param indices	the indices of the containers of the container manager
+   * @param field	the field to use
+   * @param value	the value to store
+   */
+  public void storeValueInReport(int[] indices, AbstractField field, Object value) {
+    SpectrumContainer cont;
+
+    getContainerManager().startUpdate();
+    for (int index: indices) {
+      cont = getContainerManager().get(index);
+      cont.getData().getReport().addField(field);
+      cont.getData().getReport().setValue(field, value);
+    }
+    getContainerManager().finishUpdate();
   }
 
   /**
