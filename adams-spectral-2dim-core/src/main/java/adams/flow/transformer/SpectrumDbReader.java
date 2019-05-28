@@ -234,10 +234,15 @@ public class SpectrumDbReader
 	cont = ((SpectrumIntf) getDataProvider()).loadRaw((String) m_InputToken.getPayload(), m_Format);
       else
 	cont = ((SpectrumIntf) getDataProvider()).load((String) m_InputToken.getPayload(), m_Format);
-      if (cont == null)
-	result = "No container loaded for sample ID (format=" + m_Format + "): " + m_InputToken;
-      else
-	m_OutputToken = new Token(m_PostProcessor.postProcess(cont));
+      if (cont == null) {
+        if (!m_Lenient)
+          result = "No container loaded for sample ID (format=" + m_Format + "): " + m_InputToken;
+        else
+          getLogger().warning("No container loaded for sample ID: " + m_InputToken);
+      }
+      else {
+        m_OutputToken = new Token(m_PostProcessor.postProcess(cont));
+      }
     }
     else {
       result = super.queryDatabase();
