@@ -32,10 +32,6 @@ import adams.flow.core.CallableActorReference;
 import adams.flow.core.CallableActorUser;
 import adams.flow.core.OutputProducer;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
 
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -467,21 +463,7 @@ public class MultiSpectrumAdd
     }
 
     m_OutputToken = new Token(added);
-    updateProvenance(m_OutputToken);
 
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled()) {
-      if (m_InputToken.hasProvenance())
-	cont.setProvenance(m_InputToken.getProvenance().getClone());
-      cont.addProvenance(new ProvenanceInformation(ActorType.PREPROCESSOR, m_InputToken.getPayload().getClass(), this, m_OutputToken.getPayload().getClass()));
-    }
   }
 }

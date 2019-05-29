@@ -30,10 +30,6 @@ import adams.db.DatabaseConnectionHandler;
 import adams.db.DatabaseConnectionUser;
 import adams.flow.core.ActorUtils;
 import adams.flow.core.Token;
-import adams.flow.provenance.ActorType;
-import adams.flow.provenance.Provenance;
-import adams.flow.provenance.ProvenanceContainer;
-import adams.flow.provenance.ProvenanceInformation;
 
 import java.util.List;
 
@@ -353,24 +349,8 @@ public class MultiSpectrumOutlierDetector
       getLogger().warning("Failed to obtain spectrum from " + multi + " using " + m_Filter);
     }
 
-    if (m_OutputToken != null)
-      updateProvenance(m_OutputToken);
-
     m_Filter.cleanUp();
 
     return result;
-  }
-
-  /**
-   * Updates the provenance information in the provided container.
-   *
-   * @param cont	the provenance container to update
-   */
-  public void updateProvenance(ProvenanceContainer cont) {
-    if (Provenance.getSingleton().isEnabled()) {
-      if (m_InputToken.hasProvenance())
-	cont.setProvenance(m_InputToken.getProvenance().getClone());
-      cont.addProvenance(new ProvenanceInformation(ActorType.PREPROCESSOR, m_InputToken.getPayload().getClass(), this, m_OutputToken.getPayload().getClass()));
-    }
   }
 }
