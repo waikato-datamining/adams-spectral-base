@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Transform.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -33,7 +33,6 @@ import java.net.URL;
  * Transforms a spectrum.
  * 
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2138 $
  */
 public class Transform 
   extends AbstractWebServiceClientTransformer<Spectrum, Spectrum>{
@@ -46,6 +45,12 @@ public class Transform
   
   /** input spectrum */
   protected Spectrum m_SpectrumIn;
+
+  /** the service instance. */
+  protected transient SpectralTransformServiceService m_Service;
+
+  /** the port instance. */
+  protected transient SpectralTransformService m_Port;
 
   /**
    * Returns a string describing the object.
@@ -67,6 +72,17 @@ public class Transform
     m_OptionManager.add(
 	"action", "action", 
 	"");
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
   }
 
   /**
@@ -144,31 +160,42 @@ public class Transform
    */
   @Override
   protected void doQuery() throws Exception {
-    SpectralTransformServiceService knirServiceService;
-    SpectralTransformService knirService;
-    knirServiceService = new SpectralTransformServiceService(getWsdlLocation());
-    knirService = knirServiceService.getSpectralTransformServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	knirService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	m_OutInterceptor);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) knirService));
+    if (m_Service == null) {
+      m_Service = new SpectralTransformServiceService(getWsdlLocation());
+      m_Port = m_Service.getSpectralTransformServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        m_OutInterceptor);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
    
     TransformRequest request = new TransformRequest();
     request.setId(m_SpectrumIn.getID());
     request.setFormat(m_SpectrumIn.getFormat());
     request.setAction(m_Action);
     request.setSpectrum(TransformSpectrumHelper.knirToWebservice(m_SpectrumIn));
-    TransformResponse response = knirService.transform(request);
+    TransformResponse response = m_Port.transform(request);
     
     // failed to generate data?
     if (!response.isSuccess())
       throw new IllegalStateException(response.getMessage());
     setResponseData(TransformSpectrumHelper.webserviceToKnir(response.getSpectrum()));
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }

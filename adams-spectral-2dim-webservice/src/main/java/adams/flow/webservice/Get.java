@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Get.java
- * Copyright (C) 2014-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2019 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.webservice;
 
@@ -34,7 +34,6 @@ import java.net.URL;
  * Gets a spectrum.
  * 
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2138 $
  */
 public class Get 
   extends AbstractWebServiceClientSource<Spectrum>{
@@ -47,6 +46,12 @@ public class Get
 
   /** the spectrum format. */
   protected String m_Format;
+
+  /** the service instance. */
+  protected transient SpectralGetServiceService m_Service;
+
+  /** the port instance. */
+  protected transient SpectralGetService m_Port;
 
   /**
    * Returns a string describing the object.
@@ -72,6 +77,17 @@ public class Get
     m_OptionManager.add(
 	"format", "format", 
 	SampleData.DEFAULT_FORMAT);
+  }
+
+  /**
+   * Resets the scheme.
+   */
+  @Override
+  protected void reset() {
+    super.reset();
+
+    m_Service = null;
+    m_Port    = null;
   }
 
   /**
@@ -157,29 +173,40 @@ public class Get
    */
   @Override
   protected void doQuery() throws Exception {
-    SpectralGetServiceService knirServiceService;
-    SpectralGetService knirService;
-    knirServiceService = new SpectralGetServiceService(getWsdlLocation());
-    knirService = knirServiceService.getSpectralGetServicePort();
-    WebserviceUtils.configureClient(
-	m_Owner,
-	knirService, 
-	m_ConnectionTimeout, 
-	m_ReceiveTimeout, 
-	(getUseAlternativeURL() ? getAlternativeURL() : null),
-	m_InInterceptor,
-	null);
-    //check against schema
-    WebserviceUtils.enableSchemaValidation(((BindingProvider) knirService));
+    if (m_Service == null) {
+      m_Service = new SpectralGetServiceService(getWsdlLocation());
+      m_Port = m_Service.getSpectralGetServicePort();
+      WebserviceUtils.configureClient(
+        m_Owner,
+        m_Port,
+        m_ConnectionTimeout,
+        m_ReceiveTimeout,
+        (getUseAlternativeURL() ? getAlternativeURL() : null),
+        m_InInterceptor,
+        null);
+      //check against schema
+      WebserviceUtils.enableSchemaValidation(((BindingProvider) m_Port));
+    }
    
     GetRequest request = new GetRequest();
     request.setId(m_ID);
     request.setFormat(m_Format);
-    GetResponse response = knirService.get(request);
+    GetResponse response = m_Port.get(request);
     
     // failed to generate data?
     if (!response.isSuccess())
       throw new IllegalStateException(response.getMessage());
     setResponseData(GetSpectrumHelper.webserviceToKnir(response.getSpectrum()));
+  }
+
+  /**
+   * Cleans up the client.
+   */
+  @Override
+  public void cleanUp() {
+    m_Service = null;
+    m_Port    = null;
+
+    super.cleanUp();
   }
 }
