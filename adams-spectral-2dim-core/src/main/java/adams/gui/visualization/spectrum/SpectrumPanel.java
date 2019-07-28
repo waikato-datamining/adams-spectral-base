@@ -50,6 +50,7 @@ import adams.gui.visualization.container.DataContainerPanelWithContainerList;
 import adams.gui.visualization.core.ColorProvider;
 import adams.gui.visualization.core.CoordinatesPaintlet;
 import adams.gui.visualization.core.CoordinatesPaintlet.Coordinates;
+import adams.gui.visualization.core.CrossHairTracker;
 import adams.gui.visualization.core.DefaultColorProvider;
 import adams.gui.visualization.core.Paintlet;
 import adams.gui.visualization.core.PlotPanel;
@@ -96,6 +97,9 @@ public class SpectrumPanel
 
   /** paintlet for drawing the X-axis. */
   protected CoordinatesPaintlet m_CoordinatesPaintlet;
+
+  /** the cross-hair paintlet. */
+  protected CrossHairTracker m_CrossHairTracker;
 
   /** paintlet for drawing the spectrum. */
   protected AbstractSpectrumPaintlet m_SpectrumPaintlet;
@@ -235,6 +239,13 @@ public class SpectrumPanel
     m_CoordinatesPaintlet.setXColor(props.getColor("Plot.CoordinatesColor." + Coordinates.X, Color.DARK_GRAY));
     m_CoordinatesPaintlet.setYColor(props.getColor("Plot.CoordinatesColor." + Coordinates.Y, Color.DARK_GRAY));
 
+    m_CrossHairTracker = new CrossHairTracker();
+    m_CrossHairTracker.setEnabled(props.getBoolean("Plot.CrossHairTracker.Enabled", false));
+    m_CrossHairTracker.setTextCoordinates(props.getBoolean("Plot.CrossHairTracker.Text", false));
+    m_CrossHairTracker.setColor(props.getColor("Plot.CrossHairTracker.Color", Color.BLACK));
+    m_CrossHairTracker.setPanel(this);
+    getPlot().addMouseMovementTracker(m_CrossHairTracker);
+
     m_SpectrumPointHitDetector = new SpectrumPointHitDetector(this);
 
     getPlot().addHitDetector(new WaveNumberHitDetector(this));
@@ -297,6 +308,15 @@ public class SpectrumPanel
    */
   public SelectedWaveNumberPaintlet getSelectedWaveNumberPaintlet() {
     return m_SelectedWaveNumberPaintlet;
+  }
+
+  /**
+   * Returns the cross-hair tracker.
+   *
+   * @return		the tracker
+   */
+  public CrossHairTracker getCrossHairTracker() {
+    return m_CrossHairTracker;
   }
 
   /**
