@@ -21,12 +21,17 @@
 package adams.data.io.input;
 
 import adams.core.Utils;
+import adams.data.report.DataType;
+import adams.data.report.Field;
+import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Data;
 import nom.tam.fits.Fits;
+import nom.tam.fits.HeaderCard;
 import nom.tam.image.compression.hdu.CompressedImageData;
+import nom.tam.util.Cursor;
 
 import java.lang.reflect.Array;
 import java.util.logging.Level;
@@ -126,16 +131,20 @@ public class FitsLibsReader
    */
   @Override
   protected void readData() {
-    Fits 		fits;
-    int 		i;
-    int			r;
-    int			c;
-    Spectrum		sp;
-    BasicHDU<?>		hdu;
-    Data		data;
-    CompressedImageData cidata;
-    Object		cell;
-    SpectrumPoint	point;
+    Fits 			fits;
+    int 			i;
+    int				r;
+    int				c;
+    Spectrum			sp;
+    SampleData			sd;
+    Field			field;
+    BasicHDU<?>			hdu;
+    Data			data;
+    CompressedImageData 	cidata;
+    Object			cell;
+    SpectrumPoint		point;
+    Cursor<String, HeaderCard>	iter;
+    HeaderCard			card;
 
     try {
       fits = new Fits(m_Input.getAbsolutePath());
@@ -153,9 +162,30 @@ public class FitsLibsReader
         if (data instanceof CompressedImageData) {
 	  if (isLoggingEnabled())
 	    getLogger().info("HDU #" + i + ": compressed image data");
-          cidata = (CompressedImageData) data;
-	  sp     = new Spectrum();
+
+	  // init spectrum
+	  sp = new Spectrum();
 	  sp.setID(m_Input.getName() + "-" + i);
+
+	  // add meta-data
+	  iter = hdu.getHeader().iterator();
+	  sd   = sp.getReport();
+	  while (iter.hasNext()) {
+	    card = iter.next();
+	    if ((card.getKey() != null) && (card.getValue() != null)) {
+	      if (Utils.isDouble(card.getValue()))
+	        field = new Field(card.getKey(), DataType.NUMERIC);
+	      else if (Utils.isBoolean(card.getValue()))
+	        field = new Field(card.getKey(), DataType.BOOLEAN);
+	      else
+	        field = new Field(card.getKey(), DataType.STRING);
+	      sd.addField(field);
+	      sd.setValue(field, card.getValue());
+	    }
+	  }
+
+	  // add data points
+          cidata = (CompressedImageData) data;
 	  for (c = 0; c < cidata.getData().getNCols(); c++) {
 	    for (r = 0; r < cidata.getData().getNRows(); r++) {
 	      cell  = cidata.getData().getElement(r, c);
@@ -164,6 +194,8 @@ public class FitsLibsReader
 	        sp.add(point);
 	    }
 	  }
+
+	  // add spectrum
 	  m_ReadData.add(sp);
 	}
 	else {
