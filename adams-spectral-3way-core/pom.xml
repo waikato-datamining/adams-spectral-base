@@ -108,6 +108,12 @@
       <artifactId>nd4j-native-platform</artifactId>
       <version>${nd4j.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>gov.nasa.gsfc.heasarc</groupId>
+      <artifactId>nom-tam-fits</artifactId>
+      <version>1.15.2</version>
+    </dependency>
   </dependencies>
 
   <build>

@@ -151,12 +151,6 @@
       <artifactId>musicg</artifactId>
       <version>1.4.2.2</version>
     </dependency>
-
-    <dependency>
-      <groupId>gov.nasa.gsfc.heasarc</groupId>
-      <artifactId>nom-tam-fits</artifactId>
-      <version>1.15.2</version>
-    </dependency>
   </dependencies>
 
   <build>

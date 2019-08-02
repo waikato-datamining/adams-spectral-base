@@ -19,6 +19,7 @@
  */
 package adams.gui.visualization.threewaydata.heatmapviewer;
 
+import adams.core.CleanUpHandler;
 import adams.core.Properties;
 import adams.data.conversion.Conversion;
 import adams.data.conversion.HeatmapToBufferedImage;
@@ -59,7 +60,9 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Panel for displaying a single 3-way data structure.
@@ -67,7 +70,8 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class ThreeWayDataHeatmapPanel
-  extends BasePanel {
+  extends BasePanel
+  implements CleanUpHandler {
 
   /** for serialization. */
   private static final long serialVersionUID = 1897625268125110563L;
@@ -108,6 +112,9 @@ public class ThreeWayDataHeatmapPanel
   /** the current file. */
   protected File m_CurrentFile;
 
+  /** for caching the generated images. */
+  protected Map<Double,BufferedImage> m_ImageCache;
+
   /**
    * Initializes the panel.
    *
@@ -133,6 +140,7 @@ public class ThreeWayDataHeatmapPanel
     m_CurrentFile        = null;
     m_ColorGenerator     = AbstractColorGradientGenerator.forCommandLine(props.getProperty("Image.GradientColorGenerator", new BiColorGenerator().toCommandLine()));
     m_MissingValueColor  = props.getColor("Image.MissingValueColor", ColorHelper.valueOf("#88ff0000"));
+    m_ImageCache         = new HashMap<>();
   }
 
   /**
@@ -221,48 +229,59 @@ public class ThreeWayDataHeatmapPanel
     ThreeWayDataToHeatmap	tw2hm;
     HeatmapToBufferedImage	hm2bi;
     MultiConversion		multi;
+    double			key;
 
     if (m_Data.size() == 0)
       return null;
 
-    errors = new StringBuilder();
-    props  = getProperties();
-
+    props = getProperties();
     tw2hm = new ThreeWayDataToHeatmap();
     if (m_ListX.getSelectedIndex() > -1) {
+      key = (Double) m_ListX.getSelectedValue();
       tw2hm.setMinX((Double) m_ListX.getSelectedValue());
       tw2hm.setMaxX((Double) m_ListX.getSelectedValue());
     }
     else {
+      key = Double.NEGATIVE_INFINITY;
       tw2hm.setMinX(Double.NEGATIVE_INFINITY);
       tw2hm.setMaxX(Double.POSITIVE_INFINITY);
     }
 
-    hm2bi = new HeatmapToBufferedImage();
-    hm2bi.setGenerator(m_ColorGenerator);
-    hm2bi.setMissingValueColor(m_MissingValueColor);
-
-    multi = new MultiConversion();
-    multi.setSubConversions(new Conversion[]{tw2hm, hm2bi});
-    multi.setInput(m_Data);
-    result = multi.convert();
-    if (result != null) {
-      error = "Failed to generate image: " + result;
-      if (errors.length() > 0)
-	errors.append("\n");
-      errors.append(error);
-      GUIHelper.showErrorMessage(this, error);
-      m_DataImage.setCurrentImage((BufferedImage) null);
+    if (m_ImageCache.containsKey(key)) {
+      m_DataImage.setCurrentImage(m_ImageCache.get(key));
+      m_DataImage.setScale(props.getDouble("Image.Scale", -1.0));
+      return null;
     }
     else {
-      m_DataImage.setCurrentImage(((AbstractImageContainer) hm2bi.getOutput()).toBufferedImage());
-      m_DataImage.setScale(props.getDouble("Image.Scale", -1.0));
-    }
+      errors = new StringBuilder();
 
-    if (errors.length() == 0)
-      return null;
-    else
-      return errors.toString();
+      hm2bi = new HeatmapToBufferedImage();
+      hm2bi.setGenerator(m_ColorGenerator);
+      hm2bi.setMissingValueColor(m_MissingValueColor);
+
+      multi = new MultiConversion();
+      multi.setSubConversions(new Conversion[]{tw2hm, hm2bi});
+      multi.setInput(m_Data);
+      result = multi.convert();
+      if (result != null) {
+	error = "Failed to generate image: " + result;
+	if (errors.length() > 0)
+	  errors.append("\n");
+	errors.append(error);
+	GUIHelper.showErrorMessage(this, error);
+	m_DataImage.setCurrentImage((BufferedImage) null);
+      }
+      else {
+        m_ImageCache.put(key, ((AbstractImageContainer) hm2bi.getOutput()).toBufferedImage());
+	m_DataImage.setCurrentImage(m_ImageCache.get(key));
+	m_DataImage.setScale(props.getDouble("Image.Scale", -1.0));
+      }
+
+      if (errors.length() == 0)
+	return null;
+      else
+	return errors.toString();
+    }
   }
 
   /**
@@ -280,6 +299,8 @@ public class ThreeWayDataHeatmapPanel
 
     if (value == null)
       return;
+
+    clearImageCache();
 
     m_CurrentFile = null;
     m_Data = (ThreeWayData) value.getClone();
@@ -496,5 +517,20 @@ public class ThreeWayDataHeatmapPanel
    */
   public void setReportVisible(boolean value) {
     m_SplitPaneRight.setRightComponentHidden(!value);
+  }
+
+  /**
+   * Clears the image cache.
+   */
+  protected void clearImageCache() {
+    m_ImageCache.clear();
+  }
+
+  /**
+   * Cleans up data structures, frees up memory.
+   */
+  public void cleanUp() {
+    clearImageCache();
+    m_Data = null;
   }
 }
