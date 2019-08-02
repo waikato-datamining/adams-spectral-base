@@ -21,14 +21,12 @@
 package adams.data.io.input;
 
 import adams.core.Utils;
-import adams.core.io.PlaceholderFile;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.report.Report;
 import adams.data.threeway.L1Point;
 import adams.data.threeway.L2Point;
 import adams.data.threeway.ThreeWayData;
-import adams.env.Environment;
 import nom.tam.fits.BasicHDU;
 import nom.tam.fits.Data;
 import nom.tam.fits.Fits;
@@ -38,7 +36,6 @@ import nom.tam.image.compression.hdu.CompressedImageHDU;
 import nom.tam.util.Cursor;
 
 import java.lang.reflect.Array;
-import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -260,15 +257,5 @@ public class FitsLibsReader
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to read FITS: " + m_Input, e);
     }
-  }
-
-  public static void main(String[] args) throws Exception {
-    Environment.setEnvironmentClass(Environment.class);
-    FitsLibsReader reader = new FitsLibsReader();
-    reader.setUnsigned(true);
-    reader.setInput(new PlaceholderFile("/home/fracpete/temp/fits/4mj/2465/echantillon_calib/PB16-02_0589c89c-890d-4c4c-a529-179130765eda_14_2465.fits"));
-    List<ThreeWayData> data = reader.read();
-    for (ThreeWayData d: data)
-      System.out.println(d);
   }
 }
