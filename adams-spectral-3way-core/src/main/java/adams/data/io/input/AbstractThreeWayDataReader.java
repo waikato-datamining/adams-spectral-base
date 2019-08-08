@@ -15,7 +15,7 @@
 
 /*
  * AbstractThreeWayDataReader.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -148,7 +148,7 @@ public abstract class AbstractThreeWayDataReader
    * 			displaying in the GUI or for listing the options.
    */
   public String instrumentTipText() {
-    return "The name of the instrument that generated the spectra (if not already present in data).";
+    return "The name of the instrument that generated the 3-way data (if not already present in data).";
   }
 
   /**
