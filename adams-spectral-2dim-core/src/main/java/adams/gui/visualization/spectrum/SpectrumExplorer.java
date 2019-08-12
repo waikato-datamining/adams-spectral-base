@@ -21,6 +21,7 @@
 package adams.gui.visualization.spectrum;
 
 import adams.core.CleanUpHandler;
+import adams.core.ObjectCopyHelper;
 import adams.core.StatusMessageHandler;
 import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
@@ -1522,9 +1523,16 @@ public class SpectrumExplorer
       newFrame = oldFrame.getNewWindow();
       newFrame.setVisible(visible);
       result  = (SpectrumExplorer) newFrame.getContentPane().getComponent(0);
-    }
 
-    // TODO transfer paintlet etc
+      // transfer settings
+      result.getContainerManager().setColorProvider(ObjectCopyHelper.copyObject(getContainerManager().getColorProvider()));
+      result.getSpectrumPanel().setDataPaintlet(ObjectCopyHelper.copyObject(getSpectrumPanel().getDataPaintlet()));
+      result.m_CurrentFilter = ObjectCopyHelper.copyObject(m_CurrentFilter);
+      result.m_CurrentICA = ObjectCopyHelper.copyObject(m_CurrentICA);
+      result.m_CurrentPCA = ObjectCopyHelper.copyObject(m_CurrentPCA);
+      result.m_CurrentPLS = ObjectCopyHelper.copyObject(m_CurrentPLS);
+      result.m_FilterOverlayOriginalData = m_FilterOverlayOriginalData;
+    }
 
     return result;
   }
