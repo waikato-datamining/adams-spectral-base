@@ -40,6 +40,7 @@ import adams.event.DatabaseConnectionChangeEvent;
 import adams.event.DatabaseConnectionChangeEvent.EventType;
 import adams.event.DatabaseConnectionChangeListener;
 import adams.flow.control.Flow;
+import adams.gui.application.ChildFrame;
 import adams.gui.chooser.SpectrumFileChooser;
 import adams.gui.core.AntiAliasingSupporter;
 import adams.gui.core.BaseStatusBar;
@@ -198,6 +199,15 @@ public class SpectrumExplorer
 
   /** the paintlet  menu item. */
   protected JMenuItem m_MenuItemViewPaintlet;
+
+  /** the menu item for window related stuff. */
+  protected JMenu m_MenuWindow;
+
+  /** the menuitem for creating a new window. */
+  protected JMenuItem m_MenuItemWindowNew;
+
+  /** the menuitem for duplicating theew window. */
+  protected JMenuItem m_MenuItemWindowDuplicate;
 
   /** the current filter. */
   protected adams.data.filter.Filter<Spectrum> m_CurrentFilter;
@@ -898,6 +908,29 @@ public class SpectrumExplorer
       menuitem.addActionListener((ActionEvent e) -> selectPaintlet());
       m_MenuItemViewPaintlet = menuitem;
 
+      // Window
+      menu = new JMenu("Window");
+      result.add(menu);
+      menu.setMnemonic('W');
+      menu.addChangeListener(e -> updateMenu());
+      m_MenuWindow = menu;
+
+      // Window/New window
+      menuitem = new JMenuItem("New window");
+      menu.add(menuitem);
+      menuitem.setIcon(GUIHelper.getIcon("new.gif"));
+      menuitem.setMnemonic('N');
+      menuitem.addActionListener(e -> newWindow(true));
+      m_MenuItemWindowNew = menuitem;
+
+      // Window/Duplicate window
+      menuitem = new JMenuItem("Duplicate window");
+      menu.add(menuitem);
+      menuitem.setIcon(GUIHelper.getIcon("copy.gif"));
+      menuitem.setMnemonic('D');
+      menuitem.addActionListener(e -> duplicateWindow(true));
+      m_MenuItemWindowDuplicate = menuitem;
+
       // update menu
       m_MenuBar = result;
       refreshScripts();
@@ -1469,6 +1502,60 @@ public class SpectrumExplorer
 	result = this;
       }
     }
+
+    return result;
+  }
+
+  /**
+   * Opens a new window.
+   *
+   * @param visible 	whether to make the window visible
+   */
+  protected SpectrumExplorer newWindow(boolean visible) {
+    SpectrumExplorer 	result;
+    ChildFrame 		oldFrame;
+    ChildFrame 		newFrame;
+
+    result    = null;
+    oldFrame = (ChildFrame) GUIHelper.getParent(this, ChildFrame.class);
+    if (oldFrame != null) {
+      newFrame = oldFrame.getNewWindow();
+      newFrame.setVisible(visible);
+      result  = (SpectrumExplorer) newFrame.getContentPane().getComponent(0);
+    }
+
+    // TODO transfer paintlet etc
+
+    return result;
+  }
+
+  /**
+   * Opens a new window with the same content/setup.
+   *
+   * @param visible 	whether to make the window visible
+   */
+  protected SpectrumExplorer duplicateWindow(boolean visible) {
+    SpectrumExplorer		result;
+    ChildFrame			frame;
+    SpectrumContainerManager	managerThis;
+    SpectrumContainerManager	managerNew;
+
+    result = newWindow(false);
+
+    // duplicate content
+    if (result != null) {
+      managerThis = getContainerManager();
+      managerNew  = result.getContainerManager();
+      managerNew.startUpdate();
+      managerNew.addAll(managerThis.getAll());
+      managerNew.finishUpdate();
+
+      if (visible) {
+	frame = (ChildFrame) GUIHelper.getParent(result, ChildFrame.class);
+	frame.setVisible(true);
+      }
+    }
+
 
     return result;
   }
