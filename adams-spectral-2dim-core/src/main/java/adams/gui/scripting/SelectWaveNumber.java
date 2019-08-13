@@ -80,7 +80,8 @@ public class SelectWaveNumber
    * @return		null if no error, otherwise error message
    * @throws Exception 	if something goes wrong
    */
-  public String process(String options) throws Exception {
+  @Override
+  protected String doProcess(String options) throws Exception {
     Float 	waveno;
 
     waveno = Float.parseFloat(options);

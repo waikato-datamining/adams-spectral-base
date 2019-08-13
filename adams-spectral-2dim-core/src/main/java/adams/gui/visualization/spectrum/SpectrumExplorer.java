@@ -171,6 +171,9 @@ public class SpectrumExplorer
   /** the menu item for scripts. */
   protected JMenu m_MenuScripts;
 
+  /** the stop execution menu item. */
+  protected JMenuItem m_MenuItemStopExecution;
+
   /** the start recording menu item. */
   protected JMenuItem m_MenuItemStartRecording;
 
@@ -560,6 +563,7 @@ public class SpectrumExplorer
     m_MenuItemProcessPCA.setEnabled(dataLoaded);
     m_MenuItemProcessPLS.setEnabled(dataLoaded);
 
+    m_MenuItemStopExecution.setEnabled(getScriptingEngine().isProcessing());
     m_MenuItemStartRecording.setEnabled(!getScriptingEngine().isRecording());
     m_MenuItemStopRecording.setEnabled(getScriptingEngine().isRecording());
     m_MenuItemViewAntiAliasing.setEnabled(getSpectrumPanel().getDataPaintlet() instanceof AntiAliasingSupporter);
@@ -821,6 +825,16 @@ public class SpectrumExplorer
       menu.setMnemonic('S');
       menu.addChangeListener(e -> updateMenu());
       m_MenuScripts = menu;
+
+      // Scripts/Stop execution
+      menuitem = new JMenuItem("Stop execution");
+      menu.add(menuitem);
+      menuitem.setMnemonic('x');
+      menuitem.setIcon(GUIHelper.getIcon("stop.gif"));
+      menuitem.addActionListener(e -> getScriptingEngine().stop());
+      m_MenuItemStopExecution = menuitem;
+
+      menu.addSeparator();
 
       // Scripts/Manage scripts
       menuitem = new JMenuItem("Manage...");
