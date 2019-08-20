@@ -39,6 +39,7 @@ import adams.gui.core.BasePanel;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTable;
+import adams.gui.core.BaseTable.ColumnWidthApproach;
 import adams.gui.core.ConsolePanel;
 import adams.gui.core.GUIHelper;
 import adams.gui.core.MouseUtils;
@@ -247,7 +248,7 @@ public class ListSampleDataPanel
     m_TableSampleData = new SpreadSheetTable(new SpreadSheetTableModel());
     m_TableSampleData.setShowSimpleHeaderPopupMenu(true);
     m_TableSampleData.setShowSimpleCellPopupMenu(true);
-    m_TableSampleData.setUseOptimalColumnWidths(true);
+    m_TableSampleData.setColumnWidthApproach(ColumnWidthApproach.ADAPTIVE);
     m_TableSampleData.getSelectionModel().addListSelectionListener((ListSelectionEvent e) -> updateButtons());
     m_TableSampleData.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     panel2 = new JPanel(new BorderLayout());
