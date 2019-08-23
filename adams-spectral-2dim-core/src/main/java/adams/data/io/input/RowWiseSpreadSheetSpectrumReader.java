@@ -464,6 +464,7 @@ public class RowWiseSpreadSheetSpectrumReader
     TIntArrayList	cols;
     TFloatArrayList	waveNo;
     int[]		waveCols;
+    List<SpectrumPoint>	points;
     List<Field> 	sdFields;
     Field		field;
     int[]		sdCols;
@@ -480,9 +481,19 @@ public class RowWiseSpreadSheetSpectrumReader
     else {
       sheets = new ArrayList<>();
       sheets.add(m_Reader.read(m_Input));
+      if (m_Reader instanceof ChunkedSpreadSheetReader) {
+        while (((ChunkedSpreadSheetReader) m_Reader).hasMoreChunks() && !m_Stopped) {
+          if (isLoggingEnabled())
+            getLogger().info("Reading chunk #" + (sheets.size() + 1));
+	  sheets.add(((ChunkedSpreadSheetReader) m_Reader).nextChunk());
+	}
+      }
     }
+    if (m_Stopped)
+      return;
 
     sheetNo = 0;
+    points  = new ArrayList<>();
     for (SpreadSheet sheet: sheets) {
       sheetNo++;
       if (m_Stopped)
@@ -509,14 +520,19 @@ public class RowWiseSpreadSheetSpectrumReader
       waveNo = identifyWaveNumbers(sheet, waveCols);
 
       for (Row row : sheet.rows()) {
+	if (m_Stopped)
+	  return;
 	sp = new Spectrum();
 
 	// wave numbers
+	points.clear();
 	for (i = 0; i < waveCols.length; i++) {
+	  if (m_Stopped)
+	    return;
 	  if (row.hasCell(waveCols[i]) && !row.getCell(waveCols[i]).isMissing()) {
 	    try {
 	      point = new SpectrumPoint(waveNo.get(i), row.getCell(waveCols[i]).toDouble().floatValue());
-	      sp.add(point);
+	      points.add(point);
 	    }
 	    catch (Exception e) {
 	      getLogger().log(
@@ -526,10 +542,13 @@ public class RowWiseSpreadSheetSpectrumReader
 	    }
 	  }
 	}
+	sp.addAll(points);
 
 	// sample data
 	sd = new SampleData();
 	for (i = 0; i < sdCols.length; i++) {
+	  if (m_Stopped)
+	    return;
 	  if (row.hasCell(sdCols[i]) && !row.getCell(sdCols[i]).isMissing()) {
 	    field = sdFields.get(i);
 	    sd.addField(field);
@@ -545,6 +564,8 @@ public class RowWiseSpreadSheetSpectrumReader
 	}
 
 	m_ReadData.add(sp);
+	if (isLoggingEnabled())
+	  getLogger().info("Added: " + sp);
       }
     }
   }
