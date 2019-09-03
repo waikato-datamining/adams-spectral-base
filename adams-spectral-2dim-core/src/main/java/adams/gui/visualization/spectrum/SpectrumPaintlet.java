@@ -15,7 +15,7 @@
 
 /*
  * SpectrumPaintlet.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -78,7 +78,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SpectrumPaintlet
   extends AbstractSpectrumPaintlet
@@ -117,6 +116,9 @@ public class SpectrumPaintlet
   /** whether anti-aliasing is enabled. */
   protected boolean m_AntiAliasingEnabled;
 
+  /** whether to paint all the data points (no optimization). */
+  protected boolean m_PaintAll;
+
   /**
    * Returns a string describing the object.
    *
@@ -149,6 +151,10 @@ public class SpectrumPaintlet
     m_OptionManager.add(
       "anti-aliasing-enabled", "antiAliasingEnabled",
       GUIHelper.getBoolean(getClass(), "antiAliasingEnabled", true));
+
+    m_OptionManager.add(
+      "paint-all", "paintAll",
+      false);
   }
 
   /**
@@ -312,6 +318,35 @@ public class SpectrumPaintlet
   }
 
   /**
+   * Returns whether marker shapes are disabled.
+   *
+   * @return		true if marker shapes are disabled
+   */
+  public boolean getPaintAll() {
+    return m_PaintAll;
+  }
+
+  /**
+   * Sets whether to draw markers or not.
+   *
+   * @param value	if true then marker shapes won't be drawn
+   */
+  public void setPaintAll(boolean value) {
+    m_PaintAll = value;
+    memberChanged();
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String paintAllTipText() {
+    return "If set to true, all data points will be painted, regardless whether they are visible or not.";
+  }
+
+  /**
    * Draws the data with the given color.
    *
    * @param g		the graphics context
@@ -364,8 +399,10 @@ public class SpectrumPaintlet
 
       // determine coordinates
       currX = axisX.valueToPos(SpectrumPoint.toDouble(curr.getWaveNumber()));
-      if ((i != start) && (i != end) && (currX == prevX))
-	continue;
+      if (!m_PaintAll) {
+        if ((i != start) && (i != end) && (currX == prevX))
+          continue;
+      }
       currY = axisY.valueToPos(SpectrumPoint.toDouble(curr.getAmplitude()));
 
       // draw line
