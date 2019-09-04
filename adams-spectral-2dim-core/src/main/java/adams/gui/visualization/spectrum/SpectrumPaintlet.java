@@ -154,7 +154,7 @@ public class SpectrumPaintlet
 
     m_OptionManager.add(
       "paint-all", "paintAll",
-      false);
+      true);
   }
 
   /**
