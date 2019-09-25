@@ -106,9 +106,7 @@ adams.data.spectrum.AbstractSpectrumComparator=\
 adams.db.SpectralDbBackend=\
   adams.db,\
   adams.db.mirrored,\
-  adams.db.mysql,\
-  adams.db.postgresql,\
-  adams.db.sqlite
+  adams.db.mysql
 
 # the ID provider panels
 adams.gui.tools.idprovider.AbstractIDProviderPanel=\

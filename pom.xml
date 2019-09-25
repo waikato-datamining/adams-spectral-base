@@ -49,6 +49,7 @@
 
   <modules>
     <module>adams-spectral-2dim-core</module>
+    <module>adams-spectral-2dim-db</module>
     <module>adams-spectral-2dim-rats</module>
     <module>adams-spectral-2dim-webservice</module>
     <module>adams-spectral-2dim-handheld</module>
