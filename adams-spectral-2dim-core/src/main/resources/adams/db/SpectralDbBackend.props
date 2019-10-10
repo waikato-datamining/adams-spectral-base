@@ -1,4 +1,6 @@
 # Defines what class provides the spectral DB backend interface implementations.
 
 # Class name (+ options) that provides the backend
-Backend=adams.db.mysql.SpectralDbBackend
+# For example: adams.db.mysql.SpectralDbBackend
+# leave empty for internal autodetect
+Backend=

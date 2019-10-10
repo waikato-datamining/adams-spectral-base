@@ -21,6 +21,7 @@
 package adams.db;
 
 import adams.core.ClassLister;
+import adams.core.NewInstance;
 import adams.core.Properties;
 import adams.core.Utils;
 import adams.core.logging.LoggingLevel;
@@ -41,6 +42,10 @@ public abstract class AbstractSpectralDbBackend
   private static final long serialVersionUID = 3589560540375200811L;
 
   public static final String KEY_BACKEND = "Backend";
+
+  public static final String BACKEND_AUTODETECT = "adams.db.autodetect.SpectralDbBackend";
+
+  public static final String BACKEND_MYSQL = "adams.db.mysql.SpectralDbBackend";
 
   /** the properties with the defaults. */
   protected static Properties m_Properties;
@@ -76,10 +81,16 @@ public abstract class AbstractSpectralDbBackend
         available = ClassLister.getSingleton().getClasses(SpectralDbBackend.class);
 	m_Initialized = true;
 	cmdline = getProperties().getProperty(KEY_BACKEND, "").trim();
-	if (cmdline.isEmpty())
-	  throw new IllegalStateException(
-	    "No spectral DB backend defined in " + SpectralDbBackend.FILENAME + "!\n"
-	      + "Available: " + Utils.classesToString(available));
+	if (cmdline.isEmpty()) {
+	  if (NewInstance.getSingleton().newObject(BACKEND_AUTODETECT) != null)
+	    cmdline = BACKEND_AUTODETECT;
+	  else if (NewInstance.getSingleton().newObject(BACKEND_MYSQL) != null)
+	    cmdline = BACKEND_MYSQL;
+	  else
+	    throw new IllegalStateException(
+	      "No spectral DB backend defined in " + SpectralDbBackend.FILENAME + "!\n"
+		+ "Available: " + Utils.classesToString(available));
+	}
 	try {
 	  m_Singleton = (SpectralDbBackend) OptionUtils.forCommandLine(SpectralDbBackend.class, cmdline);
 	  m_Singleton.setLoggingLevel(LoggingLevel.INFO);
