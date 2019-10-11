@@ -21,6 +21,7 @@
 package adams.db;
 
 import adams.core.Constants;
+import adams.core.logging.LoggingHelper;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 
@@ -72,6 +73,8 @@ public class SpectrumF
    */
   @Override
   public boolean init() {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
     return m_DB.init();
   }
 
@@ -83,6 +86,8 @@ public class SpectrumF
    */
   @Override
   public boolean exists(int id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return m_DB.exists(id);
   }
 
@@ -96,6 +101,8 @@ public class SpectrumF
    */
   @Override
   public boolean exists(String id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return m_DB.exists(id);
   }
 
@@ -107,6 +114,8 @@ public class SpectrumF
    */
   @Override
   public boolean exists(String id, String format) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", format=" + format);
     return m_DB.exists(id, format);
   }
 
@@ -118,6 +127,8 @@ public class SpectrumF
    */
   @Override
   public Spectrum load(int auto_id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id);
     return m_DB.load(auto_id);
   }
 
@@ -131,6 +142,8 @@ public class SpectrumF
    */
   @Override
   public Spectrum load(String id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return m_DB.load(id);
   }
 
@@ -143,6 +156,8 @@ public class SpectrumF
    */
   @Override
   public Spectrum load(String sample_id, String format) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id" + sample_id + ", format=" + format);
     return m_DB.load(sample_id, format);
   }
 
@@ -155,6 +170,8 @@ public class SpectrumF
    */
   @Override
   public Spectrum loadRaw(int auto_id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id);
     return m_DB.loadRaw(auto_id);
   }
 
@@ -168,6 +185,8 @@ public class SpectrumF
    */
   @Override
   public Spectrum loadRaw(String sample_id, String format) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format);
     return m_DB.loadRaw(sample_id, format);
   }
 
@@ -182,6 +201,8 @@ public class SpectrumF
    */
   @Override
   public Spectrum loadFromDB(int auto_id, String rlike, boolean raw) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id + ", rlike=" + rlike + ", raw=" + raw);
     return m_DB.loadFromDB(auto_id, rlike, raw);
   }
 
@@ -196,6 +217,8 @@ public class SpectrumF
    */
   @Override
   public Spectrum loadFromDB(String sample_id, String format, boolean raw) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format + ", raw=" + raw);
     return m_DB.loadFromDB(sample_id, format, raw);
   }
 
@@ -209,6 +232,8 @@ public class SpectrumF
    */
   @Override
   public int getDatabaseID(String id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return m_DB.getDatabaseID(id);
   }
 
@@ -221,6 +246,8 @@ public class SpectrumF
    */
   @Override
   public int getDatabaseID(String sample_id, String format) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format);
     return m_DB.getDatabaseID(sample_id, format);
   }
 
@@ -233,6 +260,8 @@ public class SpectrumF
    */
   @Override
   public List<String> getValues(String[] fields, SpectrumIDConditions cond) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
     return m_DB.getValues(fields, cond);
   }
 
@@ -246,6 +275,8 @@ public class SpectrumF
    */
   @Override
   public List<String> getValues(String[] fields, String where, SpectrumIDConditions cond) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
     return m_DB.getValues(fields, where, cond);
   }
 
@@ -260,6 +291,8 @@ public class SpectrumF
    */
   @Override
   public List<String> getValues(String[] fields, String tables, String where, SpectrumIDConditions cond) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
     return m_DB.getValues(fields, tables, where, cond);
   }
 
@@ -272,6 +305,8 @@ public class SpectrumF
    */
   @Override
   public Integer add(Spectrum sp) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sp=" + sp);
     return m_DB.add(sp);
   }
 
@@ -284,6 +319,8 @@ public class SpectrumF
    * @return  	new ID, or null if fail
    */
   public Integer add(Spectrum sp, boolean storeWaveNo) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sp=" + sp + ", storeWaveNo=" + storeWaveNo);
     return m_DB.add(sp, storeWaveNo);
   }
 
@@ -298,6 +335,8 @@ public class SpectrumF
    */
   @Override
   public boolean remove(String sample_id, boolean keepReport) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", keepReport=" + keepReport);
     return m_DB.remove(sample_id, keepReport);
   }
 
@@ -311,6 +350,8 @@ public class SpectrumF
    */
   @Override
   public boolean remove(String sample_id, String format, boolean keepReport) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format + ", keepReport=" + keepReport);
     return m_DB.remove(sample_id, format, keepReport);
   }
 
@@ -323,6 +364,8 @@ public class SpectrumF
    */
   @Override
   public boolean remove(int id, boolean keepReport) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", keepReport=" + keepReport);
     return m_DB.remove(id, keepReport);
   }
 
