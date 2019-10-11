@@ -21,6 +21,7 @@
 package adams.db;
 
 import adams.core.Constants;
+import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
@@ -63,6 +64,8 @@ public class SpectrumF
    */
   @Override
   public SampleDataIntf getSampleDataHandler() {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
     return m_DB.getSampleDataHandler();
   }
 
@@ -261,7 +264,7 @@ public class SpectrumF
   @Override
   public List<String> getValues(String[] fields, SpectrumIDConditions cond) {
     if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName());
+      getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", cond=" + cond);
     return m_DB.getValues(fields, cond);
   }
 
@@ -276,7 +279,7 @@ public class SpectrumF
   @Override
   public List<String> getValues(String[] fields, String where, SpectrumIDConditions cond) {
     if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName());
+      getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", where=" + where + ", cond=" + cond);
     return m_DB.getValues(fields, where, cond);
   }
 
@@ -292,7 +295,7 @@ public class SpectrumF
   @Override
   public List<String> getValues(String[] fields, String tables, String where, SpectrumIDConditions cond) {
     if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName());
+      getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", tables=" + tables + ", where=" + where + ", cond=" + cond);
     return m_DB.getValues(fields, tables, where, cond);
   }
 
