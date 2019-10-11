@@ -22,6 +22,7 @@ package adams.data.evaluator.instance;
 
 import adams.core.Utils;
 import adams.core.io.FileUtils;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.OptionUtils;
 import adams.test.AbstractTestHelper;
 import adams.test.AdamsTestCase;
@@ -109,7 +110,7 @@ public abstract class AbstractEvaluatorTestCase
       }
     }
     catch (Exception e) {
-      fail("Failed to load Instances from '" + filename + "'!\n" + Utils.throwableToString(e));
+      fail("Failed to load Instances from '" + filename + "'!\n" + LoggingHelper.throwableToString(e));
     }
 
     m_TestHelper.deleteFileFromTmp(filename);

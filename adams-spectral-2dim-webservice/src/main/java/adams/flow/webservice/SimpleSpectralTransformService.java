@@ -20,7 +20,7 @@
 
 package adams.flow.webservice;
 
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.AbstractOptionHandler;
 import adams.data.spectrum.Spectrum;
 import adams.db.DatabaseConnectionUser;
@@ -186,7 +186,7 @@ public class SimpleSpectralTransformService
     } 
     catch (java.lang.Exception ex) {
       result.setSuccess(false);
-      result.setMessage(Utils.handleException(m_Owner, "Failed to transform data using callable transformer '" + parameters.getAction() + "'!", ex));
+      result.setMessage(LoggingHelper.handleException(m_Owner, "Failed to transform data using callable transformer '" + parameters.getAction() + "'!", ex));
     }
     
     return result;

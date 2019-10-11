@@ -21,7 +21,7 @@
 package adams.data.evaluator.instance;
 
 import adams.core.Randomizable;
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.OptionUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
@@ -274,7 +274,7 @@ public class EnsembleEvaluator
 	m_Normalize[i] = eval.meanAbsoluteError();
       }
       catch (Exception e) {
-	Utils.handleException(this, "Failed to train classifier #" + (i+1) + "!", e);
+	LoggingHelper.handleException(this, "Failed to train classifier #" + (i+1) + "!", e);
 	return false;
       }
     }
@@ -311,7 +311,7 @@ public class EnsembleEvaluator
       result = new Float(max - min);
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to perform evaluation!", e);
+      LoggingHelper.handleException(this, "Failed to perform evaluation!", e);
       result = super.performEvaluate(data);
     }
 

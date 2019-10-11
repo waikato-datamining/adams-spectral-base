@@ -20,8 +20,8 @@
 
 package adams.gui.visualization.debug.objectexport;
 
-import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingHelper;
 import adams.data.io.output.SimpleSpectrumWriter;
 import adams.data.spectrum.Spectrum;
 import nz.ac.waikato.cms.locator.ClassLocator;
@@ -91,7 +91,7 @@ public class SpectrumExporter
       return null;
     }
     catch (Exception e) {
-      return "Failed to write spectrum to '" + file + "'!\n" + Utils.throwableToString(e);
+      return "Failed to write spectrum to '" + file + "'!\n" + LoggingHelper.throwableToString(e);
     }
   }
 }

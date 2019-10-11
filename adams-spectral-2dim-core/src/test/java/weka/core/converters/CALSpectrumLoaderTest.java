@@ -20,8 +20,8 @@
 
 package weka.core.converters;
 
-import adams.core.Utils;
 import adams.core.base.BaseRegExp;
+import adams.core.logging.LoggingHelper;
 import adams.env.Environment;
 import adams.test.AbstractTestHelper;
 import adams.test.AdamsTestCase;
@@ -73,7 +73,7 @@ public class CALSpectrumLoaderTest
       assertNull("Output differs:\n" + regression, regression);
     }
     catch (Exception e) {
-      fail("Failed regression test!\n" + Utils.throwableToString(e));
+      fail("Failed regression test!\n" + LoggingHelper.throwableToString(e));
     }
     m_TestHelper.deleteFileFromTmp("CALK10.CAL");
   }

@@ -20,6 +20,7 @@
 package adams.data.evaluator.instance;
 
 import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.OptionUtils;
 import adams.data.statistics.StatUtils;
 import weka.classifiers.Classifier;
@@ -494,7 +495,7 @@ public class SavitzkyGolayRange
       }
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to make prediction(s) for instance: " + data, e);
+      LoggingHelper.handleException(this, "Failed to make prediction(s) for instance: " + data, e);
       return m_MissingEvaluation;
     }
 
@@ -535,7 +536,7 @@ public class SavitzkyGolayRange
       m_ActualClassifierNone.buildClassifier(data);
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to build actual classifier (none)!", e);
+      LoggingHelper.handleException(this, "Failed to build actual classifier (none)!", e);
       return false;
     }
 
@@ -553,7 +554,7 @@ public class SavitzkyGolayRange
       m_ActualClassifierFirst.buildClassifier(data);
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to build actual classifier (first)!", e);
+      LoggingHelper.handleException(this, "Failed to build actual classifier (first)!", e);
       return false;
     }
 
@@ -571,7 +572,7 @@ public class SavitzkyGolayRange
       m_ActualClassifierSecond.buildClassifier(data);
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to build actual classifier (second)!", e);
+      LoggingHelper.handleException(this, "Failed to build actual classifier (second)!", e);
       return false;
     }
 

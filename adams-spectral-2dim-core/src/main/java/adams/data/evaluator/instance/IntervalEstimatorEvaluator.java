@@ -20,7 +20,7 @@
 
 package adams.data.evaluator.instance;
 
-import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.OptionUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.IntervalEstimator;
@@ -271,7 +271,7 @@ public class IntervalEstimatorEvaluator
       return true;
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to train classifier!", e);
+      LoggingHelper.handleException(this, "Failed to train classifier!", e);
       return false;
     }
   }
@@ -319,7 +319,7 @@ public class IntervalEstimatorEvaluator
       result = new Float(conf[0][1] - conf[0][0]);
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to perform evaluation!", e);
+      LoggingHelper.handleException(this, "Failed to perform evaluation!", e);
       result = super.performEvaluate(data);
     }
 
@@ -348,7 +348,7 @@ public class IntervalEstimatorEvaluator
       result.put(LIMIT_UPPER, (float) conf[0][1]);
     }
     catch (Exception e) {
-      Utils.handleException(this, "Failed to perform evaluation!", e);
+      LoggingHelper.handleException(this, "Failed to perform evaluation!", e);
       result = null;
     }
 

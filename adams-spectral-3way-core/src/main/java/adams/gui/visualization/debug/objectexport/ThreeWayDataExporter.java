@@ -20,8 +20,8 @@
 
 package adams.gui.visualization.debug.objectexport;
 
-import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingHelper;
 import adams.data.io.output.SimpleEEMWriter;
 import adams.data.threeway.ThreeWayData;
 import nz.ac.waikato.cms.locator.ClassLocator;
@@ -89,7 +89,7 @@ public class ThreeWayDataExporter
       return null;
     }
     catch (Exception e) {
-      return "Failed to write 3-way data to '" + file + "'!\n" + Utils.throwableToString(e);
+      return "Failed to write 3-way data to '" + file + "'!\n" + LoggingHelper.throwableToString(e);
     }
   }
 }
