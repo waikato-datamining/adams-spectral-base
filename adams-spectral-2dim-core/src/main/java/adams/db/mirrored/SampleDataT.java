@@ -21,6 +21,8 @@
 package adams.db.mirrored;
 
 import adams.core.UniqueIDs;
+import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -75,6 +77,8 @@ public class SampleDataT
    */
   @Override
   public SpectrumIntf getSpectrumHandler() {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
     return SpectralDbBackend.getSingleton().getSpectrum(getDatabaseConnection());
   }
 
@@ -86,6 +90,8 @@ public class SampleDataT
   @Override
   public boolean init() {
     synchronized(m_Updating) {
+      if (isLoggingEnabled())
+        getLogger().info(LoggingHelper.getMethodName());
       getWrapped().init();
       return m_DB.init();
     }
@@ -98,6 +104,8 @@ public class SampleDataT
    */
   @Override
   public List<Field> getFields() {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
     return m_DB.getFields();
   }
 
@@ -109,6 +117,8 @@ public class SampleDataT
    */
   @Override
   public List<Field> getFields(DataType dtype) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": dtype=" + dtype);
     return m_DB.getFields(dtype);
   }
 
@@ -120,6 +130,8 @@ public class SampleDataT
    */
   @Override
   public boolean exists(String id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return m_DB.exists(id);
   }
 
@@ -132,6 +144,8 @@ public class SampleDataT
   @Override
   public boolean remove(String id) {
     synchronized(m_Updating) {
+      if (isLoggingEnabled())
+        getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
       getWrapped().remove(id);
       return m_DB.remove(id);
     }
@@ -147,6 +161,8 @@ public class SampleDataT
   @Override
   public boolean remove(String id, AbstractField field) {
     synchronized(m_Updating) {
+      if (isLoggingEnabled())
+        getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", field=" + field);
       getWrapped().remove(id, field);
       return m_DB.remove(id, field);
     }
@@ -162,6 +178,8 @@ public class SampleDataT
   @Override
   public boolean store(String id, SampleData report) {
     synchronized(m_Updating) {
+      if (isLoggingEnabled())
+        getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", report");
       getWrapped().store(id, report);
       return m_DB.store(id, report);
     }
@@ -195,6 +213,8 @@ public class SampleDataT
    */
   @Override
   public SampleData load(String id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return m_DB.load(id);
   }
 
@@ -209,6 +229,8 @@ public class SampleDataT
    */
   @Override
   public List<String> getIDs(AbstractConditions cond) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": cond=" + cond);
     return m_DB.getIDs(cond);
   }
 
@@ -226,6 +248,8 @@ public class SampleDataT
    */
   @Override
   public List<String> getIDs(String[] columns, AbstractConditions cond) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": columns=" + Utils.arrayToString(columns) + ", cond=" + cond);
     return m_DB.getIDs(columns, cond);
   }
 
@@ -238,6 +262,8 @@ public class SampleDataT
    */
   @Override
   public List<Integer> getDBIDs(AbstractConditions conditions) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": conditions=" + conditions);
     return m_DB.getDBIDs(conditions);
   }
 
@@ -249,6 +275,8 @@ public class SampleDataT
    */
   @Override
   public List<String> getOrphanedIDs(OrphanedSampleDataConditions conditions) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": conditions=" + conditions);
     return m_DB.getOrphanedIDs(conditions);
   }
 
@@ -259,6 +287,8 @@ public class SampleDataT
    */
   @Override
   public List<String> getInstruments() {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
     return m_DB.getInstruments();
   }
 

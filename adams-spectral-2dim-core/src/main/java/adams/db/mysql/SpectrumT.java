@@ -20,6 +20,8 @@
 
 package adams.db.mysql;
 
+import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.SQLUtils;
 import adams.db.SampleDataIntf;
@@ -80,6 +82,9 @@ public class SpectrumT
     String		line;
     boolean		hasSampleID;
     boolean		hasFormat;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", tables=" + tables + ", where=" + where + ", cond=" + cond);
 
     result = new ArrayList<>();
     rs     = null;

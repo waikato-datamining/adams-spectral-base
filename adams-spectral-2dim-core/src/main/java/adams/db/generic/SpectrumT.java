@@ -22,6 +22,8 @@
 package adams.db.generic;
 
 import adams.core.Constants;
+import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
@@ -79,6 +81,9 @@ public abstract class SpectrumT
    */
   @Override
   public synchronized boolean init(){
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
+
     if (!tableExists()) {
       if (!super.init())
 	return false;
@@ -101,6 +106,8 @@ public abstract class SpectrumT
    * @return		true if the container exists
    */
   public boolean exists(int id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return isThere("AUTO_ID = " + id);
   }
 
@@ -113,6 +120,8 @@ public abstract class SpectrumT
    * @see		#exists(String, String)
    */
   public boolean exists(String id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return exists(id, SampleData.DEFAULT_FORMAT);
   }
 
@@ -123,6 +132,8 @@ public abstract class SpectrumT
    * @return		true if the container exists
    */
   public boolean exists(String id, String format) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", format=" + format);
     return isThere("SAMPLEID = " + SQLUtils.backquote(id) + " AND FORMAT = " + SQLUtils.backquote(format));
   }
 
@@ -133,6 +144,8 @@ public abstract class SpectrumT
    * @return 		Spectrum, or null if not found
    */
   public synchronized Spectrum load(int auto_id){
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id);
     return loadFromDB(auto_id, "", true);
   }
 
@@ -145,6 +158,8 @@ public abstract class SpectrumT
    * @see		#load(String, String)
    */
   public synchronized Spectrum load(String id){
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return load(id, SampleData.DEFAULT_FORMAT);
   }
 
@@ -156,6 +171,8 @@ public abstract class SpectrumT
    * @return 		Spectrum, or null if not found
    */
   public synchronized Spectrum load(String sample_id, String format){
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id" + sample_id + ", format=" + format);
     return loadFromDB(sample_id, format, true);
   }
 
@@ -167,6 +184,8 @@ public abstract class SpectrumT
    * @return 		the data container, or null if not found
    */
   public Spectrum loadRaw(int auto_id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id);
     return loadFromDB(auto_id, "", true);
   }
 
@@ -179,6 +198,8 @@ public abstract class SpectrumT
    * @return 		Spectrum, or null if not found
    */
   public Spectrum loadRaw(String sample_id, String format) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format);
     return loadFromDB(sample_id, format, true);
   }
 
@@ -243,6 +264,9 @@ public abstract class SpectrumT
     ResultSet 	rs;
     String	regexp;
 
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id + ", rlike=" + rlike + ", raw=" + raw);
+
     result = null;
     rs     = null;
     regexp = JDBC.regexpKeyword(getDatabaseConnection());
@@ -278,6 +302,9 @@ public abstract class SpectrumT
     Spectrum	result;
     ResultSet 	rs;
 
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format + ", raw=" + raw);
+
     result = null;
     rs     = null;
     try {
@@ -304,6 +331,8 @@ public abstract class SpectrumT
    * @see		#load(String, String)
    */
   public synchronized int getDatabaseID(String id){
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return getDatabaseID(id, SampleData.DEFAULT_FORMAT);
   }
 
@@ -317,6 +346,9 @@ public abstract class SpectrumT
   public synchronized int getDatabaseID(String sample_id, String format){
     int         result;
     ResultSet   rs;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format);
 
     result = Constants.NO_ID;
 
@@ -344,6 +376,8 @@ public abstract class SpectrumT
    * @return		list of tab-separated values
    */
   public List<String> getValues(String[] fields, SpectrumIDConditions cond) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", cond=" + cond);
     return getValues(fields, null, cond);
   }
 
@@ -356,6 +390,8 @@ public abstract class SpectrumT
    * @return		list of tab-separated values
    */
   public List<String> getValues(String[] fields, String where, SpectrumIDConditions cond) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", where=" + where + ", cond=" + cond);
     return getValues(fields, getTableName(), where, cond);
   }
 
@@ -378,6 +414,9 @@ public abstract class SpectrumT
     boolean		hasSampleType;
     boolean		hasFormat;
     String		regexp;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", tables=" + tables + ", where=" + where + ", cond=" + cond);
 
     result = new ArrayList<>();
     rs     = null;
@@ -518,6 +557,8 @@ public abstract class SpectrumT
    * @return  	new ID, or null if fail
    */
   public synchronized Integer add(Spectrum sp) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sp=" + sp);
     return add(sp, true);
   }
 
@@ -533,6 +574,9 @@ public abstract class SpectrumT
     Integer 		result;
     StringBuilder 	q;
     ResultSet 		rs;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sp=" + sp + ", storeWaveNo=" + storeWaveNo);
 
     result = null;
 
@@ -643,6 +687,8 @@ public abstract class SpectrumT
    * @see		#remove(String, String, boolean)
    */
   public boolean remove(String sample_id, boolean keepReport) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", keepReport=" + keepReport);
     return remove(sample_id, SampleData.FORMAT, keepReport);
   }
 
@@ -656,6 +702,9 @@ public abstract class SpectrumT
    */
   public synchronized boolean remove(String sample_id, String format, boolean keepReport) {
     ResultSet	rs;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format + ", keepReport=" + keepReport);
 
     rs = null;
     try {
@@ -688,6 +737,9 @@ public abstract class SpectrumT
     boolean	result;
     String	sql;
     Spectrum	sp;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", keepReport=" + keepReport);
 
     sp = load(id);
 

@@ -20,6 +20,7 @@
 
 package adams.db.mysql;
 
+import adams.core.logging.LoggingHelper;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.SampleDataIntf;
 import adams.db.SpectrumIntf;
@@ -53,6 +54,8 @@ public class SampleDataT
    * @return		the corresponding handler
    */
   public SpectrumIntf getSpectrumHandler() {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
     return SpectrumT.getSingleton(getDatabaseConnection());
   }
 

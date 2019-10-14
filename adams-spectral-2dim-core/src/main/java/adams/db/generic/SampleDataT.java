@@ -25,6 +25,7 @@ import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Utils;
 import adams.core.base.BaseDouble;
+import adams.core.logging.LoggingHelper;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -98,6 +99,9 @@ public abstract class SampleDataT
     int			i;
     DataType[]		dtypes;
 
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": dtype=" + dtype);
+
     result = new ArrayList<>();
 
     if (dtype != null)
@@ -150,6 +154,8 @@ public abstract class SampleDataT
    * @return		true if the report exists
    */
   public boolean exists(String id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     return isThere("ID = " + SQLUtils.backquote(id));
   }
 
@@ -160,6 +166,8 @@ public abstract class SampleDataT
    * @return		the hashtable
    */
   public SampleData load(String id) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
     SampleData result = new SampleData();
     ResultSet rs = null;
     try {
@@ -205,6 +213,9 @@ public abstract class SampleDataT
   protected boolean doStore(String id, SampleData report) {
     PreparedStatement 	stmtUpdate;
     PreparedStatement 	stmtInsert;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", report");
 
     report.update();
 
@@ -406,6 +417,8 @@ public abstract class SampleDataT
    * @return		list of spectrum ids
    */
   public List<String> getIDs(AbstractConditions cond) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": cond=" + cond);
     return getIDs(new String[]{"sp.SAMPLEID"}, cond);
   }
 
@@ -422,6 +435,8 @@ public abstract class SampleDataT
    * @return		list of spectrum ids
    */
   public List<String> getIDs(String[] columns, AbstractConditions cond) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": columns=" + Utils.arrayToString(columns) + ", cond=" + cond);
     return (List<String>) getIDs(columns, cond, false);
   }
 
@@ -433,6 +448,8 @@ public abstract class SampleDataT
    * @return		list of database IDs
    */
   public List<Integer> getDBIDs(AbstractConditions conditions) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": conditions=" + conditions);
     return (List<Integer>) getIDs(new String[]{"sp.AUTO_ID"}, conditions, true);
   }
 
@@ -669,6 +686,9 @@ public abstract class SampleDataT
     String		where;
     ResultSet 		rs;
 
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": conditions=" + conditions);
+
     result = new ArrayList<>();
     conditions.update();
 
@@ -712,6 +732,9 @@ public abstract class SampleDataT
   public List<String> getInstruments() {
     List<String>	result;
     ResultSet		rs;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
 
     result = new ArrayList<>();
 
