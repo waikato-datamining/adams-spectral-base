@@ -325,7 +325,7 @@ public class SpectrumT
     synchronized(m_Updating) {
       if (isLoggingEnabled())
         getLogger().info(LoggingHelper.getMethodName() + ": sp=" + sp);
-      getWrapped().add(sp);
+      getWrapped().add((Spectrum) sp.getClone());
       return m_DB.add(sp);
     }
   }
@@ -342,7 +342,7 @@ public class SpectrumT
     synchronized(m_Updating) {
       if (isLoggingEnabled())
         getLogger().info(LoggingHelper.getMethodName() + ": sp=" + sp + ", storeWaveNo=" + storeWaveNo);
-      getWrapped().add(sp, storeWaveNo);
+      getWrapped().add((Spectrum) sp.getClone(), storeWaveNo);
       return m_DB.add(sp, storeWaveNo);
     }
   }

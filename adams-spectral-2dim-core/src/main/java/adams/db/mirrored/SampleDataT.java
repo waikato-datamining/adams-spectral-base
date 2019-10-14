@@ -180,7 +180,7 @@ public class SampleDataT
     synchronized(m_Updating) {
       if (isLoggingEnabled())
         getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", report");
-      getWrapped().store(id, report);
+      getWrapped().store(id, (SampleData) report.getClone());
       return m_DB.store(id, report);
     }
   }
@@ -200,7 +200,7 @@ public class SampleDataT
   @Override
   public boolean store(String id, SampleData report, boolean removeExisting, boolean merge, Field[] overwrite) {
     synchronized(m_Updating) {
-      getWrapped().store(id, report, removeExisting, merge, overwrite);
+      getWrapped().store(id, (SampleData) report.getClone(), removeExisting, merge, overwrite);
       return m_DB.store(id, report, removeExisting, merge, overwrite);
     }
   }
