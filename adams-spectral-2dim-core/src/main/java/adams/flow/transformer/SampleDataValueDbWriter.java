@@ -20,7 +20,9 @@
 
 package adams.flow.transformer;
 
+import adams.core.DateUtils;
 import adams.data.report.AbstractField;
+import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.report.Report;
 import adams.data.report.ReportHandler;
@@ -30,6 +32,11 @@ import adams.db.DatabaseConnection;
 import adams.db.ReportProviderByID;
 import adams.db.SampleDataF;
 import adams.flow.core.ActorUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -214,6 +221,20 @@ public class SampleDataValueDbWriter
   }
 
   /**
+   * Method for assembling the fields to overwrite.
+   *
+   * @return		the fields
+   */
+  protected Field[] assembleFields() {
+    List<Field> 	result;
+
+    result = new ArrayList<>(Arrays.asList(m_Fields));
+    result.add(new Field(SampleData.INSERT_TIMESTAMP, DataType.STRING));
+
+    return result.toArray(new Field[0]);
+  }
+
+  /**
    * Generates a subset of the report, which only contains the specified fields.
    *
    * @param report	the report to process
@@ -225,11 +246,14 @@ public class SampleDataValueDbWriter
 
     result = new SampleData();
     result.setID(report.getID());
-    for (Field field: m_Fields) {
+    for (Field field: assembleFields()) {
       result.addField(field);
       if (report.hasValue(field))
 	result.setValue(field, report.getValue(field));
     }
+
+    // insert timestamp
+    result.setStringValue(SampleData.INSERT_TIMESTAMP, DateUtils.getTimestampFormatter().format(new Date()));
 
     return result;
   }
