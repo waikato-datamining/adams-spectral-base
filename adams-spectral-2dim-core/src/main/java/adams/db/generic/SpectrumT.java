@@ -24,6 +24,7 @@ package adams.db.generic;
 import adams.core.Constants;
 import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
+import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
@@ -599,7 +600,7 @@ public abstract class SpectrumT
 
 	  // store report (never overwrites, just adds additional fields)
 	  if (sp.hasReport())
-	    getSampleDataHandler().store(sp.getID(), sp.getReport(), false, true, new Field[0]);
+	    getSampleDataHandler().store(sp.getID(), sp.getReport(), false, true, new Field[]{new Field(SampleData.INSERT_TIMESTAMP, DataType.STRING)});
         }
 	else {
 	  getLogger().severe("no gen keys");
