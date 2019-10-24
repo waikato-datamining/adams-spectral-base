@@ -22,6 +22,7 @@ package adams.gui.visualization.instances.instancestable;
 
 import adams.core.Properties;
 import adams.core.Utils;
+import adams.core.base.BaseRegExp;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
 import adams.data.io.output.AbstractSpectrumWriter;
@@ -40,8 +41,6 @@ import adams.gui.dialog.PropertiesParameterDialog;
 import adams.gui.goe.GenericObjectEditorPanel;
 import adams.gui.visualization.instances.InstancesTable;
 import adams.gui.visualization.instances.instancestable.InstancesTablePopupMenuItemHelper.TableState;
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import weka.core.Attribute;
@@ -50,6 +49,9 @@ import weka.core.Instances;
 
 import java.awt.Dialog.ModalityType;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Exports the selected rows as spectra.
@@ -66,7 +68,13 @@ public class ExportSpectra
 
   public static final String KEY_ATTRIBUTES = "attributes";
 
-  public static final String KEY_WRITER = "statistic";
+  public static final String KEY_EXTRACTWAVENOS = "extract wavenumbers";
+
+  public static final String KEY_WAVENOREGEXP = "wavenumber regexp";
+
+  public static final String KEY_WAVENOGROUP = "wavenumber group";
+
+  public static final String KEY_WRITER = "writer";
 
   public static final String KEY_DIRECTORY = "directory";
 
@@ -108,23 +116,6 @@ public class ExportSpectra
   }
 
   /**
-   * Returns the subset of the values.
-   *
-   * @param values	all values
-   * @param atts	the attributes to retain
-   * @return		the subset
-   */
-  protected double[] subset(double[] values, int[] atts) {
-    TDoubleList result;
-
-    result = new TDoubleArrayList();
-    for (int col: atts)
-      result.add(values[col]);
-
-    return result.toArray();
-  }
-
-  /**
    * Prompts the user for parameters.
    *
    * @param table	the table this is for
@@ -143,20 +134,32 @@ public class ExportSpectra
     panel.addPropertyType(KEY_SAMPLEID, PropertyType.INDEX);
     panel.setLabel(KEY_SAMPLEID, "Sample ID");
     panel.setHelp(KEY_SAMPLEID, "The attribute index for the sample ID");
-    panel.addPropertyType(KEY_SAMPLEID, PropertyType.RANGE);
+    panel.addPropertyType(KEY_ATTRIBUTES, PropertyType.RANGE);
     panel.setLabel(KEY_ATTRIBUTES, "Amplitudes");
     panel.setHelp(KEY_ATTRIBUTES, "The attributes representing amplitudes");
+    panel.addPropertyType(KEY_EXTRACTWAVENOS, PropertyType.BOOLEAN);
+    panel.setLabel(KEY_EXTRACTWAVENOS, "Extract wave nos from attribute names?");
+    panel.setHelp(KEY_EXTRACTWAVENOS, "If wave numbers are stored in the attributes, you can enable extraction");
+    panel.addPropertyType(KEY_WAVENOREGEXP, PropertyType.REGEXP);
+    panel.setLabel(KEY_WAVENOREGEXP, "Wave no regexp");
+    panel.setHelp(KEY_WAVENOREGEXP, "The regular expression to identify the group representing the wave number in an attribute name");
+    panel.addPropertyType(KEY_WAVENOGROUP, PropertyType.INTEGER);
+    panel.setLabel(KEY_WAVENOGROUP, "Wave no regexp group");
+    panel.setHelp(KEY_WAVENOGROUP, "The regexp group that represents the wave number in an attribute name");
     panel.addPropertyType(KEY_WRITER, PropertyType.OBJECT_EDITOR);
     panel.setLabel(KEY_WRITER, "Spectrum writer");
-    panel.setHelp(KEY_WRITER, "The array statistics to apply");
+    panel.setHelp(KEY_WRITER, "The spectrum writer to use for export");
     panel.setChooser(KEY_WRITER, new GenericObjectEditorPanel(AbstractSpectrumWriter.class, new SimpleSpectrumWriter(), true));
     panel.addPropertyType(KEY_DIRECTORY, PropertyType.DIRECTORY_ABSOLUTE);
     panel.setLabel(KEY_DIRECTORY, "Export directory");
     panel.setHelp(KEY_DIRECTORY, "The directory to export the spectra to");
-    panel.setPropertyOrder(new String[]{KEY_SAMPLEID, KEY_ATTRIBUTES, KEY_WRITER, KEY_DIRECTORY});
+    panel.setPropertyOrder(new String[]{KEY_SAMPLEID, KEY_ATTRIBUTES, KEY_EXTRACTWAVENOS, KEY_WAVENOREGEXP, KEY_WAVENOGROUP, KEY_WRITER, KEY_DIRECTORY});
     last = new Properties();
     last.setProperty(KEY_SAMPLEID, "");
     last.setProperty(KEY_ATTRIBUTES, SpreadSheetColumnRange.ALL);
+    last.setBoolean(KEY_EXTRACTWAVENOS, false);
+    last.setProperty(KEY_WAVENOREGEXP, "(.*)");
+    last.setInteger(KEY_WAVENOGROUP, 1);
     last.setObject(KEY_WRITER, new SimpleSpectrumWriter());
     last.setProperty(KEY_DIRECTORY, ".");
     dialog.setProperties(last);
@@ -189,6 +192,12 @@ public class ExportSpectra
     int[]			rows;
     int[]			atts;
     TIntSet			attsSet;
+    boolean			extract;
+    BaseRegExp			regexp;
+    Integer			group;
+    float			waveno;
+    String			wavenoStr;
+    Map<String,Float> 		wavenos;
     Instances			data;
     int				row;
     Instance			inst;
@@ -222,6 +231,10 @@ public class ExportSpectra
     idIndex.setData(data);
     id         = idIndex.getIntIndex();
     dir        = new PlaceholderDirectory(last.getProperty(KEY_DIRECTORY));
+    extract    = last.getBoolean(KEY_EXTRACTWAVENOS, false);
+    regexp     = new BaseRegExp(last.getProperty(KEY_WAVENOREGEXP, "(.*)"));
+    group      = last.getInteger(KEY_WAVENOGROUP, 1);
+    wavenos    = new HashMap<>();
     for (row = 0; row < data.numInstances(); row++) {
       inst = data.instance(row);
       spec = new Spectrum();
@@ -245,8 +258,30 @@ public class ExportSpectra
 
         // amplitude or sampledata?
         if (attsSet.contains(i)) {
-          // TODO wave number -> option
-          point = new SpectrumPoint(spec.size(), (float) inst.value(i));
+          if (extract) {
+            if (!wavenos.containsKey(inst.attribute(i).name())) {
+              try {
+		wavenoStr = inst.attribute(i).name().replaceAll(regexp.getValue(), "$" + group);
+		waveno    = Float.parseFloat(wavenoStr);
+	      }
+	      catch (Exception e) {
+                getLogger().log(
+                  Level.SEVERE,
+		  "Failed to extract wave number from attribute name '"
+		    + inst.attribute(i).name() + "' using regexp '" + regexp
+		    + "' and group " + group + "!", e);
+                waveno = spec.size();
+	      }
+	      wavenos.put(inst.attribute(i).name(), waveno);
+	    }
+	    else {
+	      waveno = wavenos.get(inst.attribute(i).name());
+	    }
+	  }
+	  else {
+            waveno = spec.size();
+	  }
+          point = new SpectrumPoint(waveno, (float) inst.value(i));
           spec.add(point);
 	}
 	else {
@@ -274,6 +309,10 @@ public class ExportSpectra
         return false;
       }
     }
+
+    GUIHelper.showInformationMessage(
+      GUIHelper.getParentComponent(state.table),
+      "Exported " + data.numInstances() + " spectra to " + dir.getAbsolutePath() + "!");
 
     return true;
   }
