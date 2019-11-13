@@ -15,7 +15,7 @@
 
 /*
  *    SpectrumClassifier.java
- *    Copyright (C) 2011-2016 University of Waikato, Hamilton, New Zealand
+ *    Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -24,6 +24,7 @@ package weka.classifiers.meta;
 import adams.data.instances.ArffUtils;
 import weka.classifiers.AbstainingClassifier;
 import weka.classifiers.SingleClassifierEnhancer;
+import weka.core.BatchPredictor;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
 import weka.core.Instance;
@@ -77,7 +78,6 @@ import weka.filters.unsupervised.attribute.Remove;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SpectrumClassifier
   extends SingleClassifierEnhancer
@@ -147,6 +147,20 @@ public class SpectrumClassifier
   }
 
   /**
+   * Return true if this classifier can generate batch predictions in an
+   * efficient manner. Default implementation here returns false. Subclasses to
+   * override as appropriate.
+   *
+   * @return true if this classifier can generate batch predictions in an
+   *         efficient manner.
+   */
+  @Override
+  public boolean implementsMoreEfficientBatchPrediction() {
+    return (m_Classifier instanceof BatchPredictor)
+      && ((BatchPredictor) m_Classifier).implementsMoreEfficientBatchPrediction();
+  }
+
+  /**
    * Build the classifier on the filtered data.
    *
    * @param data 	the training data
@@ -186,6 +200,30 @@ public class SpectrumClassifier
     }
 
     return m_Classifier.distributionForInstance(instance);
+  }
+
+  /**
+   * Batch scoring method
+   *
+   * @param insts the instances to get predictions for
+   * @return an array of probability distributions, one for each instance
+   * @throws Exception if a problem occurs
+   */
+  @Override
+  public double[][] distributionsForInstances(Instances insts) throws Exception {
+    double[][]		result;
+    int			i;
+
+    if (m_Classifier instanceof BatchPredictor) {
+      result = ((BatchPredictor) m_Classifier).distributionsForInstances(insts);
+    }
+    else {
+      result = new double[insts.numInstances()][];
+      for (i = 0; i < insts.numInstances(); i++)
+        result[i] = m_Classifier.distributionForInstance(insts.instance(i));
+    }
+
+    return result;
   }
 
   /**
@@ -261,7 +299,7 @@ public class SpectrumClassifier
    */
   @Override
   public String getRevision() {
-    return RevisionUtils.extract("$Revision: 2242 $");
+    return RevisionUtils.extract("$Revision$");
   }
 
   /**
