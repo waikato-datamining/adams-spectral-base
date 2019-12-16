@@ -15,7 +15,7 @@
 
 /*
  * SpectrumPanelWithSampleData.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.spectrum;
@@ -26,9 +26,15 @@ import adams.data.spectrum.Spectrum;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseScrollPane;
 import adams.gui.core.BaseTabbedPane;
+import adams.gui.core.SearchPanel;
+import adams.gui.core.SearchPanel.LayoutType;
+import adams.gui.event.SearchEvent;
+import adams.gui.event.SearchListener;
 import adams.gui.visualization.report.ReportFactory.Model;
 import adams.gui.visualization.spectrum.SampleDataFactory.Table;
 
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.util.List;
@@ -58,6 +64,8 @@ public class SpectrumPanelWithSampleData
    */
   @Override
   protected void initGUI() {
+    JPanel 	panel;
+
     super.initGUI();
 
     setLayout(new BorderLayout());
@@ -69,8 +77,22 @@ public class SpectrumPanelWithSampleData
     m_PanelSpectrum.setSidePanelVisible(false);
     m_TabbedPane.addTab("Spectrum", m_PanelSpectrum);
 
+    panel = new BasePanel(new BorderLayout());
+    panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+    m_TabbedPane.addTab("Sample data", panel);
+
     m_TableSampleData = new Table();
-    m_TabbedPane.addTab("Sample data", new BaseScrollPane(m_TableSampleData));
+    panel.add(new BaseScrollPane(m_TableSampleData), BorderLayout.CENTER);
+
+    // search
+    final SearchPanel searchPanel = new SearchPanel(LayoutType.HORIZONTAL, true);
+    searchPanel.addSearchListener(new SearchListener() {
+      public void searchInitiated(SearchEvent e) {
+	m_TableSampleData.search(searchPanel.getSearchText(), searchPanel.isRegularExpression());
+	searchPanel.grabFocus();
+      }
+    });
+    panel.add(searchPanel, BorderLayout.SOUTH);
   }
 
   /**
