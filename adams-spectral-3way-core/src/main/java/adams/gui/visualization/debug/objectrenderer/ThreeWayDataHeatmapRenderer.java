@@ -15,7 +15,7 @@
 
 /*
  * ThreeWayDataRenderer.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.debug.objectrenderer;
@@ -37,6 +37,9 @@ public class ThreeWayDataHeatmapRenderer
 
   private static final long serialVersionUID = -3528006886476495175L;
 
+  /** the last setup. */
+  protected ThreeWayDataHeatmapPanel m_LastPanel;
+
   /**
    * Checks whether the renderer can handle the specified class.
    *
@@ -46,6 +49,32 @@ public class ThreeWayDataHeatmapRenderer
   @Override
   public boolean handles(Class cls) {
     return ClassLocator.isSubclass(ThreeWayData.class, cls);
+  }
+
+  /**
+   * Checks whether the renderer can use a cached setup to render an object.
+   *
+   * @param obj		the object to render
+   * @param panel	the panel to render into
+   * @return		true if possible
+   */
+  @Override
+  public boolean canRenderCached(Object obj, JPanel panel) {
+    return (m_LastPanel != null);
+  }
+
+  /**
+   * Performs the actual rendering.
+   *
+   * @param obj		the object to render
+   * @param panel	the panel to render into
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String doRenderCached(Object obj, JPanel panel) {
+    m_LastPanel.setData((ThreeWayData) obj);
+    panel.add(m_LastPanel, BorderLayout.CENTER);
+    return null;
   }
 
   /**
@@ -64,6 +93,8 @@ public class ThreeWayDataHeatmapRenderer
     spPanel = new ThreeWayDataHeatmapPanel(null);
     spPanel.setData(data);
     panel.add(spPanel, BorderLayout.CENTER);
+
+    m_LastPanel = spPanel;
 
     return null;
   }

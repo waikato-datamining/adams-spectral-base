@@ -37,6 +37,9 @@ public class SpectrumRenderer
 
   private static final long serialVersionUID = -3528006886476495175L;
 
+  /** the last setup. */
+  protected SpectrumPanelWithSampleData m_LastSpectrumPanel;
+
   /**
    * Checks whether the renderer can handle the specified class.
    *
@@ -46,6 +49,32 @@ public class SpectrumRenderer
   @Override
   public boolean handles(Class cls) {
     return ClassLocator.isSubclass(Spectrum.class, cls);
+  }
+
+  /**
+   * Checks whether the renderer can use a cached setup to render an object.
+   *
+   * @param obj		the object to render
+   * @param panel	the panel to render into
+   * @return		true if possible
+   */
+  @Override
+  public boolean canRenderCached(Object obj, JPanel panel) {
+    return (m_LastSpectrumPanel != null);
+  }
+
+  /**
+   * Performs the actual rendering.
+   *
+   * @param obj		the object to render
+   * @param panel	the panel to render into
+   * @return		null if successful, otherwise error message
+   */
+  @Override
+  protected String doRenderCached(Object obj, JPanel panel) {
+    m_LastSpectrumPanel.display((Spectrum) obj);
+    panel.add(m_LastSpectrumPanel, BorderLayout.CENTER);
+    return null;
   }
 
   /**
@@ -64,6 +93,8 @@ public class SpectrumRenderer
     spPanel = new SpectrumPanelWithSampleData();
     spPanel.display(data);
     panel.add(spPanel, BorderLayout.CENTER);
+
+    m_LastSpectrumPanel = spPanel;
 
     return null;
   }
