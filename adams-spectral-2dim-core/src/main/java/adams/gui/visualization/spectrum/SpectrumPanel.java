@@ -520,6 +520,7 @@ public class SpectrumPanel
     AbstractInstanceGenerator 	generator;
     AbstractFileSaver		saver;
     File			file;
+    DataSink			sink;
 
     if (m_ExportDatasetDialog == null) {
       if (getParentDialog() != null)
@@ -542,10 +543,11 @@ public class SpectrumPanel
     }
 
     file = m_ExportDatasetDialog.getFile();
-    saver = m_ExportDatasetDialog.getExport();
+    saver = (AbstractFileSaver) OptionUtils.shallowCopy(m_ExportDatasetDialog.getExport());
     try {
-      saver.setFile(file);
-      DataSink.write(saver, data);
+      saver.setFile(file.getAbsoluteFile());
+      sink = new DataSink(saver);
+      sink.write(data);
     }
     catch (Exception e) {
       GUIHelper.showErrorMessage(this, "Failed to export spectra to: " + file, e);
