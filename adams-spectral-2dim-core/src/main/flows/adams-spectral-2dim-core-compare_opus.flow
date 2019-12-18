@@ -1,11 +1,13 @@
 # Project: adams
-# Date: 2016-04-26 13:08:50
+# Date: 2019-12-18 17:05:37
 # User: fracpete
 # Charset: UTF-8
-adams.flow.control.Flow -annotation "Compares the spectra loaded with old and new Opus reader." -flow-execution-listener adams.flow.execution.NullListener
+# Modules: adams-compress,adams-core,adams-json,adams-math,adams-ml,adams-spectral-2dim-core,adams-spreadsheet,adams-visualstats,adams-weka-lts
+#
+adams.flow.control.Flow -annotation "Compares the spectra loaded with old and new Opus reader\\nand outputs whether they are the same (or similar enough, i.e., CC of at least 0.99)." -flow-execution-listener adams.flow.execution.NullListener -flow-restart-manager adams.flow.control.flowrestart.NullManager
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -name Info -short-title true -writer adams.data.io.output.NullWriter
- adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select Opus files"
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select Opus files" -initial-dir ${FLOWS}/data
  adams.flow.control.Tee -name info
   adams.flow.transformer.BaseName
   adams.flow.sink.CallableSink -callable Info

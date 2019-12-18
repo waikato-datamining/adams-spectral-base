@@ -1,11 +1,13 @@
 # Project: adams
-# Date: 2016-04-26 13:08:42
+# Date: 2019-12-18 17:06:16
 # User: fracpete
 # Charset: UTF-8
+# Modules: adams-compress,adams-core,adams-json,adams-math,adams-ml,adams-spectral-2dim-core,adams-spreadsheet,adams-visualstats,adams-weka-lts
+#
 adams.flow.control.Flow -annotation "Counts the number of spectra loaded from Opus files with the new reader." -flow-execution-listener adams.flow.execution.NullListener
  adams.flow.standalone.CallableActors
   adams.flow.sink.Display -name Info -short-title true -writer adams.data.io.output.NullWriter
- adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select Opus files"
+ adams.flow.source.SelectFile -stop-if-canceled true -file-chooser-title "Select Opus files" -initial-dir ${FLOWS}/data
  adams.flow.control.Tee -name info
   adams.flow.transformer.BaseName
   adams.flow.sink.CallableSink -callable Info
