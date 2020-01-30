@@ -15,7 +15,7 @@
 
 /*
  * ExportSpectra.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2020 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.instances.instancestable;
@@ -23,6 +23,7 @@ package adams.gui.visualization.instances.instancestable;
 import adams.core.Properties;
 import adams.core.Utils;
 import adams.core.base.BaseRegExp;
+import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderDirectory;
 import adams.core.io.PlaceholderFile;
 import adams.data.io.output.AbstractSpectrumWriter;
@@ -301,7 +302,7 @@ public class ExportSpectra
       }
 
       // save spectrum
-      output = new PlaceholderFile(dir.getAbsolutePath() + File.separator + spec.getID() + "." + writer.getDefaultFormatExtension());
+      output = new PlaceholderFile(dir.getAbsolutePath() + File.separator + FileUtils.createFilename(spec.getID(), "_") + "." + writer.getDefaultFormatExtension());
       writer.setOutput(output);
       if (!writer.write(spec)) {
 	GUIHelper.showErrorMessage(
