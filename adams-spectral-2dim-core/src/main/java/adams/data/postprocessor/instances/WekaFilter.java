@@ -13,12 +13,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * WekaFilter.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.postprocessor.instances;
 
+import adams.core.Utils;
 import adams.core.option.OptionUtils;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -34,13 +35,9 @@ import weka.filters.unsupervised.attribute.SpectrumFilter;
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
- * Valid options are: <br><br>
- *
- * <pre>-D &lt;int&gt; (property: debugLevel)
- * &nbsp;&nbsp;&nbsp;The greater the number the more additional info the scheme may output to
- * &nbsp;&nbsp;&nbsp;the console (0 = off).
- * &nbsp;&nbsp;&nbsp;default: 0
- * &nbsp;&nbsp;&nbsp;minimum: 0
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
  *
  * <pre>-serialization-file &lt;adams.core.io.PlaceholderFile&gt; (property: serializationFile)
@@ -48,9 +45,10 @@ import weka.filters.unsupervised.attribute.SpectrumFilter;
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  *
- * <pre>-override-serialized-file (property: overrideSerializedFile)
+ * <pre>-override-serialized-file &lt;boolean&gt; (property: overrideSerializedFile)
  * &nbsp;&nbsp;&nbsp;If set to true, then any serialized file will be ignored and the setup for
  * &nbsp;&nbsp;&nbsp;serialization will be regenerated.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
  * <pre>-filter &lt;weka.filters.Filter&gt; (property: filter)
@@ -58,10 +56,14 @@ import weka.filters.unsupervised.attribute.SpectrumFilter;
  * &nbsp;&nbsp;&nbsp;default: weka.filters.AllFilter
  * </pre>
  *
+ * <pre>-wrap &lt;boolean&gt; (property: wrap)
+ * &nbsp;&nbsp;&nbsp;Whether to wrap the filter in a weka.filters.unsupervised.attribute.SpectrumFilter.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2347 $
  */
 public class WekaFilter
   extends AbstractSerializablePostProcessor {
@@ -77,6 +79,9 @@ public class WekaFilter
 
   /** the filtered data generated when initializing the postprocessor. */
   protected Instances m_FilteredInitData;
+
+  /** whether to wrap the filter in a SpectrumFilter. */
+  protected boolean m_Wrap;
 
   /**
    * Returns a string describing the object.
@@ -96,8 +101,12 @@ public class WekaFilter
     super.defineOptions();
 
     m_OptionManager.add(
-	    "filter", "filter",
-	    getDefaultFilter());
+      "filter", "filter",
+      getDefaultFilter());
+
+    m_OptionManager.add(
+      "wrap", "wrap",
+      true);
   }
 
   /**
@@ -139,12 +148,46 @@ public class WekaFilter
   }
 
   /**
+   * Sets whether to wrap the filter in a {@link SpectrumFilter}.
+   *
+   * @param value 	true if to wrap
+   */
+  public void setWrap(boolean value) {
+    m_Wrap = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to wrap the filter in a {@link SpectrumFilter}.
+   *
+   * @return 		true if to wrap
+   */
+  public boolean getWrap() {
+    return m_Wrap;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String wrapTipText() {
+    return "Whether to wrap the filter in a " + Utils.classToString(SpectrumFilter.class) + ".";
+  }
+
+  /**
    * Regenerates all the objects that are necessary for serialization.
    */
   public void initSerializationSetup() {
     try {
-      m_ActualFilter = new SpectrumFilter();
-      ((SpectrumFilter) m_ActualFilter).setFilter((Filter) OptionUtils.shallowCopy(m_Filter));
+      if (m_Wrap) {
+	m_ActualFilter = new SpectrumFilter();
+	((SpectrumFilter) m_ActualFilter).setFilter((Filter) OptionUtils.shallowCopy(m_Filter));
+      }
+      else {
+        m_ActualFilter = (Filter) OptionUtils.shallowCopy(m_Filter);
+      }
       m_ActualFilter.setInputFormat(m_InitData);
       m_FilteredInitData = Filter.useFilter(m_InitData, m_ActualFilter);
     }
