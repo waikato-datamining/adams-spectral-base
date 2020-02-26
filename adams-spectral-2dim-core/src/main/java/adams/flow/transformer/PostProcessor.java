@@ -15,7 +15,7 @@
 
 /*
  * PostProcessor.java
- * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -27,6 +27,7 @@ import adams.core.logging.LoggingLevel;
 import adams.data.instance.WekaInstanceContainer;
 import adams.data.postprocessor.instances.AbstractPostProcessor;
 import adams.data.report.Report;
+import adams.data.textrenderer.AbstractTextRenderer;
 import adams.flow.container.PostProcessingContainer;
 import adams.flow.control.StorageName;
 import adams.flow.core.AbstractModelLoader.ModelLoadingType;
@@ -559,7 +560,7 @@ public class PostProcessor
       }
       catch (Exception e) {
 	m_OutputToken = null;
-	result = handleException("Failed to post-process: " + m_InputToken.getPayload(), e);
+	result = handleException("Failed to post-process: " + AbstractTextRenderer.renderObject(m_InputToken.getPayload()), e);
       }
     }
 
