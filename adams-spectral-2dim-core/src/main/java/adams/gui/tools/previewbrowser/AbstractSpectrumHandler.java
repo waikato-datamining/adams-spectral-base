@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumHandler.java
- * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.tools.previewbrowser;
 
@@ -27,7 +27,6 @@ import adams.gui.visualization.spectrum.SpectrumPanel;
 import adams.gui.visualization.spectrum.SpectrumPanelWithSampleData;
 import weka.core.Utils;
 
-import javax.swing.JPanel;
 import java.io.File;
 
 /**
@@ -102,12 +101,26 @@ public abstract class AbstractSpectrumHandler
 
   /**
    * Returns the preview for the specified files.
+   * <br>
+   * Default implementation just creates a new preview.
+   *
+   * @param files	the files to create the view for
+   * @param previewPanel the preview panel to resuse
+   * @return		the preview, NoPreviewAvailablePanel in case of an error
+   * @see		NoPreviewAvailablePanel
+   */
+  public PreviewPanel reusePreview(File[] files, PreviewPanel previewPanel) {
+    return getPreview(files);
+  }
+
+  /**
+   * Returns the preview for the specified files.
    *
    * @param files	the files to create the view for
    * @return		the preview, NoPreviewAvailablePanel in case of an error
    * @see		NoPreviewAvailablePanel
    */
-  public JPanel getPreview(File[] files) {
+  public PreviewPanel getPreview(File[] files) {
     String	msg;
 
     for (File file: files) {
