@@ -15,12 +15,13 @@
 
 /*
  * IQRCleaner.java
- * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.cleaner.instance;
 
 import adams.core.Range;
+import adams.core.classmanager.ClassManager;
 import adams.core.option.OptionUtils;
 import adams.data.cleaner.CleanerDetails;
 import adams.data.spreadsheet.DefaultSpreadSheet;
@@ -302,7 +303,7 @@ public class IQRCleaner
     remove = new RemoveInstancesWithMissingValue();
     remove.setIgnoreClass(true);
 
-    iqr = (InterquartileRange) adams.core.Utils.deepCopy(m_Filter);
+    iqr = (InterquartileRange) ClassManager.getSingleton().deepCopy(m_Filter);
     iqr.setOutlierFactor(m_IQR);
     iqr.setExtremeValuesFactor(m_IQR + 1.0);
     iqr.setExtremeValuesAsOutliers(true);
