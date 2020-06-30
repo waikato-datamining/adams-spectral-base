@@ -6,12 +6,12 @@
   <parent>
     <groupId>nz.ac.waikato.cms.adams</groupId>
     <artifactId>adams-spectral-base-pom</artifactId>
-    <version>20.6.0-SNAPSHOT</version>
+    <version>20.7.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>adams-spectral-3way-core</artifactId>
   <packaging>jar</packaging>
-  <version>20.6.0-SNAPSHOT</version>
+  <version>20.7.0-SNAPSHOT</version>
 
   <name>adams-spectral-3way-core</name>
   <description>Core module for 3-way spectral data.</description>
