@@ -316,6 +316,7 @@ public class WaveNumberExpression
     result = data.getHeader();
 
     exp = m_Expression.getValue();
+    exp = getOptionManager().getVariables().expand(exp);
     try {
       points = data.toList();
       symbols = new HashMap();
