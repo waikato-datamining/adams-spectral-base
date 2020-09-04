@@ -84,6 +84,9 @@ public class ASCSpectrumReader
     /** the last error that occurred. */
     protected String lastError = "";
 
+    /** whether to force replacing comma with point. */
+    protected boolean m_ForceCommaToPoint;
+
     /**
      * Returns the last error that occurred.
      *
@@ -203,6 +206,7 @@ public class ASCSpectrumReader
      * @return		true if successfully parsed
      */
     public boolean parse(String in) {
+      m_ForceCommaToPoint = getLocale().equals(LocaleHelper.getSingleton().getEnUS());
       String lines[] = in.split("\\n");
       boolean processingHeader=true;
       for (int i = 0; i < lines.length; i++){
@@ -233,6 +237,10 @@ public class ASCSpectrumReader
 	    return false;
 	  }
 	  try {
+	    if (m_ForceCommaToPoint) {
+	      vals[0] = vals[0].replace(",", ".");
+	      vals[1] = vals[1].replace(",", ".");
+	    }
 	    NumberFormat nf = LocaleHelper.getSingleton().getNumberFormat(getLocale());
 	    nf.setMaximumFractionDigits(4);
 	    Number n = nf.parse(vals[0]);
