@@ -15,7 +15,7 @@
 
 /*
  * ExportValidationSets.java
- * Copyright (C) 2017-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2020 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -149,6 +149,7 @@ public class ExportValidationSets
       }
       doExport(frame, wizard.getProperties(false));
     });
+    wizard.update();
   }
 
   /**
