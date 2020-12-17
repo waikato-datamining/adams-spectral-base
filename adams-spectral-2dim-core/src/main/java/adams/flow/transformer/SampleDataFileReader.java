@@ -15,7 +15,7 @@
 
 /*
  * SampleDataFileReader.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2020 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -34,55 +34,62 @@ import adams.flow.core.ActorUtils;
  <!-- globalinfo-end -->
  *
  <!-- flow-summary-start -->
- * Input/output:<br>
+ * Input&#47;output:<br>
  * - accepts:<br>
- * <pre>   java.lang.String</pre>
+ * &nbsp;&nbsp;&nbsp;java.lang.String<br>
  * - generates:<br>
- * <pre>   knir.data.sampledata.SampleData</pre>
+ * &nbsp;&nbsp;&nbsp;adams.data.sampledata.SampleData<br>
  * <br><br>
  <!-- flow-summary-end -->
  *
  <!-- options-start -->
- * Valid options are: <br><br>
- *
- * <pre>-D (property: debug)
- *         If set to true, scheme may output additional info to the console.
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
  *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
- *         The name of the actor.
- *         default: SampleDataFileReader
+ * &nbsp;&nbsp;&nbsp;The name of the actor.
+ * &nbsp;&nbsp;&nbsp;default: SampleDataFileReader
  * </pre>
  *
- * <pre>-annotation &lt;adams.core.base.BaseText&gt; (property: annotations)
- *         The annotations to attach to this actor.
- *         default:
+ * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
+ * &nbsp;&nbsp;&nbsp;The annotations to attach to this actor.
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
  *
- * <pre>-skip (property: skip)
- *         If set to true, transformation is skipped and the input token is just forwarded
- *          as it is.
+ * <pre>-skip &lt;boolean&gt; (property: skip)
+ * &nbsp;&nbsp;&nbsp;If set to true, transformation is skipped and the input token is just forwarded
+ * &nbsp;&nbsp;&nbsp;as it is.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-reader &lt;adams.data.io.input.AbstractReportReader [options]&gt; (property: reader)
- *         The reader to use for importing the reports.
- *         default: knir.data.input.SimpleSampleDataReader -input .
+ * <pre>-stop-flow-on-error &lt;boolean&gt; (property: stopFlowOnError)
+ * &nbsp;&nbsp;&nbsp;If set to true, the flow execution at this level gets stopped in case this
+ * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
+ * &nbsp;&nbsp;&nbsp;actors.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * Default options for knir.data.input.SimpleSampleDataReader (-reader/reader):
- *
- * <pre>-D (property: debug)
- *         If set to true, scheme may output additional info to the console.
+ * <pre>-silent &lt;boolean&gt; (property: silent)
+ * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
+ * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
- * <pre>-input &lt;adams.core.io.PlaceholderFile&gt; (property: input)
- *         The file to read and turn into a report.
- *         default: .
+ * <pre>-output-array &lt;boolean&gt; (property: outputArray)
+ * &nbsp;&nbsp;&nbsp;If enabled, outputs the sample data as an array rather than one-by-one.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
+ *
+ * <pre>-reader &lt;adams.data.io.input.AbstractReportReader&gt; (property: reader)
+ * &nbsp;&nbsp;&nbsp;The reader to use for importing the reports.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.io.input.SimpleSampleDataReader
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SampleDataFileReader
   extends AbstractReportFileReader<SampleData> {
@@ -136,12 +143,23 @@ public class SampleDataFileReader
   }
 
   /**
-   * Returns the class of objects that it generates.
+   * Returns the base class of the items.
    *
-   * @return		the report class
+   * @return the class
    */
   @Override
-  public Class[] generates() {
-    return new Class[]{SampleData.class};
+  protected Class getItemClass() {
+    return SampleData.class;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return tip text for this property suitable for
+   * displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String outputArrayTipText() {
+    return "If enabled, outputs the sample data as an array rather than one-by-one.";
   }
 }
