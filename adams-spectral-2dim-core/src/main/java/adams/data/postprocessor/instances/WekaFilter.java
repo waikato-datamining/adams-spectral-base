@@ -19,8 +19,8 @@
  */
 package adams.data.postprocessor.instances;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.Utils;
-import adams.core.option.OptionUtils;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.filters.AllFilter;
@@ -183,10 +183,10 @@ public class WekaFilter
     try {
       if (m_Wrap) {
 	m_ActualFilter = new SpectrumFilter();
-	((SpectrumFilter) m_ActualFilter).setFilter((Filter) OptionUtils.shallowCopy(m_Filter));
+	((SpectrumFilter) m_ActualFilter).setFilter(ObjectCopyHelper.copyObject(m_Filter));
       }
       else {
-        m_ActualFilter = (Filter) OptionUtils.shallowCopy(m_Filter);
+        m_ActualFilter = ObjectCopyHelper.copyObject(m_Filter);
       }
       m_ActualFilter.setInputFormat(m_InitData);
       m_FilteredInitData = Filter.useFilter(m_InitData, m_ActualFilter);

@@ -19,8 +19,8 @@
  */
 package adams.data.evaluator.instance;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.Randomizable;
-import adams.core.option.OptionUtils;
 import adams.data.statistics.StatUtils;
 import adams.flow.container.WekaTrainTestSetContainer;
 import gnu.trove.list.array.TDoubleArrayList;
@@ -457,7 +457,7 @@ public class CrossValidatedPrediction
       values    = new TDoubleArrayList();
       while (generator.hasNext()) {
 	cont = generator.next();
-	cls  = (Classifier) OptionUtils.shallowCopy(m_Classifier);
+	cls  = ObjectCopyHelper.copyObject(m_Classifier);
 	cls.buildClassifier((Instances) cont.getValue(WekaTrainTestSetContainer.VALUE_TRAIN));
 	values.add(cls.classifyInstance(data));
       }

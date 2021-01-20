@@ -20,7 +20,7 @@
 
 package weka.filters.unsupervised.attribute;
 
-import adams.core.option.OptionUtils;
+import adams.core.ObjectCopyHelper;
 import weka.core.Attribute;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
@@ -413,10 +413,10 @@ public class SpectrumFilter
 
     m_MultiFilter = new MultiFilter();
     m_MultiFilter.setFilters(
-	new Filter[]{
-	    remove,
-	  (Filter) OptionUtils.shallowCopy(m_Filter)
-	}
+      new Filter[]{
+        remove,
+        ObjectCopyHelper.copyObject(m_Filter)
+      }
     );
 
     m_MultiFilter.setInputFormat(instances);

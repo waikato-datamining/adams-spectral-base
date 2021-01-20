@@ -20,7 +20,7 @@
 
 package adams.data.evaluator.instance;
 
-import adams.core.option.OptionUtils;
+import adams.core.ObjectCopyHelper;
 import weka.core.Instances;
 import weka.core.neighboursearch.NearestNeighbourSearch;
 
@@ -118,7 +118,7 @@ public abstract class AbstractNearestNeighborBasedEvaluator
       return false;
 
     m_TrainingData = data;
-    m_ActualSearch = (NearestNeighbourSearch) OptionUtils.shallowCopy(m_Search);
+    m_ActualSearch = ObjectCopyHelper.copyObject(m_Search);
     if (m_ActualSearch == null) {
       getLogger().severe("Failed to create copy of search algorithm!");
       return false;

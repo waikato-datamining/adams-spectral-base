@@ -19,9 +19,9 @@
  */
 package adams.data.evaluator.instance;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.Utils;
 import adams.core.logging.LoggingHelper;
-import adams.core.option.OptionUtils;
 import adams.data.statistics.StatUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.GPD;
@@ -529,7 +529,7 @@ public class SavitzkyGolayRange
     sg.setDerivativeOrder(0);
     fc = new FilteredClassifier();
     fc.setFilter(sg);
-    fc.setClassifier((Classifier) OptionUtils.shallowCopy(m_ClassifierNone));
+    fc.setClassifier(ObjectCopyHelper.copyObject(m_ClassifierNone));
     m_ActualClassifierNone = new SpectrumClassifier();
     m_ActualClassifierNone.setClassifier(fc);
     try {
@@ -547,7 +547,7 @@ public class SavitzkyGolayRange
     sg.setDerivativeOrder(1);
     fc = new FilteredClassifier();
     fc.setFilter(sg);
-    fc.setClassifier((Classifier) OptionUtils.shallowCopy(m_ClassifierFirst));
+    fc.setClassifier(ObjectCopyHelper.copyObject(m_ClassifierFirst));
     m_ActualClassifierFirst = new SpectrumClassifier();
     m_ActualClassifierFirst.setClassifier(fc);
     try {
@@ -565,7 +565,7 @@ public class SavitzkyGolayRange
     sg.setDerivativeOrder(2);
     fc = new FilteredClassifier();
     fc.setFilter(sg);
-    fc.setClassifier((Classifier) OptionUtils.shallowCopy(m_ClassifierSecond));
+    fc.setClassifier(ObjectCopyHelper.copyObject(m_ClassifierSecond));
     m_ActualClassifierSecond = new SpectrumClassifier();
     m_ActualClassifierSecond.setClassifier(fc);
     try {

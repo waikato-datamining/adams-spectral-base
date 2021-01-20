@@ -20,8 +20,8 @@
 
 package adams.data.evaluator.instance;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.logging.LoggingHelper;
-import adams.core.option.OptionUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.IntervalEstimator;
 import weka.classifiers.functions.GaussianProcessesNoWeights;
@@ -260,7 +260,7 @@ public class IntervalEstimatorEvaluator
     m_TrainingData = data;
 
     try {
-      m_ActualClassifier = (Classifier) OptionUtils.shallowCopy(m_Classifier);
+      m_ActualClassifier = ObjectCopyHelper.copyObject(m_Classifier);
       m_ActualClassifier.buildClassifier(data);
       m_Header = new Instances(data, 0);
       m_ClassRange = new double[]{

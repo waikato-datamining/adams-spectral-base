@@ -1183,7 +1183,7 @@ public class SpectrumExplorer
       protected FastICA m_ICA;
       @Override
       protected Object doInBackground() throws Exception {
-	m_ICA = (FastICA) OptionUtils.shallowCopy(m_CurrentICA);
+	m_ICA = ObjectCopyHelper.copyObject(m_CurrentICA);
 	List<Spectrum> list = new ArrayList<>();
 	for (SpectrumContainer cont: getContainerManager().getAllVisible())
 	  list.add(cont.getData());
@@ -1259,7 +1259,7 @@ public class SpectrumExplorer
       protected PCA m_PCA;
       @Override
       protected Object doInBackground() throws Exception {
-	m_PCA = (PCA) OptionUtils.shallowCopy(m_CurrentPCA);
+	m_PCA = ObjectCopyHelper.copyObject(m_CurrentPCA);
 	List<Spectrum> list = new ArrayList<>();
 	for (SpectrumContainer cont: getContainerManager().getAllVisible())
 	  list.add(cont.getData());
@@ -1335,7 +1335,7 @@ public class SpectrumExplorer
       protected PLS m_PLS;
       @Override
       protected Object doInBackground() throws Exception {
-	m_PLS = (PLS) OptionUtils.shallowCopy(m_CurrentPLS);
+	m_PLS = ObjectCopyHelper.copyObject(m_CurrentPLS);
 	List<Spectrum> list = new ArrayList<>();
 	for (SpectrumContainer cont: getContainerManager().getAllVisible())
 	  list.add(cont.getData());

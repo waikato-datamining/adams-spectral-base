@@ -20,7 +20,7 @@
 
 package adams.data.evaluator.instance;
 
-import adams.core.option.OptionUtils;
+import adams.core.ObjectCopyHelper;
 import adams.data.statistics.StatUtils;
 import weka.core.DenseInstance;
 import weka.core.DistanceFunction;
@@ -298,7 +298,7 @@ public class DistanceToCenter
       }
       centerDataset.add(center);
       // calculate distance to center
-      distance = (DistanceFunction) OptionUtils.shallowCopy(m_Search.getDistanceFunction());
+      distance = ObjectCopyHelper.copyObject(m_Search.getDistanceFunction());
       distance.setInstances(neighbors);
       distance.update(center);
       distance.update(data);

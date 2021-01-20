@@ -20,9 +20,9 @@
 
 package adams.data.evaluator.instance;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.Randomizable;
 import adams.core.logging.LoggingHelper;
-import adams.core.option.OptionUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LinearRegressionJ;
@@ -266,7 +266,7 @@ public class EnsembleEvaluator
     m_Normalize         = new double[m_Classifiers.length];
     for (i = 0; i < m_Classifiers.length; i++) {
       try {
-	m_ActualClassifiers[i] = (Classifier) OptionUtils.shallowCopy(m_Classifiers[i]);
+	m_ActualClassifiers[i] = ObjectCopyHelper.copyObject(m_Classifiers[i]);
 	m_ActualClassifiers[i].buildClassifier(data);
 	// determine normalization factor
 	eval = new Evaluation(data);

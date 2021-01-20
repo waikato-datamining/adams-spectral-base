@@ -21,6 +21,7 @@
 package adams.data.cleaner.instance;
 
 import adams.core.ClassLister;
+import adams.core.ObjectCopyHelper;
 import adams.core.ShallowCopySupporter;
 import adams.core.option.AbstractOptionConsumer;
 import adams.core.option.AbstractOptionHandler;
@@ -178,7 +179,7 @@ public abstract class AbstractCleaner
     Instances	result;
 
     try {
-      m_ActualPreFilter = (Filter) OptionUtils.shallowCopy(m_PreFilter);
+      m_ActualPreFilter = ObjectCopyHelper.copyObject(m_PreFilter);
       m_ActualPreFilter.setInputFormat(data);
       result = Filter.useFilter(data, m_ActualPreFilter);
     }

@@ -20,6 +20,7 @@
 
 package adams.gui.visualization.spectrum;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.Properties;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
@@ -543,7 +544,7 @@ public class SpectrumPanel
     }
 
     file = m_ExportDatasetDialog.getFile();
-    saver = (AbstractFileSaver) OptionUtils.shallowCopy(m_ExportDatasetDialog.getExport());
+    saver = ObjectCopyHelper.copyObject(m_ExportDatasetDialog.getExport());
     try {
       saver.setFile(file.getAbsoluteFile());
       sink = new DataSink(saver);
