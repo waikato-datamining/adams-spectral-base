@@ -32,7 +32,7 @@ import adams.data.spreadsheet.SpreadSheetRowRange;
 
 /**
  <!-- globalinfo-start -->
- * Turns a spreadsheet into spectra.
+ * Turns spreadsheet columns into spectra.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -129,7 +129,7 @@ public class SpreadSheetColumnsToSpectra
    */
   @Override
   public String globalInfo() {
-    return "Turns a spreadsheet into spectra.";
+    return "Turns spreadsheet columns into spectra.";
   }
 
   /**
