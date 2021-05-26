@@ -19,6 +19,8 @@
  */
 package adams.data.conversion;
 
+import adams.core.QuickInfoHelper;
+import adams.core.base.BaseRegExp;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
@@ -46,6 +48,13 @@ import adams.data.spreadsheet.SpreadSheetRowRange;
  * &nbsp;&nbsp;&nbsp;The (optional) column in the spreadsheet that contains the wavenumber information.
  * &nbsp;&nbsp;&nbsp;default:
  * &nbsp;&nbsp;&nbsp;example: An index is a number starting with 1; column names (case-sensitive) as well as the following placeholders can be used: first, second, third, last_2, last_1, last; numeric indices can be enforced by preceding them with '#' (eg '#12'); column names can be surrounded by double quotes.
+ * </pre>
+ *
+ * <pre>-wave-number-regexp &lt;adams.core.base.BaseRegExp&gt; (property: waveNumberRegExp)
+ * &nbsp;&nbsp;&nbsp;The regular expression to identify the wave number (1st group is used).
+ * &nbsp;&nbsp;&nbsp;default: (.*)
+ * &nbsp;&nbsp;&nbsp;more: https:&#47;&#47;docs.oracle.com&#47;javase&#47;tutorial&#47;essential&#47;regex&#47;
+ * &nbsp;&nbsp;&nbsp;https:&#47;&#47;docs.oracle.com&#47;javase&#47;8&#47;docs&#47;api&#47;java&#47;util&#47;regex&#47;Pattern.html
  * </pre>
  *
  * <pre>-cols-amplitude &lt;adams.data.spreadsheet.SpreadSheetColumnRange&gt; (property: columnsAmplitude)
@@ -98,8 +107,13 @@ public class SpreadSheetColumnsToSpectra
   /** for serialization. */
   private static final long serialVersionUID = -258589003642261978L;
 
+  public static final String DEFAULT_WAVENO_REGEXP = "(.*)";
+
   /** the (optional) wavenumber column. */
   protected SpreadSheetColumnIndex m_ColumnWaveNumber;
+
+  /** the regular expression to extract the wave number from the header (first group is used). */
+  protected BaseRegExp m_WaveNumberRegExp;
 
   /** the column with amplitudes. */
   protected SpreadSheetColumnRange m_ColumnsAmplitude;
@@ -142,6 +156,10 @@ public class SpreadSheetColumnsToSpectra
     m_OptionManager.add(
       "col-wave-number", "columnWaveNumber",
       new SpreadSheetColumnIndex());
+
+    m_OptionManager.add(
+      "wave-number-regexp", "waveNumberRegExp",
+      new BaseRegExp(DEFAULT_WAVENO_REGEXP));
 
     m_OptionManager.add(
       "cols-amplitude", "columnsAmplitude",
@@ -199,6 +217,35 @@ public class SpreadSheetColumnsToSpectra
    */
   public String columnWaveNumberTipText() {
     return "The (optional) column in the spreadsheet that contains the wavenumber information.";
+  }
+
+  /**
+   * Sets the regular expression to identify the wave number (1st group is used).
+   *
+   * @param value	the expression
+   */
+  public void setWaveNumberRegExp(BaseRegExp value) {
+    m_WaveNumberRegExp = value;
+    reset();
+  }
+
+  /**
+   * Returns the regular expression to identify the wave number (1st group is used).
+   *
+   * @return		the expression
+   */
+  public BaseRegExp getWaveNumberRegExp() {
+    return m_WaveNumberRegExp;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String waveNumberRegExpTipText() {
+    return "The regular expression to identify the wave number (1st group is used).";
   }
 
   /**
@@ -425,6 +472,23 @@ public class SpreadSheetColumnsToSpectra
   }
 
   /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "rowID", (m_RowID.isEmpty() ? "-none-" : m_RowID.getIndex()), "ID: ");
+    result += QuickInfoHelper.toString(this, "rowsAmplitude", (m_RowsAmplitude.isEmpty() ? "-none-" : m_RowsAmplitude.getRange()), ", amplitudes: ");
+    result += QuickInfoHelper.toString(this, "rowsSampleData", (m_RowsSampleData.isEmpty() ? "-none-" : m_RowsSampleData.getRange()), ", sampledata: ");
+    result += QuickInfoHelper.toString(this, "waveNumberRegExp", m_WaveNumberRegExp, ", wave no regexp: ");
+
+    return result;
+  }
+
+  /**
    * Performs the actual conversion.
    *
    * @return		the converted data
@@ -445,11 +509,15 @@ public class SpreadSheetColumnsToSpectra
     Row			row;
     int			wave;
     Cell 		cell;
-    
+    boolean 		useRegexp;
+    String 		wavenoStr;
+    float		waveno;
+
     sheet = (SpreadSheet) m_Input;
 
     m_ColumnWaveNumber.setSpreadSheet(sheet);
     colWave = m_ColumnWaveNumber.getIntIndex();
+    useRegexp = !m_WaveNumberRegExp.getValue().equals(DEFAULT_WAVENO_REGEXP);
 
     m_ColumnsAmplitude.setSpreadSheet(sheet);
     colsAmp = m_ColumnsAmplitude.getIntIndices();
@@ -496,8 +564,12 @@ public class SpreadSheetColumnsToSpectra
 	}
 	else {
 	  if (row.hasCell(colWave) && row.hasCell(colsAmp[i])) {
+	    wavenoStr = row.getCell(colWave).getContent();
+	    if (useRegexp)
+	      wavenoStr = wavenoStr.replaceAll(m_WaveNumberRegExp.getValue(), "$1");
+	    waveno = Float.parseFloat(wavenoStr);  // TODO locale?
 	    result[i].add(new SpectrumPoint(
-	      row.getCell(colWave).toDouble().floatValue(),
+	      waveno,
 	      row.getCell(colsAmp[i]).toDouble().floatValue()));
 	  }
 	}
