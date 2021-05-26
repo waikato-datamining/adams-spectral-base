@@ -80,6 +80,11 @@ import adams.data.spreadsheet.SpreadSheetRowRange;
  * &nbsp;&nbsp;&nbsp;example: An index is a number starting with 1; the following placeholders can be used as well: first, second, third, last_2, last_1, last
  * </pre>
  *
+ * <pre>-sampledata-names-in-header &lt;boolean&gt; (property: sampleDataNamesInHeader)
+ * &nbsp;&nbsp;&nbsp;Whether the sample data names are stored in the header.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  * <pre>-cols-sampledata &lt;adams.data.spreadsheet.SpreadSheetColumnRange&gt; (property: columnsSampleData)
  * &nbsp;&nbsp;&nbsp;The columns that contain sampledata.
  * &nbsp;&nbsp;&nbsp;default:
@@ -117,7 +122,7 @@ public class SpreadSheetRowsToSpectra
   /** the (optional) wavenumber row. */
   protected SpreadSheetRowIndex m_RowWaveNumber;
 
-  /** whether the row wavenumbers are in the header row. */
+  /** whether the wavenumbers are in the header row. */
   protected boolean m_WaveNumbersInHeader;
 
   /** the regular expression to extract the wave number from the header (first group is used). */
@@ -131,6 +136,9 @@ public class SpreadSheetRowsToSpectra
 
   /** the column with the sample data names. */
   protected SpreadSheetRowIndex m_RowSampleDataNames;
+
+  /** whether the sample data names are in the header row. */
+  protected boolean m_SampleDataNamesInHeader;
 
   /** the rows to get the sample data from. */
   protected SpreadSheetColumnRange m_ColumnsSampleData;
@@ -184,6 +192,10 @@ public class SpreadSheetRowsToSpectra
     m_OptionManager.add(
       "row-sampledata-names", "rowSampleDataNames",
       new SpreadSheetRowIndex());
+
+    m_OptionManager.add(
+      "sampledata-names-in-header", "sampleDataNamesInHeader",
+      false);
 
     m_OptionManager.add(
       "cols-sampledata", "columnsSampleData",
@@ -406,6 +418,35 @@ public class SpreadSheetRowsToSpectra
   }
 
   /**
+   * Sets whether the wave numbers are in the header.
+   *
+   * @param value	true if in header
+   */
+  public void setSampleDataNamesInHeader(boolean value) {
+    m_SampleDataNamesInHeader = value;
+    reset();
+  }
+
+  /**
+   * Returns whether the sample data names are in the header.
+   *
+   * @return 		true if in header
+   */
+  public boolean getSampleDataNamesInHeader() {
+    return m_SampleDataNamesInHeader;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String sampleDataNamesInHeaderTipText() {
+    return "Whether the sample data names are stored in the header.";
+  }
+
+  /**
    * Sets the columns with sampledata.
    *
    * @param value	the columns
@@ -526,6 +567,7 @@ public class SpreadSheetRowsToSpectra
     result += QuickInfoHelper.toString(this, "columnsSampleData", (m_ColumnsSampleData.isEmpty() ? "-none-" : m_ColumnsSampleData.getRange()), ", sampledata: ");
     result += QuickInfoHelper.toString(this, "waveNumberRegExp", m_WaveNumberRegExp, ", wave no regexp: ");
     result += QuickInfoHelper.toString(this, "waveNumbersInHeader", m_WaveNumbersInHeader, "wave nos in header", ", ");
+    result += QuickInfoHelper.toString(this, "sampleDataNamesInHeader", m_SampleDataNamesInHeader, "SD names in header", ", ");
 
     return result;
   }
@@ -581,11 +623,16 @@ public class SpreadSheetRowsToSpectra
     if (colsAmp.length == 0)
       throw new IllegalStateException("Failed to locate amplitude columns: " + m_ColumnsAmplitude);
 
-    m_RowSampleDataNames.setSpreadSheet(sheet);
-    rowMeta    = m_RowSampleDataNames.getIntIndex();
-    rowMetaObj = null;
-    if (rowMeta > -1)
-      rowMetaObj = sheet.getRow(rowMeta);
+    if (m_SampleDataNamesInHeader) {
+      rowMetaObj = sheet.getHeaderRow();
+    }
+    else {
+      m_RowSampleDataNames.setSpreadSheet(sheet);
+      rowMeta = m_RowSampleDataNames.getIntIndex();
+      rowMetaObj = null;
+      if (rowMeta > -1)
+	rowMetaObj = sheet.getRow(rowMeta);
+    }
 
     m_ColumnsSampleData.setSpreadSheet(sheet);
     colsMeta = m_ColumnsSampleData.getIntIndices();
