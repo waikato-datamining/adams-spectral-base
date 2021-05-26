@@ -48,6 +48,11 @@ import adams.data.spreadsheet.SpreadSheetRowRange;
  * &nbsp;&nbsp;&nbsp;example: An index is a number starting with 1; the following placeholders can be used as well: first, second, third, last_2, last_1, last
  * </pre>
  *
+ * <pre>-wave-numbers-in-header &lt;boolean&gt; (property: waveNumbersInHeader)
+ * &nbsp;&nbsp;&nbsp;Whether the wave numbers are stored in the header.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  * <pre>-cols-amplitude &lt;adams.data.spreadsheet.SpreadSheetColumnRange&gt; (property: columnsAmplitude)
  * &nbsp;&nbsp;&nbsp;The columns that contain amplitude information.
  * &nbsp;&nbsp;&nbsp;default:
@@ -101,6 +106,9 @@ public class SpreadSheetRowsToSpectra
   /** the (optional) wavenumber row. */
   protected SpreadSheetRowIndex m_RowWaveNumber;
 
+  /** whether the row wavenumbers are in the header row. */
+  protected boolean m_WaveNumbersInHeader;
+
   /** the rows with amplitudes. */
   protected SpreadSheetRowRange m_RowsAmplitude;
 
@@ -142,6 +150,10 @@ public class SpreadSheetRowsToSpectra
     m_OptionManager.add(
       "row-wave-number", "rowWaveNumber",
       new SpreadSheetRowIndex());
+
+    m_OptionManager.add(
+      "wave-numbers-in-header", "waveNumbersInHeader",
+      false);
 
     m_OptionManager.add(
       "cols-amplitude", "columnsAmplitude",
@@ -199,6 +211,35 @@ public class SpreadSheetRowsToSpectra
    */
   public String rowWaveNumberTipText() {
     return "The (optional) row in the spreadsheet that contains the wavenumber information.";
+  }
+
+  /**
+   * Sets whether the wave numbers are in the header.
+   *
+   * @param value	true if in header
+   */
+  public void setWaveNumbersInHeader(boolean value) {
+    m_WaveNumbersInHeader = value;
+    reset();
+  }
+
+  /**
+   * Returns whether the wave numbers are in the header.
+   *
+   * @return 		true if in header
+   */
+  public boolean getWaveNumbersInHeader() {
+    return m_WaveNumbersInHeader;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String waveNumbersInHeaderTipText() {
+    return "Whether the wave numbers are stored in the header.";
   }
 
   /**
@@ -450,11 +491,16 @@ public class SpreadSheetRowsToSpectra
     
     sheet = (SpreadSheet) m_Input;
 
-    m_RowWaveNumber.setSpreadSheet(sheet);
-    rowWave    = m_RowWaveNumber.getIntIndex();
     rowWaveObj = null;
-    if (rowWave > -1)
-      rowWaveObj = sheet.getRow(rowWave);
+    if (m_WaveNumbersInHeader) {
+      rowWaveObj = sheet.getHeaderRow();
+    }
+    else {
+      m_RowWaveNumber.setSpreadSheet(sheet);
+      rowWave = m_RowWaveNumber.getIntIndex();
+      if (rowWave > -1)
+	rowWaveObj = sheet.getRow(rowWave);
+    }
 
     m_RowsAmplitude.setSpreadSheet(sheet);
     rowsAmp = m_RowsAmplitude.getIntIndices();
