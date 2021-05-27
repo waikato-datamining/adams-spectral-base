@@ -14,7 +14,7 @@
  */
 
 /*
- * MergeSampleData.java
+ * MergeSampleDataFromMap.java
  * Copyright (C) 2021 University of Waikato, Hamilton, NZ
  */
 
@@ -97,7 +97,7 @@ import java.util.Map;
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class MergeSampleData
+public class MergeSampleDataFromMap
   extends AbstractTransformer
   implements StorageUser {
 

@@ -14,7 +14,7 @@
  */
 
 /*
- * MergeSampleDataTest.java
+ * MergeSampleDataFromMapTest.java
  * Copyright (C) 2021 University of Waikato, Hamilton, New Zealand
  */
 
@@ -34,7 +34,7 @@ import junit.framework.TestSuite;
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
-public class MergeSampleDataTest
+public class MergeSampleDataFromMapTest
   extends AbstractSpectrumFlowTest {
 
   /**
@@ -42,7 +42,7 @@ public class MergeSampleDataTest
    *
    * @param name	the name of the test
    */
-  public MergeSampleDataTest(String name) {
+  public MergeSampleDataFromMapTest(String name) {
     super(name);
   }
 
@@ -62,7 +62,7 @@ public class MergeSampleDataTest
    * @return		the test suite
    */
   public static Test suite() {
-    return new TestSuite(MergeSampleDataTest.class);
+    return new TestSuite(MergeSampleDataFromMapTest.class);
   }
 
   /**
