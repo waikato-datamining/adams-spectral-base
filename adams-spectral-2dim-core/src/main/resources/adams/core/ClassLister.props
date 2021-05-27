@@ -102,6 +102,10 @@ adams.data.smoothing.AbstractSmoother=\
 adams.data.spectrum.AbstractSpectrumComparator=\
   adams.data.spectrum
 
+# the spreadsheet row generators
+adams.data.spreadsheetrowgenerator.AbstractSpreadSheetRowGenerator=\
+  adams.data.spreadsheetrowgenerator
+
 # the spectral DB backends
 adams.db.SpectralDbBackend=\
   adams.db,\
