@@ -21,7 +21,6 @@ package adams.data.conversion;
 
 import adams.core.QuickInfoHelper;
 import adams.data.sampledata.SampleData;
-import adams.data.spectrum.Spectrum;
 import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
@@ -255,7 +254,7 @@ public class SpreadSheetColumnsToSampleData
    */
   @Override
   public Class generates() {
-    return Spectrum[].class;
+    return SampleData[].class;
   }
 
   /**
