@@ -76,19 +76,17 @@ public class SpreadSheetColumnsToSampleData
   /** for serialization. */
   private static final long serialVersionUID = -258589003642261978L;
 
-  public static final String DEFAULT_WAVENO_REGEXP = "(.*)";
-
   /** the column with the sample data names. */
   protected SpreadSheetColumnIndex m_ColSampleDataNames;
+
+  /** the columns with the sample data values. */
+  protected SpreadSheetColumnRange m_ColsSampleDataValues;
 
   /** the rows to get the sample data from. */
   protected SpreadSheetRowRange m_RowsSampleData;
 
   /** the (optional) row with the sample ID. */
   protected SpreadSheetRowIndex m_RowID;
-
-  /** the columns with the sample data values. */
-  protected SpreadSheetColumnRange m_ColsSampleDataValues;
 
   /**
    * Returns a string describing the object.
@@ -112,16 +110,16 @@ public class SpreadSheetColumnsToSampleData
       new SpreadSheetColumnIndex());
 
     m_OptionManager.add(
+      "cols-sampledata-values", "colsSampleDataValues",
+      new SpreadSheetColumnRange());
+
+    m_OptionManager.add(
       "rows-sampledata", "rowsSampleData",
       new SpreadSheetRowRange());
 
     m_OptionManager.add(
       "row-id", "rowID",
       new SpreadSheetRowIndex());
-
-    m_OptionManager.add(
-      "cols-sampledata-values", "colsSampleDataValues",
-      new SpreadSheetColumnRange());
   }
 
   /**
