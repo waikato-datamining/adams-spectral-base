@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * JsonSpectrumReaderTest.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2021 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.input;
 
@@ -28,7 +28,6 @@ import junit.framework.TestSuite;
  * java adams.data.io.input.JsonSpectrumReaderTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class JsonSpectrumReaderTest
   extends AbstractSpectrumReaderTestCase {
@@ -50,7 +49,8 @@ public class JsonSpectrumReaderTest
    */
   protected String[] getRegressionInputFiles() {
     return new String[]{
-	"146048-NIR-FOSS.json"
+	"146048-NIR-FOSS.json",
+	"146048-NIR-FOSS-ref_and_meta.json",
     };
   }
 
@@ -61,7 +61,8 @@ public class JsonSpectrumReaderTest
    */
   protected AbstractSpectrumReader[] getRegressionSetups() {
     return new AbstractSpectrumReader[]{
-	new JsonSpectrumReader()
+	new JsonSpectrumReader(),
+	new JsonSpectrumReader(),
     };
   }
 

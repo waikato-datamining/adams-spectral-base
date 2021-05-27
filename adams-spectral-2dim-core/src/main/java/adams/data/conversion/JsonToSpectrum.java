@@ -15,7 +15,7 @@
 
 /*
  * JsonToSpectrum.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.conversion;
@@ -33,16 +33,29 @@ import java.io.StringReader;
  <!-- globalinfo-start -->
  * Turns a JSON string into a spectrum.<br>
  * Input format:<br>
+ * - complete report stored:<br>
  * {<br>
  *   "id": "someid",<br>
  *   "format": "NIR",<br>
- *   "data": [<br>
- *     {"wave": 1.0, "ampl": 1.1},<br>
- *     {"wave": 2.0, "ampl": 2.1}<br>
- *   ],<br>
+ *   "waves": [1.0, 2.0],<br>
+ *   "amplitudes": [1.1, 2.1],<br>
  *   "report": {<br>
  *     "Sample ID": "someid",<br>
  *     "GLV2": 1.123,<br>
+ *     "valid": true<br>
+ *   }<br>
+ * }<br>
+ * <br>
+ * - specific reference and meta-data values stored:<br>
+ * {<br>
+ *   "id": "someid",<br>
+ *   "format": "NIR",<br>
+ *   "waves": [1.0, 2.0],<br>
+ *   "amplitudes": [1.1, 2.1],<br>
+ *   "reference": {<br>
+ *     "GLV2": 1.123<br>
+ *   },<br>
+ *   "meta-data": {<br>
  *     "valid": true<br>
  *   }<br>
  * }<br>
@@ -73,7 +86,10 @@ public class JsonToSpectrum
   public String globalInfo() {
     return "Turns a JSON string into a spectrum.\n"
       + "Input format:\n"
-      + SpectrumJsonUtils.example();
+      + "- complete report stored:\n"
+      + SpectrumJsonUtils.example(false) + "\n"
+      + "- specific reference and meta-data values stored:\n"
+      + SpectrumJsonUtils.example(true);
   }
 
   /**

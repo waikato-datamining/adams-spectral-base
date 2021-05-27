@@ -13,12 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * JsonSpectrumWriterTest.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2021 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
+import adams.data.report.DataType;
+import adams.data.report.Field;
 import adams.env.Environment;
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -28,7 +30,6 @@ import junit.framework.TestSuite;
  * java adams.data.io.output.JsonSpectrumWriterTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class JsonSpectrumWriterTest
   extends AbstractSpectrumWriterTestCase {
@@ -50,7 +51,8 @@ public class JsonSpectrumWriterTest
    */
   protected String[] getRegressionInputFiles() {
     return new String[]{
-	"146048-NIR-FOSS.spec"
+	"146048-NIR-FOSS.spec",
+	"146048-NIR-FOSS.spec",
     };
   }
 
@@ -60,9 +62,16 @@ public class JsonSpectrumWriterTest
    * @return		the setups
    */
   protected AbstractDataContainerWriter[] getRegressionSetups() {
-    return new AbstractDataContainerWriter[]{
-	new JsonSpectrumWriter()
-    };
+    JsonSpectrumWriter[] 	result;
+
+    result = new JsonSpectrumWriter[2];
+    result[0] = new JsonSpectrumWriter();
+    result[1] = new JsonSpectrumWriter();
+    result[1].setUseReferenceAndMetaData(true);
+    result[1].setReferenceValues(new Field[]{new Field("NIN2", DataType.NUMERIC), new Field("PHN2", DataType.NUMERIC)});
+    result[1].setMetaDataValues(new Field[]{new Field("Source", DataType.STRING), new Field("Instrument", DataType.STRING)});
+
+    return result;
   }
 
   /**

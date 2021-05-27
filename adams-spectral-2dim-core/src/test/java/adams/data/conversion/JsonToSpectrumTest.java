@@ -15,7 +15,7 @@
 
 /*
  * JsonToSpectrumTest.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.conversion;
@@ -67,11 +67,14 @@ public class JsonToSpectrumTest
   protected Object[] getRegressionInput() {
     Object[]		result;
     List<String>	lines;
+    List<String>	lines2;
 
     try {
       m_TestHelper.copyResourceToTmp("spectrum.json");
       lines = Files.readAllLines(new TmpFile("spectrum.json").toPath());
-      result = new Object[]{Utils.flatten(lines, "\n")};
+      m_TestHelper.copyResourceToTmp("spectrum-ref_and_meta.json");
+      lines2 = Files.readAllLines(new TmpFile("spectrum-ref_and_meta.json").toPath());
+      result = new Object[]{Utils.flatten(lines, "\n"), Utils.flatten(lines2, "\n")};
     }
     catch (Exception e) {
       result = new Object[0];

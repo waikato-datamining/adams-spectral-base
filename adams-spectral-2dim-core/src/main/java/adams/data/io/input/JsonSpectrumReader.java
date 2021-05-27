@@ -15,7 +15,7 @@
 
 /*
  * JsonSpectrumReader.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -36,16 +36,29 @@ import java.util.logging.Level;
  <!-- globalinfo-start -->
  * Reads spectra in JSON format.<br>
  * Input format (single spectrum):<br>
+ * - complete report stored:<br>
  * {<br>
  *   "id": "someid",<br>
  *   "format": "NIR",<br>
- *   "data": [<br>
- *     {"wave": 1.0, "ampl": 1.1},<br>
- *     {"wave": 2.0, "ampl": 2.1}<br>
- *   ],<br>
+ *   "waves": [1.0, 2.0],<br>
+ *   "amplitudes": [1.1, 2.1],<br>
  *   "report": {<br>
  *     "Sample ID": "someid",<br>
  *     "GLV2": 1.123,<br>
+ *     "valid": true<br>
+ *   }<br>
+ * }<br>
+ * <br>
+ * - specific reference and meta-data values stored:<br>
+ * {<br>
+ *   "id": "someid",<br>
+ *   "format": "NIR",<br>
+ *   "waves": [1.0, 2.0],<br>
+ *   "amplitudes": [1.1, 2.1],<br>
+ *   "reference": {<br>
+ *     "GLV2": 1.123<br>
+ *   },<br>
+ *   "meta-data": {<br>
  *     "valid": true<br>
  *   }<br>
  * }<br>
@@ -112,7 +125,10 @@ public class JsonSpectrumReader
   public String globalInfo() {
     return "Reads spectra in JSON format.\n"
       + "Input format (single spectrum):\n"
-      + SpectrumJsonUtils.example() + "\n"
+      + "- complete report stored:\n"
+      + SpectrumJsonUtils.example(false) + "\n"
+      + "- specific reference and meta-data values stored:\n"
+      + SpectrumJsonUtils.example(true) + "\n"
       + "Multiple spectra are wrapped in an array called 'spectra'.";
   }
 

@@ -15,11 +15,13 @@
 
 /*
  * SpectrumToJsonTest.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.conversion;
 
+import adams.data.report.DataType;
+import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
 import adams.env.Environment;
 import junit.framework.Test;
@@ -69,9 +71,16 @@ public class SpectrumToJsonTest
    */
   @Override
   protected Conversion[] getRegressionSetups() {
-    return new SpectrumToJson[]{
-      new SpectrumToJson(),
-    };
+    SpectrumToJson[] result;
+
+    result    = new SpectrumToJson[2];
+    result[0] = new SpectrumToJson();
+    result[1] = new SpectrumToJson();
+    result[1].setUseReferenceAndMetaData(true);
+    result[1].setReferenceValues(new Field[]{new Field("CAN1", DataType.NUMERIC), new Field("MAGU", DataType.NUMERIC), new Field("Clay", DataType.NUMERIC)});
+    result[1].setMetaDataValues(new Field[]{new Field("jaar", DataType.NUMERIC), new Field("Nr prakt", DataType.STRING), new Field("Format", DataType.STRING)});
+
+    return result;
   }
 
   /**

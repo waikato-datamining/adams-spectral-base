@@ -15,13 +15,14 @@
 
 /*
  * JsonSpectrumWriter.java
- * Copyright (C) 2016-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.output;
 
 import adams.core.io.FileUtils;
 import adams.core.io.PrettyPrintingSupporter;
+import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumJsonUtils;
 import com.google.gson.Gson;
@@ -35,16 +36,29 @@ import java.util.List;
 <!-- globalinfo-start -->
 * Writes spectra in JSON format.<br>
 * Output format for single spectrum:<br>
+* - outputting the complete report:<br>
 * {<br>
 *   "id": "someid",<br>
 *   "format": "NIR",<br>
-*   "data": [<br>
-*     {"wave": 1.0, "ampl": 1.1},<br>
-*     {"wave": 2.0, "ampl": 2.1}<br>
-*   ],<br>
+*   "waves": [1.0, 2.0],<br>
+*   "amplitudes": [1.1, 2.1],<br>
 *   "report": {<br>
 *     "Sample ID": "someid",<br>
 *     "GLV2": 1.123,<br>
+*     "valid": true<br>
+*   }<br>
+* }<br>
+* <br>
+* - outputting specific reference and meta-data values:<br>
+* {<br>
+*   "id": "someid",<br>
+*   "format": "NIR",<br>
+*   "waves": [1.0, 2.0],<br>
+*   "amplitudes": [1.1, 2.1],<br>
+*   "reference": {<br>
+*     "GLV2": 1.123<br>
+*   },<br>
+*   "meta-data": {<br>
 *     "valid": true<br>
 *   }<br>
 * }<br>
@@ -64,6 +78,22 @@ import java.util.List;
 * &nbsp;&nbsp;&nbsp;default: ${TMP}&#47;out.tmp
 * </pre>
 *
+* <pre>-use-reference-and-metadata &lt;boolean&gt; (property: useReferenceAndMetaData)
+* &nbsp;&nbsp;&nbsp;If enabled, the only the specified reference and meta-data report values
+* &nbsp;&nbsp;&nbsp;are output (in separate sections).
+* &nbsp;&nbsp;&nbsp;default: false
+* </pre>
+*
+* <pre>-reference-value &lt;adams.data.report.Field&gt; [-reference-value ...] (property: referenceValues)
+* &nbsp;&nbsp;&nbsp;The reference values to output.
+* &nbsp;&nbsp;&nbsp;default:
+* </pre>
+*
+* <pre>-metadata-value &lt;adams.data.report.Field&gt; [-metadata-value ...] (property: metaDataValues)
+* &nbsp;&nbsp;&nbsp;The meta-data values to output.
+* &nbsp;&nbsp;&nbsp;default:
+* </pre>
+*
 * <pre>-pretty-printing &lt;boolean&gt; (property: prettyPrinting)
 * &nbsp;&nbsp;&nbsp;If enabled, the output is printed in a 'pretty' format.
 * &nbsp;&nbsp;&nbsp;default: false
@@ -80,6 +110,15 @@ public class JsonSpectrumWriter
   /** for serialization. */
   private static final long serialVersionUID = 208155740775061862L;
 
+  /** whether to output speficied reference and meta-data values. */
+  protected boolean m_UseReferenceAndMetaData;
+
+  /** the reference values. */
+  protected Field[] m_ReferenceValues;
+
+  /** the meta-data values. */
+  protected Field[] m_MetaDataValues;
+
   /** whether to use pretty-printing. */
   protected boolean m_PrettyPrinting;
 
@@ -92,7 +131,10 @@ public class JsonSpectrumWriter
   public String globalInfo() {
     return "Writes spectra in JSON format.\n"
       + "Output format for single spectrum:\n"
-      + SpectrumJsonUtils.example() + "\n"
+      + "- outputting the complete report:\n"
+      + SpectrumJsonUtils.example(false) + "\n"
+      + "- outputting specific reference and meta-data values:\n"
+      + SpectrumJsonUtils.example(true) + "\n"
       + "Multiple spectra get wrapped in an array called 'spectra'.";
   }
 
@@ -103,8 +145,109 @@ public class JsonSpectrumWriter
     super.defineOptions();
 
     m_OptionManager.add(
+      "use-reference-and-metadata", "useReferenceAndMetaData",
+      false);
+
+    m_OptionManager.add(
+      "reference-value", "referenceValues",
+      new Field[0]);
+
+    m_OptionManager.add(
+      "metadata-value", "metaDataValues",
+      new Field[0]);
+
+    m_OptionManager.add(
       "pretty-printing", "prettyPrinting",
       false);
+  }
+
+  /**
+   * Sets whether only the specified reference and meta-data report values are
+   * output (in separate sections).
+   *
+   * @param value	true if to use pretty-printing
+   */
+  public void setUseReferenceAndMetaData(boolean value) {
+    m_UseReferenceAndMetaData = value;
+    reset();
+  }
+
+  /**
+   * Returns whether only the specified reference and meta-data report values
+   * are output (in separate sections).
+   *
+   * @return		true if to use pretty-printing
+   */
+  public boolean getUseReferenceAndMetaData() {
+    return m_UseReferenceAndMetaData;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String useReferenceAndMetaDataTipText() {
+    return "If enabled, the only the specified reference and meta-data report values are output (in separate sections).";
+  }
+
+  /**
+   * Sets the reference values to output.
+   *
+   * @param value	the fields
+   */
+  public void setReferenceValues(Field[] value) {
+    m_ReferenceValues = value;
+    reset();
+  }
+
+  /**
+   * Returns the reference values to output.
+   *
+   * @return		the fields
+   */
+  public Field[] getReferenceValues() {
+    return m_ReferenceValues;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String referenceValuesTipText() {
+    return "The reference values to output.";
+  }
+
+  /**
+   * Sets the meta-data values to output.
+   *
+   * @param value	the fields
+   */
+  public void setMetaDataValues(Field[] value) {
+    m_MetaDataValues = value;
+    reset();
+  }
+
+  /**
+   * Returns the meta-data values to output.
+   *
+   * @return		the fields
+   */
+  public Field[] getMetaDataValues() {
+    return m_MetaDataValues;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String metaDataValuesTipText() {
+    return "The meta-data values to output.";
   }
 
   /**
@@ -194,7 +337,10 @@ public class JsonSpectrumWriter
     jcont  = new JsonObject();
     jspecs = new JsonArray();
     for (Spectrum spec: data) {
-      jspec = SpectrumJsonUtils.toJson(spec);
+      if (m_UseReferenceAndMetaData)
+	jspec = SpectrumJsonUtils.toJson(spec, m_ReferenceValues, m_MetaDataValues);
+      else
+	jspec = SpectrumJsonUtils.toJson(spec);
       jspecs.add(jspec);
     }
     jcont.add("spectra", jspecs);
