@@ -20,8 +20,10 @@
 
 package adams.flow.transformer;
 
+import adams.core.ClassCrossReference;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
+import adams.data.conversion.SampleDataArrayToMap;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.flow.control.StorageName;
@@ -99,7 +101,7 @@ import java.util.Map;
  */
 public class MergeSampleDataFromMap
   extends AbstractTransformer
-  implements StorageUser {
+  implements StorageUser, ClassCrossReference {
 
   private static final long serialVersionUID = 2746984385469969356L;
 
@@ -126,6 +128,15 @@ public class MergeSampleDataFromMap
     return "Merges the passing through spectrum/sample data objects with the "
       + "referenced map of sample data objects in storage (the map uses the "
       + "sample ID as key).";
+  }
+
+  /**
+   * Returns the cross-referenced classes.
+   *
+   * @return		the classes
+   */
+  public Class[] getClassCrossReferences() {
+    return new Class[]{SampleDataArrayToMap.class};
   }
 
   /**
