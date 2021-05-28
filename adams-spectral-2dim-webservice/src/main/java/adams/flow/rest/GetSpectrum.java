@@ -15,7 +15,7 @@
 
 /*
  * GetSpectrum.java
- * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
@@ -50,7 +50,10 @@ public class GetSpectrum
   public String globalInfo() {
     return "Retrieves spectra via ID and format.\n"
       + "Format:\n"
-      + SpectrumJsonUtils.example();
+      + "- complete report stored:\n"
+      + SpectrumJsonUtils.example(false) + "\n"
+      + "- specific reference and meta-data values stored:\n"
+      + SpectrumJsonUtils.example(true);
   }
 
   /**

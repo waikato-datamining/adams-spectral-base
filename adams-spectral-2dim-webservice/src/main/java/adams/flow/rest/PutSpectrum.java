@@ -15,7 +15,7 @@
 
 /*
  * PutSpectrum.java
- * Copyright (C) 2018-2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.rest;
@@ -50,7 +50,10 @@ public class PutSpectrum
     return "Stores spectra in the database.\n"
       + "Delete any spectrum that already exists with this ID/format beforehand.\n"
       + "Format:\n"
-      + SpectrumJsonUtils.example();
+      + "- complete report stored:\n"
+      + SpectrumJsonUtils.example(false) + "\n"
+      + "- specific reference and meta-data values stored:\n"
+      + SpectrumJsonUtils.example(true);
   }
 
   /**
@@ -92,7 +95,10 @@ public class PutSpectrum
 	  + msg
 	  + "\n"
 	  + "Expected format:\n"
-	  + SpectrumJsonUtils.example();
+	  + "- complete report stored:\n"
+	  + SpectrumJsonUtils.example(false) + "\n"
+	  + "- specific reference and meta-data values stored:\n"
+	  + SpectrumJsonUtils.example(true);
     }
   }
 }
