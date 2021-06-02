@@ -15,7 +15,7 @@
 
 /*
  * ASCIIXYSpectrumReader.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -25,6 +25,7 @@ import adams.data.io.input.sampleidextraction.Filename;
 import adams.data.io.input.sampleidextraction.SampleIDExtraction;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -94,7 +95,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class ASCIIXYSpectrumReader
   extends AbstractSpectrumReader
@@ -253,5 +253,17 @@ public class ASCIIXYSpectrumReader
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to read spectral data!", e);
     }
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, ASCIIXYSpectrumReader.class, args);
   }
 }

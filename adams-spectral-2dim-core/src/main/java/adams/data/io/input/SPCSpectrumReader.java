@@ -15,7 +15,7 @@
 
 /*
  * SPCSpectrumReader.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -30,6 +30,7 @@ import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -82,7 +83,6 @@ import java.util.List;
 <!-- options-end -->
 *
 * @author  fracpete (fracpete at waikato dot ac dot nz)
-* @version $Revision: 2242 $
 */
 public class SPCSpectrumReader
   extends AbstractSpectrumReader {
@@ -94,7 +94,6 @@ public class SPCSpectrumReader
    * Parser class for SPC files.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision: 2242 $
    */
   public static abstract class AbstractParser
     implements Serializable {
@@ -1138,5 +1137,17 @@ public class SPCSpectrumReader
       m_ReadData.addAll(parser.getSpectra());
     else
       getLogger().severe("Failed to parse '" + m_Input + "': " + msg);
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, SPCSpectrumReader.class, args);
   }
 }

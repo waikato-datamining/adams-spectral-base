@@ -15,7 +15,7 @@
 
 /*
  * ExtractIdAndTypeSpectrumReader.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -25,6 +25,7 @@ import adams.data.groupextraction.GroupExtractor;
 import adams.data.idextraction.IDExtractor;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
+import adams.env.Environment;
 import com.github.fracpete.javautils.enumerate.Enumerated;
 
 import static com.github.fracpete.javautils.Enumerate.enumerate;
@@ -295,5 +296,17 @@ public class ExtractIdAndTypeSpectrumReader
 	}
       }
     }
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, ExtractIdAndTypeSpectrumReader.class, args);
   }
 }

@@ -25,6 +25,7 @@ import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 import gnu.trove.list.TFloatList;
 import gnu.trove.list.array.TFloatArrayList;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
@@ -499,5 +500,17 @@ public class UnscramblerSpectrumReader
     // close all streams
     while (m_Streams.size() > 0)
       FileUtils.closeQuietly(m_Streams.remove(m_Streams.size() - 1));
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, UnscramblerSpectrumReader.class, args);
   }
 }

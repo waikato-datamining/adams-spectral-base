@@ -15,7 +15,7 @@
 
 /*
  * SimpleSpectrumReader.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -29,6 +29,7 @@ import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -60,7 +61,6 @@ import java.util.zip.GZIPInputStream;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SimpleSpectrumReader
   extends AbstractSpectrumReader {
@@ -227,5 +227,17 @@ public class SimpleSpectrumReader
   @Override
   protected void readData() {
     read(m_Input.getAbsolutePath());
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, SimpleSpectrumReader.class, args);
   }
 }

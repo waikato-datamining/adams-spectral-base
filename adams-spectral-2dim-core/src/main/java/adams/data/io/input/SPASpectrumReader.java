@@ -15,7 +15,7 @@
 
 /*
  * SPASpectrumReader.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -27,6 +27,7 @@ import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 
 /**
  <!-- globalinfo-start -->
@@ -76,7 +77,6 @@ import adams.data.spectrum.SpectrumPoint;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SPASpectrumReader
   extends AbstractSpectrumReader {
@@ -301,5 +301,17 @@ public class SPASpectrumReader
     }
 
     m_ReadData.add(sp);
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, SPASpectrumReader.class, args);
   }
 }

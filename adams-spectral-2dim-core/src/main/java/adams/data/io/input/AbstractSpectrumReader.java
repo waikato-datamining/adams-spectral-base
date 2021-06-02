@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumReader.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -24,13 +24,20 @@ import adams.core.ClassLister;
 import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Stoppable;
+import adams.core.io.PlaceholderDirectory;
+import adams.core.io.PlaceholderFile;
+import adams.core.logging.LoggingHelper;
+import adams.core.option.OptionUtils;
+import adams.data.io.output.SimpleSpectrumWriter;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.report.Report;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
+import adams.env.Environment;
 
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -38,7 +45,6 @@ import java.util.logging.Level;
  * turn them into spectrums.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2332 $
  */
 public abstract class AbstractSpectrumReader
   extends AbstractDataContainerReader<Spectrum>
@@ -46,6 +52,8 @@ public abstract class AbstractSpectrumReader
 
   /** for serialization. */
   private static final long serialVersionUID = -4690065186988048507L;
+
+  public static final String OPTION_OUTPUTDIR = "--output-dir";
 
   /** the instrument this data is from. */
   protected String m_Instrument;
@@ -329,4 +337,60 @@ public abstract class AbstractSpectrumReader
   public static String[] getReaders() {
     return ClassLister.getSingleton().getClassnames(AbstractSpectrumReader.class);
   }
+
+  /**
+   * Runs the reader from commandline.
+   *
+   * @param env		the environment class to use
+   * @param reader	the reader to execute
+   * @param args	the commandline arguments, use --input to specify the input file/dir
+   *                    and --output-dir to specify directory to save them as .spec files
+   */
+  public static void runReader(Class env, Class reader, String[] args) {
+    AbstractSpectrumReader 	readerInst;
+    List<Spectrum> 		specs;
+    PlaceholderDirectory	outputDir;
+    int				i;
+    PlaceholderFile		outputFile;
+    SimpleSpectrumWriter	writer;
+
+    Environment.setEnvironmentClass(env);
+    LoggingHelper.useHandlerFromOptions(args);
+
+    try {
+      if (OptionUtils.helpRequested(args)) {
+	System.out.println("Help requested...\n");
+	readerInst = (AbstractSpectrumReader) OptionUtils.forName(AbstractSpectrumReader.class, reader.getName(), new String[0]);
+	System.out.print("\n" + OptionUtils.list(readerInst));
+	LoggingHelper.outputHandlerOption();
+      }
+      else {
+        outputDir = null;
+	if (OptionUtils.hasFlag(args, OPTION_OUTPUTDIR)) {
+	  outputDir = new PlaceholderDirectory(OptionUtils.getOption(args, OPTION_OUTPUTDIR));
+	  OptionUtils.removeOption(args, OPTION_OUTPUTDIR);
+	}
+	readerInst = (AbstractSpectrumReader) OptionUtils.forName(AbstractSpectrumReader.class, reader.getName(), args);
+	specs = readerInst.read();
+	if (outputDir != null) {
+	  for (i = 0; i < specs.size(); i++) {
+	    outputFile = new PlaceholderFile(outputDir.getAbsolutePath() + "/" + (i+1) + ".spec");
+	    System.out.println((i+1) + ". " + outputFile);
+	    writer = new SimpleSpectrumWriter();
+	    writer.setOutputSampleData(true);
+	    writer.setOutput(outputFile);
+	    writer.write(specs.get(i));
+	  }
+	}
+	else {
+	  for (i = 0; i < specs.size(); i++)
+	    System.out.println((i+1) + ". " + specs.get(i));
+	}
+      }
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
 }

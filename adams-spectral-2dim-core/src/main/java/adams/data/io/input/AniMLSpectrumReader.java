@@ -15,10 +15,12 @@
 
 /*
  * AniMLSpectrumReader.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
+
+import adams.env.Environment;
 
 /**
  <!-- globalinfo-start -->
@@ -62,7 +64,6 @@ package adams.data.io.input;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class AniMLSpectrumReader
   extends AbstractJCampSpectrumReader {
@@ -99,5 +100,17 @@ public class AniMLSpectrumReader
    */
   public String[] getFormatExtensions() {
     return new String[]{"animl", "xml"};
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, AniMLSpectrumReader.class, args);
   }
 }

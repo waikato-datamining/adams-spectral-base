@@ -15,7 +15,7 @@
 
 /*
  * RowWiseSpreadSheetSpectrumReader.java
- * Copyright (C) 2015-2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -30,6 +30,7 @@ import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
+import adams.env.Environment;
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
@@ -576,5 +577,17 @@ public class RowWiseSpreadSheetSpectrumReader
   public void stopExecution() {
     super.stopExecution();
     m_Reader.stopExecution();
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, RowWiseSpreadSheetSpectrumReader.class, args);
   }
 }

@@ -15,7 +15,7 @@
 
 /*
  * JCampDXSpectrumReader.java
- * Copyright (C) 2011-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -24,6 +24,7 @@ import adams.core.io.FileUtils;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
+import adams.env.Environment;
 
 import java.util.List;
 
@@ -73,7 +74,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class JCampDXSpectrumReader
   extends AbstractJCampSpectrumReader {
@@ -201,5 +201,17 @@ public class JCampDXSpectrumReader
 	break;
       }
     }
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, JCampDXSpectrumReader.class, args);
   }
 }

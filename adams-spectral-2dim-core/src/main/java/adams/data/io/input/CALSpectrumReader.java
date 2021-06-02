@@ -15,7 +15,7 @@
 
 /*
  * CALSpectrumReader.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -29,6 +29,7 @@ import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 
 import java.util.Vector;
 
@@ -53,7 +54,6 @@ import java.util.Vector;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2251 $
  */
 public class CALSpectrumReader
   extends AbstractSpectrumReader {
@@ -361,6 +361,17 @@ public class CALSpectrumReader
 	break;
       }
     }
+  }
 
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, CALSpectrumReader.class, args);
   }
 }

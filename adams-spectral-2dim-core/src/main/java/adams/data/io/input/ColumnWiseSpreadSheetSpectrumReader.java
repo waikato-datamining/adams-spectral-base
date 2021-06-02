@@ -15,7 +15,7 @@
 
 /*
  * ColumnWiseSpreadSheetSpectrumReader.java
- * Copyright (C) 2013-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2021 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.input;
 
@@ -30,6 +30,7 @@ import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
+import adams.env.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -626,5 +627,17 @@ public class ColumnWiseSpreadSheetSpectrumReader
   public void stopExecution() {
     super.stopExecution();
     m_Reader.stopExecution();
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, ColumnWiseSpreadSheetSpectrumReader.class, args);
   }
 }

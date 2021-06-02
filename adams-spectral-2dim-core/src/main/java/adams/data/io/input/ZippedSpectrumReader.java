@@ -15,7 +15,7 @@
 
 /*
  * ZippedSpectrumReader.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -25,6 +25,7 @@ import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.core.io.TempUtils;
 import adams.data.spectrum.Spectrum;
+import adams.env.Environment;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 
@@ -387,5 +388,17 @@ public class ZippedSpectrumReader
       m_ReadData.clear();
       getLogger().log(Level.SEVERE, "Failed to read from: " + m_Input, e);
     }
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, ZippedSpectrumReader.class, args);
   }
 }

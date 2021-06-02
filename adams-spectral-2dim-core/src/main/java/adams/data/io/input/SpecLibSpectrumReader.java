@@ -15,7 +15,7 @@
 
 /*
  * SpecLibSpectrumReader.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -26,6 +26,7 @@ import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 
 import java.util.List;
 
@@ -87,7 +88,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1941 $
  */
 public class SpecLibSpectrumReader
   extends AbstractSpectrumReader {
@@ -338,5 +338,17 @@ public class SpecLibSpectrumReader
 	  getLogger().fine("Ignored amplitude: " + wave + "/" + ampl);
       }
     }
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, SpecLibSpectrumReader.class, args);
   }
 }

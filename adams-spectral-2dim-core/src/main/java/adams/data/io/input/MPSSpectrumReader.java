@@ -15,7 +15,7 @@
 
 /*
  * MPSSpectrumReader.java
- * Copyright (C) 2017-2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -29,6 +29,7 @@ import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 
 import java.util.List;
 
@@ -217,5 +218,17 @@ public class MPSSpectrumReader
     }
 
     m_ReadData.add(sp);
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, MPSSpectrumReader.class, args);
   }
 }

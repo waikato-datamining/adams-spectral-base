@@ -15,7 +15,7 @@
 
 /*
  * OpusSpectrumReaderExt.java
- * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -33,6 +33,7 @@ import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.env.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +120,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class OpusSpectrumReaderExt
   extends AbstractSpectrumReader {
@@ -141,6 +141,8 @@ public class OpusSpectrumReaderExt
   public static final String FIELD_OPUS_LOG = "Opus.Log";
 
   public static final String PREFIX_OPUS = "Opus.";
+
+  private static final long serialVersionUID = 3801630783793342561L;
 
   /** the hex mask for the spectrum to extract. */
   protected String m_SpectrumBlockType;
@@ -631,5 +633,17 @@ public class OpusSpectrumReaderExt
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to read '" + m_Input + "'!", e);
     }
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, OpusSpectrumReaderExt.class, args);
   }
 }

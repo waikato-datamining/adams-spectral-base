@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SoilCaresScannerSpectrumReader.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -29,6 +29,7 @@ import adams.data.spectrum.SpectrumPoint;
 import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.env.Environment;
 
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -94,7 +95,6 @@ import java.util.zip.ZipFile;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SoilCaresScannerSpectrumReader
   extends AbstractSpectrumReader {
@@ -431,5 +431,17 @@ public class SoilCaresScannerSpectrumReader
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to load file: " + m_Input, e);
     }
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, SoilCaresScannerSpectrumReader.class, args);
   }
 }

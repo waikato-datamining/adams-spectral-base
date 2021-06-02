@@ -23,6 +23,7 @@ package adams.data.io.input;
 import adams.core.io.FileUtils;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumJsonUtils;
+import adams.env.Environment;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -195,5 +196,17 @@ public class JsonSpectrumReader
       FileUtils.closeQuietly(breader);
       FileUtils.closeQuietly(freader);
     }
+  }
+
+  /**
+   * Runs the reader from the command-line.
+   *
+   * If the option {@link #OPTION_OUTPUTDIR} is specified then the read spectra
+   * get output as .spec files in that directory.
+   *
+   * @param args	the command-line options to use
+   */
+  public static void main(String[] args) {
+    runReader(Environment.class, JsonSpectrumReader.class, args);
   }
 }
