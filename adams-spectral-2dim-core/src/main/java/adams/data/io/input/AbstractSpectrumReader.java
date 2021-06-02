@@ -392,5 +392,4 @@ public abstract class AbstractSpectrumReader
       e.printStackTrace();
     }
   }
-
 }
