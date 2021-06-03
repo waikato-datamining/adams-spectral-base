@@ -360,6 +360,11 @@ public abstract class AbstractSpectrumReader
     try {
       if (OptionUtils.helpRequested(args)) {
 	System.out.println("Help requested...\n");
+        System.out.println("General options");
+        System.out.println("===============\n");
+        System.out.println(OPTION_OUTPUTDIR + " <dir>");
+        System.out.println("\tThe directory to write the spectrum to (as .spec files).");
+        System.out.println("\tOutputs the spectra to stdout if not provided.\n");
 	readerInst = (AbstractSpectrumReader) OptionUtils.forName(AbstractSpectrumReader.class, reader.getName(), new String[0]);
 	System.out.print("\n" + OptionUtils.list(readerInst));
 	LoggingHelper.outputHandlerOption();
