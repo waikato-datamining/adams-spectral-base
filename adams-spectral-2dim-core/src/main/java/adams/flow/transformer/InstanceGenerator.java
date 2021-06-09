@@ -15,11 +15,12 @@
 
 /*
  * InstanceGenerator.java
- * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
+import adams.core.LenientModeSupporter;
 import adams.core.QuickInfoHelper;
 import adams.data.instance.WekaInstanceContainer;
 import adams.data.report.Report;
@@ -100,7 +101,7 @@ import java.util.logging.Level;
  */
 public class InstanceGenerator
   extends AbstractTransformer
-  implements DatabaseConnectionUser {
+  implements DatabaseConnectionUser, LenientModeSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = 9173099269238100664L;
