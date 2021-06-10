@@ -21,6 +21,7 @@
 package adams.flow.transformer;
 
 import adams.core.ClassCrossReference;
+import adams.core.LenientModeSupporter;
 import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import adams.data.conversion.SampleDataArrayToMap;
@@ -34,7 +35,10 @@ import java.util.Map;
 
 /**
  <!-- globalinfo-start -->
- * Merges the passing through spectrum&#47;sample data objects with the referenced map of sample data objects in storage (the map uses the sample ID as key).
+ * Merges the passing through spectrum&#47;sample data objects with the referenced map of sample data objects in storage (the map uses the sample ID as key).<br>
+ * <br>
+ * See also:<br>
+ * adams.data.conversion.SampleDataArrayToMap
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -57,7 +61,7 @@ import java.util.Map;
  *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
  * &nbsp;&nbsp;&nbsp;The name of the actor.
- * &nbsp;&nbsp;&nbsp;default: MergeSampleData
+ * &nbsp;&nbsp;&nbsp;default: MergeSampleDataFromMap
  * </pre>
  *
  * <pre>-annotation &lt;adams.core.base.BaseAnnotation&gt; (property: annotations)
@@ -95,13 +99,18 @@ import java.util.Map;
  * &nbsp;&nbsp;&nbsp;default: MERGE_CURRENT_WITH_OTHER
  * </pre>
  *
+ * <pre>-lenient &lt;boolean&gt; (property: lenient)
+ * &nbsp;&nbsp;&nbsp;If enabled, missing IDs in the map won't cause an error.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class MergeSampleDataFromMap
   extends AbstractTransformer
-  implements StorageUser, ClassCrossReference {
+  implements StorageUser, ClassCrossReference, LenientModeSupporter {
 
   private static final long serialVersionUID = 2746984385469969356L;
 
@@ -117,6 +126,9 @@ public class MergeSampleDataFromMap
 
   /** the merge type. */
   protected MergeReport.MergeType m_Merge;
+
+  /** whether to be lenient. */
+  protected boolean m_Lenient;
 
   /**
    * Returns a string describing the object.
@@ -153,6 +165,10 @@ public class MergeSampleDataFromMap
     m_OptionManager.add(
       "merge", "merge",
       MergeReport.MergeType.MERGE_CURRENT_WITH_OTHER);
+
+    m_OptionManager.add(
+      "lenient", "lenient",
+      false);
   }
 
   /**
@@ -214,6 +230,35 @@ public class MergeSampleDataFromMap
   }
 
   /**
+   * Sets whether to use lenient mode (missing IDs in map won't cause error).
+   *
+   * @param value	true if to turn on lenient mode
+   */
+  public void setLenient(boolean value) {
+    m_Lenient = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use lenient mode (missing IDs in map won't cause error).
+   *
+   * @return		true if lenient mode on
+   */
+  public boolean getLenient() {
+    return m_Lenient;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String lenientTipText() {
+    return "If enabled, missing IDs in the map won't cause an error.";
+  }
+
+  /**
    * Returns the class that the consumer accepts.
    *
    * @return the Class of objects that can be processed
@@ -254,6 +299,7 @@ public class MergeSampleDataFromMap
 
     result = QuickInfoHelper.toString(this, "storageName", m_StorageName, "storage: ");
     result += QuickInfoHelper.toString(this, "merge", m_Merge, ", merge: ");
+    result += QuickInfoHelper.toString(this, "lenient", m_Lenient, "lenient", ", ");
 
     return result;
   }
@@ -272,78 +318,93 @@ public class MergeSampleDataFromMap
     SampleData			other;
     SampleData			merged;
     String			id;
+    boolean			skip;
 
     result = null;
     map    = null;
+    skip   = false;
 
     // get map
     if (getStorageHandler().getStorage().has(m_StorageName)) {
       if (getStorageHandler().getStorage().get(m_StorageName) instanceof Map)
 	map = (Map<String,SampleData>) getStorageHandler().getStorage().get(m_StorageName);
       else
-        result = "Expected Report/ReportHandler in storage, but found: " + Utils.classToString(getStorageHandler().getStorage().get(m_StorageName));
+	result = "Expected map in storage, but found: " + Utils.classToString(getStorageHandler().getStorage().get(m_StorageName));
     }
     else {
-      result = "Storage item with bays not available: " + m_StorageName;
+      result = "Storage item with map not available: " + m_StorageName;
     }
 
     // input data
     spectrum = null;
     current  = new SampleData();
     merged   = new SampleData();
+    other    = new SampleData();
     id       = null;
-    if (m_InputToken.hasPayload(Spectrum.class)) {
-      spectrum = m_InputToken.getPayload(Spectrum.class);
-      current  = spectrum.getReport();
-      id       = spectrum.getID();
-    }
-    else if (m_InputToken.hasPayload(SampleData.class)) {
-      current = m_InputToken.getPayload(SampleData.class);
-      id      = current.getID();
-    }
-    else {
-      result = m_InputToken.unhandledData();
+    if (result == null) {
+      if (m_InputToken.hasPayload(Spectrum.class)) {
+	spectrum = m_InputToken.getPayload(Spectrum.class);
+	current = spectrum.getReport();
+	id = spectrum.getID();
+      }
+      else if (m_InputToken.hasPayload(SampleData.class)) {
+	current = m_InputToken.getPayload(SampleData.class);
+	id = current.getID();
+      }
+      else {
+	result = m_InputToken.unhandledData();
+      }
     }
 
     // get from map
-    other = new SampleData();
     if (result == null) {
       if (map != null) {
-        if (map.containsKey(id))
+	if (map.containsKey(id)) {
 	  other = map.get(id);
-	else
+	}
+	else if (m_Lenient) {
+	  getLogger().warning("Failed to retrieve sample data from map using sample ID: " + id);
+	  skip = true;
+	}
+	else {
 	  result = "Failed to retrieve sample data from map using sample ID: " + id;
+	}
       }
     }
 
     if (result == null) {
-      switch (m_Merge) {
-	case REPLACE:
-	  merged = (SampleData) other.getClone();
-	  break;
-
-	case MERGE_CURRENT_WITH_OTHER:
-	  merged = (SampleData) current.getClone();
-	  merged.mergeWith(other);
-	  break;
-
-	case MERGE_OTHER_WITH_CURRENT:
-	  merged = (SampleData) other.getClone();
-	  merged.mergeWith(current);
-	  break;
-
-	default:
-	  result = "Unhandled merge type: " + m_Merge;
-      }
-    }
-
-    if (result == null) {
-      if (spectrum != null) {
-	spectrum.setReport(merged);
-	m_OutputToken = new Token(spectrum);
+      if (skip) {
+	m_OutputToken = m_InputToken;
       }
       else {
-        m_OutputToken = new Token(merged);
+	switch (m_Merge) {
+	  case REPLACE:
+	    merged = (SampleData) other.getClone();
+	    break;
+
+	  case MERGE_CURRENT_WITH_OTHER:
+	    merged = (SampleData) current.getClone();
+	    merged.mergeWith(other);
+	    break;
+
+	  case MERGE_OTHER_WITH_CURRENT:
+	    merged = (SampleData) other.getClone();
+	    merged.mergeWith(current);
+	    break;
+
+	  default:
+	    result = "Unhandled merge type: " + m_Merge;
+	}
+
+	if (result == null) {
+	  if (spectrum != null) {
+	    spectrum.setReport(merged);
+	    m_OutputToken = new Token(spectrum);
+	  }
+	  else {
+	    m_OutputToken = new Token(merged);
+	  }
+	}
       }
     }
 
