@@ -19,7 +19,9 @@
  */
 package adams.data.conversion;
 
+import adams.core.LenientModeSupporter;
 import adams.core.QuickInfoHelper;
+import adams.core.logging.LoggingHelper;
 import adams.data.sampledata.SampleData;
 import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Row;
@@ -28,6 +30,9 @@ import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
 import adams.data.spreadsheet.SpreadSheetRowIndex;
 import adams.data.spreadsheet.SpreadSheetRowRange;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -47,6 +52,12 @@ import adams.data.spreadsheet.SpreadSheetRowRange;
  * &nbsp;&nbsp;&nbsp;example: An index is a number starting with 1; column names (case-sensitive) as well as the following placeholders can be used: first, second, third, last_2, last_1, last; numeric indices can be enforced by preceding them with '#' (eg '#12'); column names can be surrounded by double quotes.
  * </pre>
  *
+ * <pre>-cols-sampledata-values &lt;adams.data.spreadsheet.SpreadSheetColumnRange&gt; (property: colsSampleDataValues)
+ * &nbsp;&nbsp;&nbsp;The columns to get the sample data values from.
+ * &nbsp;&nbsp;&nbsp;default:
+ * &nbsp;&nbsp;&nbsp;example: A range is a comma-separated list of single 1-based indices or sub-ranges of indices ('start-end'); 'inv(...)' inverts the range '...'; column names (case-sensitive) as well as the following placeholders can be used: first, second, third, last_2, last_1, last; numeric indices can be enforced by preceding them with '#' (eg '#12'); column names can be surrounded by double quotes.
+ * </pre>
+ *
  * <pre>-rows-sampledata &lt;adams.data.spreadsheet.SpreadSheetRowRange&gt; (property: rowsSampleData)
  * &nbsp;&nbsp;&nbsp;The rows that contain sampledata.
  * &nbsp;&nbsp;&nbsp;default:
@@ -59,10 +70,9 @@ import adams.data.spreadsheet.SpreadSheetRowRange;
  * &nbsp;&nbsp;&nbsp;example: An index is a number starting with 1; the following placeholders can be used as well: first, second, third, last_2, last_1, last
  * </pre>
  *
- * <pre>-cols-sampledata-values &lt;adams.data.spreadsheet.SpreadSheetColumnRange&gt; (property: colsSampleDataValues)
- * &nbsp;&nbsp;&nbsp;The columns to get the sample data values from.
- * &nbsp;&nbsp;&nbsp;default:
- * &nbsp;&nbsp;&nbsp;example: A range is a comma-separated list of single 1-based indices or sub-ranges of indices ('start-end'); 'inv(...)' inverts the range '...'; column names (case-sensitive) as well as the following placeholders can be used: first, second, third, last_2, last_1, last; numeric indices can be enforced by preceding them with '#' (eg '#12'); column names can be surrounded by double quotes.
+ * <pre>-lenient &lt;boolean&gt; (property: lenient)
+ * &nbsp;&nbsp;&nbsp;If enabled, then errors (e.g., due to corrupt data) will not cause exceptions.
+ * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
  <!-- options-end -->
@@ -70,7 +80,8 @@ import adams.data.spreadsheet.SpreadSheetRowRange;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class SpreadSheetColumnsToSampleData
-  extends AbstractConversion {
+  extends AbstractConversion
+  implements LenientModeSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -258589003642261978L;
@@ -86,6 +97,9 @@ public class SpreadSheetColumnsToSampleData
 
   /** the (optional) row with the sample ID. */
   protected SpreadSheetRowIndex m_RowID;
+
+  /** whether to skip over errors. */
+  protected boolean m_Lenient;
 
   /**
    * Returns a string describing the object.
@@ -119,6 +133,10 @@ public class SpreadSheetColumnsToSampleData
     m_OptionManager.add(
       "row-id", "rowID",
       new SpreadSheetRowIndex());
+
+    m_OptionManager.add(
+      "lenient", "lenient",
+      false);
   }
 
   /**
@@ -238,6 +256,38 @@ public class SpreadSheetColumnsToSampleData
   }
 
   /**
+   * Sets whether to skip over errors.
+   *
+   * @param value	true if to skip
+   */
+  @Override
+  public void setLenient(boolean value) {
+    m_Lenient = value;
+    reset();
+  }
+
+  /**
+   * Returns whether whether to skip over errors.
+   *
+   * @return		true if to skip
+   */
+  @Override
+  public boolean getLenient() {
+    return m_Lenient;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String lenientTipText() {
+    return "If enabled, then errors (e.g., due to corrupt data) will not cause exceptions.";
+  }
+
+  /**
    * Returns the class that is accepted as input.
    *
    * @return		the class
@@ -270,6 +320,7 @@ public class SpreadSheetColumnsToSampleData
     result += QuickInfoHelper.toString(this, "rowsSampleData", (m_RowsSampleData.isEmpty() ? "-none-" : m_RowsSampleData.getRange()), ", rows: ");
     result += QuickInfoHelper.toString(this, "colSampleDataNames", (m_ColSampleDataNames.isEmpty() ? "-none-" : m_ColSampleDataNames.getIndex()), ", names: ");
     result += QuickInfoHelper.toString(this, "colsSampleDataValues", (m_ColsSampleDataValues.isEmpty() ? "-none-" : m_ColsSampleDataValues.getRange()), ", value cols: ");
+    result += QuickInfoHelper.toString(this, "lenient", m_Lenient, "lenient", ", ");
 
     return result;
   }
@@ -282,7 +333,8 @@ public class SpreadSheetColumnsToSampleData
    */
   @Override
   protected Object doConvert() throws Exception {
-    SampleData[]	result;
+    List<SampleData> 	result;
+    SampleData		sd;
     SpreadSheet		sheet;
     int			i;
     int			n;
@@ -313,33 +365,43 @@ public class SpreadSheetColumnsToSampleData
     m_RowID.setSpreadSheet(sheet);
     rowID = m_RowID.getIntIndex();
 
-    result = new SampleData[colsValues.length];
+    result = new ArrayList<>();
     for (i = 0; i < colsValues.length; i++) {
-      result[i] = new SampleData();
-      if ((rowID > -1) && sheet.hasCell(rowID, colsValues[i]) && !sheet.getCell(rowID, colsValues[i]).isMissing())
-	result[i].setID(sheet.getCell(rowID, colsValues[i]).getContent());
-      else
-        result[i].setID("" + (i+1));
+      try {
+	sd = new SampleData();
+	if ((rowID > -1) && sheet.hasCell(rowID, colsValues[i]) && !sheet.getCell(rowID, colsValues[i]).isMissing())
+	  sd.setID(sheet.getCell(rowID, colsValues[i]).getContent());
+	else
+	  sd.setID("" + (i+1));
 
-      // sample data
-      if (colMeta > -1) {
-	for (n = 0; n < rowsMeta.length; n++) {
-	  if (rowsMeta[n] == rowID)
-	    continue;
-	  row = sheet.getRow(rowsMeta[n]);
-	  if (row.hasCell(colsValues[i]) && !row.getCell(colsValues[i]).isMissing()) {
-	    cell = row.getCell(colsValues[i]);
-	    if (cell.isNumeric())
-	      result[i].setNumericValue(row.getCell(colMeta).getContent(), cell.toDouble());
-	    else if (cell.isBoolean())
-	      result[i].setBooleanValue(row.getCell(colMeta).getContent(), cell.toBoolean());
-	    else
-	      result[i].setStringValue(row.getCell(colMeta).getContent(), cell.getContent());
+	// sample data
+	if (colMeta > -1) {
+	  for (n = 0; n < rowsMeta.length; n++) {
+	    if (rowsMeta[n] == rowID)
+	      continue;
+	    row = sheet.getRow(rowsMeta[n]);
+	    if (row.hasCell(colsValues[i]) && !row.getCell(colsValues[i]).isMissing()) {
+	      cell = row.getCell(colsValues[i]);
+	      if (cell.isNumeric())
+		sd.setNumericValue(row.getCell(colMeta).getContent(), cell.toDouble());
+	      else if (cell.isBoolean())
+		sd.setBooleanValue(row.getCell(colMeta).getContent(), cell.toBoolean());
+	      else
+		sd.setStringValue(row.getCell(colMeta).getContent(), cell.getContent());
+	    }
 	  }
 	}
+
+	result.add(sd);
+      }
+      catch (Exception e) {
+	if (m_Lenient)
+	  getLogger().warning("Failed to process column " + (colsValues[i] + 1) + ":\n" + LoggingHelper.throwableToString(e));
+	else
+	  throw e;
       }
     }
-    
+
     return result;
   }
 }

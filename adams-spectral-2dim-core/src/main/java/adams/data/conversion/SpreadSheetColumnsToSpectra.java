@@ -19,8 +19,10 @@
  */
 package adams.data.conversion;
 
+import adams.core.LenientModeSupporter;
 import adams.core.QuickInfoHelper;
 import adams.core.base.BaseRegExp;
+import adams.core.logging.LoggingHelper;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
@@ -31,6 +33,9 @@ import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
 import adams.data.spreadsheet.SpreadSheetRowIndex;
 import adams.data.spreadsheet.SpreadSheetRowRange;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -97,12 +102,18 @@ import adams.data.spreadsheet.SpreadSheetRowRange;
  * &nbsp;&nbsp;&nbsp;default: unknown
  * </pre>
  *
+ * <pre>-lenient &lt;boolean&gt; (property: lenient)
+ * &nbsp;&nbsp;&nbsp;If enabled, then errors (e.g., due to corrupt data) will not cause exceptions.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class SpreadSheetColumnsToSpectra
-  extends AbstractConversion {
+  extends AbstractConversion
+  implements LenientModeSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -258589003642261978L;
@@ -129,13 +140,16 @@ public class SpreadSheetColumnsToSpectra
 
   /** the (optional) row with the sample ID. */
   protected SpreadSheetRowIndex m_RowID;
-  
+
   /** the format to use for the spectrum. */
   protected String m_Format;
-  
+
   /** the instrument to use for the spectrum. */
   protected String m_Instrument;
-  
+
+  /** whether to skip over errors. */
+  protected boolean m_Lenient;
+
   /**
    * Returns a string describing the object.
    *
@@ -188,6 +202,10 @@ public class SpreadSheetColumnsToSpectra
     m_OptionManager.add(
       "instrument", "instrument",
       "unknown");
+
+    m_OptionManager.add(
+      "lenient", "lenient",
+      false);
   }
 
   /**
@@ -452,6 +470,38 @@ public class SpreadSheetColumnsToSpectra
   }
 
   /**
+   * Sets whether to skip over errors.
+   *
+   * @param value	true if to skip
+   */
+  @Override
+  public void setLenient(boolean value) {
+    m_Lenient = value;
+    reset();
+  }
+
+  /**
+   * Returns whether whether to skip over errors.
+   *
+   * @return		true if to skip
+   */
+  @Override
+  public boolean getLenient() {
+    return m_Lenient;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String lenientTipText() {
+    return "If enabled, then errors (e.g., due to corrupt data) will not cause exceptions.";
+  }
+
+  /**
    * Returns the class that is accepted as input.
    *
    * @return		the class
@@ -484,6 +534,7 @@ public class SpreadSheetColumnsToSpectra
     result += QuickInfoHelper.toString(this, "rowsAmplitude", (m_RowsAmplitude.isEmpty() ? "-none-" : m_RowsAmplitude.getRange()), ", amplitudes: ");
     result += QuickInfoHelper.toString(this, "rowsSampleData", (m_RowsSampleData.isEmpty() ? "-none-" : m_RowsSampleData.getRange()), ", sampledata: ");
     result += QuickInfoHelper.toString(this, "waveNumberRegExp", m_WaveNumberRegExp, ", wave no regexp: ");
+    result += QuickInfoHelper.toString(this, "lenient", m_Lenient, "lenient", ", ");
 
     return result;
   }
@@ -496,7 +547,8 @@ public class SpreadSheetColumnsToSpectra
    */
   @Override
   protected Object doConvert() throws Exception {
-    Spectrum[]		result;
+    List<Spectrum> 	result;
+    Spectrum		spec;
     SpreadSheet		sheet;
     int			colWave;
     int[] 		colsAmp;
@@ -537,63 +589,73 @@ public class SpreadSheetColumnsToSpectra
 
     m_RowID.setSpreadSheet(sheet);
     rowID = m_RowID.getIntIndex();
-    
-    result = new Spectrum[colsAmp.length];
+
+    result = new ArrayList<>();
     for (i = 0; i < colsAmp.length; i++) {
-      result[i] = new Spectrum();
-      result[i].setReport(new SampleData());
-      if ((rowID > -1) && sheet.hasCell(rowID, colsAmp[i]) && !sheet.getCell(rowID, colsAmp[i]).isMissing())
-	result[i].setID(sheet.getCell(rowID, colsAmp[i]).getContent());
-      else
-        result[i].setID("" + (i+1));
-      result[i].setFormat(m_Format);
+      try{
+	spec = new Spectrum();
+	spec.setReport(new SampleData());
+	if ((rowID > -1) && sheet.hasCell(rowID, colsAmp[i]) && !sheet.getCell(rowID, colsAmp[i]).isMissing())
+	  spec.setID(sheet.getCell(rowID, colsAmp[i]).getContent());
+	else
+	  spec.setID("" + (i+1));
+	spec.setFormat(m_Format);
 
-      // wave numbers
-      wave = 0;
-      for (n = 0; n < rowsAmp.length; n++) {
-        if (rowsAmp[n] == rowID)
-          continue;
-        wave++;
-        row = sheet.getRow(rowsAmp[n]);
-        if (colWave == -1) {
-	  if (row.hasCell(colsAmp[i])) {
-	    result[i].add(new SpectrumPoint(
-	      wave,
-	      row.getCell(colsAmp[i]).toDouble().floatValue()));
-	  }
-	}
-	else {
-	  if (row.hasCell(colWave) && row.hasCell(colsAmp[i])) {
-	    wavenoStr = row.getCell(colWave).getContent();
-	    if (useRegexp)
-	      wavenoStr = wavenoStr.replaceAll(m_WaveNumberRegExp.getValue(), "$1");
-	    waveno = Float.parseFloat(wavenoStr);  // TODO locale?
-	    result[i].add(new SpectrumPoint(
-	      waveno,
-	      row.getCell(colsAmp[i]).toDouble().floatValue()));
-	  }
-	}
-      }
-
-      // sample data
-      if (colMeta > -1) {
-	for (n = 0; n < rowsMeta.length; n++) {
-	  if (rowsMeta[n] == rowID)
+	// wave numbers
+	wave = 0;
+	for (n = 0; n < rowsAmp.length; n++) {
+	  if (rowsAmp[n] == rowID)
 	    continue;
-	  row = sheet.getRow(rowsMeta[n]);
-	  if (row.hasCell(colsAmp[i]) && !row.getCell(colsAmp[i]).isMissing()) {
-	    cell = row.getCell(colsAmp[i]);
-	    if (cell.isNumeric())
-	      result[i].getReport().setNumericValue(row.getCell(colMeta).getContent(), cell.toDouble());
-	    else if (cell.isBoolean())
-	      result[i].getReport().setBooleanValue(row.getCell(colMeta).getContent(), cell.toBoolean());
-	    else
-	      result[i].getReport().setStringValue(row.getCell(colMeta).getContent(), cell.getContent());
+	  wave++;
+	  row = sheet.getRow(rowsAmp[n]);
+	  if (colWave == -1) {
+	    if (row.hasCell(colsAmp[i])) {
+	      spec.add(new SpectrumPoint(
+		wave,
+		row.getCell(colsAmp[i]).toDouble().floatValue()));
+	    }
+	  }
+	  else {
+	    if (row.hasCell(colWave) && row.hasCell(colsAmp[i])) {
+	      wavenoStr = row.getCell(colWave).getContent();
+	      if (useRegexp)
+		wavenoStr = wavenoStr.replaceAll(m_WaveNumberRegExp.getValue(), "$1");
+	      waveno = Float.parseFloat(wavenoStr);  // TODO locale?
+	      spec.add(new SpectrumPoint(
+		waveno,
+		row.getCell(colsAmp[i]).toDouble().floatValue()));
+	    }
 	  }
 	}
+
+	// sample data
+	if (colMeta > -1) {
+	  for (n = 0; n < rowsMeta.length; n++) {
+	    if (rowsMeta[n] == rowID)
+	      continue;
+	    row = sheet.getRow(rowsMeta[n]);
+	    if (row.hasCell(colsAmp[i]) && !row.getCell(colsAmp[i]).isMissing()) {
+	      cell = row.getCell(colsAmp[i]);
+	      if (cell.isNumeric())
+		spec.getReport().setNumericValue(row.getCell(colMeta).getContent(), cell.toDouble());
+	      else if (cell.isBoolean())
+		spec.getReport().setBooleanValue(row.getCell(colMeta).getContent(), cell.toBoolean());
+	      else
+		spec.getReport().setStringValue(row.getCell(colMeta).getContent(), cell.getContent());
+	    }
+	  }
+	}
+
+	result.add(spec);
+      }
+      catch (Exception e) {
+	if (m_Lenient)
+	  getLogger().warning("Failed to process column " + (colsAmp[i] + 1) + ":\n" + LoggingHelper.throwableToString(e));
+	else
+	  throw e;
       }
     }
-    
-    return result;
+
+    return result.toArray(new Spectrum[0]);
   }
 }

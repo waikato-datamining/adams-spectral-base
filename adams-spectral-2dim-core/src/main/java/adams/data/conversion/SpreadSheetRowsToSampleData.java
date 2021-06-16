@@ -19,7 +19,9 @@
  */
 package adams.data.conversion;
 
+import adams.core.LenientModeSupporter;
 import adams.core.QuickInfoHelper;
+import adams.core.logging.LoggingHelper;
 import adams.data.sampledata.SampleData;
 import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Row;
@@ -28,6 +30,9 @@ import adams.data.spreadsheet.SpreadSheetColumnIndex;
 import adams.data.spreadsheet.SpreadSheetColumnRange;
 import adams.data.spreadsheet.SpreadSheetRowIndex;
 import adams.data.spreadsheet.SpreadSheetRowRange;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -70,12 +75,18 @@ import adams.data.spreadsheet.SpreadSheetRowRange;
  * &nbsp;&nbsp;&nbsp;example: An index is a number starting with 1; column names (case-sensitive) as well as the following placeholders can be used: first, second, third, last_2, last_1, last; numeric indices can be enforced by preceding them with '#' (eg '#12'); column names can be surrounded by double quotes.
  * </pre>
  *
+ * <pre>-lenient &lt;boolean&gt; (property: lenient)
+ * &nbsp;&nbsp;&nbsp;If enabled, then errors (e.g., due to corrupt data) will not cause exceptions.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class SpreadSheetRowsToSampleData
-  extends AbstractConversion {
+  extends AbstractConversion
+  implements LenientModeSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -258589003642261978L;
@@ -94,6 +105,9 @@ public class SpreadSheetRowsToSampleData
 
   /** the (optional) row with the sample ID. */
   protected SpreadSheetColumnIndex m_ColumnID;
+
+  /** whether to skip over errors. */
+  protected boolean m_Lenient;
 
   /**
    * Returns a string describing the object.
@@ -131,6 +145,10 @@ public class SpreadSheetRowsToSampleData
     m_OptionManager.add(
       "col-id", "columnID",
       new SpreadSheetColumnIndex());
+
+    m_OptionManager.add(
+      "lenient", "lenient",
+      false);
   }
 
   /**
@@ -279,6 +297,38 @@ public class SpreadSheetRowsToSampleData
   }
 
   /**
+   * Sets whether to skip over errors.
+   *
+   * @param value	true if to skip
+   */
+  @Override
+  public void setLenient(boolean value) {
+    m_Lenient = value;
+    reset();
+  }
+
+  /**
+   * Returns whether whether to skip over errors.
+   *
+   * @return		true if to skip
+   */
+  @Override
+  public boolean getLenient() {
+    return m_Lenient;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String lenientTipText() {
+    return "If enabled, then errors (e.g., due to corrupt data) will not cause exceptions.";
+  }
+
+  /**
    * Returns the class that is accepted as input.
    *
    * @return		the class
@@ -311,6 +361,7 @@ public class SpreadSheetRowsToSampleData
     result += QuickInfoHelper.toString(this, "columnsSampleData", (m_ColumnsSampleData.isEmpty() ? "-none-" : m_ColumnsSampleData.getRange()), ", cols: ");
     result += QuickInfoHelper.toString(this, "sampleDataNamesInHeader", m_SampleDataNamesInHeader, "SD names in header", ", ");
     result += QuickInfoHelper.toString(this, "rowsSampleDataValues", (m_RowsSampleDataValues.isEmpty() ? "-none-" : m_RowsSampleDataValues.getRange()), ", rows: ");
+    result += QuickInfoHelper.toString(this, "lenient", m_Lenient, "lenient", ", ");
 
     return result;
   }
@@ -323,7 +374,8 @@ public class SpreadSheetRowsToSampleData
    */
   @Override
   protected Object doConvert() throws Exception {
-    SampleData[]	result;
+    List<SampleData> 	result;
+    SampleData		sd;
     SpreadSheet		sheet;
     int[] 		rowsValues;
     int			i;
@@ -349,7 +401,7 @@ public class SpreadSheetRowsToSampleData
       m_RowSampleDataNames.setSpreadSheet(sheet);
       rowMeta = m_RowSampleDataNames.getIntIndex();
       if (rowMeta == -1)
-        throw new IllegalStateException("Failed to locate row with sample data names: " + m_RowSampleDataNames.getIndex());
+	throw new IllegalStateException("Failed to locate row with sample data names: " + m_RowSampleDataNames.getIndex());
       rowMetaObj = sheet.getRow(rowMeta);
     }
 
@@ -360,34 +412,44 @@ public class SpreadSheetRowsToSampleData
 
     m_ColumnID.setSpreadSheet(sheet);
     colID = m_ColumnID.getIntIndex();
-    
-    result = new SampleData[rowsValues.length];
-    for (i = 0; i < rowsValues.length; i++) {
-      row       = sheet.getRow(rowsValues[i]);
-      result[i] = new SampleData();
-      if ((colID > -1) && row.hasCell(colID) && !row.getCell(colID).isMissing())
-	result[i].setID(row.getCell(colID).getContent());
-      else
-        result[i].setID("" + (i+1));
 
-      // sample data
-      if (rowMetaObj != null) {
-	for (n = 0; n < colsMeta.length; n++) {
-	  if (colsMeta[n] == colID)
-	    continue;
-	  if (row.hasCell(colsMeta[n]) && !row.getCell(colsMeta[n]).isMissing()) {
-	    cell = row.getCell(colsMeta[n]);
-	    if (cell.isNumeric())
-	      result[i].setNumericValue(rowMetaObj.getCell(colsMeta[n]).getContent(), cell.toDouble());
-	    else if (cell.isBoolean())
-	      result[i].setBooleanValue(rowMetaObj.getCell(colsMeta[n]).getContent(), cell.toBoolean());
-	    else
-	      result[i].setStringValue(rowMetaObj.getCell(colsMeta[n]).getContent(), cell.getContent());
+    result = new ArrayList<>();
+    for (i = 0; i < rowsValues.length; i++) {
+      try {
+	row = sheet.getRow(rowsValues[i]);
+	sd  = new SampleData();
+	if ((colID > -1) && row.hasCell(colID) && !row.getCell(colID).isMissing())
+	  sd.setID(row.getCell(colID).getContent());
+	else
+	  sd.setID("" + (i+1));
+
+	// sample data
+	if (rowMetaObj != null) {
+	  for (n = 0; n < colsMeta.length; n++) {
+	    if (colsMeta[n] == colID)
+	      continue;
+	    if (row.hasCell(colsMeta[n]) && !row.getCell(colsMeta[n]).isMissing()) {
+	      cell = row.getCell(colsMeta[n]);
+	      if (cell.isNumeric())
+		sd.setNumericValue(rowMetaObj.getCell(colsMeta[n]).getContent(), cell.toDouble());
+	      else if (cell.isBoolean())
+		sd.setBooleanValue(rowMetaObj.getCell(colsMeta[n]).getContent(), cell.toBoolean());
+	      else
+		sd.setStringValue(rowMetaObj.getCell(colsMeta[n]).getContent(), cell.getContent());
+	    }
 	  }
 	}
+
+	result.add(sd);
+      }
+      catch (Exception e) {
+	if (m_Lenient)
+	  getLogger().warning("Failed to process row " + (rowsValues[i] + 1) + ":\n" + LoggingHelper.throwableToString(e));
+	else
+	  throw e;
       }
     }
-    
-    return result;
+
+    return result.toArray(new SampleData[0]);
   }
 }
