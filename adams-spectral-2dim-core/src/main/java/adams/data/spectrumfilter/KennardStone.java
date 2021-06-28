@@ -15,7 +15,7 @@
 
 /*
  * KennardStone.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2021 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -29,6 +29,8 @@ import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Batch filter that applies the Kennard-stone algorithm to select a subset of spectra
@@ -48,13 +50,16 @@ public class KennardStone
   /** Batch filter to apply before selection */
   protected BatchFilter m_BatchFilter;
 
+  /** whether to invert the selection. */
+  protected boolean m_Invert;
+
   @Override
   public String globalInfo() {
     return "Apply the Kennard-Stone algorithm to the array of spectra. Each spectrum has the pre filter applied"
       + "and the array of pre filtered spectra have a batch filter applied before the algorithm is applied";
   }
 
-  public void defineOptions(){
+  public void defineOptions() {
     super.defineOptions();
 
     m_OptionManager.add(
@@ -67,93 +72,132 @@ public class KennardStone
 
     m_OptionManager.add(
       "batch-filter", "batchFilter",
-      new PassThrough<>()
-    );
+      new PassThrough<>());
 
+    m_OptionManager.add(
+      "invert", "invert",
+      false);
   }
 
   /**
    * Set the number of spectra to select in subset
-   * @param val       Size of subset
+   *
+   * @param value       Size of subset
    */
-  public void setNumberInSubset(int val){
-    m_NumberInSubset = val;
+  public void setNumberInSubset(int value) {
+    m_NumberInSubset = value;
     reset();
   }
 
   /**
    * get the number of spectra to select in subset
+   *
    * @return      Size of subset
    */
-  public int getNumberInSubset(){
+  public int getNumberInSubset() {
     return m_NumberInSubset;
   }
 
   /**
    * Tip text for this property
+   *
    * @return      Description for displaying in the GUI
    */
-  public String numberInSubsetTipText(){
+  public String numberInSubsetTipText() {
     return "Number of spectra in subset array";
   }
 
   /**
    * Set the filter to apply before selection
-   * @param val       Filter to apply
+   *
+   * @param value       Filter to apply
    */
-  public void setPreFilter(Filter val){
-    m_PreFilter = val;
+  public void setPreFilter(Filter value) {
+    m_PreFilter = value;
     reset();
   }
 
   /**
    * Get the filter to apply before selection
+   *
    * @return      Filter to apply
    */
-  public Filter getPreFilter(){
+  public Filter getPreFilter() {
     return m_PreFilter;
   }
 
   /**
    * Tip text for this property
+   *
    * @return      Description for displaying in the GUI
    */
-  public String preFilterTipText(){
+  public String preFilterTipText() {
     return "Pre filter to use on the spectra";
   }
 
   /**
    * Set the batch filter to apply before selection
-   * @param val       Batch filter
+   *
+   * @param value       Batch filter
    */
-  public void setBatchFilter(BatchFilter val){
-    m_BatchFilter = val;
+  public void setBatchFilter(BatchFilter value) {
+    m_BatchFilter = value;
     reset();
   }
 
   /**
    * Get the batch filter to apply before selection
+   *
    * @return      Batch filter
    */
-  public BatchFilter getBatchFilter(){
+  public BatchFilter getBatchFilter() {
     return m_BatchFilter;
   }
 
   /**
    * Description for this property
+   *
    * @return      Description for displaying in the GUI
    */
-  public String batchFilterTipText(){
+  public String batchFilterTipText() {
     return "Batch filter to apply to the spectra";
+  }
+
+  /**
+   * Set whether to return the remaining spectra are returned rather than the chosen ones.
+   * 
+   * @param value       true if to invert
+   */
+  public void setInvert(boolean value) {
+    m_Invert = value;
+    reset();
+  }
+
+  /**
+   * Get whether to return the remaining spectra are returned rather than the chosen ones.
+   * 
+   * @return      true if to invert
+   */
+  public boolean getInvert() {
+    return m_Invert;
+  }
+
+  /**
+   * Description for this property.
+   * 
+   * @return      Description for displaying in the GUI
+   */
+  public String invertTipText() {
+    return "If enabled, the remaining spectra are returned rather than the chosen ones.";
   }
 
   @Override
   protected DataContainer[] processBatchData(DataContainer[] data) {
-    Spectrum[] toReturn;
+    List<Spectrum> result;
     Spectrum[] preFiltered;
     int numSpectraInitial = data.length;
     if(m_NumberInSubset == -1) {
-      toReturn = (Spectrum[])data;
+      return data;
     }
     else {
       //copy of original un-filtered spectra
@@ -186,14 +230,14 @@ public class KennardStone
       }
 
       //Keep a record of chosen and remaining indices
-      ArrayList<Integer> chosen = new ArrayList<Integer>();
-      ArrayList<Integer> remaining = new ArrayList<Integer>();
+      ArrayList<Integer> chosen = new ArrayList<>();
+      ArrayList<Integer> remaining = new ArrayList<>();
       for (int i = 0; i < numSpectraInitial; i++) {
 	remaining.add(i);
       }
 
       //find 2 samples that are furthest apart using uniform distance
-      double maxDistance = -1;
+      double maxDistance = 0;
       distanceInitial = -1;
 
       int chosen1 = -1;
@@ -222,7 +266,7 @@ public class KennardStone
 
       //Loop through until the right amount are found.
       for (int m = 3; m <= m_NumberInSubset; m++) {
-	maxDistanceTest = -1;
+	maxDistanceTest = 0;
 	bestIndex = -1;
 	for (int i = 0; i < remaining.size(); i++) {
 	  lowestDistanceSingle = Double.POSITIVE_INFINITY;
@@ -243,23 +287,31 @@ public class KennardStone
 	remaining.remove(remaining.indexOf(bestIndex));
       }
 
-      toReturn = new Spectrum[chosen.size()];
-      for (int i = 0; i < chosen.size(); i++) {
-	toReturn[i] = (Spectrum) preFiltered[chosen.get(i)];
+      if (m_Invert) {
+        result = new ArrayList<>();
+        HashSet<Integer> chosenSet = new HashSet<>(chosen);
+        for (int i = 0; i < preFiltered.length; i++) {
+          if (!chosenSet.contains(i))
+            result.add(preFiltered[i]);
+	}
       }
+      else {
+	result = new ArrayList<>();
+	for (int i = 0; i < chosen.size(); i++)
+	  result.add(preFiltered[chosen.get(i)]);
+      }
+      return result.toArray(new Spectrum[0]);
     }
-    return toReturn;
   }
 
   /**
    * Calculate the distance between any two spectra. Currently just uses euclidean distance
    *
-   * @param spec1     Spectrum1
-   * @param spec2     Spectrum2
-   * @return
+   * @param spec1     	Spectrum1
+   * @param spec2     	Spectrum2
+   * @return		the distance
    */
-  protected double calculateDistance(Spectrum spec1, Spectrum spec2){
-
+  protected double calculateDistance(Spectrum spec1, Spectrum spec2) {
     Object[] specPoint1 = spec1.toArray();
     Object[] specPoint2 = spec2.toArray();
 
@@ -268,7 +320,7 @@ public class KennardStone
     double val1 = -1;
     double val2 = -1;
 
-    for(int i = 0; i < spec1.size(); i++){
+    for(int i = 0; i < spec1.size(); i++) {
       val1 = ((SpectrumPoint)specPoint1[i]).getAmplitude();
       val2 = ((SpectrumPoint)specPoint2[i]).getAmplitude();
       spec1Array[i] = val1;
