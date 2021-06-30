@@ -402,6 +402,6 @@ public class SpreadSheetColumnsToSampleData
       }
     }
 
-    return result;
+    return result.toArray(new SampleData[0]);
   }
 }
