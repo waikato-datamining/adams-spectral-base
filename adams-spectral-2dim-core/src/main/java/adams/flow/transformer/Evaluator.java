@@ -185,6 +185,9 @@ public class Evaluator
   /** the model loader. */
   protected EvaluatorModelLoader m_ModelLoader;
 
+  /** whether to clean up after build. */
+  protected boolean m_CleanAfterBuild;
+
   /**
    * Returns a string describing the object.
    *
@@ -244,6 +247,10 @@ public class Evaluator
     m_OptionManager.add(
       "version", "version",
       "");
+
+    m_OptionManager.add(
+        "clean-after-build", "cleanAfterBuild",
+        false);
   }
 
   /**
@@ -569,6 +576,35 @@ public class Evaluator
   }
 
   /**
+   * Sets whether to discard the internal evaluator again after building it.
+   *
+   * @param value	true if to discard
+   */
+  public void setCleanAfterBuild(boolean value) {
+    m_CleanAfterBuild = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to discard the internal evaluator again after building it.
+   *
+   * @return		true if to discard
+   */
+  public boolean getCleanAfterBuild() {
+    return m_CleanAfterBuild;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String cleanAfterBuildTipText() {
+    return "If enabled, the internnaly built evaluator gets discarded again.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -584,6 +620,7 @@ public class Evaluator
     result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
     result += QuickInfoHelper.toString(this, "evaluatorResetVariable", m_EvaluatorResetVariable, ", reset: ");
     result += QuickInfoHelper.toString(this, "noCopy", (m_NoCopy ? "no copy" : "copy"), ", ");
+    result += QuickInfoHelper.toString(this, "cleanAfterBuild", (m_CleanAfterBuild ? "clean" : "keep"), ", ");
 
     return result;
   }
@@ -799,6 +836,13 @@ public class Evaluator
       catch (Exception e) {
 	m_OutputToken = null;
 	result = handleException("Failed to evaluate: " + m_InputToken.getPayload(), e);
+      }
+    }
+
+    if (m_CleanAfterBuild) {
+      if (m_ActualEvaluator != null) {
+        m_ActualEvaluator.destroy();
+        m_ActualEvaluator = null;
       }
     }
 
