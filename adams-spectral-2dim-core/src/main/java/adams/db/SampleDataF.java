@@ -15,7 +15,7 @@
 
 /*
  * SampleDataF.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2021 University of Waikato, Hamilton, NZ
  */
 
 package adams.db;
@@ -265,6 +265,32 @@ public class SampleDataF
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName());
     return m_DB.getInstruments();
+  }
+
+  /**
+   * Stores the records. Removes any previously existing reference values.
+   *
+   * @param records	the report
+   * @param types	the data types to import
+   * @param skipFields 	the fields to skip (regular expression), null to accept all
+   * @param batchSize   the maximum number of records in one batch
+   * @return		true if successfully inserted/updated
+   */
+  @Override
+  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
+    return m_DB.bulkStore(records, types, skipFields, batchSize);
+  }
+
+  /**
+   * Interrupts a currently running bulk store, if possible.
+   */
+  @Override
+  public void stopBulkStore() {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
+    m_DB.stopBulkStore();
   }
 
   /**

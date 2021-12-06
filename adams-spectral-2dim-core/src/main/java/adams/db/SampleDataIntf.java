@@ -15,7 +15,7 @@
 
 /*
  * SampleDataIntf.java
- * Copyright (C) 2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2019-2021 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -33,7 +33,8 @@ import java.util.List;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public interface SampleDataIntf
-  extends TableInterface, FieldProvider<Field>, ReportProviderByID<SampleData>, InstrumentProvider {
+  extends TableInterface, FieldProvider<Field>, ReportProviderByID<SampleData>, InstrumentProvider,
+          BulkReportUpdater<SampleData> {
 
   /** this table name. */
   public final static String TABLE_NAME = "sampledata";

@@ -15,7 +15,7 @@
 
 /*
  * SampleDataT.java
- * Copyright (C) 2008-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2021 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -52,6 +52,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -59,6 +60,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 /**
  * A class for handling the sample data reports table.
@@ -74,6 +76,9 @@ public abstract class SampleDataT
 
   /** the table manager. */
   protected static TableManager<SampleDataT> m_TableManager;
+
+  /** whether to stop the bulk store. */
+  protected boolean m_BulkStoreStopped;
 
   /**
    * Constructor.
@@ -765,6 +770,120 @@ public abstract class SampleDataT
    */
   public static synchronized void initTable(AbstractDatabaseConnection dbcon) {
     getSingleton(dbcon).init();
+  }
+
+  /**
+   * Stores the records. Removes any previously existing reference values.
+   *
+   * @param records	the report
+   * @param types	the data types to import
+   * @param skipFields 	the fields to skip (regular expression), null to accept all
+   * @param batchSize   the maximum number of records in one batch
+   * @return		true if successfully inserted/updated
+   */
+  @Override
+  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize) {
+    boolean		result;
+    PreparedStatement	delete;
+    PreparedStatement	insert;
+    boolean		committed;
+    int			i;
+    int			n;
+    Set<DataType>	typesSet;
+    Pattern		skipPattern;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
+
+    m_BulkStoreStopped = false;
+
+    try {
+      delete = prepareStatement("DELETE FROM " + getTableName() + " WHERE ID = ? AND NAME = ?");
+      insert = prepareStatement("INSERT INTO " + getTableName() + "(ID, NAME, TYPE, VALUE)  VALUES(?, ?, ?, ?)");
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to prepare statements!", e);
+      return false;
+    }
+
+    result    = true;
+    n         = 0;
+    committed = true;
+    typesSet  = new HashSet<>(Arrays.asList(types));
+    if (skipFields != null)
+      skipPattern = Pattern.compile(skipFields);
+    else
+      skipPattern = null;
+    for (i = 0; i < records.length; i++) {
+      for (AbstractField field: records[i].getFields()) {
+        // stopped?
+        if (m_BulkStoreStopped)
+          break;
+
+        // not accepted type?
+	if (!typesSet.contains(field.getDataType()))
+	  continue;
+
+        // skip fields
+	if (skipPattern.matcher(field.getName()).matches())
+	  continue;
+
+        try {
+	  // delete
+	  delete.setString(1, records[i].getID());
+	  delete.setString(2, field.getName());
+	  delete.addBatch();
+
+	  // insert
+	  insert.setString(1, records[i].getID());
+	  insert.setString(2, field.getName());
+	  insert.setString(3, field.getDataType().toDisplay());
+	  insert.setString(4, "" + records[i].getValue(field));
+	  insert.addBatch();
+
+	  n++;
+	  committed = false;
+	  if (n % batchSize == 0) {
+	    if (isLoggingEnabled())
+	      getLogger().info(LoggingHelper.getMethodName() + ": committing batches, # records so far: " + n);
+	    delete.executeBatch();
+	    insert.executeBatch();
+	    delete.clearBatch();
+	    insert.clearBatch();
+	    committed = true;
+	  }
+	}
+        catch (Exception e) {
+          result = false;
+          break;
+	}
+      }
+    }
+
+    try {
+      if (!committed) {
+	delete.executeBatch();
+	insert.executeBatch();
+      }
+      delete.clearBatch();
+      insert.clearBatch();
+    }
+    catch (Exception e) {
+      // ignored
+    }
+
+    SQLUtils.close(delete);
+    SQLUtils.close(insert);
+
+    return result && !m_BulkStoreStopped;
+  }
+
+  /**
+   * Interrupts a currently running bulk store, if possible.
+   */
+  @Override
+  public void stopBulkStore() {
+    m_BulkStoreStopped = true;
   }
 
   /**
