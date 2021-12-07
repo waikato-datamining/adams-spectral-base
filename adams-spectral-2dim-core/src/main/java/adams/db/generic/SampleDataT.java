@@ -825,7 +825,7 @@ public abstract class SampleDataT
 	  continue;
 
         // skip fields
-	if (skipPattern.matcher(field.getName()).matches())
+	if ((skipPattern != null) && skipPattern.matcher(field.getName()).matches())
 	  continue;
 
         try {
