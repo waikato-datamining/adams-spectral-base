@@ -15,7 +15,7 @@
 
 /*
  * ThreeWayDataPanel.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2022 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.threewaydata.heatmapviewer;
 
@@ -189,6 +189,7 @@ public class ThreeWayDataHeatmapPanel
     painter = new RectanglePainter();
     painter.setColor(Color.RED);
     m_DataImage = new ImagePanel();
+    m_DataImage.getUndo().setEnabled(false);
     m_DataImage.setSelectionEnabled(true);
     m_DataImage.setSelectionShapePainter(painter);
     m_SplitPaneRight.setLeftComponent(m_DataImage);
