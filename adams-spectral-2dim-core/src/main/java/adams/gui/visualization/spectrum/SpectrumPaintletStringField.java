@@ -15,7 +15,7 @@
 
 /*
  * SpectrumPaintletNumericField.java
- * Copyright (C) 2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2021-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.spectrum;
@@ -24,6 +24,7 @@ import adams.core.base.BaseRegExp;
 import adams.data.report.Field;
 import adams.data.report.Report;
 import adams.gui.visualization.core.ColorProvider;
+import adams.gui.visualization.core.ColorProviderHandler;
 import adams.gui.visualization.core.DefaultColorProvider;
 
 import java.awt.Color;
@@ -42,7 +43,8 @@ import java.util.Set;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SpectrumPaintletStringField
-  extends SpectrumPaintlet {
+  extends SpectrumPaintlet
+  implements ColorProviderHandler {
 
   private static final long serialVersionUID = -8532199500169281341L;
 

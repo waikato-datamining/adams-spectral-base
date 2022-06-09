@@ -15,7 +15,7 @@
 
 /*
  * SpectrumDisplay.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2022 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -29,6 +29,7 @@ import adams.flow.sink.spectrumdisplay.AbstractPlotUpdater;
 import adams.flow.sink.spectrumdisplay.SimplePlotUpdater;
 import adams.gui.core.BasePanel;
 import adams.gui.visualization.core.ColorProvider;
+import adams.gui.visualization.core.ColorProviderHandler;
 import adams.gui.visualization.core.DefaultColorProvider;
 import adams.gui.visualization.spectrum.AbstractSpectrumPaintlet;
 import adams.gui.visualization.spectrum.SpectrumContainer;
@@ -160,11 +161,10 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2245 $
  */
 public class SpectrumDisplay
   extends AbstractGraphicalDisplay
-  implements DisplayPanelProvider, DataPlotUpdaterHandler<AbstractPlotUpdater> {
+  implements DisplayPanelProvider, DataPlotUpdaterHandler<AbstractPlotUpdater>, ColorProviderHandler {
 
   /**
    * Panel to be used in {@link DisplayPanelManager} sink.
