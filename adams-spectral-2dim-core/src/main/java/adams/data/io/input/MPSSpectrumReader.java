@@ -15,7 +15,7 @@
 
 /*
  * MPSSpectrumReader.java
- * Copyright (C) 2017-2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -24,6 +24,7 @@ import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
+import adams.data.DateFormatString;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
@@ -78,12 +79,18 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
+ * <pre>-date-format &lt;adams.data.DateFormatString&gt; (property: dateFormat)
+ * &nbsp;&nbsp;&nbsp;The format to use for parsing the 'TimeMeasured' date.
+ * &nbsp;&nbsp;&nbsp;default: dd-MMM-yyyy HH:mm:ss
+ * &nbsp;&nbsp;&nbsp;more: https:&#47;&#47;docs.oracle.com&#47;javase&#47;8&#47;docs&#47;api&#47;java&#47;text&#47;SimpleDateFormat.html
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class MPSSpectrumReader
-  extends AbstractSpectrumReader {
+    extends AbstractSpectrumReader {
 
   private static final long serialVersionUID = -5193326571132442647L;
 
@@ -100,6 +107,9 @@ public class MPSSpectrumReader
 
   public static final String DATEFORMAT_TIME_MEASURED = "dd-MMM-yyyy HH:mm:ss";
 
+  /** the format to use for parsing the date in the file. */
+  protected DateFormatString m_DateFormat;
+
   /**
    * Returns a string describing the object.
    *
@@ -108,6 +118,47 @@ public class MPSSpectrumReader
   @Override
   public String globalInfo() {
     return "Reads XRF spectra in MPS format.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  @Override
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+        "date-format", "dateFormat",
+        new DateFormatString(DATEFORMAT_TIME_MEASURED));
+  }
+
+  /**
+   * Sets the date format for parsing the {@link #KEY_TIME_MEASURED} field.
+   *
+   * @param value	the format
+   */
+  public void setDateFormat(DateFormatString value) {
+    m_DateFormat = value;
+    reset();
+  }
+
+  /**
+   * Returns the date format for parsing the {@link #KEY_TIME_MEASURED} field.
+   *
+   * @return		the format
+   */
+  public DateFormatString getDateFormat() {
+    return m_DateFormat;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String dateFormatTipText() {
+    return "The format to use for parsing the '" + KEY_TIME_MEASURED + "' date.";
   }
 
   /**
@@ -149,7 +200,7 @@ public class MPSSpectrumReader
     int			index;
 
     lines   = FileUtils.loadFromFile(m_Input);
-    dfMPS   = new DateFormat(DATEFORMAT_TIME_MEASURED);
+    dfMPS   = m_DateFormat.toDateFormat();
     df      = DateUtils.getTimestampFormatter();
     sp      = new Spectrum();
     sd      = new SampleData();
@@ -165,32 +216,32 @@ public class MPSSpectrumReader
       if (line.contains(SEPARATOR)) {
         parts = line.split(SEPARATOR);
         for (i = 0; i < parts.length; i++)
-	  parts[i] = parts[i].trim();
+          parts[i] = parts[i].trim();
         if (parts.length == 2) {
           if (parts[0].startsWith(KEY_SAMPLE_IDENT)) {
             sp.setID(parts[1]);
-	  }
-	  else if (parts[0].startsWith(KEY_TIME_MEASURED)) {
+          }
+          else if (parts[0].startsWith(KEY_TIME_MEASURED)) {
             field = new Field(SampleData.INSERT_TIMESTAMP, DataType.STRING);
             sd.addField(field);
             try {
-	      sd.setValue(field, df.format(dfMPS.parse(parts[1])));
-	    }
-	    catch (Exception e) {
+              sd.setValue(field, df.format(dfMPS.parse(parts[1])));
+            }
+            catch (Exception e) {
               getLogger().warning("Unparseable date: " + parts[1]);
-	      sd.setValue(field, parts[1]);
-	    }
+              sd.setValue(field, parts[1]);
+            }
             field = new Field(parts[0], DataType.STRING);
             sd.addField(field);
             try {
-	      sd.setValue(field, df.format(dfMPS.parse(parts[1])));
-	    }
-	    catch (Exception e) {
+              sd.setValue(field, df.format(dfMPS.parse(parts[1])));
+            }
+            catch (Exception e) {
               getLogger().warning("Unparseable date: " + parts[1]);
-	      sd.setValue(field, parts[1]);
-	    }
-	  }
-	  else {
+              sd.setValue(field, parts[1]);
+            }
+          }
+          else {
             if (Utils.isDouble(parts[1])) {
               field = new Field(parts[0], DataType.NUMERIC);
               sd.addField(field);
@@ -199,20 +250,20 @@ public class MPSSpectrumReader
                 zeroFit = Double.parseDouble(parts[1]);
               else if (parts[0].startsWith(KEY_GAIN_FIT))
                 gainFit = Double.parseDouble(parts[1]);
-	    }
-	    else {
+            }
+            else {
               field = new Field(parts[0], DataType.STRING);
               sd.addField(field);
               sd.setValue(field, parts[1]);
-	    }
-	  }
-	}
+            }
+          }
+        }
       }
       else {
         sp.add(
-          new SpectrumPoint(
-            (float) (zeroFit + index * gainFit),
-	    Float.parseFloat(line)));
+            new SpectrumPoint(
+                (float) (zeroFit + index * gainFit),
+                Float.parseFloat(line)));
         index++;
       }
     }
