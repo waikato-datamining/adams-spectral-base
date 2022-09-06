@@ -48,6 +48,7 @@ import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTabbedPane;
 import adams.gui.core.BaseTable;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.core.MenuBarProvider;
 import adams.gui.core.RecentFilesHandlerWithCommandline;
 import adams.gui.core.RecentFilesHandlerWithCommandline.Setup;
@@ -687,7 +688,7 @@ public class SpectrumExplorer
       menu.add(menuitem);
       menuitem.setMnemonic('C');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed N"));
-      menuitem.setIcon(GUIHelper.getIcon("new.gif"));
+      menuitem.setIcon(ImageManager.getIcon("new.gif"));
       menuitem.addActionListener(e -> clearData());
       m_MenuItemClearData = menuitem;
 
@@ -698,7 +699,7 @@ public class SpectrumExplorer
       menu.add(menuitem);
       menuitem.setMnemonic('D');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed D"));
-      menuitem.setIcon(GUIHelper.getIcon("database.gif"));
+      menuitem.setIcon(ImageManager.getIcon("database.gif"));
       menuitem.addActionListener(e ->loadData());
 
       // File/Open
@@ -706,7 +707,7 @@ public class SpectrumExplorer
       menu.add(menuitem);
       menuitem.setMnemonic('O');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
-      menuitem.setIcon(GUIHelper.getIcon("open.gif"));
+      menuitem.setIcon(ImageManager.getIcon("open.gif"));
       menuitem.addActionListener(e -> loadDataFromDisk());
 
       // File/Recent files
@@ -738,7 +739,7 @@ public class SpectrumExplorer
       menu.add(menuitem);
       menuitem.setMnemonic('C');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
-      menuitem.setIcon(GUIHelper.getIcon("exit.png"));
+      menuitem.setIcon(ImageManager.getIcon("exit.png"));
       menuitem.addActionListener(e -> close());
 
       // Edit
@@ -752,7 +753,7 @@ public class SpectrumExplorer
       menu.add(menuitem);
       menuitem.setMnemonic('n');
       menuitem.setSelected(m_Undo.isEnabled());
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(e -> {
         if (m_MenuItemEnableUndo.isSelected())
           getScriptingEngine().add(this, EnableUndo.ACTION);
@@ -767,7 +768,7 @@ public class SpectrumExplorer
       menuitem.setMnemonic('U');
       menuitem.setEnabled(m_Undo.canUndo());
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Z"));
-      menuitem.setIcon(GUIHelper.getIcon("undo.gif"));
+      menuitem.setIcon(ImageManager.getIcon("undo.gif"));
       menuitem.addActionListener(e ->undo());
       m_MenuItemUndo = menuitem;
 
@@ -776,7 +777,7 @@ public class SpectrumExplorer
       menuitem.setMnemonic('R');
       menuitem.setEnabled(m_Undo.canUndo());
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Y"));
-      menuitem.setIcon(GUIHelper.getIcon("redo.gif"));
+      menuitem.setIcon(ImageManager.getIcon("redo.gif"));
       menuitem.addActionListener(e ->redo());
       m_MenuItemRedo = menuitem;
 
@@ -791,7 +792,7 @@ public class SpectrumExplorer
       menu.add(menuitem);
       menuitem.setMnemonic('F');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed F"));
-      menuitem.setIcon(GUIHelper.getIcon("run.gif"));
+      menuitem.setIcon(ImageManager.getIcon("run.gif"));
       menuitem.addActionListener(e -> filter());
       m_MenuItemProcessFilter = menuitem;
 
@@ -799,7 +800,7 @@ public class SpectrumExplorer
       menuitem = new JMenuItem("ICA...");
       menu.add(menuitem);
       menuitem.setMnemonic('I');
-      menuitem.setIcon(GUIHelper.getIcon("scatterplot.gif"));
+      menuitem.setIcon(ImageManager.getIcon("scatterplot.gif"));
       menuitem.addActionListener(e -> ica());
       m_MenuItemProcessICA = menuitem;
 
@@ -807,7 +808,7 @@ public class SpectrumExplorer
       menuitem = new JMenuItem("PCA...");
       menu.add(menuitem);
       menuitem.setMnemonic('P');
-      menuitem.setIcon(GUIHelper.getIcon("scatterplot.gif"));
+      menuitem.setIcon(ImageManager.getIcon("scatterplot.gif"));
       menuitem.addActionListener(e -> pca());
       m_MenuItemProcessPCA = menuitem;
 
@@ -815,7 +816,7 @@ public class SpectrumExplorer
       menuitem = new JMenuItem("PLS...");
       menu.add(menuitem);
       menuitem.setMnemonic('L');
-      menuitem.setIcon(GUIHelper.getIcon("scatterplot.gif"));
+      menuitem.setIcon(ImageManager.getIcon("scatterplot.gif"));
       menuitem.addActionListener(e -> pls());
       m_MenuItemProcessPLS = menuitem;
 
@@ -830,7 +831,7 @@ public class SpectrumExplorer
       menuitem = new JMenuItem("Stop execution");
       menu.add(menuitem);
       menuitem.setMnemonic('x');
-      menuitem.setIcon(GUIHelper.getIcon("stop.gif"));
+      menuitem.setIcon(ImageManager.getIcon("stop.gif"));
       menuitem.addActionListener(e -> getScriptingEngine().stop());
       m_MenuItemStopExecution = menuitem;
 
@@ -841,14 +842,14 @@ public class SpectrumExplorer
       menu.add(menuitem);
       menuitem.setMnemonic('m');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed M"));
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(e -> manageScripts());
 
       // Scripts/Start recording
       menuitem = new JMenuItem("Start recording");
       menu.add(menuitem);
       menuitem.setMnemonic('S');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(e -> startRecording());
       m_MenuItemStartRecording = menuitem;
 
@@ -856,7 +857,7 @@ public class SpectrumExplorer
       menuitem = new JMenuItem("Stop recording");
       menu.add(menuitem);
       menuitem.setMnemonic('t');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(e -> stopRecording());
       m_MenuItemStopRecording = menuitem;
 
@@ -933,7 +934,7 @@ public class SpectrumExplorer
       // Window/New window
       menuitem = new JMenuItem("New window");
       menu.add(menuitem);
-      menuitem.setIcon(GUIHelper.getIcon("new.gif"));
+      menuitem.setIcon(ImageManager.getIcon("new.gif"));
       menuitem.setMnemonic('N');
       menuitem.addActionListener(e -> newWindow(true));
       m_MenuItemWindowNew = menuitem;
@@ -941,7 +942,7 @@ public class SpectrumExplorer
       // Window/Duplicate window
       menuitem = new JMenuItem("Duplicate window");
       menu.add(menuitem);
-      menuitem.setIcon(GUIHelper.getIcon("copy.gif"));
+      menuitem.setIcon(ImageManager.getIcon("copy.gif"));
       menuitem.setMnemonic('D');
       menuitem.addActionListener(e -> duplicateWindow(true));
       m_MenuItemWindowDuplicate = menuitem;

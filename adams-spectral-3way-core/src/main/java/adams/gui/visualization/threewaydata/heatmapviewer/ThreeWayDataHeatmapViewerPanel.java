@@ -35,6 +35,7 @@ import adams.gui.core.BasePanel;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.CustomColorImageIcon;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.core.MenuBarProvider;
 import adams.gui.core.RecentFilesHandlerWithCommandline;
 import adams.gui.core.RecentFilesHandlerWithCommandline.Setup;
@@ -275,7 +276,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menuitem = new JMenuItem("Open...");
       menu.add(menuitem);
       menuitem.setMnemonic('o');
-      menuitem.setIcon(GUIHelper.getIcon("open.gif"));
+      menuitem.setIcon(ImageManager.getIcon("open.gif"));
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
       menuitem.addActionListener(new ActionListener() {
 	@Override
@@ -306,7 +307,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menu.add(menuitem);
       menuitem.setMnemonic('S');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl shift pressed S"));
-      menuitem.setIcon(GUIHelper.getIcon("save.gif"));
+      menuitem.setIcon(ImageManager.getIcon("save.gif"));
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -321,7 +322,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menu.add(menuitem);
       menuitem.setMnemonic('t');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed W"));
-      menuitem.setIcon(GUIHelper.getIcon("delete.gif"));
+      menuitem.setIcon(ImageManager.getIcon("delete.gif"));
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -335,7 +336,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menu.add(menuitem);
       menuitem.setMnemonic('a');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed N"));
-      menuitem.setIcon(GUIHelper.getIcon("delete_all.gif"));
+      menuitem.setIcon(ImageManager.getIcon("delete_all.gif"));
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -354,7 +355,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menu.add(menuitem);
       menuitem.setMnemonic('C');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
-      menuitem.setIcon(GUIHelper.getIcon("exit.png"));
+      menuitem.setIcon(ImageManager.getIcon("exit.png"));
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -378,7 +379,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menu.add(menuitem);
       menuitem.setMnemonic('F');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed F"));
-      menuitem.setIcon(GUIHelper.getIcon("run.gif"));
+      menuitem.setIcon(ImageManager.getIcon("run.gif"));
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -392,7 +393,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menuitem = new JMenuItem("Filter all...");
       menu.add(menuitem);
       menuitem.setMnemonic('a');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -417,7 +418,7 @@ public class ThreeWayDataHeatmapViewerPanel
       submenu = new JMenu("Zoom");
       menu.add(submenu);
       submenu.setMnemonic('Z');
-      submenu.setIcon(GUIHelper.getIcon("glasses.gif"));
+      submenu.setIcon(ImageManager.getIcon("glasses.gif"));
       submenu.addChangeListener(new ChangeListener() {
 	public void stateChanged(ChangeEvent e) {
 	  updateMenu();
@@ -499,7 +500,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menu.add(menuitem);
       menuitem.setSelected(false);
       menuitem.setMnemonic('A');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       m_MenuItemViewApplyAll = menuitem;
 
       // View/Remove all overlays
@@ -507,7 +508,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menu.add(menuitem);
       menuitem.setSelected(false);
       menuitem.setMnemonic('R');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -527,7 +528,7 @@ public class ThreeWayDataHeatmapViewerPanel
       menu.add(menuitem);
       menuitem.setSelected(false);
       menuitem.setMnemonic('d');
-      menuitem.setIcon(GUIHelper.getEmptyIcon());
+      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent e) {

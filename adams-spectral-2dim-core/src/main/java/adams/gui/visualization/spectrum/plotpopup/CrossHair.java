@@ -21,7 +21,7 @@
 package adams.gui.visualization.spectrum.plotpopup;
 
 import adams.data.spectrum.Spectrum;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.visualization.container.DataContainerPanelWithContainerList;
 import adams.gui.visualization.container.datacontainerpanel.plotpopup.AbstractPlotPopupCustomizer;
 import adams.gui.visualization.spectrum.SpectrumContainer;
@@ -95,7 +95,7 @@ public class CrossHair
       item = new JMenuItem("Enable cross-hairs");
       item.addActionListener((ActionEvent ex) -> sppanel.getCrossHairTracker().setEnabled(true));
     }
-    item.setIcon(GUIHelper.getIcon("crosshair.png"));
+    item.setIcon(ImageManager.getIcon("crosshair.png"));
     menu.add(item);
   }
 }

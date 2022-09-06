@@ -21,7 +21,7 @@
 package adams.gui.visualization.spectrum.plotpopup;
 
 import adams.data.spectrum.Spectrum;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.visualization.container.DataContainerPanelWithContainerList;
 import adams.gui.visualization.container.datacontainerpanel.plotpopup.AbstractPlotPopupCustomizer;
 import adams.gui.visualization.spectrum.SpectrumContainer;
@@ -86,7 +86,7 @@ public class SaveVisible
   public void customize(DataContainerPanelWithContainerList<Spectrum, SpectrumContainerManager, SpectrumContainer> panel, MouseEvent e, JPopupMenu menu) {
     JMenuItem		item;
 
-    item = new JMenuItem("Save visible...", GUIHelper.getIcon("save.gif"));
+    item = new JMenuItem("Save visible...", ImageManager.getIcon("save.gif"));
     item.addActionListener((ActionEvent ae) -> ((SpectrumPanel) panel).saveVisibleSpectra());
     menu.add(item);
   }

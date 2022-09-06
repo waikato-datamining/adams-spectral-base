@@ -25,6 +25,7 @@ import adams.db.DatabaseConnection;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.core.MenuBarProvider;
 import adams.gui.scripting.DeleteData;
 import adams.gui.scripting.ScriptingCommand;
@@ -161,7 +162,7 @@ public class DeleteSpectrumPanel
       menu.add(menuitem);
       menuitem.setMnemonic('C');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
-      menuitem.setIcon(GUIHelper.getIcon("exit.png"));
+      menuitem.setIcon(ImageManager.getIcon("exit.png"));
       menuitem.addActionListener(e -> closeParent());
 
       // update menu

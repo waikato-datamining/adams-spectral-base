@@ -21,7 +21,7 @@
 package adams.gui.visualization.threewaydata.heatmapviewer.multipageaction;
 
 import adams.core.logging.LoggingObject;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.visualization.threewaydata.heatmapviewer.ThreeWayDataHeatmapViewerMultiPagePane;
 
 import javax.swing.Icon;
@@ -66,9 +66,9 @@ public abstract class AbstractMultiPageMenuItem
    */
   protected Icon getIcon() {
     if (getIconName() == null)
-      return GUIHelper.getEmptyIcon();
+      return ImageManager.getEmptyIcon();
     else
-      return GUIHelper.getIcon(getIconName());
+      return ImageManager.getIcon(getIconName());
   }
 
   /**

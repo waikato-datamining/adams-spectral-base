@@ -22,7 +22,7 @@ package adams.gui.visualization.spectrum.plotpopup;
 
 import adams.data.spectrum.Spectrum;
 import adams.data.statistics.InformativeStatistic;
-import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.visualization.container.DataContainerPanelWithContainerList;
 import adams.gui.visualization.container.datacontainerpanel.plotpopup.AbstractPlotPopupCustomizer;
 import adams.gui.visualization.spectrum.SpectrumContainer;
@@ -91,7 +91,7 @@ public class Statistics
     final List<SpectrumContainer> 	visibleConts;
 
     visibleConts = panel.getTableModelContainers(true);
-    item         = new JMenuItem("Statistics", GUIHelper.getIcon("statistics.png"));
+    item         = new JMenuItem("Statistics", ImageManager.getIcon("statistics.png"));
     item.addActionListener((ActionEvent ae) -> {
       List<InformativeStatistic> stats = new ArrayList<>();
       for (SpectrumContainer cont : visibleConts)

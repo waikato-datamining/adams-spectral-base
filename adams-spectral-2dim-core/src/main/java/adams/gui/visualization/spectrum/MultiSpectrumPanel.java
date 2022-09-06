@@ -27,6 +27,7 @@ import adams.data.spectrum.Spectrum;
 import adams.gui.chooser.SpectrumFileChooser;
 import adams.gui.core.BasePanel;
 import adams.gui.core.GUIHelper;
+import adams.gui.core.ImageManager;
 import adams.gui.core.MenuBarProvider;
 import adams.gui.core.MultiPagePane;
 import adams.gui.goe.GenericObjectEditorDialog;
@@ -152,7 +153,7 @@ public class MultiSpectrumPanel
       menu.add(menuitem);
       menuitem.setMnemonic('O');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed O"));
-      menuitem.setIcon(GUIHelper.getIcon("open.gif"));
+      menuitem.setIcon(ImageManager.getIcon("open.gif"));
       menuitem.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 	  load();
@@ -165,7 +166,7 @@ public class MultiSpectrumPanel
       menu.add(menuitem);
       menuitem.setMnemonic('S');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed S"));
-      menuitem.setIcon(GUIHelper.getIcon("save.gif"));
+      menuitem.setIcon(ImageManager.getIcon("save.gif"));
       menuitem.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 	  saveAs();
@@ -179,7 +180,7 @@ public class MultiSpectrumPanel
       menu.add(menuitem);
       menuitem.setMnemonic('C');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed Q"));
-      menuitem.setIcon(GUIHelper.getIcon("exit.png"));
+      menuitem.setIcon(ImageManager.getIcon("exit.png"));
       menuitem.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 	  closeWindow();
@@ -202,7 +203,7 @@ public class MultiSpectrumPanel
       menu.add(menuitem);
       menuitem.setMnemonic('N');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed N"));
-      menuitem.setIcon(GUIHelper.getIcon("new.gif"));
+      menuitem.setIcon(ImageManager.getIcon("new.gif"));
       menuitem.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 	  newTab();
@@ -215,7 +216,7 @@ public class MultiSpectrumPanel
       menu.add(menuitem);
       menuitem.setMnemonic('C');
       menuitem.setAccelerator(GUIHelper.getKeyStroke("ctrl pressed W"));
-      menuitem.setIcon(GUIHelper.getIcon("delete.gif"));
+      menuitem.setIcon(ImageManager.getIcon("delete.gif"));
       menuitem.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 	  closeTab();
