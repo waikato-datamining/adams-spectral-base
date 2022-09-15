@@ -15,7 +15,7 @@
 
 /*
  * SampleDataT.java
- * Copyright (C) 2019-2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.db.mirrored;
@@ -299,13 +299,14 @@ public class SampleDataT
    * @param types	the data types to import
    * @param skipFields 	the fields to skip (regular expression), null to accept all
    * @param batchSize   the maximum number of records in one batch
+   * @param autoCommit  whether to use auto-commit or not (turning off may impact other transactions!)
    * @return		true if successfully inserted/updated
    */
   @Override
-  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize) {
+  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize, boolean autoCommit) {
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName());
-    return m_DB.bulkStore(records, types, skipFields, batchSize);
+    return m_DB.bulkStore(records, types, skipFields, batchSize, autoCommit);
   }
 
   /**

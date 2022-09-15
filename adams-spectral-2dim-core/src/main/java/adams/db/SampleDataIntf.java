@@ -15,7 +15,7 @@
 
 /*
  * SampleDataIntf.java
- * Copyright (C) 2019-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2019-2022 University of Waikato, Hamilton, New Zealand
  *
  */
 

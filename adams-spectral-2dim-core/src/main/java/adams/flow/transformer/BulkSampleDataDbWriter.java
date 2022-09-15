@@ -128,6 +128,9 @@ public class BulkSampleDataDbWriter
   /** the number of records in a batch. */
   protected int m_BatchSize;
 
+  /** whether to use auto-commit. */
+  protected boolean m_AutoCommit;
+
   /** the instance that is currently running a bulk store. */
   protected transient SampleDataF m_SampleDataF;
 
@@ -170,6 +173,10 @@ public class BulkSampleDataDbWriter
     m_OptionManager.add(
 	"batch-size", "batchSize",
 	1000, 1, null);
+
+    m_OptionManager.add(
+        "auto-commit", "autoCommit",
+        true);
   }
 
   /**
@@ -289,6 +296,35 @@ public class BulkSampleDataDbWriter
   }
 
   /**
+   * Sets whether to use auto-commit for bulk transaction. May impact other transactions, therefore use with caution!
+   *
+   * @param value 	true if to use auto-commit
+   */
+  public void setAutoCommit(boolean value) {
+    m_AutoCommit = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use auto-commit for bulk transactions. May impact other transactions, therefore use with caution!
+   *
+   * @return 		true if to use auto-commit
+   */
+  public boolean getAutoCommit() {
+    return m_AutoCommit;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String autoCommitTipText() {
+    return "If disabled, auto-commit gets turned off for the bulk update, which may impact other transactions; use with caution.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -301,6 +337,7 @@ public class BulkSampleDataDbWriter
     if (m_SkipFields)
       result += QuickInfoHelper.toString(this, "skipFieldsRegExp", m_SkipFieldsRegExp, ", skip: ");
     result += QuickInfoHelper.toString(this, "batchSize", m_BatchSize, ", batch size: ");
+    result += QuickInfoHelper.toString(this, "autoCommit", (m_AutoCommit ? "auto-commit ON" : "auto-commit OFF"), ", ");
 
     return result;
   }
@@ -381,7 +418,7 @@ public class BulkSampleDataDbWriter
 
     if (result == null) {
       m_SampleDataF = SampleDataF.getSingleton(m_DatabaseConnection);
-      success       = m_SampleDataF.bulkStore(records, m_DataTypes, (m_SkipFields ? m_SkipFieldsRegExp.getValue() : null), m_BatchSize);
+      success       = m_SampleDataF.bulkStore(records, m_DataTypes, (m_SkipFields ? m_SkipFieldsRegExp.getValue() : null), m_BatchSize, m_AutoCommit);
       m_OutputToken = new Token(success);
     }
 

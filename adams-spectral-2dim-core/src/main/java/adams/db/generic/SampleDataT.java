@@ -779,10 +779,11 @@ public abstract class SampleDataT
    * @param types	the data types to import
    * @param skipFields 	the fields to skip (regular expression), null to accept all
    * @param batchSize   the maximum number of records in one batch
+   * @param autoCommit  whether to use auto-commit or not (turning off may impact other transactions!)
    * @return		true if successfully inserted/updated
    */
   @Override
-  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize) {
+  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize, boolean autoCommit) {
     boolean		result;
     PreparedStatement	delete;
     PreparedStatement	insert;
@@ -796,6 +797,13 @@ public abstract class SampleDataT
       getLogger().info(LoggingHelper.getMethodName());
 
     m_BulkStoreStopped = false;
+
+    try {
+      getDatabaseConnection().getConnection(false).setAutoCommit(false);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.WARNING, "Failed to turn off auto-commit!", e);
+    }
 
     try {
       delete = prepareStatement("DELETE FROM " + getTableName() + " WHERE ID = ? AND NAME = ?");
@@ -848,6 +856,7 @@ public abstract class SampleDataT
 	      getLogger().info(LoggingHelper.getMethodName() + ": committing batches, # records so far: " + n);
 	    delete.executeBatch();
 	    insert.executeBatch();
+	    getDatabaseConnection().getConnection(false).commit();
 	    delete.clearBatch();
 	    insert.clearBatch();
 	    committed = true;
@@ -874,6 +883,13 @@ public abstract class SampleDataT
 
     SQLUtils.close(delete);
     SQLUtils.close(insert);
+
+    try {
+      getDatabaseConnection().getConnection(false).setAutoCommit(true);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.WARNING, "Failed to turn on auto-commit!", e);
+    }
 
     return result && !m_BulkStoreStopped;
   }
