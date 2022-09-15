@@ -105,6 +105,18 @@ import adams.flow.core.Token;
  * &nbsp;&nbsp;&nbsp;minimum: 1
  * </pre>
  *
+ * <pre>-auto-commit &lt;boolean&gt; (property: autoCommit)
+ * &nbsp;&nbsp;&nbsp;If disabled, auto-commit gets turned off for the bulk update, which may
+ * &nbsp;&nbsp;&nbsp;impact other transactions; use with caution.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ *
+ * <pre>-new-connection &lt;boolean&gt; (property: newConnection)
+ * &nbsp;&nbsp;&nbsp;If enabled, a new database connection is opened (and then closed) just for
+ * &nbsp;&nbsp;&nbsp;this operation; use this when turning off auto-commit.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -131,6 +143,9 @@ public class BulkSampleDataDbWriter
   /** whether to use auto-commit. */
   protected boolean m_AutoCommit;
 
+  /** whether to use a new database connection. */
+  protected boolean m_NewConnection;
+
   /** the instance that is currently running a bulk store. */
   protected transient SampleDataF m_SampleDataF;
 
@@ -151,32 +166,36 @@ public class BulkSampleDataDbWriter
     super.defineOptions();
 
     m_OptionManager.add(
-	"data-type", "dataTypes",
-	new adams.data.report.DataType[0]);
+        "data-type", "dataTypes",
+        new adams.data.report.DataType[0]);
 
     m_OptionManager.add(
-	"skip-fields", "skipFields",
-	false);
+        "skip-fields", "skipFields",
+        false);
 
     m_OptionManager.add(
-	"skip-fields-regexp", "skipFieldsRegExp",
-	new BaseRegExp("("
-	    + adams.data.sampledata.SampleData.PROPERTY_PARENTID + "|"
-	    + adams.data.sampledata.SampleData.SAMPLE_ID + "|"
-	    + adams.data.sampledata.SampleData.SAMPLE_TYPE + "|"
-	    + adams.data.sampledata.SampleData.FORMAT + "|"
-	    + adams.data.sampledata.SampleData.INSERT_TIMESTAMP + "|"
-	    + adams.data.sampledata.SampleData.INSTRUMENT + "|"
-	    + adams.data.sampledata.SampleData.SOURCE
-	    + ").*"));
+        "skip-fields-regexp", "skipFieldsRegExp",
+        new BaseRegExp("("
+            + adams.data.sampledata.SampleData.PROPERTY_PARENTID + "|"
+            + adams.data.sampledata.SampleData.SAMPLE_ID + "|"
+            + adams.data.sampledata.SampleData.SAMPLE_TYPE + "|"
+            + adams.data.sampledata.SampleData.FORMAT + "|"
+            + adams.data.sampledata.SampleData.INSERT_TIMESTAMP + "|"
+            + adams.data.sampledata.SampleData.INSTRUMENT + "|"
+            + adams.data.sampledata.SampleData.SOURCE
+            + ").*"));
 
     m_OptionManager.add(
-	"batch-size", "batchSize",
-	1000, 1, null);
+        "batch-size", "batchSize",
+        1000, 1, null);
 
     m_OptionManager.add(
         "auto-commit", "autoCommit",
         true);
+
+    m_OptionManager.add(
+        "new-connection", "newConnection",
+        false);
   }
 
   /**
@@ -325,6 +344,35 @@ public class BulkSampleDataDbWriter
   }
 
   /**
+   * Sets whether to use a new connection for this update. Use when autoCommit is off.
+   *
+   * @param value 	true if to use new connection
+   */
+  public void setNewConnection(boolean value) {
+    m_NewConnection = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to use a new connection for this update. Use when autoCommit is off.
+   *
+   * @return 		true if to use new connection
+   */
+  public boolean getNewConnection() {
+    return m_NewConnection;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String newConnectionTipText() {
+    return "If enabled, a new database connection is opened (and then closed) just for this operation; use this when turning off auto-commit.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -338,6 +386,7 @@ public class BulkSampleDataDbWriter
       result += QuickInfoHelper.toString(this, "skipFieldsRegExp", m_SkipFieldsRegExp, ", skip: ");
     result += QuickInfoHelper.toString(this, "batchSize", m_BatchSize, ", batch size: ");
     result += QuickInfoHelper.toString(this, "autoCommit", (m_AutoCommit ? "auto-commit ON" : "auto-commit OFF"), ", ");
+    result += QuickInfoHelper.toString(this, "newConnection", (m_NewConnection ? "new conn" : "re-use conn"), ", ");
 
     return result;
   }
@@ -360,9 +409,9 @@ public class BulkSampleDataDbWriter
   @Override
   protected AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
-	this,
-	adams.flow.standalone.DatabaseConnectionProvider.class,
-	getDefaultDatabaseConnection());
+        this,
+        adams.flow.standalone.DatabaseConnectionProvider.class,
+        getDefaultDatabaseConnection());
   }
 
   /**
@@ -373,8 +422,8 @@ public class BulkSampleDataDbWriter
   @Override
   public Class[] accepts() {
     return new Class[]{
-	SampleData[].class,
-	Spectrum[].class};
+        SampleData[].class,
+        Spectrum[].class};
   }
 
   /**
@@ -410,7 +459,7 @@ public class BulkSampleDataDbWriter
       spectra = m_InputToken.getPayload(Spectrum[].class);
       records = new SampleData[spectra.length];
       for (i = 0; i < spectra.length; i++)
-	records[i] = spectra[i].getReport();
+        records[i] = spectra[i].getReport();
     }
     else {
       result = m_InputToken.unhandledData();
@@ -418,7 +467,7 @@ public class BulkSampleDataDbWriter
 
     if (result == null) {
       m_SampleDataF = SampleDataF.getSingleton(m_DatabaseConnection);
-      success       = m_SampleDataF.bulkStore(records, m_DataTypes, (m_SkipFields ? m_SkipFieldsRegExp.getValue() : null), m_BatchSize, m_AutoCommit);
+      success       = m_SampleDataF.bulkStore(records, m_DataTypes, (m_SkipFields ? m_SkipFieldsRegExp.getValue() : null), m_BatchSize, m_AutoCommit, m_NewConnection);
       m_OutputToken = new Token(success);
     }
 

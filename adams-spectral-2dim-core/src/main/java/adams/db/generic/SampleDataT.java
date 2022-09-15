@@ -48,6 +48,8 @@ import adams.db.indices.IndexColumn;
 import adams.db.indices.Indices;
 import adams.db.types.ColumnType;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
@@ -780,10 +782,11 @@ public abstract class SampleDataT
    * @param skipFields 	the fields to skip (regular expression), null to accept all
    * @param batchSize   the maximum number of records in one batch
    * @param autoCommit  whether to use auto-commit or not (turning off may impact other transactions!)
+   * @param newConnection	uses a separate database connection just for this connection (then no auto-commit doesn't affect the rest)
    * @return		true if successfully inserted/updated
    */
   @Override
-  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize, boolean autoCommit) {
+  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize, boolean autoCommit, boolean newConnection) {
     boolean		result;
     PreparedStatement	delete;
     PreparedStatement	insert;
@@ -792,17 +795,38 @@ public abstract class SampleDataT
     int			n;
     Set<DataType>	typesSet;
     Pattern		skipPattern;
+    boolean		useSameConnection;
+    Connection		m_Connection;
 
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName());
 
     m_BulkStoreStopped = false;
+    useSameConnection  = true;
 
-    try {
-      getDatabaseConnection().getConnection(false).setAutoCommit(false);
+    if (newConnection) {
+      try {
+	if (getDatabaseConnection().getUser().equals(""))
+	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getUser());
+	else
+	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
+	useSameConnection = false;
+      }
+      catch(Exception e) {
+        getLogger().warning("Failed to open separate connection to " + getDatabaseConnection().getURL() + ", re-using existing one.");
+	useSameConnection = true;
+      }
     }
-    catch (Exception e) {
-      getLogger().log(Level.WARNING, "Failed to turn off auto-commit!", e);
+
+    if (!newConnection || useSameConnection) {
+      if (!autoCommit) {
+	try {
+	  getDatabaseConnection().getConnection(false).setAutoCommit(false);
+	}
+	catch (Exception e) {
+	  getLogger().log(Level.WARNING, "Failed to turn off auto-commit!", e);
+	}
+      }
     }
 
     try {
@@ -884,11 +908,13 @@ public abstract class SampleDataT
     SQLUtils.close(delete);
     SQLUtils.close(insert);
 
-    try {
-      getDatabaseConnection().getConnection(false).setAutoCommit(true);
-    }
-    catch (Exception e) {
-      getLogger().log(Level.WARNING, "Failed to turn on auto-commit!", e);
+    if (!autoCommit) {
+      try {
+	getDatabaseConnection().getConnection(false).setAutoCommit(true);
+      }
+      catch (Exception e) {
+	getLogger().log(Level.WARNING, "Failed to turn on auto-commit!", e);
+      }
     }
 
     return result && !m_BulkStoreStopped;

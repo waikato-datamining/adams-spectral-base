@@ -275,13 +275,14 @@ public class SampleDataF
    * @param skipFields 	the fields to skip (regular expression), null to accept all
    * @param batchSize   the maximum number of records in one batch
    * @param autoCommit  whether to use auto-commit or not (turning off may impact other transactions!)
+   * @param newConnection	uses a separate database connection just for this connection (then no auto-commit doesn't affect the rest)
    * @return		true if successfully inserted/updated
    */
   @Override
-  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize, boolean autoCommit) {
+  public boolean bulkStore(SampleData[] records, DataType[] types, String skipFields, int batchSize, boolean autoCommit, boolean newConnection) {
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName());
-    return m_DB.bulkStore(records, types, skipFields, batchSize, autoCommit);
+    return m_DB.bulkStore(records, types, skipFields, batchSize, autoCommit, newConnection);
   }
 
   /**
