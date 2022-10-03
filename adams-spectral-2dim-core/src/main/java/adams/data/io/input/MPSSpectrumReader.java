@@ -85,6 +85,11 @@ import java.util.List;
  * &nbsp;&nbsp;&nbsp;more: https:&#47;&#47;docs.oracle.com&#47;javase&#47;8&#47;docs&#47;api&#47;java&#47;text&#47;SimpleDateFormat.html
  * </pre>
  *
+ * <pre>-normalize-by-live-time &lt;boolean&gt; (property: normalizeByLiveTime)
+ * &nbsp;&nbsp;&nbsp;Normalizes the amplitudes using the 'LiveTime' value.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -105,10 +110,15 @@ public class MPSSpectrumReader
 
   public static final String KEY_GAIN_FIT = "GainFit";
 
+  public final static String KEY_LIVE_TIME = "LiveTime";
+
   public static final String DATEFORMAT_TIME_MEASURED = "dd-MMM-yyyy HH:mm:ss";
 
   /** the format to use for parsing the date in the file. */
   protected DateFormatString m_DateFormat;
+
+  /** whether to normalize the amplitude by live time. */
+  protected boolean m_NormalizeByLiveTime;
 
   /**
    * Returns a string describing the object.
@@ -128,8 +138,12 @@ public class MPSSpectrumReader
     super.defineOptions();
 
     m_OptionManager.add(
-        "date-format", "dateFormat",
-        new DateFormatString(DATEFORMAT_TIME_MEASURED));
+	"date-format", "dateFormat",
+	new DateFormatString(DATEFORMAT_TIME_MEASURED));
+
+    m_OptionManager.add(
+	"normalize-by-live-time", "normalizeByLiveTime",
+	false);
   }
 
   /**
@@ -159,6 +173,35 @@ public class MPSSpectrumReader
    */
   public String dateFormatTipText() {
     return "The format to use for parsing the '" + KEY_TIME_MEASURED + "' date.";
+  }
+
+  /**
+   * Sets whether to normalize the amplitudes with the {@link #KEY_LIVE_TIME} field.
+   *
+   * @param value	true if to normalize
+   */
+  public void setNormalizeByLiveTime(boolean value) {
+    m_NormalizeByLiveTime = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to normalize the amplitudes with the {@link #KEY_LIVE_TIME} field.
+   *
+   * @return		true if to normalize
+   */
+  public boolean getNormalizeByLiveTime() {
+    return m_NormalizeByLiveTime;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String normalizeByLiveTimeTipText() {
+    return "Normalizes the amplitudes using the '" + KEY_LIVE_TIME + "' value.";
   }
 
   /**
@@ -197,74 +240,78 @@ public class MPSSpectrumReader
     DateFormat		df;
     double		zeroFit;
     double		gainFit;
+    double		liveTime;
     int			index;
 
-    lines   = FileUtils.loadFromFile(m_Input);
-    dfMPS   = m_DateFormat.toDateFormat();
-    df      = DateUtils.getTimestampFormatter();
-    sp      = new Spectrum();
-    sd      = new SampleData();
+    lines    = FileUtils.loadFromFile(m_Input);
+    dfMPS    = m_DateFormat.toDateFormat();
+    df       = DateUtils.getTimestampFormatter();
+    sp       = new Spectrum();
+    sd       = new SampleData();
     sp.setReport(sd);
-    index   = 0;
-    zeroFit = 0.0;
-    gainFit = 0.0;
+    index    = 0;
+    zeroFit  = 0.0;
+    gainFit  = 0.0;
+    liveTime = 1.0;
     for (String line: lines) {
       // empty?
       if (line.trim().isEmpty())
-        continue;
+	continue;
       // meta-data?
       if (line.contains(SEPARATOR)) {
-        parts = line.split(SEPARATOR);
-        for (i = 0; i < parts.length; i++)
-          parts[i] = parts[i].trim();
-        if (parts.length == 2) {
-          if (parts[0].startsWith(KEY_SAMPLE_IDENT)) {
-            sp.setID(parts[1]);
-          }
-          else if (parts[0].startsWith(KEY_TIME_MEASURED)) {
-            field = new Field(SampleData.INSERT_TIMESTAMP, DataType.STRING);
-            sd.addField(field);
-            try {
-              sd.setValue(field, df.format(dfMPS.parse(parts[1])));
-            }
-            catch (Exception e) {
-              getLogger().warning("Unparseable date: " + parts[1]);
-              sd.setValue(field, parts[1]);
-            }
-            field = new Field(parts[0], DataType.STRING);
-            sd.addField(field);
-            try {
-              sd.setValue(field, df.format(dfMPS.parse(parts[1])));
-            }
-            catch (Exception e) {
-              getLogger().warning("Unparseable date: " + parts[1]);
-              sd.setValue(field, parts[1]);
-            }
-          }
-          else {
-            if (Utils.isDouble(parts[1])) {
-              field = new Field(parts[0], DataType.NUMERIC);
-              sd.addField(field);
-              sd.setValue(field, parts[1]);
-              if (parts[0].startsWith(KEY_ZERO_FIT))
-                zeroFit = Double.parseDouble(parts[1]);
-              else if (parts[0].startsWith(KEY_GAIN_FIT))
-                gainFit = Double.parseDouble(parts[1]);
-            }
-            else {
-              field = new Field(parts[0], DataType.STRING);
-              sd.addField(field);
-              sd.setValue(field, parts[1]);
-            }
-          }
-        }
+	parts = line.split(SEPARATOR);
+	for (i = 0; i < parts.length; i++)
+	  parts[i] = parts[i].trim();
+	if (parts.length == 2) {
+	  if (parts[0].startsWith(KEY_SAMPLE_IDENT)) {
+	    sp.setID(parts[1]);
+	  }
+	  else if (parts[0].startsWith(KEY_TIME_MEASURED)) {
+	    field = new Field(SampleData.INSERT_TIMESTAMP, DataType.STRING);
+	    sd.addField(field);
+	    try {
+	      sd.setValue(field, df.format(dfMPS.parse(parts[1])));
+	    }
+	    catch (Exception e) {
+	      getLogger().warning("Unparseable date: " + parts[1]);
+	      sd.setValue(field, parts[1]);
+	    }
+	    field = new Field(parts[0], DataType.STRING);
+	    sd.addField(field);
+	    try {
+	      sd.setValue(field, df.format(dfMPS.parse(parts[1])));
+	    }
+	    catch (Exception e) {
+	      getLogger().warning("Unparseable date: " + parts[1]);
+	      sd.setValue(field, parts[1]);
+	    }
+	  }
+	  else {
+	    if (Utils.isDouble(parts[1])) {
+	      field = new Field(parts[0], DataType.NUMERIC);
+	      sd.addField(field);
+	      sd.setValue(field, parts[1]);
+	      if (parts[0].startsWith(KEY_ZERO_FIT))
+		zeroFit = Double.parseDouble(parts[1]);
+	      else if (parts[0].startsWith(KEY_GAIN_FIT))
+		gainFit = Double.parseDouble(parts[1]);
+	      else if (parts[0].startsWith(KEY_LIVE_TIME) && m_NormalizeByLiveTime)
+		liveTime = Double.parseDouble(parts[1]);
+	    }
+	    else {
+	      field = new Field(parts[0], DataType.STRING);
+	      sd.addField(field);
+	      sd.setValue(field, parts[1]);
+	    }
+	  }
+	}
       }
       else {
-        sp.add(
-            new SpectrumPoint(
-                (float) (zeroFit + index * gainFit),
-                Float.parseFloat(line)));
-        index++;
+	sp.add(
+	    new SpectrumPoint(
+		(float) (zeroFit + index * gainFit),
+		(float) (Double.parseDouble(line) / liveTime)));
+	index++;
       }
     }
 
