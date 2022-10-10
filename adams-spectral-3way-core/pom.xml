@@ -93,13 +93,13 @@
     <dependency>
       <groupId>nz.ac.waikato.cms.adams</groupId>
       <artifactId>multiway-algorithms</artifactId>
-      <version>0.0.11</version>
+      <version>0.0.13</version>
     </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.0</version>
+      <version>1.18.24</version>
       <scope>provided</scope>
     </dependency>
 
