@@ -79,7 +79,7 @@ public class ThreeWayDataHeatmapViewerMultiPagePane
     classes     = ClassLister.getSingleton().getClasses(AbstractMultiPageMenuItem.class);
     for (Class cls: classes) {
       try {
-        m_MenuItems.add((AbstractMultiPageMenuItem) cls.newInstance());
+        m_MenuItems.add((AbstractMultiPageMenuItem) cls.getDeclaredConstructor().newInstance());
       }
       catch (Exception e) {
         ConsolePanel.getSingleton().append(
