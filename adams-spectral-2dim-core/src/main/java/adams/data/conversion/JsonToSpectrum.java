@@ -15,7 +15,7 @@
 
 /*
  * JsonToSpectrum.java
- * Copyright (C) 2018-2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.conversion;
@@ -130,8 +130,7 @@ public class JsonToSpectrum
     breader = null;
     try {
       breader = new BufferedReader(new StringReader(input));
-      jp = new JsonParser();
-      je = jp.parse(breader);
+      je = JsonParser.parseReader(breader);
       result = SpectrumJsonUtils.fromJson(je.getAsJsonObject());
     }
     catch (Exception e) {

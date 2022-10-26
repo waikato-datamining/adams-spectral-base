@@ -15,7 +15,7 @@
 
 /*
  * JsonSpectrumReader.java
- * Copyright (C) 2016-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2022 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -162,7 +162,6 @@ public class JsonSpectrumReader
     Spectrum		spec;
     FileReader		freader;
     BufferedReader	breader;
-    JsonParser 		jp;
     JsonElement		je;
     JsonObject		jobj;
     JsonArray		array;
@@ -173,8 +172,7 @@ public class JsonSpectrumReader
     try {
       freader = new FileReader(m_Input.getAbsolutePath());
       breader = new BufferedReader(freader);
-      jp = new JsonParser();
-      je = jp.parse(breader);
+      je = JsonParser.parseReader(breader);
 
       jobj = je.getAsJsonObject();
       if (jobj.has("spectra")) {
