@@ -15,7 +15,7 @@
 
 /*
  * SpectrumExplorer.java
- * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2022 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -1168,6 +1168,7 @@ public class SpectrumExplorer
       else
 	m_DialogICA = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogICA.setTitle("ICA");
+      m_DialogICA.setUISettingsPrefix(FastICA.class);
       m_DialogICA.getGOEEditor().setCanChangeClassInDialog(false);
       m_DialogICA.getGOEEditor().setClassType(FastICA.class);
       m_DialogICA.setCurrent(m_CurrentICA);
@@ -1244,6 +1245,7 @@ public class SpectrumExplorer
       else
 	m_DialogPCA = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogPCA.setTitle("PCA");
+      m_DialogPCA.setUISettingsPrefix(PCA.class);
       m_DialogPCA.getGOEEditor().setCanChangeClassInDialog(false);
       m_DialogPCA.getGOEEditor().setClassType(PCA.class);
       m_DialogPCA.setCurrent(m_CurrentPCA);
@@ -1320,6 +1322,7 @@ public class SpectrumExplorer
       else
 	m_DialogPLS = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogPLS.setTitle("PLS");
+      m_DialogPLS.setUISettingsPrefix(PLS.class);
       m_DialogPLS.getGOEEditor().setCanChangeClassInDialog(false);
       m_DialogPLS.getGOEEditor().setClassType(PLS.class);
       m_DialogPLS.setCurrent(m_CurrentPLS);
@@ -1412,6 +1415,7 @@ public class SpectrumExplorer
       else
 	m_DialogColorProvider = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogColorProvider.setTitle("Select color provider");
+      m_DialogColorProvider.setUISettingsPrefix(ColorProvider.class);
       m_DialogColorProvider.getGOEEditor().setClassType(ColorProvider.class);
       m_DialogColorProvider.getGOEEditor().setCanChangeClassInDialog(true);
     }
@@ -1437,6 +1441,7 @@ public class SpectrumExplorer
       else
 	m_DialogPaintlet = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogPaintlet.setTitle("Select paintlet");
+      m_DialogPaintlet.setUISettingsPrefix(AbstractSpectrumPaintlet.class);
       m_DialogPaintlet.getGOEEditor().setClassType(AbstractSpectrumPaintlet.class);
       m_DialogPaintlet.getGOEEditor().setCanChangeClassInDialog(true);
     }

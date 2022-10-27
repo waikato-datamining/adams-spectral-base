@@ -15,7 +15,7 @@
 
 /*
  * DatabaseSearchPanel.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.tools.idprovider;
@@ -286,6 +286,7 @@ public class DatabaseSearchPanel
     else
       dialog = new GenericObjectEditorDialog(getParentFrame(), true);
     dialog.setTitle("Sample data conditions");
+    dialog.setUISettingsPrefix(AbstractSpectrumConditions.class);
     dialog.getGOEEditor().setCanChangeClassInDialog(false);
     dialog.getGOEEditor().setClassType(AbstractSpectrumConditions.class);
     dialog.setCurrent(m_Conditions);
