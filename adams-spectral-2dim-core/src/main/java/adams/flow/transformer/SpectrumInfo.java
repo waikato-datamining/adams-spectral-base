@@ -15,15 +15,15 @@
 
 /*
  * SpectrumInfo.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-20222 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
+import adams.data.spectrum.Spectrum;
 import adams.flow.core.DataInfoActor;
 import adams.flow.core.Token;
-import adams.data.spectrum.Spectrum;
 
 import java.util.ArrayList;
 
@@ -78,7 +78,6 @@ import java.util.ArrayList;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SpectrumInfo
   extends AbstractTransformer
@@ -253,19 +252,19 @@ public class SpectrumInfo
 	break;
 
       case MIN_WAVE:
-	m_Queue.add(new Double(sp.getMinWaveNumber().getWaveNumber()));
+	m_Queue.add((double) sp.getMinWaveNumber().getWaveNumber());
 	break;
 
       case MAX_WAVE:
-	m_Queue.add(new Double(sp.getMaxWaveNumber().getWaveNumber()));
+	m_Queue.add((double) sp.getMaxWaveNumber().getWaveNumber());
 	break;
 
       case MIN_AMPLITUDE:
-	m_Queue.add(new Double(sp.getMinAmplitude().getAmplitude()));
+	m_Queue.add((double) sp.getMinAmplitude().getAmplitude());
 	break;
 
       case MAX_AMPLITUDE:
-	m_Queue.add(new Double(sp.getMaxAmplitude().getAmplitude()));
+	m_Queue.add((double) sp.getMaxAmplitude().getAmplitude());
 	break;
 
       default:
