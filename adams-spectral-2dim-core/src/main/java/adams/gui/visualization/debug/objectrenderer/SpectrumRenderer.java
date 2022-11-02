@@ -15,7 +15,7 @@
 
 /*
  * SpectrumRenderer.java
- * Copyright (C) 2015-2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.debug.objectrenderer;
@@ -68,10 +68,11 @@ public class SpectrumRenderer
    *
    * @param obj		the object to render
    * @param panel	the panel to render into
+   * @param limit       the limit to use for the rendering (if applicable), ignored if null
    * @return		null if successful, otherwise error message
    */
   @Override
-  protected String doRenderCached(Object obj, JPanel panel) {
+  protected String doRenderCached(Object obj, JPanel panel, Integer limit) {
     m_LastSpectrumPanel.display((Spectrum) obj);
     panel.add(m_LastSpectrumPanel, BorderLayout.CENTER);
     return null;
@@ -82,10 +83,11 @@ public class SpectrumRenderer
    *
    * @param obj		the object to render
    * @param panel	the panel to render into
+   * @param limit       the limit to use for the rendering (if applicable), ignored if null
    * @return		null if successful, otherwise error message
    */
   @Override
-  protected String doRender(Object obj, JPanel panel) {
+  protected String doRender(Object obj, JPanel panel, Integer limit) {
     Spectrum 			data;
     SpectrumPanelWithSampleData spPanel;
 
