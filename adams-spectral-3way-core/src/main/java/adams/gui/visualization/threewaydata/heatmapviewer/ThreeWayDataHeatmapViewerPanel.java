@@ -52,7 +52,7 @@ import adams.gui.plugin.ToolPluginSupporter;
 import adams.gui.sendto.SendToActionSupporter;
 import adams.gui.sendto.SendToActionUtils;
 import adams.gui.visualization.container.FilterDialog;
-import adams.gui.visualization.core.AbstractColorGradientGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 import adams.gui.visualization.heatmap.overlay.Centroid;
 import adams.gui.visualization.heatmap.selection.AbstractSelectionProcessor;
 import adams.gui.visualization.heatmap.selection.NullProcessor;
@@ -944,8 +944,8 @@ public class ThreeWayDataHeatmapViewerPanel
       else
 	m_DialogColorGenerator = new GenericObjectEditorDialog(getParentFrame(), true);
       m_DialogColorGenerator.setTitle("Select color generator");
-      m_DialogColorGenerator.setUISettingsPrefix(AbstractColorGradientGenerator.class);
-      m_DialogColorGenerator.getGOEEditor().setClassType(AbstractColorGradientGenerator.class);
+      m_DialogColorGenerator.setUISettingsPrefix(ColorGradientGenerator.class);
+      m_DialogColorGenerator.getGOEEditor().setClassType(ColorGradientGenerator.class);
       m_DialogColorGenerator.getGOEEditor().setCanChangeClassInDialog(true);
       m_DialogColorGenerator.setLocationRelativeTo(this);
     }
@@ -954,7 +954,7 @@ public class ThreeWayDataHeatmapViewerPanel
     m_DialogColorGenerator.setVisible(true);
     if (m_DialogColorGenerator.getResult() != GenericObjectEditorDialog.APPROVE_OPTION)
       return;
-    getCurrentPanel().setColorGenerator(((AbstractColorGradientGenerator) m_DialogColorGenerator.getCurrent()).shallowCopy());
+    getCurrentPanel().setColorGenerator(((ColorGradientGenerator) m_DialogColorGenerator.getCurrent()).shallowCopy());
   }
 
   /**

@@ -15,15 +15,15 @@
 
 /*
  * SpectrumPaintletNumericField.java
- * Copyright (C) 2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2021-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.visualization.spectrum;
 
 import adams.data.report.Field;
 import adams.data.report.Report;
-import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 
 import java.awt.Color;
 
@@ -42,7 +42,7 @@ public class SpectrumPaintletNumericField
   protected Field m_Field;
 
   /** the color gradient generator to use. */
-  protected AbstractColorGradientGenerator m_Generator;
+  protected ColorGradientGenerator m_Generator;
 
   /** the default color if field is missing. */
   protected Color m_DefaultColor;
@@ -125,7 +125,7 @@ public class SpectrumPaintletNumericField
    *
    * @param value	the generator
    */
-  public void setGenerator(AbstractColorGradientGenerator value) {
+  public void setGenerator(ColorGradientGenerator value) {
     m_Generator = value;
     memberChanged();
   }
@@ -135,7 +135,7 @@ public class SpectrumPaintletNumericField
    *
    * @return		the generator
    */
-  public AbstractColorGradientGenerator getGenerator() {
+  public ColorGradientGenerator getGenerator() {
     return m_Generator;
   }
 

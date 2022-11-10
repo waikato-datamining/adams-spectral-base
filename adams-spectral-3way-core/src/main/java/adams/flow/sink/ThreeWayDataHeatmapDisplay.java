@@ -15,7 +15,7 @@
 
 /*
  * ThreeWayDataHeatmapDisplay.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2022 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -25,7 +25,7 @@ import adams.core.option.OptionUtils;
 import adams.data.threeway.ThreeWayData;
 import adams.flow.core.Token;
 import adams.gui.core.BasePanel;
-import adams.gui.visualization.core.AbstractColorGradientGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 import adams.gui.visualization.core.MultiColorGenerator;
 import adams.gui.visualization.threewaydata.heatmapviewer.ThreeWayDataHeatmapPanel;
 import adams.gui.visualization.threewaydata.heatmapviewer.overlay.AbstractThreeWayDataOverlay;
@@ -125,7 +125,7 @@ import java.awt.Color;
  * &nbsp;&nbsp;&nbsp;default: adams.gui.print.NullWriter
  * </pre>
  *
- * <pre>-color-generator &lt;adams.gui.visualization.core.AbstractColorGradientGenerator&gt; (property: colorGenerator)
+ * <pre>-color-generator &lt;adams.gui.visualization.core.ColorGradientGenerator&gt; (property: colorGenerator)
  * &nbsp;&nbsp;&nbsp;The generator for the color gradient.
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.MultiColorGenerator
  * </pre>
@@ -164,7 +164,7 @@ public class ThreeWayDataHeatmapDisplay
   private static final long serialVersionUID = -5963541661512220421L;
 
   /** the generator for the color gradient. */
-  protected AbstractColorGradientGenerator m_ColorGenerator;
+  protected ColorGradientGenerator m_ColorGenerator;
 
   /** the overlays to use. */
   protected AbstractThreeWayDataOverlay[] m_Overlays;
@@ -241,7 +241,7 @@ public class ThreeWayDataHeatmapDisplay
    *
    * @param value 	the generator
    */
-  public void setColorGenerator(AbstractColorGradientGenerator value) {
+  public void setColorGenerator(ColorGradientGenerator value) {
     m_ColorGenerator = value;
     reset();
   }
@@ -251,7 +251,7 @@ public class ThreeWayDataHeatmapDisplay
    *
    * @return 		the generator
    */
-  public AbstractColorGradientGenerator getColorGenerator() {
+  public ColorGradientGenerator getColorGenerator() {
     return m_ColorGenerator;
   }
 
@@ -472,7 +472,7 @@ public class ThreeWayDataHeatmapDisplay
 	super.initGUI();
 	setLayout(new BorderLayout());
 	m_Panel = new ThreeWayDataHeatmapPanel(null);
-	m_Panel.setColorGenerator((AbstractColorGradientGenerator) OptionUtils.shallowCopy(m_ColorGenerator));
+	m_Panel.setColorGenerator((ColorGradientGenerator) OptionUtils.shallowCopy(m_ColorGenerator));
         for (AbstractThreeWayDataOverlay overlay: m_Overlays)
           m_Panel.addOverlay(overlay);
 	m_Panel.setMissingValueColor(m_MissingValueColor);

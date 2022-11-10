@@ -40,6 +40,7 @@ import adams.gui.core.UISettings;
 import adams.gui.event.SearchEvent;
 import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 import adams.gui.visualization.image.ImagePanel;
 import adams.gui.visualization.image.selectionshape.RectanglePainter;
 import adams.gui.visualization.report.ReportFactory;
@@ -101,7 +102,7 @@ public class ThreeWayDataHeatmapPanel
   protected BaseSplitPane m_SplitPaneRight;
 
   /** the color generator to use. */
-  protected AbstractColorGradientGenerator m_ColorGenerator;
+  protected ColorGradientGenerator m_ColorGenerator;
 
   /** the color to use for missing values. */
   protected Color m_MissingValueColor;
@@ -366,7 +367,7 @@ public class ThreeWayDataHeatmapPanel
    * 
    * @param value	the generator
    */
-  public void setColorGenerator(AbstractColorGradientGenerator value) {
+  public void setColorGenerator(ColorGradientGenerator value) {
     m_ColorGenerator = value;
     refresh();
   }
@@ -376,7 +377,7 @@ public class ThreeWayDataHeatmapPanel
    * 
    * @return		the generator
    */
-  public AbstractColorGradientGenerator getColorGenerator() {
+  public ColorGradientGenerator getColorGenerator() {
     return m_ColorGenerator;
   }
 

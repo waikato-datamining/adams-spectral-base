@@ -15,15 +15,15 @@
 
 /*
  * Spectrogram.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.spectrumimage;
 
 import adams.data.conversion.SpectrumToBufferedImage;
 import adams.data.spectrum.Spectrum;
-import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 
 import java.awt.image.BufferedImage;
 
@@ -68,7 +68,7 @@ import java.awt.image.BufferedImage;
  * &nbsp;&nbsp;&nbsp;minimum: 0
  * </pre>
  *
- * <pre>-generator &lt;adams.gui.visualization.core.AbstractColorGradientGenerator&gt; (property: generator)
+ * <pre>-generator &lt;adams.gui.visualization.core.ColorGradientGenerator&gt; (property: generator)
  * &nbsp;&nbsp;&nbsp;The generator to use for creating the gradient colors.
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
  * </pre>
@@ -82,6 +82,8 @@ import java.awt.image.BufferedImage;
 public class Spectrogram
   extends AbstractSpectrumImageGeneratorWithRange {
 
+  private static final long serialVersionUID = -8167173639711870289L;
+
   /** the FFT sample size (power of 2). */
   protected int m_FFTSampleSize;
 
@@ -89,7 +91,7 @@ public class Spectrogram
   protected int m_OverlapFactor;
 
   /** the generator to use. */
-  protected AbstractColorGradientGenerator m_Generator;
+  protected ColorGradientGenerator m_Generator;
 
   /** The conversion that does the actual work. */
   protected transient SpectrumToBufferedImage m_Convertor;
@@ -200,7 +202,7 @@ public class Spectrogram
    *
    * @param value	the generator
    */
-  public void setGenerator(AbstractColorGradientGenerator value) {
+  public void setGenerator(ColorGradientGenerator value) {
     m_Generator = value;
     reset();
   }
@@ -210,7 +212,7 @@ public class Spectrogram
    *
    * @return		the generator
    */
-  public AbstractColorGradientGenerator getGenerator() {
+  public ColorGradientGenerator getGenerator() {
     return m_Generator;
   }
 

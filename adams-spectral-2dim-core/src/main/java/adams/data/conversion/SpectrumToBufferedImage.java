@@ -15,14 +15,14 @@
 
 /*
  * SpectrumToBufferedImage.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2022 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.conversion;
 
 import adams.data.spectrum.Spectrum;
-import adams.gui.visualization.core.AbstractColorGradientGenerator;
 import adams.gui.visualization.core.BiColorGenerator;
+import adams.gui.visualization.core.ColorGradientGenerator;
 import com.musicg.wave.Wave;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -55,7 +55,7 @@ import java.awt.image.BufferedImage;
  * &nbsp;&nbsp;&nbsp;minimum: 0
  * </pre>
  *
- * <pre>-generator &lt;adams.gui.visualization.core.AbstractColorGradientGenerator&gt; (property: generator)
+ * <pre>-generator &lt;adams.gui.visualization.core.ColorGradientGenerator&gt; (property: generator)
  * &nbsp;&nbsp;&nbsp;The generator to use for creating the gradient colors.
  * &nbsp;&nbsp;&nbsp;default: adams.gui.visualization.core.BiColorGenerator
  * </pre>
@@ -70,6 +70,8 @@ import java.awt.image.BufferedImage;
 public class SpectrumToBufferedImage
   extends AbstractConversion {
 
+  private static final long serialVersionUID = -8920538282070058213L;
+
   /** the FFT sample size (power of 2). */
   protected int m_FFTSampleSize;
 
@@ -77,7 +79,7 @@ public class SpectrumToBufferedImage
   protected int m_OverlapFactor;
 
   /** the generator to use. */
-  protected AbstractColorGradientGenerator m_Generator;
+  protected ColorGradientGenerator m_Generator;
 
   /** the gradient colors. */
   protected transient Color[] m_GradientColors;
@@ -214,7 +216,7 @@ public class SpectrumToBufferedImage
    *
    * @param value	the generator
    */
-  public void setGenerator(AbstractColorGradientGenerator value) {
+  public void setGenerator(ColorGradientGenerator value) {
     m_Generator = value;
     reset();
   }
@@ -224,7 +226,7 @@ public class SpectrumToBufferedImage
    *
    * @return		the generator
    */
-  public AbstractColorGradientGenerator getGenerator() {
+  public ColorGradientGenerator getGenerator() {
     return m_Generator;
   }
 
