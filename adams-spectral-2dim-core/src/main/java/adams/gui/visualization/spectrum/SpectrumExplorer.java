@@ -753,7 +753,6 @@ public class SpectrumExplorer
       menu.add(menuitem);
       menuitem.setMnemonic('n');
       menuitem.setSelected(m_Undo.isEnabled());
-      menuitem.setIcon(ImageManager.getEmptyIcon());
       menuitem.addActionListener(e -> {
         if (m_MenuItemEnableUndo.isSelected())
           getScriptingEngine().add(this, EnableUndo.ACTION);

@@ -500,7 +500,6 @@ public class ThreeWayDataHeatmapViewerPanel
       menu.add(menuitem);
       menuitem.setSelected(false);
       menuitem.setMnemonic('A');
-      menuitem.setIcon(ImageManager.getEmptyIcon());
       m_MenuItemViewApplyAll = menuitem;
 
       // View/Remove all overlays
