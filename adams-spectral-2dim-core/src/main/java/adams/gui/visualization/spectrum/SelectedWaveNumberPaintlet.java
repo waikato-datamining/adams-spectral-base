@@ -21,6 +21,7 @@
 package adams.gui.visualization.spectrum;
 
 import adams.data.spectrum.SpectrumPoint;
+import adams.gui.core.GUIHelper;
 import adams.gui.event.PaintEvent.PaintMoment;
 import adams.gui.visualization.core.AxisPanel;
 import adams.gui.visualization.core.plot.Axis;
@@ -178,6 +179,7 @@ public class SelectedWaveNumberPaintlet
     if (point != null) {
       axisX = getPanel().getPlot().getAxis(Axis.BOTTOM);
       g.setColor(getColor());
+      GUIHelper.configureAntiAliasing(g, true);
       g.drawLine(
         axisX.valueToPos(point.getWaveNumber()),
         0,
