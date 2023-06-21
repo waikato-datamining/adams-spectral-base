@@ -15,10 +15,11 @@
 
 /*
  * WekaPredictionContainerToEvaluationContainer.java
- * Copyright (C) 2012-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2023 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.conversion;
 
+import adams.core.QuickInfoHelper;
 import adams.flow.container.EvaluationContainer;
 import adams.flow.container.WekaPredictionContainer;
 import weka.core.Instance;
@@ -34,12 +35,12 @@ import weka.core.Instance;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-id &lt;java.lang.String&gt; (property: ID)
  * &nbsp;&nbsp;&nbsp;The (optional) ID for the evaluation (to be used instead of component).
  * &nbsp;&nbsp;&nbsp;default: 
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -66,8 +67,8 @@ public class WekaPredictionContainerToEvaluationContainer
    */
   @Override
   public String globalInfo() {
-    return 
-	"Turns a " + WekaPredictionContainer.class.getName() 
+    return
+      "Turns a " + WekaPredictionContainer.class.getName()
 	+ " into a " + EvaluationContainer.class.getName() + ".";
   }
 
@@ -79,16 +80,16 @@ public class WekaPredictionContainerToEvaluationContainer
     super.defineOptions();
 
     m_OptionManager.add(
-	    "component", "component",
-	    "");
+      "component", "component",
+      "");
 
     m_OptionManager.add(
-	    "version", "version",
-	    "");
+      "version", "version",
+      "");
 
     m_OptionManager.add(
-	    "id", "ID",
-	    "");
+      "id", "ID",
+      "");
   }
 
   /**
@@ -179,6 +180,22 @@ public class WekaPredictionContainerToEvaluationContainer
   }
 
   /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "component", m_Component, "component: ");
+    result += QuickInfoHelper.toString(this, "version", m_Version, ", version: ");
+    result += QuickInfoHelper.toString(this, "ID", m_ID, ", ID: ");
+
+    return result;
+  }
+
+  /**
    * Returns the class that is accepted as input.
    *
    * @return		the class
@@ -209,7 +226,7 @@ public class WekaPredictionContainerToEvaluationContainer
     EvaluationContainer		result;
     WekaPredictionContainer	input;
     Instance			inst;
-    
+
     result = new EvaluationContainer();
     input  = (WekaPredictionContainer) m_Input;
     inst   = (Instance) input.getValue(WekaPredictionContainer.VALUE_INSTANCE);
