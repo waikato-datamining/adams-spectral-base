@@ -15,7 +15,7 @@
 
 /*
  * ThreeWayDataFileReader.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -65,12 +65,12 @@ public class ThreeWayDataFileReader
   }
 
   /**
-   * Returns the class of objects that it generates.
+   * Returns the base class of the items.
    *
-   * @return		the data type
+   * @return		the class
    */
   @Override
-  public Class[] generates() {
-    return new Class[]{ThreeWayData.class};
+  protected Class getItemClass() {
+    return ThreeWayData.class;
   }
 }

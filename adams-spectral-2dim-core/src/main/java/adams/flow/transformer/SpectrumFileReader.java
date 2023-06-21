@@ -232,16 +232,16 @@ public class SpectrumFileReader
   }
 
   /**
-   * Returns the class of objects that it generates.
+   * Returns the base class of the items.
    *
-   * @return		the data type
+   * @return		the class
    */
   @Override
-  public Class[] generates() {
+  protected Class getItemClass() {
     if (m_OutputMultiSpectrum)
-      return new Class[]{MultiSpectrum.class};
+      return MultiSpectrum.class;
     else
-      return new Class[]{Spectrum.class};
+      return Spectrum.class;
   }
   
   /**
