@@ -15,7 +15,7 @@
 
 /*
  * ThreeWayDataHeatmapDisplay.java
- * Copyright (C) 2018-2022 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -401,6 +401,16 @@ public class ThreeWayDataHeatmapDisplay
     result += QuickInfoHelper.toString(this, "zoom", m_Zoom, ", zoom: ");
 
     return result;
+  }
+
+  /**
+   * Whether "clear" is supported and shows up in the menu.
+   *
+   * @return		true if supported
+   */
+  @Override
+  public boolean supportsClear() {
+    return true;
   }
 
   /**

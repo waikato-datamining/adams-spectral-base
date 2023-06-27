@@ -15,7 +15,7 @@
 
 /*
  * SpectrumDisplay.java
- * Copyright (C) 2009-2022 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2023 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.sink;
@@ -170,7 +170,6 @@ public class SpectrumDisplay
    * Panel to be used in {@link DisplayPanelManager} sink.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
-   * @version $Revision: 2245 $
    */
   protected class DisplayPanel
     extends AbstractComponentDisplayPanel
@@ -488,6 +487,16 @@ public class SpectrumDisplay
    */
   public String plotUpdaterTipText() {
     return "The updating strategy for the plot.";
+  }
+
+  /**
+   * Whether "clear" is supported and shows up in the menu.
+   *
+   * @return		true if supported
+   */
+  @Override
+  public boolean supportsClear() {
+    return true;
   }
 
   /**
