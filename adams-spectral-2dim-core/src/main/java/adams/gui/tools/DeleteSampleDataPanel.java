@@ -198,6 +198,7 @@ public class DeleteSampleDataPanel
     m_SplitPane.setDividerLocation(0.5);
     m_SplitPane.setResizeWeight(0.5);
     m_SplitPane.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+    m_SplitPane.setUISettingsParameters(getClass(), "SplitPane");
     panel.add(m_SplitPane, BorderLayout.CENTER);
 
     // IDs
