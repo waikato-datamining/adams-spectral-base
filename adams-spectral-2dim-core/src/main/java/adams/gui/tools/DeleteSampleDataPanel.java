@@ -15,7 +15,7 @@
 
 /*
  * DeleteSampleDataPanel.java
- * Copyright (C) 2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2019-2023 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -30,6 +30,7 @@ import adams.env.Environment;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseComboBox;
 import adams.gui.core.BasePanel;
+import adams.gui.core.BasePopupMenu;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
 import adams.gui.core.BaseTable;
@@ -45,8 +46,10 @@ import adams.gui.selection.SelectSpectrumPanel;
 import adams.gui.tools.idprovider.AbstractIDProviderPanel;
 import adams.gui.tools.idprovider.IDConsumer;
 import adams.gui.tools.idprovider.TableModel;
+import com.github.fracpete.jclipboardhelper.ClipboardHelper;
 
 import javax.swing.BorderFactory;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
@@ -54,7 +57,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -141,8 +147,8 @@ public class DeleteSampleDataPanel
     m_IDPanels = new HashMap<>();
     for (Class cls: ClassLister.getSingleton().getClasses(AbstractIDProviderPanel.class)) {
       try {
-        constr = cls.getConstructor(IDConsumer.class);
-        panel  = (AbstractIDProviderPanel) constr.newInstance(this);
+	constr = cls.getConstructor(IDConsumer.class);
+	panel  = (AbstractIDProviderPanel) constr.newInstance(this);
 	m_IDPanels.put(panel.getPanelName(), panel);
       }
       catch (Exception e) {
@@ -210,13 +216,28 @@ public class DeleteSampleDataPanel
     m_ButtonCheckSelected.addActionListener((ActionEvent e) -> {
       int[] selected = m_TableIDs.getSelectedRows();
       for (int i = 0; i < selected.length; i++)
-        selected[i] = m_TableIDs.getActualRow(selected[i]);
+	selected[i] = m_TableIDs.getActualRow(selected[i]);
       m_Model.check(selected);
     });
     m_TableIDs.addToButtonsPanel(m_ButtonCheckSelected);
     m_ButtonSelectInvert = new BaseButton("Invert");
     m_ButtonSelectInvert.addActionListener((ActionEvent e) -> m_Model.invertChecked());
     m_TableIDs.addToButtonsPanel(m_ButtonSelectInvert);
+    m_TableIDs.getComponent().addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+	if (m_TableIDs.getSelectedRow() != -1) {
+	  if (MouseUtils.isRightClick(e)) {
+	    e.consume();
+	    BasePopupMenu menu = createPopupMenu(e);
+	    if (menu != null)
+	      menu.showAbsolute(m_TableIDs, e);
+	  }
+	}
+	if (!e.isConsumed())
+	  super.mouseClicked(e);
+      }
+    });
 
     m_SearchIDs = new SearchPanel(LayoutType.HORIZONTAL, true);
     m_SearchIDs.setButtonCaption("Search");
@@ -268,6 +289,48 @@ public class DeleteSampleDataPanel
   protected void finishInit() {
     super.finishInit();
     updateButtons();
+  }
+
+  /**
+   * Creates the popup menu for the table.
+   */
+  public BasePopupMenu createPopupMenu(MouseEvent e) {
+    BasePopupMenu	result;
+    final int[]		rows;
+    int			i;
+    JMenuItem 		menuitem;
+
+    result = null;
+    if (m_TableIDs.getSelectedRows().length > 0)
+      rows = m_TableIDs.getSelectedRows();
+    else if (m_TableIDs.rowAtPoint(new Point(e.getX(), e.getY())) != -1)
+      rows = new int[]{m_TableIDs.rowAtPoint(new Point(e.getX(), e.getY()))};
+    else
+      rows = new int[0];
+    if (rows.length > 0) {
+      result = new BasePopupMenu();
+      for (i = 0; i < m_TableIDs.getColumnCount(); i++) {
+        if (m_TableIDs.getColumnClass(i) == Boolean.class)
+          continue;
+	final int col = i;
+	menuitem = new JMenuItem("Copy '" + m_TableIDs.getColumnName(i) + "'");
+	menuitem.addActionListener((ActionEvent ex) -> {
+	  StringBuilder list = new StringBuilder();
+	  for (int row: rows) {
+	    Object obj = m_TableIDs.getValueAt(row, col);
+	    if (obj != null) {
+	      if (list.length() > 0)
+		list.append("\n");
+	      list.append(obj);
+	    }
+	  }
+	  ClipboardHelper.copyToClipboard(list.toString());
+	});
+	result.add(menuitem);
+      }
+    }
+
+    return result;
   }
 
   /**
