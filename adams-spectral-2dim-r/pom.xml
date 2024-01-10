@@ -6,12 +6,12 @@
   <parent>
     <groupId>nz.ac.waikato.cms.adams</groupId>
     <artifactId>adams-spectral-base-pom</artifactId>
-    <version>24.1.0</version>
+    <version>24.1.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>adams-spectral-2dim-r</artifactId>
   <packaging>jar</packaging>
-  <version>24.1.0</version>
+  <version>24.1.1-SNAPSHOT</version>
 
   <name>adams-spectral-2dim-r</name>
   <description>Renjin packages for spectral data.</description>
