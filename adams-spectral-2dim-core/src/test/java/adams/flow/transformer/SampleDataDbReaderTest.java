@@ -106,9 +106,9 @@ public class SampleDataDbReaderTest
   public void testRegression() {
     performRegressionTest(
 	new File[]{
+	    new TmpFile("871562.csv"),
 	    new TmpFile("871563.csv"),
-	    new TmpFile("871653.csv"),
-	    new TmpFile("871738.csv")});
+	    new TmpFile("871553.csv")});
   }
 
   /**

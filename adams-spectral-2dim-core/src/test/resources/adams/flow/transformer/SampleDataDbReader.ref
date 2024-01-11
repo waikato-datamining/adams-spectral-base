@@ -1,3 +1,36 @@
+--> 871562.csv
+Field,Type,Value
+"Parent ID",S,152
+"BFI lds",N,34.288516
+"BFI1 vers",N,28.262755
+CALU,N,104.56
+CAN1,N,0.643217
+CECU,N,114.66
+Clay,N,139.87
+COR6,N,9.05
+"Dummy report",B,false
+GLV0,N,14.46
+GLV1,N,27.87
+GLV2,N,42.33
+"Insert Timestamp",S,"2009-11-27 20:15:40"
+Instrument,S,unknown
+jaar,N,2007
+K-Exch,N,3.6
+KALU,N,3.6
+LUT2,N,139.87
+MAGU,N,7.8
+MANU,N,0.03
+mnd,S,40a
+N-total,N,0.96
+NATU,N,0.55
+"Nr prakt",S,202844
+NTT6,N,0.96
+PHC3,N,-999
+ProdID,S,7
+"Sample ID",S,871562
+Source,S,152.spec
+STT6,N,0.16
+
 --> 871563.csv
 Field,Type,Value
 "Parent ID",S,3
@@ -31,9 +64,36 @@ ProdID,S,7
 Source,S,3.spec
 STT6,N,0.18
 
---> 871653.csv
-file is missing
-
---> 871738.csv
-file is missing
+--> 871553.csv
+Field,Type,Value
+"Parent ID",S,77
+"BFI lds",N,60.197115
+"BFI1 vers",N,49.610303
+CALU,N,118.48
+CAN1,N,12.069088
+CECU,N,98.04
+Clay,N,96.33
+COR6,N,9.13
+"Dummy report",B,false
+GLV0,N,10.63
+GLV1,N,24.69
+GLV2,N,35.32
+"Insert Timestamp",S,"2009-11-27 20:15:35"
+Instrument,S,unknown
+jaar,N,2007
+K-Exch,N,2.86
+KALU,N,2.86
+LUT2,N,96.33
+MAGU,N,7.86
+MANU,N,0.02
+mnd,S,40a
+N-total,N,0.86
+NATU,N,0.79
+"Nr prakt",S,202803
+NTT6,N,0.86
+PHC3,N,-999
+ProdID,S,7
+"Sample ID",S,871553
+Source,S,77.spec
+STT6,N,0.34
 
