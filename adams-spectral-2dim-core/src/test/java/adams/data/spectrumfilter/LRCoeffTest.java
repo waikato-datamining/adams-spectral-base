@@ -13,13 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * LRCoeffTest.java
- * Copyright (C) 2010-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.spectrumfilter;
 
 import adams.core.base.BaseRegExp;
+import adams.core.logging.LoggingLevel;
 import adams.data.filter.Filter;
 import adams.data.instances.SimpleInstanceGenerator;
 import adams.data.report.DataType;
@@ -94,6 +95,7 @@ public class LRCoeffTest
     generator = new SimpleInstanceGenerator();
     generator.setField(new Field("CAN1", DataType.NUMERIC));
     result[0] = new LRCoeff();
+    result[0].setLoggingLevel(LoggingLevel.INFO);
     result[0].setGenerator(generator);
     result[0].setConditions(cond);
 
@@ -107,6 +109,7 @@ public class LRCoeffTest
     generator = new SimpleInstanceGenerator();
     generator.setField(new Field("CAN1", DataType.NUMERIC));
     result[1] = new LRCoeff();
+    result[1].setLoggingLevel(LoggingLevel.INFO);
     result[1].setGenerator(generator);
     result[1].setScale(true);
     result[1].setConditions(cond);
@@ -121,6 +124,7 @@ public class LRCoeffTest
     generator = new SimpleInstanceGenerator();
     generator.setField(new Field("CAN1", DataType.NUMERIC));
     result[2] = new LRCoeff();
+    result[2].setLoggingLevel(LoggingLevel.INFO);
     result[2].setGenerator(generator);
     result[2].setScale(true);
     result[2].setAbsolute(true);

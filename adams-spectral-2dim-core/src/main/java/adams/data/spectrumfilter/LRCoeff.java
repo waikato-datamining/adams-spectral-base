@@ -15,7 +15,7 @@
 
 /*
  * LRCoeff.java
- * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -348,8 +348,10 @@ public class LRCoeff
     double min=Double.POSITIVE_INFINITY;
     double max=Double.NEGATIVE_INFINITY;
     Instances header=null;
-    List<Integer> ids=SampleDataF.getSingleton(getDatabaseConnection()).getDBIDs(m_Conditions);
-    for (Integer id:ids) {
+    List<String> ids=SampleDataF.getSingleton(getDatabaseConnection()).getIDs(m_Conditions);
+    if (isLoggingEnabled())
+      getLogger().info("Sample IDs: " + ids);
+    for (String id:ids) {
       Spectrum sp=SpectrumF.getSingleton(getDatabaseConnection()).load(id);
       Instance inst  = m_Generator.generate(sp);
       if (header == null) {
