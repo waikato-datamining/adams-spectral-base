@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumConditions.java
- * Copyright (C) 2010-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.db;
@@ -66,6 +66,9 @@ public abstract class AbstractSpectrumConditions
   /** whether to sort by insert timestamp. */
   protected boolean m_SortOnInsertTimestamp;
 
+  /** whether to sort by sample ID. */
+  protected boolean m_SortOnSampleID;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -74,44 +77,48 @@ public abstract class AbstractSpectrumConditions
     super.defineOptions();
 
     m_OptionManager.add(
-	    "instrument", "instrument",
-	    new BaseRegExp(""));
+      "instrument", "instrument",
+      new BaseRegExp(""));
 
     m_OptionManager.add(
-	    "sampleid", "sampleIDRegExp",
-	    new BaseRegExp(""));
+      "sampleid", "sampleIDRegExp",
+      new BaseRegExp(""));
 
     m_OptionManager.add(
-	    "format", "format",
-	    new BaseRegExp(""));
+      "format", "format",
+      new BaseRegExp(""));
 
     m_OptionManager.add(
-	    "type", "sampleTypeRegExp",
-	    new BaseRegExp(""));
+      "type", "sampleTypeRegExp",
+      new BaseRegExp(""));
 
     m_OptionManager.add(
-	    "start", "startDate",
-	    BaseDateTime.infinityPast());
+      "start", "startDate",
+      BaseDateTime.infinityPast());
 
     m_OptionManager.add(
-	    "end", "endDate",
-	    BaseDateTime.infinityFuture());
+      "end", "endDate",
+      BaseDateTime.infinityFuture());
 
     m_OptionManager.add(
-	    "no-dummies", "excludeDummies",
-	    false);
+      "no-dummies", "excludeDummies",
+      false);
 
     m_OptionManager.add(
-	    "only-dummies", "onlyDummies",
-	    false);
+      "only-dummies", "onlyDummies",
+      false);
 
     m_OptionManager.add(
-	    "latest", "latest",
-	    false);
+      "latest", "latest",
+      false);
 
     m_OptionManager.add(
-	    "sort-on-insert-timestamp", "sortOnInsertTimestamp",
-	    false);
+      "sort-on-insert-timestamp", "sortOnInsertTimestamp",
+      false);
+
+    m_OptionManager.add(
+      "sort-on-sampleid", "sortOnSampleID",
+      false);
   }
 
   /**
@@ -382,6 +389,8 @@ public abstract class AbstractSpectrumConditions
    */
   public void setSortOnInsertTimestamp(boolean value) {
     m_SortOnInsertTimestamp = value;
+    if (m_SortOnInsertTimestamp)
+      m_SortOnSampleID = false;
     reset();
   }
 
@@ -401,7 +410,38 @@ public abstract class AbstractSpectrumConditions
    * 			displaying in the GUI or for listing the options.
    */
   public String sortOnInsertTimestampTipText() {
-    return "If set to true, sorting is performed on the '" + SampleData.INSERT_TIMESTAMP + "' field instead of the auto ID.";
+    return "If set to true, sorting is performed on the '" + SampleData.INSERT_TIMESTAMP + "' field instead of the auto ID, automatically disables sorting on Sample ID.";
+  }
+
+  /**
+   * Sets whether to sort on {@link SampleData#SAMPLE_ID} instead of auto ID.
+   *
+   * @param value 	if true then to sort on {@link SampleData#SAMPLE_ID}
+   */
+  public void setSortOnSampleID(boolean value) {
+    m_SortOnSampleID = value;
+    if (m_SortOnSampleID)
+      m_SortOnInsertTimestamp = false;
+    reset();
+  }
+
+  /**
+   * Returns whether to sort on {@link SampleData#SAMPLE_ID} instead of auto ID.
+   *
+   * @return 		true if to sort on {@link SampleData#SAMPLE_ID}
+   */
+  public boolean getSortOnSampleID() {
+    return m_SortOnSampleID;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String sortOnSampleIDTipText() {
+    return "If set to true, sorting is performed on the '" + SampleData.SAMPLE_ID + "' field instead of the auto ID, automatically disables sorting on '" + SampleData.INSERT_TIMESTAMP + "'.";
   }
 
   /**

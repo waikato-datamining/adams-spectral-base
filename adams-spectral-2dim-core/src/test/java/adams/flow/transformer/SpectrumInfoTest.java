@@ -99,7 +99,7 @@ public class SpectrumInfoTest
       adams.db.SpectrumConditionsMulti spectrumconditionsmulti11 = new adams.db.SpectrumConditionsMulti();
       argOption = (AbstractArgumentOption) spectrumconditionsmulti11.getOptionManager().findByProperty("limit");
       spectrumconditionsmulti11.setLimit((Integer) argOption.valueOf("1"));
-      spectrumconditionsmulti11.setSortOnInsertTimestamp(true);
+      spectrumconditionsmulti11.setSortOnSampleID(true);
       spectrumidsupplier9.setConditions(spectrumconditionsmulti11);
 
       actors1[2] = spectrumidsupplier9;

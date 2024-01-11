@@ -88,7 +88,7 @@ public class LRCoeffTest
     cond = new SpectrumConditionsMulti();
     cond.setFormat(new BaseRegExp("NIR"));
     cond.setLimit(100);
-    cond.setSortOnInsertTimestamp(true);
+    cond.setSortOnSampleID(true);
     cond.setFields(new Field[]{
 	new Field("CAN1", DataType.NUMERIC)
     });
@@ -102,7 +102,7 @@ public class LRCoeffTest
     cond = new SpectrumConditionsMulti();
     cond.setFormat(new BaseRegExp("NIR"));
     cond.setLimit(100);
-    cond.setSortOnInsertTimestamp(true);
+    cond.setSortOnSampleID(true);
     cond.setFields(new Field[]{
 	new Field("CAN1", DataType.NUMERIC)
     });
@@ -117,7 +117,7 @@ public class LRCoeffTest
     cond = new SpectrumConditionsMulti();
     cond.setFormat(new BaseRegExp("NIR"));
     cond.setLimit(100);
-    cond.setSortOnInsertTimestamp(true);
+    cond.setSortOnSampleID(true);
     cond.setFields(new Field[]{
 	new Field("CAN1", DataType.NUMERIC)
     });

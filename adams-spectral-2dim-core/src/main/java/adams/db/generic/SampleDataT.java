@@ -641,7 +641,9 @@ public abstract class SampleDataT
       else
 	sort = " ASC";
       if (conditions.getSortOnInsertTimestamp())
-	sql += " ORDER BY sd_sort_by_date.VALUE" + sort + ", sp.SAMPLEID ASC";
+	sql += " ORDER BY sd_sort_by_date.VALUE" + sort;
+      else if (conditions.getSortOnSampleID())
+	sql += " ORDER BY sp.SAMPLEID" + sort;
       else
 	sql += " ORDER BY sp.AUTO_ID" + sort;
 

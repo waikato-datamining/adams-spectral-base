@@ -95,7 +95,7 @@ public class InterPercentileRangeCleanerTest
     cond = new SpectrumConditionsMulti();
     cond.setLimit(100);
     cond.setFormat(new BaseRegExp("NIR"));
-    cond.setSortOnInsertTimestamp(true);
+    cond.setSortOnSampleID(true);
     result[0] = new InterPercentileRangeCleaner();
     result[0].setConditions(cond);
     result[0].setSerializationFile(new TmpFile("iprc"));

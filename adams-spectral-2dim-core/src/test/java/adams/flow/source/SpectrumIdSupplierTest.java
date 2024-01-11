@@ -78,7 +78,7 @@ public class SpectrumIdSupplierTest
     SpectrumConditionsMulti cond = new SpectrumConditionsMulti();
     cond.setLimit(10);
     cond.setFormat(new BaseRegExp("NIR"));
-    cond.setSortOnInsertTimestamp(true);
+    cond.setSortOnSampleID(true);
     SpectrumIdSupplier id = new SpectrumIdSupplier();
     id.setConditions(cond);
 

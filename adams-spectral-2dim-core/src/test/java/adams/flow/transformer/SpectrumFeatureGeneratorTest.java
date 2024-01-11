@@ -122,7 +122,7 @@ public class SpectrumFeatureGeneratorTest
       adams.db.SpectrumConditionsMulti spectrumconditionsmulti10 = new adams.db.SpectrumConditionsMulti();
       argOption = (AbstractArgumentOption) spectrumconditionsmulti10.getOptionManager().findByProperty("limit");
       spectrumconditionsmulti10.setLimit((Integer) argOption.valueOf("10"));
-      spectrumconditionsmulti10.setSortOnInsertTimestamp(true);
+      spectrumconditionsmulti10.setSortOnSampleID(true);
       spectrumidsupplier8.setConditions(spectrumconditionsmulti10);
 
       actors1[1] = spectrumidsupplier8;

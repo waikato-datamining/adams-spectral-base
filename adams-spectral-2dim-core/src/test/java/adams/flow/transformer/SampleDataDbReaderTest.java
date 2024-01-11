@@ -82,7 +82,7 @@ public class SampleDataDbReaderTest
     SpectrumConditionsMulti cond = new SpectrumConditionsMulti();
     cond.setLimit(3);
     cond.setFormat(new BaseRegExp("NIR"));
-    cond.setSortOnInsertTimestamp(true);
+    cond.setSortOnSampleID(true);
     SpectrumIdSupplier sis = new SpectrumIdSupplier();
     sis.setGenerateSampleIDs(true);
     sis.setConditions(cond);
