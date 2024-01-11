@@ -15,7 +15,7 @@
 
 /*
  * SampleDataT.java
- * Copyright (C) 2008-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2024 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -490,6 +490,7 @@ public abstract class SampleDataT
     Field[]			fields;
     Field[]			required;
     String			regexp;
+    String			sort;
 
     if (dbids)
       result = new ArrayList<Integer>();
@@ -635,14 +636,14 @@ public abstract class SampleDataT
       }
 
       // ordering
-      if (conditions.getSortOnInsertTimestamp())
-	sql += " ORDER BY sd_sort_by_date.VALUE";
-      else
-	sql += " ORDER BY sp.AUTO_ID";
       if (conditions.getLatest())
-	sql += " DESC";
+	sort = " DESC";
       else
-	sql += " ASC";
+	sort = " ASC";
+      if (conditions.getSortOnInsertTimestamp())
+	sql += " ORDER BY sd_sort_by_date.VALUE" + sort + ", sp.SAMPLEID ASC";
+      else
+	sql += " ORDER BY sp.AUTO_ID" + sort;
 
       // limit
       if (conditions.getLimit() > 0)
