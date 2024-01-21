@@ -15,16 +15,18 @@
 
 /*
  * Evaluator.java
- * Copyright (C) 2011-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.core.Utils;
 import adams.core.VariableName;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
+import adams.core.option.OptionUtils;
 import adams.data.InPlaceProcessing;
 import adams.data.evaluator.instance.AbstractEvaluator;
 import adams.data.evaluator.instance.NullEvaluator;
@@ -38,6 +40,9 @@ import adams.flow.core.CallableActorReference;
 import adams.flow.core.EvaluatorModelLoader;
 import adams.flow.core.ModelLoaderSupporter;
 import adams.flow.core.Token;
+import adams.flow.standalone.JobRunnerInstance;
+import adams.multiprocess.AbstractJob;
+import adams.multiprocess.JobRunnerSupporter;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -57,12 +62,13 @@ import java.util.Map;
  * - accepts:<br>
  * &nbsp;&nbsp;&nbsp;weka.core.Instances<br>
  * &nbsp;&nbsp;&nbsp;weka.core.Instance<br>
+ * &nbsp;&nbsp;&nbsp;adams.data.instance.WekaInstanceContainer<br>
  * &nbsp;&nbsp;&nbsp;adams.flow.container.EvaluationContainer<br>
  * - generates:<br>
  * &nbsp;&nbsp;&nbsp;adams.flow.container.EvaluationContainer<br>
  * <br><br>
  * Container information:<br>
- * - adams.flow.container.EvaluationContainer: Instance, Instances, Evaluations, Evaluator, Abstention classification, Component, ID
+ * - adams.flow.container.EvaluationContainer: Instance, Instances, Evaluations, Evaluator, Classification, Abstention classification, Distribution, Component, Version, ID, Report
  * <br><br>
  <!-- flow-summary-end -->
  *
@@ -70,6 +76,7 @@ import java.util.Map;
  * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
@@ -93,11 +100,19 @@ import java.util.Map;
  * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
  * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-silent &lt;boolean&gt; (property: silent)
  * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
  * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
+ * </pre>
+ *
+ * <pre>-no-copy &lt;boolean&gt; (property: noCopy)
+ * &nbsp;&nbsp;&nbsp;If enabled, no copy of the evaluation container is generated before adding
+ * &nbsp;&nbsp;&nbsp;the additional evaluations.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
@@ -126,31 +141,126 @@ import java.util.Map;
  * &nbsp;&nbsp;&nbsp;The storage item to obtain the model from, ignored if not present.
  * &nbsp;&nbsp;&nbsp;default: storage
  * </pre>
- * 
+ *
  * <pre>-use-evaluator-reset-variable &lt;boolean&gt; (property: useEvaluatorResetVariable)
- * &nbsp;&nbsp;&nbsp;If enabled, chnages to the specified variable are monitored in order to 
+ * &nbsp;&nbsp;&nbsp;If enabled, chnages to the specified variable are monitored in order to
  * &nbsp;&nbsp;&nbsp;reset the evaluator, eg when a storage evaluator changed.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-evaluator-reset-variable &lt;adams.core.VariableName&gt; (property: evaluatorResetVariable)
- * &nbsp;&nbsp;&nbsp;The variable to monitor for changes in order to reset the evaluator, eg 
+ * &nbsp;&nbsp;&nbsp;The variable to monitor for changes in order to reset the evaluator, eg
  * &nbsp;&nbsp;&nbsp;when a storage evaluator changed.
  * &nbsp;&nbsp;&nbsp;default: variable
  * </pre>
- * 
+ *
  * <pre>-component &lt;java.lang.String&gt; (property: component)
  * &nbsp;&nbsp;&nbsp;The component identifier.
- * &nbsp;&nbsp;&nbsp;default: 
+ * &nbsp;&nbsp;&nbsp;default:
  * </pre>
- * 
+ *
+ * <pre>-version &lt;java.lang.String&gt; (property: version)
+ * &nbsp;&nbsp;&nbsp;The version.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
+ * <pre>-clean-after-build &lt;boolean&gt; (property: cleanAfterBuild)
+ * &nbsp;&nbsp;&nbsp;If enabled, the internnaly built evaluator gets discarded again.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-prefer-jobrunner &lt;boolean&gt; (property: preferJobRunner)
+ * &nbsp;&nbsp;&nbsp;If enabled, tries to offload the processing onto a adams.flow.standalone.JobRunnerInstance;
+ * &nbsp;&nbsp;&nbsp; applies only to training.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  dale (dale at waikato dot ac dot nz)
  */
 public class Evaluator
   extends AbstractTransformer
-  implements ModelLoaderSupporter, InPlaceProcessing {
+  implements ModelLoaderSupporter, InPlaceProcessing, JobRunnerSupporter {
+
+  public static class EvaluateJob
+    extends AbstractJob {
+
+    private static final long serialVersionUID = 6406892820872772446L;
+
+    /** the evaluator to train. */
+    protected AbstractEvaluator m_Evaluator;
+
+    /** the data to use for training. */
+    protected Instances m_Data;
+
+    /**
+     * Initializes the job.
+     *
+     * @param evaluator  the evaluator to train
+     * @param data the training data
+     */
+    public EvaluateJob(AbstractEvaluator evaluator, Instances data) {
+      super();
+      m_Evaluator = evaluator;
+      m_Data      = data;
+    }
+
+    /**
+     * Checks whether all pre-conditions have been met.
+     *
+     * @return null if everything is OK, otherwise an error message
+     */
+    @Override
+    protected String preProcessCheck() {
+      if (m_Evaluator == null)
+	return "No evaluator to train!";
+      if (m_Data == null)
+	return "No training data!";
+      return null;
+    }
+
+    /**
+     * Does the actual execution of the job.
+     *
+     * @throws Exception if fails to execute job
+     */
+    @Override
+    protected void process() throws Exception {
+      m_Evaluator.build(m_Data);
+    }
+
+    /**
+     * Checks whether all post-conditions have been met.
+     *
+     * @return null if everything is OK, otherwise an error message
+     */
+    @Override
+    protected String postProcessCheck() {
+      return null;
+    }
+
+    /**
+     * Returns a string representation of this job.
+     *
+     * @return the job as string
+     */
+    @Override
+    public String toString() {
+      return OptionUtils.getCommandLine(m_Evaluator) + "\n" + m_Data.relationName();
+    }
+
+    /**
+     * Cleans up data structures, frees up memory.
+     * Removes dependencies and job parameters.
+     */
+    @Override
+    public void cleanUp() {
+      m_Evaluator = null;
+      m_Data      = null;
+      super.cleanUp();
+    }
+  }
 
   /** for serialization. */
   private static final long serialVersionUID = 4523798891781897832L;
@@ -188,6 +298,12 @@ public class Evaluator
   /** whether to clean up after build. */
   protected boolean m_CleanAfterBuild;
 
+  /** whether to offload training into a JobRunnerInstance. */
+  protected boolean m_PreferJobRunner;
+
+  /** the JobRunnerInstance to use. */
+  protected transient JobRunnerInstance m_JobRunnerInstance;
+
   /**
    * Returns a string describing the object.
    *
@@ -196,9 +312,9 @@ public class Evaluator
   @Override
   public String globalInfo() {
     return
-        "If input is Instances, build this Evaluator. If Instance, use the "
-      + "built Evaluator.\n"
-      + "The name of this evaluator is used for storing the evaluation result.";
+      "If input is Instances, build this Evaluator. If Instance, use the "
+	+ "built Evaluator.\n"
+	+ "The name of this evaluator is used for storing the evaluation result.";
   }
 
   /**
@@ -249,8 +365,12 @@ public class Evaluator
       "");
 
     m_OptionManager.add(
-        "clean-after-build", "cleanAfterBuild",
-        false);
+      "clean-after-build", "cleanAfterBuild",
+      false);
+
+    m_OptionManager.add(
+      "prefer-jobrunner", "preferJobRunner",
+      false);
   }
 
   /**
@@ -482,8 +602,8 @@ public class Evaluator
    */
   public String useEvaluatorResetVariableTipText() {
     return
-        "If enabled, chnages to the specified variable are monitored in order "
-	  + "to reset the evaluator, eg when a storage evaluator changed.";
+      "If enabled, chnages to the specified variable are monitored in order "
+	+ "to reset the evaluator, eg when a storage evaluator changed.";
   }
 
   /**
@@ -513,8 +633,8 @@ public class Evaluator
    */
   public String evaluatorResetVariableTipText() {
     return
-        "The variable to monitor for changes in order to reset the evaluator, eg "
-	  + "when a storage evaluator changed.";
+      "The variable to monitor for changes in order to reset the evaluator, eg "
+	+ "when a storage evaluator changed.";
   }
 
   /**
@@ -605,6 +725,36 @@ public class Evaluator
   }
 
   /**
+   * Sets whether to offload processing to a JobRunner instance if available.
+   *
+   * @param value	if true try to find/use a JobRunner instance
+   */
+  public void setPreferJobRunner(boolean value) {
+    m_PreferJobRunner = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to offload processing to a JobRunner instance if available.
+   *
+   * @return		if true try to find/use a JobRunner instance
+   */
+  public boolean getPreferJobRunner() {
+    return m_PreferJobRunner;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String preferJobRunnerTipText() {
+    return "If enabled, tries to offload the processing onto a " + Utils.classToString(JobRunnerInstance.class) + "; applies only to training.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -621,6 +771,7 @@ public class Evaluator
     result += QuickInfoHelper.toString(this, "evaluatorResetVariable", m_EvaluatorResetVariable, ", reset: ");
     result += QuickInfoHelper.toString(this, "noCopy", (m_NoCopy ? "no copy" : "copy"), ", ");
     result += QuickInfoHelper.toString(this, "cleanAfterBuild", (m_CleanAfterBuild ? "clean" : "keep"), ", ");
+    result += QuickInfoHelper.toString(this, "preferJobRunner", m_PreferJobRunner, ", jobrunner");
 
     return result;
   }
@@ -699,6 +850,25 @@ public class Evaluator
   }
 
   /**
+   * Initializes the item for flow execution.
+   *
+   * @return		null if everything is fine, otherwise error message
+   */
+  @Override
+  public String setUp() {
+    String	result;
+
+    result = super.setUp();
+
+    if (result == null) {
+      if (m_PreferJobRunner)
+	m_JobRunnerInstance = JobRunnerInstance.locate(this, true);
+    }
+
+    return result;
+  }
+
+  /**
    * Loads the evaluator from the evaluator file.
    *
    * @return		null if everything worked, otherwise an error message
@@ -715,7 +885,7 @@ public class Evaluator
     }
     else {
       if (!errors.isEmpty())
-        result = errors.toString();
+	result = errors.toString();
     }
 
     m_ResetEvaluator = false;
@@ -750,6 +920,7 @@ public class Evaluator
     EvaluationContainer		newCont;
     Map<String,Object> 		evals;
     HashMap<String,Float>       eval;
+    EvaluateJob job;
 
     result = null;
 
@@ -790,26 +961,35 @@ public class Evaluator
 	}
 
 	// process data
-        synchronized(m_ActualEvaluator) {
-          eval = null;
-          if (data != null) {
-            m_ActualEvaluator.build(data);
-          }
-          else if (inst != null) {
-            eval = m_ActualEvaluator.evaluate(inst);
-          }
-        }
+	synchronized(m_ActualEvaluator) {
+	  eval = null;
+	  if (data != null) {
+	    if (m_JobRunnerInstance != null) {
+	      job    = new EvaluateJob(m_ActualEvaluator, data);
+	      result = m_JobRunnerInstance.executeJob(job);
+	      job.cleanUp();
+	      if (result != null)
+		throw new Exception(result);
+	    }
+	    else {
+	      m_ActualEvaluator.build(data);
+	    }
+	  }
+	  else if (inst != null) {
+	    eval = m_ActualEvaluator.evaluate(inst);
+	  }
+	}
 
 	// generate output
 	if (cont != null) {
 	  if (m_NoCopy)
 	    newCont = cont;
 	  else
-            newCont = (EvaluationContainer) cont.getClone();
-        }
+	    newCont = (EvaluationContainer) cont.getClone();
+	}
 	else {
-          newCont = new EvaluationContainer();
-        }
+	  newCont = new EvaluationContainer();
+	}
 	newCont.setValue(EvaluationContainer.VALUE_EVALUATOR, m_ActualEvaluator);
 	if (data != null)
 	  newCont.setValue(EvaluationContainer.VALUE_INSTANCES, data);
@@ -828,9 +1008,9 @@ public class Evaluator
 	if (report != null)
 	  newCont.setValue(EvaluationContainer.VALUE_REPORT, report.getClone());
 	if (!m_Component.isEmpty())
-          newCont.setValue(EvaluationContainer.VALUE_COMPONENT, m_Component);
+	  newCont.setValue(EvaluationContainer.VALUE_COMPONENT, m_Component);
 	if (!m_Version.isEmpty())
-          newCont.setValue(EvaluationContainer.VALUE_VERSION, m_Version);
+	  newCont.setValue(EvaluationContainer.VALUE_VERSION, m_Version);
 	m_OutputToken = new Token(newCont);
       }
       catch (Exception e) {
@@ -841,8 +1021,8 @@ public class Evaluator
 
     if (m_CleanAfterBuild) {
       if (m_ActualEvaluator != null) {
-        m_ActualEvaluator.destroy();
-        m_ActualEvaluator = null;
+	m_ActualEvaluator.destroy();
+	m_ActualEvaluator = null;
       }
     }
 
@@ -858,6 +1038,8 @@ public class Evaluator
       m_ActualEvaluator.destroy();
       m_ActualEvaluator = null;
     }
+
+    m_JobRunnerInstance = null;
 
     super.wrapUp();
   }

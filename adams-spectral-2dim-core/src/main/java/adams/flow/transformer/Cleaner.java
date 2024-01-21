@@ -15,16 +15,18 @@
 
 /*
  * Cleaner.java
- * Copyright (C) 2011-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
+import adams.core.option.OptionUtils;
 import adams.data.cleaner.CleanerDetails;
 import adams.data.cleaner.instance.AbstractCleaner;
 import adams.data.cleaner.instance.IQRCleaner;
@@ -38,6 +40,9 @@ import adams.flow.core.CallableActorReference;
 import adams.flow.core.CleanerModelLoader;
 import adams.flow.core.ModelLoaderSupporter;
 import adams.flow.core.Token;
+import adams.flow.standalone.JobRunnerInstance;
+import adams.multiprocess.AbstractJob;
+import adams.multiprocess.JobRunnerSupporter;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -72,6 +77,7 @@ import java.util.Hashtable;
  * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-name &lt;java.lang.String&gt; (property: name)
@@ -95,12 +101,14 @@ import java.util.Hashtable;
  * &nbsp;&nbsp;&nbsp;actor encounters an error; the error gets propagated; useful for critical
  * &nbsp;&nbsp;&nbsp;actors.
  * &nbsp;&nbsp;&nbsp;default: false
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-silent &lt;boolean&gt; (property: silent)
  * &nbsp;&nbsp;&nbsp;If enabled, then no errors are output in the console; Note: the enclosing
  * &nbsp;&nbsp;&nbsp;actor handler must have this enabled as well.
  * &nbsp;&nbsp;&nbsp;default: false
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-cleaner &lt;adams.data.cleaner.instance.AbstractCleaner&gt; (property: cleaner)
@@ -136,14 +144,112 @@ import java.util.Hashtable;
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
  *
+ * <pre>-prefer-jobrunner &lt;boolean&gt; (property: preferJobRunner)
+ * &nbsp;&nbsp;&nbsp;If enabled, tries to offload the processing onto a adams.flow.standalone.JobRunnerInstance;
+ * &nbsp;&nbsp;&nbsp; applies only to training.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  dale (dale at waikato dot ac dot nz)
- * @version $Revision: 2355 $
  */
 public class Cleaner
   extends AbstractTransformer
-  implements ModelLoaderSupporter {
+  implements ModelLoaderSupporter, JobRunnerSupporter {
+
+  public static class CleanJob
+    extends AbstractJob {
+
+    private static final long serialVersionUID = 6406892820872772446L;
+
+    /** the cleaner to apply. */
+    protected AbstractCleaner m_Evaluator;
+
+    /** the data to clean. */
+    protected Instances m_Data;
+
+    /** the cleaned data. */
+    protected Instances m_Cleaned;
+
+    /**
+     * Initializes the job.
+     *
+     * @param cleaner  	the cleaner to apply
+     * @param data 	the data to clean
+     */
+    public CleanJob(AbstractCleaner cleaner, Instances data) {
+      super();
+      m_Evaluator = cleaner;
+      m_Data      = data;
+      m_Cleaned   = null;
+    }
+
+    /**
+     * Returns the cleaned data.
+     *
+     * @return		the cleaned data, null if not available
+     */
+    public Instances getCleaned() {
+      return m_Cleaned;
+    }
+
+    /**
+     * Checks whether all pre-conditions have been met.
+     *
+     * @return null if everything is OK, otherwise an error message
+     */
+    @Override
+    protected String preProcessCheck() {
+      if (m_Evaluator == null)
+	return "No cleaner to train!";
+      if (m_Data == null)
+	return "No training data!";
+      return null;
+    }
+
+    /**
+     * Does the actual execution of the job.
+     *
+     * @throws Exception if fails to execute job
+     */
+    @Override
+    protected void process() throws Exception {
+      m_Cleaned = m_Evaluator.clean(m_Data);
+    }
+
+    /**
+     * Checks whether all post-conditions have been met.
+     *
+     * @return null if everything is OK, otherwise an error message
+     */
+    @Override
+    protected String postProcessCheck() {
+      return null;
+    }
+
+    /**
+     * Returns a string representation of this job.
+     *
+     * @return the job as string
+     */
+    @Override
+    public String toString() {
+      return OptionUtils.getCommandLine(m_Evaluator) + "\n" + m_Data.relationName();
+    }
+
+    /**
+     * Cleans up data structures, frees up memory.
+     * Removes dependencies and job parameters.
+     */
+    @Override
+    public void cleanUp() {
+      m_Evaluator = null;
+      m_Data      = null;
+      m_Cleaned   = null;
+      super.cleanUp();
+    }
+  }
 
   /** for serialization. */
   private static final long serialVersionUID = -7274476322706230890L;
@@ -163,6 +269,12 @@ public class Cleaner
   /** the model loader. */
   protected CleanerModelLoader m_ModelLoader;
 
+  /** whether to offload training into a JobRunnerInstance. */
+  protected boolean m_PreferJobRunner;
+
+  /** the JobRunnerInstance to use. */
+  protected transient JobRunnerInstance m_JobRunnerInstance;
+
   /**
    * Returns a string describing the object.
    *
@@ -171,10 +283,10 @@ public class Cleaner
   @Override
   public String globalInfo() {
     return
-        "In case of Instances objects, 'unclean' Instance objects get removed. "
-      + "When receiving an Instance object, a note is attached.\n"
-      + m_ModelLoader.automaticOrderInfo() + "\n"
-      + "4. The cleaner is instantiated from the provided definition.";
+      "In case of Instances objects, 'unclean' Instance objects get removed. "
+	+ "When receiving an Instance object, a note is attached.\n"
+	+ m_ModelLoader.automaticOrderInfo() + "\n"
+	+ "4. The cleaner is instantiated from the provided definition.";
   }
 
   /**
@@ -207,6 +319,10 @@ public class Cleaner
     m_OptionManager.add(
       "cleaner-details-output", "cleanerDetailsOutput",
       new PlaceholderFile());
+
+    m_OptionManager.add(
+      "prefer-jobrunner", "preferJobRunner",
+      false);
   }
 
   /**
@@ -405,9 +521,39 @@ public class Cleaner
    */
   public String cleanerDetailsOutputTipText() {
     return
-	"The file to save the cleaner details to after training, in case "
+      "The file to save the cleaner details to after training, in case "
 	+ "the cleaner implements the " + CleanerDetails.class.getName()
 	+ " interface; ignored if pointing to a directory.";
+  }
+
+  /**
+   * Sets whether to offload processing to a JobRunner instance if available.
+   *
+   * @param value	if true try to find/use a JobRunner instance
+   */
+  public void setPreferJobRunner(boolean value) {
+    m_PreferJobRunner = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to offload processing to a JobRunner instance if available.
+   *
+   * @return		if true try to find/use a JobRunner instance
+   */
+  public boolean getPreferJobRunner() {
+    return m_PreferJobRunner;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String preferJobRunnerTipText() {
+    return "If enabled, tries to offload the processing onto a " + Utils.classToString(JobRunnerInstance.class) + "; applies only to training.";
   }
 
   /**
@@ -425,6 +571,7 @@ public class Cleaner
     result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
     result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
     result += QuickInfoHelper.toString(this, "cleanerDetailsOutput", m_CleanerDetailsOutput, ", details: ");
+    result += QuickInfoHelper.toString(this, "preferJobRunner", m_PreferJobRunner, ", jobrunner");
 
     return result;
   }
@@ -501,6 +648,25 @@ public class Cleaner
   }
 
   /**
+   * Initializes the item for flow execution.
+   *
+   * @return		null if everything is fine, otherwise error message
+   */
+  @Override
+  public String setUp() {
+    String	result;
+
+    result = super.setUp();
+
+    if (result == null) {
+      if (m_PreferJobRunner)
+	m_JobRunnerInstance = JobRunnerInstance.locate(this, true);
+    }
+
+    return result;
+  }
+
+  /**
    * Configures the cleaner.
    *
    * @return		null if successful, otherwise error message
@@ -518,7 +684,7 @@ public class Cleaner
     }
     else {
       if (!errors.isEmpty())
-        result = errors.toString();
+	result = errors.toString();
     }
 
     return result;
@@ -540,6 +706,7 @@ public class Cleaner
     Row			row;
     CleaningContainer	cont;
     CleaningContainer	newCont;
+    CleanJob		job;
 
     result = null;
 
@@ -575,7 +742,17 @@ public class Cleaner
 
 	// apply cleaner
 	if (data != null) {
-	  cleaned = m_ActualCleaner.clean(data);
+	  if (m_JobRunnerInstance != null) {
+	    job     = new CleanJob(m_ActualCleaner, data);
+	    result  = m_JobRunnerInstance.executeJob(job);
+	    cleaned = job.getCleaned();
+	    job.cleanUp();
+	    if (result != null)
+	      throw new Exception(result);
+	  }
+	  else {
+	    cleaned = m_ActualCleaner.clean(data);
+	  }
 	  if (cleaned == null) {
 	    if (m_ActualCleaner.hasCleanInstancesError())
 	      throw new IllegalStateException(
@@ -630,6 +807,8 @@ public class Cleaner
       m_ActualCleaner.destroy();
       m_ActualCleaner = null;
     }
+
+    m_JobRunnerInstance = null;
 
     super.wrapUp();
   }
