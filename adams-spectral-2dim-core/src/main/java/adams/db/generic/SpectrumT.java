@@ -15,7 +15,7 @@
 
 /*
  * SpectrumT.java
- * Copyright (C) 2008-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2024 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -255,7 +255,7 @@ public abstract class SpectrumT
    * Load a spectrum from DB with given auto_id.
    *
    * @param auto_id	the databae ID
-   * @param rlike 	regex for chrom name
+   * @param rlike 	regex for spectrum ID
    * @param raw		whether to return the raw spectrum or filter it
    * 			through the global container filter
    * @return 		Spectrum, or null if not found
@@ -272,7 +272,7 @@ public abstract class SpectrumT
     rs     = null;
     regexp = JDBC.regexpKeyword(getDatabaseConnection());
     try {
-      if (rlike.equals(""))
+      if (rlike.isEmpty())
 	rs = select("*", "AUTO_ID=" + auto_id);
       else
 	rs = select("*", "AUTO_ID=" + auto_id + " AND SAMPLEID " + regexp + " " + SQLUtils.backquote(rlike));
@@ -431,21 +431,21 @@ public abstract class SpectrumT
 
     // sample name
     if (hasSampleID) {
-      if (where.length() > 0)
+      if (!where.isEmpty())
 	where += " AND";
       where += " SAMPLEID " + regexp + " " + SQLUtils.backquote(cond.getSampleIDRegExp());
     }
 
     // sample type
     if (hasSampleType) {
-      if (where.length() > 0)
+      if (!where.isEmpty())
 	where += " AND";
       where += " SAMPLETYPE " + regexp + " " + SQLUtils.backquote(cond.getSampleTypeRegExp());
     }
 
     // data format
     if (hasFormat) {
-      if (where.length() > 0)
+      if (!where.isEmpty())
 	where += " AND";
       where += " FORMAT " + regexp + " " + SQLUtils.backquote(cond.getFormat());
     }
@@ -454,7 +454,7 @@ public abstract class SpectrumT
     if (cond.getLimit() > -1)
       where += " LIMIT " + cond.getLimit();
 
-    if (where.length() == 0)
+    if (where.isEmpty())
       where = null;
     else
       where = where.trim();
@@ -507,10 +507,10 @@ public abstract class SpectrumT
       if (result.length() > 0)
 	result.append(",");
       if (storeWaveNo) {
-	result.append(Float.toString(point.getWaveNumber()));
+	result.append(point.getWaveNumber());
 	result.append(":");
       }
-      result.append(Float.toString(point.getAmplitude()));
+      result.append(point.getAmplitude());
     }
 
     return result.toString();
