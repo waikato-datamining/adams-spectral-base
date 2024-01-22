@@ -15,7 +15,7 @@
 
 /*
  * SpectrumIdSupplier.java
- * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.source;
@@ -225,7 +225,7 @@ public class SpectrumIdSupplier
       if (m_GenerateSampleIDs)
 	result.add(id);
       else
-	result.add(new Integer(id));
+	result.add(Integer.parseInt(id));
     }
 
     return result;
