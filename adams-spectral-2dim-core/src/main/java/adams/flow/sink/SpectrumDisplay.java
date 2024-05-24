@@ -20,6 +20,7 @@
 
 package adams.flow.sink;
 
+import adams.core.logging.Logger;
 import adams.data.conversion.MultiSpectrumToSpectra;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
@@ -214,44 +215,7 @@ public class SpectrumDisplay
 
     @Override
     public void display(Token token) {
-      SpectrumContainer		cont;
-      SpectrumContainerManager	manager;
-      MultiSpectrum		multi;
-      Spectrum			spec;
-      int			i;
-      MultiSpectrumToSpectra	conv;
-      Spectrum[]		specs;
-      String			msg;
-
-      cont    = null;
-      manager = m_Panel.getContainerManager();
-      manager.startUpdate();
-      if (token.getPayload() instanceof MultiSpectrum) {
-	multi = (MultiSpectrum) token.getPayload();
-	conv = new MultiSpectrumToSpectra();
-	conv.setInput(multi);
-	msg = conv.convert();
-	if (msg == null) {
-	  specs = (Spectrum[]) conv.getOutput();
-	  for (i = 0; i < specs.length; i++) {
-	    spec = specs[i];
-	    cont = manager.newContainer(spec);
-	    manager.add(cont);
-	  }
-	}
-	else {
-	  getLogger().warning(msg);
-	}
-	conv.destroy();
-      }
-      else {
-	spec = (Spectrum) token.getPayload();
-	cont = manager.newContainer(spec);
-	manager.add(cont);
-      }
-
-      if (cont != null)
-	m_PlotUpdater.update(m_Panel.getSpectrumPanel(), cont);
+      tokenToContainers(token, m_Panel, m_PlotUpdater, getLogger());
     }
 
     @Override
@@ -553,10 +517,17 @@ public class SpectrumDisplay
     return new Class[]{Spectrum.class, Spectrum[].class, MultiSpectrum.class, MultiSpectrum[].class};
   }
 
-  protected List<SpectrumContainer> toContainers(Object obj) {
+  /**
+   * Turns the object into spectrum containers.
+   *
+   * @param obj		the spectrum data to convert
+   * @param manager	the manager to use
+   * @param logger 	for logging warnings
+   * @return		the generated containers
+   */
+  protected static List<SpectrumContainer> spectrumToContainers(Object obj, SpectrumContainerManager manager, Logger logger) {
     List<SpectrumContainer>	result;
     SpectrumContainer		cont;
-    SpectrumContainerManager	manager;
     MultiSpectrum		multi;
     Spectrum			spec;
     int				i;
@@ -565,7 +536,6 @@ public class SpectrumDisplay
     String			msg;
 
     result = new ArrayList<>();
-    manager = ((SpectrumExplorer) m_Panel).getContainerManager();
 
     if (obj instanceof MultiSpectrum) {
       multi = (MultiSpectrum) obj;
@@ -581,7 +551,7 @@ public class SpectrumDisplay
 	}
       }
       else {
-	getLogger().warning(msg);
+	logger.warning(msg);
       }
       conv.destroy();
     }
@@ -595,6 +565,38 @@ public class SpectrumDisplay
   }
 
   /**
+   * Displays the token.
+   *
+   * @param token	the token to display
+   * @param panel 	the explorer panel context
+   * @param plotUpdater the updater to use
+   * @param logger 	for logging warnings
+   */
+  protected static void tokenToContainers(Token token, SpectrumExplorer panel, AbstractPlotUpdater plotUpdater, Logger logger) {
+    SpectrumContainerManager	manager;
+    List<SpectrumContainer>	conts;
+    int				i;
+    Object			obj;
+
+    manager = panel.getContainerManager();
+    conts   = new ArrayList<>();
+    obj     = token.getPayload();
+    if (obj.getClass().isArray()) {
+      for (i = 0; i < Array.getLength(obj); i++)
+	conts.addAll(spectrumToContainers(Array.get(obj, i), manager, logger));
+    }
+    else {
+      conts.addAll(spectrumToContainers(obj, manager, logger));
+    }
+
+    manager.startUpdate();
+    manager.addAll(conts);
+
+    if (!conts.isEmpty())
+      plotUpdater.update(panel.getSpectrumPanel());
+  }
+
+  /**
    * Displays the token (the panel and dialog have already been created at
    * this stage).
    *
@@ -602,27 +604,7 @@ public class SpectrumDisplay
    */
   @Override
   protected void display(Token token) {
-    List<SpectrumContainer>	conts;
-    SpectrumContainerManager	manager;
-    int				i;
-    Object			obj;
-
-    manager = ((SpectrumExplorer) m_Panel).getContainerManager();
-    conts   = new ArrayList<>();
-    obj     = token.getPayload();
-    if (obj.getClass().isArray()) {
-      for (i = 0; i < Array.getLength(obj); i++)
-	conts.addAll(toContainers(Array.get(obj, i)));
-    }
-    else {
-      conts.addAll(toContainers(obj));
-    }
-
-    manager.startUpdate();
-    manager.addAll(conts);
-
-    if (!conts.isEmpty())
-      m_PlotUpdater.update(((SpectrumExplorer) getPanel()).getSpectrumPanel());
+    tokenToContainers(token, (SpectrumExplorer) m_Panel, m_PlotUpdater, getLogger());
   }
 
   /**
