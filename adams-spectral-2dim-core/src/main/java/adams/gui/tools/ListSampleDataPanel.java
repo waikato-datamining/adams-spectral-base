@@ -15,7 +15,7 @@
 
 /*
  * ListSampleDataPanel.java
- * Copyright (C) 2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2019-2024 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -23,6 +23,7 @@ package adams.gui.tools;
 
 import adams.core.ClassLister;
 import adams.core.Properties;
+import adams.core.base.BaseRegExp;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -35,6 +36,7 @@ import adams.db.SampleDataF;
 import adams.env.Environment;
 import adams.gui.core.BaseButton;
 import adams.gui.core.BaseComboBox;
+import adams.gui.core.BaseObjectTextField;
 import adams.gui.core.BasePanel;
 import adams.gui.core.BaseSplitPane;
 import adams.gui.core.BaseStatusBar;
@@ -57,6 +59,7 @@ import com.googlecode.jfilechooserbookmarks.gui.BaseScrollPane;
 import nz.ac.waikato.cms.locator.StringCompare;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
@@ -129,6 +132,9 @@ public class ListSampleDataPanel
 
   /** the search panel for the sample data. */
   protected SearchPanel m_SearchSampleData;
+
+  /** the regexp field for limiting the sample data fields. */
+  protected BaseObjectTextField<BaseRegExp> m_TextRegexp;
 
   /** the button for displaying the sample data. */
   protected BaseButton m_ButtonDisplay;
@@ -270,6 +276,11 @@ public class ListSampleDataPanel
     panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
     panelAll.add(panel, BorderLayout.SOUTH);
 
+    m_TextRegexp = new BaseObjectTextField<>(new BaseRegExp());
+    m_TextRegexp.setToolTipText("The regular expression for matching the sample data field names, eg '.*2$' for all ending in '2' or '^A.*' for all starting with 'A'.");
+    panel.add(new JLabel("Fields"));
+    panel.add(m_TextRegexp);
+
     m_ButtonDisplay = new BaseButton("Display");
     m_ButtonDisplay.setMnemonic('D');
     m_ButtonDisplay.addActionListener((ActionEvent e) -> display());
@@ -318,7 +329,7 @@ public class ListSampleDataPanel
     final String[]	sel;
     SwingWorker		worker;
 
-    sel   = m_Model.getSelectedSampleIDs();
+    sel = m_Model.getSelectedSampleIDs();
 
     worker = new SwingWorker() {
       protected boolean successful;
@@ -331,6 +342,8 @@ public class ListSampleDataPanel
 	Set<String> namesSet = new HashSet<>();
 	Map<String,SampleData> all = new HashMap<>();
 	SampleDataF sdt = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
+	BaseRegExp fieldRegExp = m_TextRegexp.getObject();
+	boolean matchAll = fieldRegExp.isMatchAll();
 	for (int i = 0; i < sel.length; i++) {
 	  m_StatusBar.showStatus("Loading: " + (i+1) + "/" + sel.length + "...");
 	  SampleData sd = sdt.load(sel[i]);
@@ -346,6 +359,10 @@ public class ListSampleDataPanel
 	      continue;
 	    if (field.getName().equals(SampleData.FIELD_EXCLUDED))
 	      continue;
+	    if (!matchAll) {
+	      if (!fieldRegExp.isMatch(field.getName()))
+		continue;
+	    }
 	    namesSet.add(field.getName());
 	  }
 	}
