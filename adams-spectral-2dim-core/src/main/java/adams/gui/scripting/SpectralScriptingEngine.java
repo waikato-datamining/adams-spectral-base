@@ -13,24 +13,22 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectralScriptingEngine.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.gui.scripting;
 
 import adams.core.Properties;
+import adams.core.scriptingengine.BackgroundScriptingEngineRegistry;
 import adams.db.AbstractDatabaseConnection;
 import adams.env.SpectralScriptingEngineDefinition;
-
-import java.util.Iterator;
 
 /**
  * Scripting engine for spectral module.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class SpectralScriptingEngine
   extends ScriptingEngine {
@@ -76,25 +74,17 @@ public class SpectralScriptingEngine
    * @return		the singleton
    */
   public synchronized static AbstractScriptingEngine getSingleton(AbstractDatabaseConnection dbcon) {
+    SpectralScriptingEngine	engine;
+
     if (m_ScriptingEngineManager == null)
       m_ScriptingEngineManager = new ScriptingEngineManager();
     if (!m_ScriptingEngineManager.has(dbcon)) {
-      m_ScriptingEngineManager.add(dbcon, new SpectralScriptingEngine());
-      m_ScriptingEngineManager.get(dbcon).setDatabaseConnection(dbcon);
+      engine = new SpectralScriptingEngine();
+      engine.setDatabaseConnection(dbcon);
+      m_ScriptingEngineManager.add(dbcon, engine);
+      BackgroundScriptingEngineRegistry.getSingleton().register(engine);
     }
 
     return m_ScriptingEngineManager.get(dbcon);
-  }
-
-  /**
-   * Stops all scripting engines.
-   */
-  public synchronized static void stopAllEngines() {
-    Iterator<AbstractScriptingEngine> iter;
-    if (m_ScriptingEngineManager != null) {
-      iter = m_ScriptingEngineManager.iterator();
-      while (iter.hasNext())
-	iter.next().stopEngine();
-    }
   }
 }
