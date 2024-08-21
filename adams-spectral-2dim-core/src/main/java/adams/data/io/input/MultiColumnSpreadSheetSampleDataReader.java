@@ -391,6 +391,7 @@ public class MultiColumnSpreadSheetSampleDataReader
     SampleData			sd;
     Field[]			fields;
     Cell			cell;
+    boolean			any;
 
     result = new ArrayList<>();
 
@@ -446,6 +447,7 @@ public class MultiColumnSpreadSheetSampleDataReader
 
       sd = newInstance();
       sd.setID(row.getCell(colID).getContent().trim());
+      any = false;
       for (int index: colsSD) {
 	if (index == colID)
 	  continue;
@@ -456,8 +458,10 @@ public class MultiColumnSpreadSheetSampleDataReader
 	  continue;
 	sd.addField(fields[index]);
 	sd.setValue(fields[index], cell.getContent());
+	any = true;
       }
-      result.add(sd);
+      if (any)
+	result.add(sd);
     }
 
     return result;
