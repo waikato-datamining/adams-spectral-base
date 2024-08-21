@@ -144,6 +144,9 @@ public class MultiColumnSpreadSheetSampleDataReader
   public void defineOptions() {
     super.defineOptions();
 
+    m_OptionManager.removeByProperty("format");
+    m_OptionManager.removeByProperty("offline");
+
     m_OptionManager.add(
       "reader", "reader",
       new CsvSpreadSheetReader());
