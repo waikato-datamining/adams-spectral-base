@@ -1,0 +1,34 @@
+--> sampledata-multicol-out0.csv
+#1:
+Bool1[B]: true
+Num1[N]: 1.1
+Num2[N]: 1.2
+Sample ID[S]: 10001
+Str1[S]: v1
+
+#2:
+Bool1[B]: false
+Num1[N]: 2.1
+Num2[N]: 2.2
+Sample ID[S]: 10002
+
+#3:
+Bool1[B]: true
+Num2[N]: 3.2
+Sample ID[S]: 10003
+Str1[S]: v3
+
+#4:
+Bool1[B]: false
+Num1[N]: 4.1
+Sample ID[S]: 10004
+Str1[S]: v4
+
+#5:
+Num1[N]: 5.1
+Num2[N]: 5.2
+Sample ID[S]: 10005
+Str1[S]: v5
+
+
+
