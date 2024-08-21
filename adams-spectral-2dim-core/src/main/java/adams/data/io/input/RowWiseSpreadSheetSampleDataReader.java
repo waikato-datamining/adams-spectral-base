@@ -15,7 +15,7 @@
 
 /*
  * RowWiseSpreadSheetSampleDataReader.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -26,6 +26,8 @@ import adams.data.sampledata.SampleData;
 import adams.data.spreadsheet.Cell;
 import adams.data.spreadsheet.Row;
 import adams.data.spreadsheet.SpreadSheet;
+import adams.data.spreadsheet.rowfinder.AllFinder;
+import adams.data.spreadsheet.rowfinder.RowFinder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,7 @@ import java.util.logging.Level;
  * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
  * </pre>
  *
  * <pre>-input &lt;adams.core.io.PlaceholderFile&gt; (property: input)
@@ -84,7 +87,12 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;The name of the column containing the reference value.
  * &nbsp;&nbsp;&nbsp;default: Value
  * </pre>
- * 
+ *
+ * <pre>-row-finder &lt;adams.data.spreadsheet.rowfinder.RowFinder&gt; (property: rowFinder)
+ * &nbsp;&nbsp;&nbsp;The row finder to use for locating the rows to import.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.spreadsheet.rowfinder.AllFinder
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
@@ -109,6 +117,9 @@ public class RowWiseSpreadSheetSampleDataReader
 
   /** the column name that stores the reference value. */
   protected String m_ColumnMeasurementValue;
+
+  /** for locating the rows to import. */
+  protected RowFinder m_RowFinder;
 
   /**
    * Returns a string describing the object.
@@ -146,6 +157,10 @@ public class RowWiseSpreadSheetSampleDataReader
     m_OptionManager.add(
       "col-value", "columnMeasurementValue",
       "Value");
+
+    m_OptionManager.add(
+      "row-finder", "rowFinder",
+      new AllFinder());
   }
 
   /**
@@ -315,6 +330,35 @@ public class RowWiseSpreadSheetSampleDataReader
   }
 
   /**
+   * Sets the row finder to use for locating the rows to import.
+   *
+   * @param value 	the finder
+   */
+  public void setRowFinder(RowFinder value) {
+    m_RowFinder = value;
+    reset();
+  }
+
+  /**
+   * Returns the row finder to use for locating the rows to import.
+   *
+   * @return 		the finder
+   */
+  public RowFinder getRowFinder() {
+    return m_RowFinder;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String rowFinderTipText() {
+    return "The row finder to use for locating the rows to import.";
+  }
+
+  /**
    * Returns a new instance of the report class in use.
    *
    * @return		the new (empty) report
@@ -327,7 +371,7 @@ public class RowWiseSpreadSheetSampleDataReader
   /**
    * Locates the column and returns the key for the column.
    *
-   * @param sheet	the spread sheet to work on
+   * @param sheet	the spreadsheet to work on
    * @param column	the column to locate
    * @param fail	if true then a IllegalStateException execption is
    * 			thrown in case the column cannot be located
@@ -340,7 +384,7 @@ public class RowWiseSpreadSheetSampleDataReader
     String		msg;
 
     result = null;
-    if ((sheet.getColumnCount() == 0) || (column.length() == 0))
+    if ((sheet.getColumnCount() == 0) || column.isEmpty())
       return result;
 
     row = sheet.getHeaderRow();
@@ -372,7 +416,7 @@ public class RowWiseSpreadSheetSampleDataReader
   protected List<SampleData> readData() {
     List<SampleData> 		result;
     SpreadSheet			sheet;
-    Row				row;
+    List<Row>			rows;
     int				i;
     String			keySampleID;
     String			keySampleType;
@@ -394,14 +438,22 @@ public class RowWiseSpreadSheetSampleDataReader
     keyMeasurementName  = locateColumn(sheet, m_ColumnMeasurementName, true);
     keyMeasurementValue = locateColumn(sheet, m_ColumnMeasurementValue, true);
 
+    // rows to process
+    rows = new ArrayList<>();
+    if (m_RowFinder instanceof AllFinder) {
+      rows.addAll(sheet.rows());
+    }
+    else {
+      for (int index: m_RowFinder.findRows(sheet))
+	rows.add(sheet.getRow(index));
+    }
+
     // read data
     sampleKey = null;
     sd        = null;
-    for (i = 0; i < sheet.getRowCount(); i++) {
+    for (Row row: rows) {
       if (m_Stopped)
 	break;
-      
-      row = sheet.getRow(i);
 
       if (row.getCell(0).getContent().trim().equals("="))
 	continue;
@@ -421,7 +473,7 @@ public class RowWiseSpreadSheetSampleDataReader
 	sd.setValue(field, Double.parseDouble(row.getCell(keyMeasurementValue).getContent().trim()));
       }
       catch (Exception e) {
-	getLogger().log(Level.SEVERE, "Failed to convert measurement value in row #" + (i + 1) + ": " + row.getCell(keyMeasurementValue).getContent().trim(), e);
+	getLogger().log(Level.SEVERE, "Failed to convert measurement value in row: " + row, e);
       }
     }
 
