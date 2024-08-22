@@ -127,7 +127,7 @@ public abstract class SampleDataT
 	if (dtype != null)
 	  whereParts.add("sd.TYPE = " + SQLUtils.backquote(dtype.toString()));
 
-	if (whereParts.size() > 0) {
+	if (!whereParts.isEmpty()) {
 	  where = "";
 	  for (i = 0; i < whereParts.size(); i++) {
 	    if (i > 0)
@@ -539,7 +539,7 @@ public abstract class SampleDataT
 	tables += ", " + getTableName() + " sd";
       if (fields.length > 0) {
 	for (i = 0; i < fields.length; i++) {
-	  if (fields[i].getName().length() > 0)
+	  if (!fields[i].getName().isEmpty())
 	    tables += ", " + getTableName() + " sd" + i;
 	}
       }
@@ -553,7 +553,7 @@ public abstract class SampleDataT
 	tables += ", " + getTableName() + " sd_dummies";
       if (required.length > 0) {
 	for (i = 0; i < required.length; i++) {
-	  if (required[i].getName().length() > 0)
+	  if (!required[i].getName().isEmpty())
 	    tables += ", " + getTableName() + " sd_req" + i;
 	}
       }
@@ -564,7 +564,7 @@ public abstract class SampleDataT
       // WHERE
       if (fields.length > 0) {
 	for (i = 0; i < fields.length; i++) {
-	  if (fields[i].getName().length() > 0) {
+	  if (!fields[i].getName().isEmpty()) {
 	    where.add("sd" + i + ".ID = sp.SAMPLEID");
 	    where.add("sd" + i + ".NAME = " + SQLUtils.backquote(fields[i].getName()));
 	  }
@@ -613,7 +613,7 @@ public abstract class SampleDataT
 
       if (required.length > 0) {
 	for (i = 0; i < required.length; i++) {
-	  if (required[i].getName().length() > 0) {
+	  if (!required[i].getName().isEmpty()) {
 	    where.add("sd_req" + i + ".ID = sp.SAMPLEID");
 	    where.add("sd_req" + i + ".NAME = " + SQLUtils.backquote(required[i].getName()));
 	  }
@@ -685,9 +685,9 @@ public abstract class SampleDataT
   }
 
   /**
-   * Returns a list of sample IDs of of sample data without associated spectra.
+   * Returns a list of sample IDs of sample data without associated spectra.
    *
-   * @param conditions	the conditions that the sampledata must meet
+   * @param conditions	the conditions that the sample data must meet
    * @return		list of sample IDs
    */
   public List<String> getOrphanedIDs(OrphanedSampleDataConditions conditions) {
@@ -804,27 +804,29 @@ public abstract class SampleDataT
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName());
 
+    m_Connection       = null;
     m_BulkStoreStopped = false;
     useSameConnection  = true;
 
     if (newConnection) {
       try {
-	if (getDatabaseConnection().getUser().equals(""))
+	if (getDatabaseConnection().getUser().isEmpty())
 	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getUser());
 	else
 	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
+	m_Connection.setAutoCommit(autoCommit);
 	useSameConnection = false;
       }
       catch(Exception e) {
         getLogger().warning("Failed to open separate connection to " + getDatabaseConnection().getURL() + ", re-using existing one.");
-	useSameConnection = true;
       }
     }
 
     if (!newConnection || useSameConnection) {
       if (!autoCommit) {
 	try {
-	  getDatabaseConnection().getConnection(false).setAutoCommit(false);
+	  m_Connection = getDatabaseConnection().getConnection(false);
+	  m_Connection.setAutoCommit(false);
 	}
 	catch (Exception e) {
 	  getLogger().log(Level.WARNING, "Failed to turn off auto-commit!", e);
@@ -832,9 +834,19 @@ public abstract class SampleDataT
       }
     }
 
+    if (m_Connection == null) {
+      getLogger().warning("Falling back on default connection: " + getDatabaseConnection());
+      m_Connection = getDatabaseConnection().getConnection(false);
+    }
+
+    if (m_Connection == null) {
+      getLogger().severe("Cannot insert data, due to failure of obtaining connection from: " + getDatabaseConnection());
+      return false;
+    }
+
     try {
-      delete = prepareStatement("DELETE FROM " + getTableName() + " WHERE ID = ? AND NAME = ?");
-      insert = prepareStatement("INSERT INTO " + getTableName() + "(ID, NAME, TYPE, VALUE)  VALUES(?, ?, ?, ?)");
+      delete = prepareStatement(m_Connection, "DELETE FROM " + getTableName() + " WHERE ID = ? AND NAME = ?", false);
+      insert = prepareStatement(m_Connection, "INSERT INTO " + getTableName() + "(ID, NAME, TYPE, VALUE)  VALUES(?, ?, ?, ?)", false);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to prepare statements!", e);
@@ -883,7 +895,7 @@ public abstract class SampleDataT
 	      getLogger().info(LoggingHelper.getMethodName() + ": committing batches, # records so far: " + n);
 	    delete.executeBatch();
 	    insert.executeBatch();
-	    getDatabaseConnection().getConnection(false).commit();
+	    m_Connection.commit();
 	    delete.clearBatch();
 	    insert.clearBatch();
 	    committed = true;
@@ -911,12 +923,21 @@ public abstract class SampleDataT
     SQLUtils.close(delete);
     SQLUtils.close(insert);
 
-    if (!autoCommit) {
+    if (!autoCommit && useSameConnection) {
       try {
 	getDatabaseConnection().getConnection(false).setAutoCommit(true);
       }
       catch (Exception e) {
 	getLogger().log(Level.WARNING, "Failed to turn on auto-commit!", e);
+      }
+    }
+
+    if (!useSameConnection) {
+      try {
+	m_Connection.close();
+      }
+      catch (Exception e) {
+	getLogger().log(Level.WARNING, "Failed to close connection!", e);
       }
     }
 
