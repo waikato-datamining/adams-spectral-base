@@ -690,7 +690,7 @@ public abstract class SpectrumT
     }
 
     try {
-      delete = prepareStatement(m_Connection, "DELETE FROM " + getTableName() + " WHERE ID = ? AND FORMAT = ?", false);
+      delete = prepareStatement(m_Connection, "DELETE FROM " + getTableName() + " WHERE SAMPLEID = ? AND FORMAT = ?", false);
       insert = prepareStatement(m_Connection, "INSERT INTO " + getTableName() + "(SAMPLEID, SAMPLETYPE, FORMAT, POINTS) VALUES(?, ?, ?, ?)", false);
     }
     catch (Exception e) {
