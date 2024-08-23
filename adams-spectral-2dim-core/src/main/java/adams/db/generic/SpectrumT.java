@@ -726,7 +726,8 @@ public abstract class SpectrumT
 	    getLogger().info(LoggingHelper.getMethodName() + ": committing batches, # records so far: " + n);
 	  delete.executeBatch();
 	  insert.executeBatch();
-	  m_Connection.commit();
+	  if (!autoCommit)
+	    m_Connection.commit();
 	  delete.clearBatch();
 	  insert.clearBatch();
 	  committed = true;
@@ -742,6 +743,8 @@ public abstract class SpectrumT
       if (!committed) {
 	delete.executeBatch();
 	insert.executeBatch();
+	if (!autoCommit)
+	  m_Connection.commit();
       }
       delete.clearBatch();
       insert.clearBatch();
