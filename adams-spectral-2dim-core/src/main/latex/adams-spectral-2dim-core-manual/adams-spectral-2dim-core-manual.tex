@@ -42,7 +42,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2017-2021} &
+		\parbox[c][2cm]{2cm}{\copyright 2017-2024} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -101,6 +101,8 @@ The following sources are available:
 The following transformers are available:
 \begin{tight_itemize}
   \item \textit{BulkSampleDataDbWriter} -- writes sample data to the database like \textit{SampleDataDbWriter}, but
+  with much higher throughput.
+  \item \textit{BulkSpectrumDbWriter} -- writes spectra to the database like \textit{SpectrumDbWriter}, but
   with much higher throughput.
   \item \textit{Cleaner} -- cleans a Weka dataset with a specific cleaner
   and performs checks on single Instance objects.

@@ -15,7 +15,7 @@
 
 /*
  * SpectrumIntf.java
- * Copyright (C) 2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2019-2024 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -215,6 +215,23 @@ public interface SpectrumIntf
    * @return  	new ID, or null if fail
    */
   public Integer add(Spectrum sp, boolean storeWaveNo);
+
+  /**
+   * Stores the spectra in the database.
+   *
+   * @param sp  	the spectra to add
+   * @param storeWaveNo	whether to store the wave numbers as well
+   * @param batchSize   the maximum number of records in one batch
+   * @param autoCommit  whether to use auto-commit or not (turning off may impact other transactions!)
+   * @param newConnection	uses a separate database connection just for this connection (then no auto-commit doesn't affect the rest)
+   * @return 		true if successfully inserted/updated
+   */
+  public boolean bulkAdd(Spectrum[] sp, boolean storeWaveNo, int batchSize, boolean autoCommit, boolean newConnection);
+
+  /**
+   * Interrupts a currently running bulk store, if possible.
+   */
+  public void stopBulkAdd();
 
   /**
    * Removes the spectrum and its sample data.

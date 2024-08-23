@@ -44,6 +44,9 @@ import adams.db.indices.Indices;
 import adams.db.types.AutoIncrementType;
 import adams.db.types.ColumnType;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -65,6 +68,9 @@ public abstract class SpectrumT
 
   /** the table manager. */
   protected static TableManager<SpectrumT> m_TableManager;
+
+  /** whether to stop the bulk add. */
+  protected boolean m_BulkAddStopped;
 
   /**
    * Constructor - initalise with database connection.
@@ -280,7 +286,6 @@ public abstract class SpectrumT
       result = resultsetToSpectrum(rs, raw);
     }
     catch (Exception e) {
-      result = null;
       getLogger().log(Level.SEVERE, "Failed to process DB ID " + auto_id, e);
     }
     finally{
@@ -313,7 +318,6 @@ public abstract class SpectrumT
       result = resultsetToSpectrum(rs, raw);
     }
     catch (Exception e) {
-      result = null;
       getLogger().log(Level.SEVERE, "Failed to process Sample ID " + sample_id, e);
     }
     finally{
@@ -567,9 +571,9 @@ public abstract class SpectrumT
    * Adds a spectrum to the database. Returns the created auto-id, and sets in
    * Spectrum.
    *
-   * @param sp  	spectrum Header
-   * @param storeWaveNo   whether to store the wave numbers as well
-   * @return  	new ID, or null if fail
+   * @param sp  	the spectrum to add
+   * @param storeWaveNo	whether to store the wave numbers as well
+   * @return  		new ID, or null if fail
    */
   public Integer add(Spectrum sp, boolean storeWaveNo) {
     Integer 		result;
@@ -604,12 +608,10 @@ public abstract class SpectrumT
         }
 	else {
 	  getLogger().severe("no gen keys");
-	  result = null;
 	}
       }
       else {
 	getLogger().severe("null genkeys");
-	result = null;
       }
     }
     catch (Exception e) {
@@ -621,6 +623,163 @@ public abstract class SpectrumT
     }
 
     return result;
+  }
+
+  /**
+   * Stores the spectra in the database.
+   *
+   * @param sp  	the spectra to add
+   * @param storeWaveNo	whether to store the wave numbers as well
+   * @param batchSize   the maximum number of records in one batch
+   * @param autoCommit  whether to use auto-commit or not (turning off may impact other transactions!)
+   * @param newConnection	uses a separate database connection just for this connection (then no auto-commit doesn't affect the rest)
+   * @return 		true if successfully inserted/updated
+   */
+  @Override
+  public boolean bulkAdd(Spectrum[] sp, boolean storeWaveNo, int batchSize, boolean autoCommit, boolean newConnection) {
+    boolean		result;
+    PreparedStatement 	delete;
+    PreparedStatement	insert;
+    boolean		committed;
+    int			i;
+    int			n;
+    boolean		useSameConnection;
+    Connection 		m_Connection;
+
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName());
+
+    m_Connection       = null;
+    m_BulkAddStopped = false;
+    useSameConnection  = true;
+
+    if (newConnection) {
+      try {
+	if (getDatabaseConnection().getUser().isEmpty())
+	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getUser());
+	else
+	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
+	m_Connection.setAutoCommit(autoCommit);
+	useSameConnection = false;
+      }
+      catch(Exception e) {
+	getLogger().warning("Failed to open separate connection to " + getDatabaseConnection().getURL() + ", re-using existing one.");
+      }
+    }
+
+    if (!newConnection || useSameConnection) {
+      if (!autoCommit) {
+	try {
+	  m_Connection = getDatabaseConnection().getConnection(false);
+	  m_Connection.setAutoCommit(false);
+	}
+	catch (Exception e) {
+	  getLogger().log(Level.WARNING, "Failed to turn off auto-commit!", e);
+	}
+      }
+    }
+
+    if (m_Connection == null) {
+      getLogger().warning("Falling back on default connection: " + getDatabaseConnection());
+      m_Connection = getDatabaseConnection().getConnection(false);
+    }
+
+    if (m_Connection == null) {
+      getLogger().severe("Cannot insert data, due to failure of obtaining connection from: " + getDatabaseConnection());
+      return false;
+    }
+
+    try {
+      delete = prepareStatement(m_Connection, "DELETE FROM " + getTableName() + " WHERE ID = ? AND FORMAT = ?", false);
+      insert = prepareStatement(m_Connection, "INSERT INTO " + getTableName() + "(SAMPLEID, SAMPLETYPE, FORMAT, POINTS) VALUES(?, ?, ?, ?)", false);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to prepare statements!", e);
+      return false;
+    }
+
+    result    = true;
+    n         = 0;
+    committed = true;
+    for (i = 0; i < sp.length; i++) {
+      // stopped?
+      if (m_BulkAddStopped)
+	break;
+
+      try {
+	// delete
+	delete.setString(1, sp[i].getID());
+	delete.setString(2, sp[i].getFormat());
+	delete.addBatch();
+
+	// insert
+	insert.setString(1, sp[i].getID());
+	insert.setString(2, sp[i].getType());
+	insert.setString(3, sp[i].getFormat());
+	insert.setString(4, pointsToString(sp[i], storeWaveNo));
+	insert.addBatch();
+
+	n++;
+	committed = false;
+	if (n % batchSize == 0) {
+	  if (isLoggingEnabled())
+	    getLogger().info(LoggingHelper.getMethodName() + ": committing batches, # records so far: " + n);
+	  delete.executeBatch();
+	  insert.executeBatch();
+	  m_Connection.commit();
+	  delete.clearBatch();
+	  insert.clearBatch();
+	  committed = true;
+	}
+      }
+      catch (Exception e) {
+	result = false;
+	break;
+      }
+    }
+
+    try {
+      if (!committed) {
+	delete.executeBatch();
+	insert.executeBatch();
+      }
+      delete.clearBatch();
+      insert.clearBatch();
+    }
+    catch (Exception e) {
+      // ignored
+    }
+
+    SQLUtils.close(delete);
+    SQLUtils.close(insert);
+
+    if (!autoCommit && useSameConnection) {
+      try {
+	getDatabaseConnection().getConnection(false).setAutoCommit(true);
+      }
+      catch (Exception e) {
+	getLogger().log(Level.WARNING, "Failed to turn on auto-commit!", e);
+      }
+    }
+
+    if (!useSameConnection) {
+      try {
+	m_Connection.close();
+      }
+      catch (Exception e) {
+	getLogger().log(Level.WARNING, "Failed to close connection!", e);
+      }
+    }
+
+    return result && !m_BulkAddStopped;
+  }
+
+  /**
+   * Interrupts a currently running bulk store, if possible.
+   */
+  @Override
+  public void stopBulkAdd() {
+    m_BulkAddStopped = true;
   }
 
   /**

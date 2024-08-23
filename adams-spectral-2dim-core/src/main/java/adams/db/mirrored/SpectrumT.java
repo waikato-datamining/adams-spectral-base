@@ -15,7 +15,7 @@
 
 /*
  * SpectrumT.java
- * Copyright (C) 2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.db.mirrored;
@@ -338,6 +338,7 @@ public class SpectrumT
    * @param storeWaveNo   whether to store the wave numbers as well
    * @return  	new ID, or null if fail
    */
+  @Override
   public Integer add(Spectrum sp, boolean storeWaveNo) {
     synchronized(m_Updating) {
       if (isLoggingEnabled())
@@ -345,6 +346,35 @@ public class SpectrumT
       getWrapped().add((Spectrum) sp.getClone(), storeWaveNo);
       return m_DB.add(sp, storeWaveNo);
     }
+  }
+
+  /**
+   * Stores the spectra in the database.
+   *
+   * @param sp  	the spectra to add
+   * @param storeWaveNo	whether to store the wave numbers as well
+   * @param batchSize   the maximum number of records in one batch
+   * @param autoCommit  whether to use auto-commit or not (turning off may impact other transactions!)
+   * @param newConnection	uses a separate database connection just for this connection (then no auto-commit doesn't affect the rest)
+   * @return 		true if successfully inserted/updated
+   */
+  @Override
+  public boolean bulkAdd(Spectrum[] sp, boolean storeWaveNo, int batchSize, boolean autoCommit, boolean newConnection) {
+    synchronized(m_Updating) {
+      if (isLoggingEnabled())
+	getLogger().info(LoggingHelper.getMethodName() + ": #sp=" + sp.length + ", storeWaveNo=" + storeWaveNo + ", batchSize=" + batchSize + ", autoCommit=" + autoCommit + ", newConnection=" + newConnection);
+      getWrapped().bulkAdd(sp, storeWaveNo, batchSize, autoCommit, newConnection);
+      return m_DB.bulkAdd(sp, storeWaveNo, batchSize, autoCommit, newConnection);
+    }
+  }
+
+  /**
+   * Interrupts a currently running bulk store, if possible.
+   */
+  @Override
+  public void stopBulkAdd() {
+    getWrapped().stopBulkAdd();
+    m_DB.stopBulkAdd();
   }
 
   /**
