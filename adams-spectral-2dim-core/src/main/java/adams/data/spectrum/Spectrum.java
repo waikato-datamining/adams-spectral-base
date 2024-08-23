@@ -15,7 +15,7 @@
 
 /*
  * Spectrum.java
- * Copyright (C) 2009-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrum;
@@ -130,7 +130,7 @@ public class Spectrum
    */
   @Override
   public int hashCode() {
-    return new String(getID() + " " + getFormat() + super.hashCode()).hashCode();
+    return (getID() + " " + getFormat() + super.hashCode()).hashCode();
   }
 
   /**
@@ -472,7 +472,7 @@ public class Spectrum
     result = CompareUtils.compare(getFormat(), sp.getFormat());
 
     if (result == 0)
-      result = new Integer(getDatabaseID()).compareTo(sp.getDatabaseID());
+      result = Integer.compare(getDatabaseID(), sp.getDatabaseID());
 
     if (result == 0)
       result = CompareUtils.compare(getReport(), sp.getReport());
