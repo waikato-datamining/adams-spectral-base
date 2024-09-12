@@ -15,7 +15,7 @@
 
 /*
  * SpectrumExplorer.java
- * Copyright (C) 2009-2022 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -91,6 +91,7 @@ import adams.gui.visualization.core.Paintlet;
 import adams.gui.visualization.report.ReportContainer;
 import adams.gui.visualization.stats.scatterplot.AbstractScatterPlotOverlay;
 import adams.gui.visualization.stats.scatterplot.Coordinates;
+import adams.gui.visualization.stats.scatterplot.PolygonSelection;
 import adams.gui.visualization.stats.scatterplot.ScatterPlot;
 import adams.gui.visualization.stats.scatterplot.action.ViewDataClickAction;
 
@@ -1211,14 +1212,20 @@ public class SpectrumExplorer
 	  ScatterPlot plot = new ScatterPlot();
 	  plot.setData(m_ICA.getComponents());
 	  plot.setMouseClickAction(new ViewDataClickAction());
-	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{
+	    new Coordinates(),
+	    new PolygonSelection(),
+	  });
 	  plot.reset();
 	  tabbedPane.addTab("Components", plot);
 	  // sources
 	  plot = new ScatterPlot();
 	  plot.setData(m_ICA.getSources());
 	  plot.setMouseClickAction(new ViewDataClickAction());
-	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{
+	    new Coordinates(),
+	    new PolygonSelection(),
+	  });
 	  plot.reset();
 	  tabbedPane.addTab("Sources", plot);
 	  // display dialog
@@ -1365,14 +1372,20 @@ public class SpectrumExplorer
 	  ScatterPlot plot = new ScatterPlot();
 	  plot.setData(m_PLS.getLoadings());
 	  plot.setMouseClickAction(new ViewDataClickAction());
-	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{
+	    new Coordinates(),
+	    new PolygonSelection(),
+	  });
 	  plot.reset();
 	  tabbedPane.addTab("Loadings", plot);
 	  // scores
 	  plot = new ScatterPlot();
 	  plot.setData(m_PLS.getScores());
 	  plot.setMouseClickAction(new ViewDataClickAction());
-	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{
+	    new Coordinates(),
+	    new PolygonSelection(),
+	  });
 	  plot.reset();
 	  tabbedPane.addTab("Scores", plot);
 	  // display dialog
