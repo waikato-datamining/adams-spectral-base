@@ -1295,14 +1295,20 @@ public class SpectrumExplorer
 	  ScatterPlot plot = new ScatterPlot();
 	  plot.setData(m_PCA.getLoadings());
 	  plot.setMouseClickAction(new ViewDataClickAction());
-	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{
+	    new Coordinates(),
+	    new PolygonSelection(),
+	  });
 	  plot.reset();
 	  tabbedPane.addTab("Loadings", plot);
 	  // scores
 	  plot = new ScatterPlot();
 	  plot.setData(m_PCA.getScores());
 	  plot.setMouseClickAction(new ViewDataClickAction());
-	  plot.setOverlays(new AbstractScatterPlotOverlay[]{new Coordinates()});
+	  plot.setOverlays(new AbstractScatterPlotOverlay[]{
+	    new Coordinates(),
+	    new PolygonSelection(),
+	  });
 	  plot.reset();
 	  tabbedPane.addTab("Scores", plot);
 	  // display dialog
