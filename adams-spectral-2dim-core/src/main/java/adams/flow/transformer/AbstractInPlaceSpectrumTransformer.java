@@ -15,7 +15,7 @@
 
 /*
  * AbstractInPlaceSpectrumTransformer.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.transformer;
 
@@ -51,20 +51,22 @@ public abstract class AbstractInPlaceSpectrumTransformer
   }
 
   /**
-   * Sets whether to skip creating a copy of the spreadsheet before setting value.
+   * Sets whether to skip creating a copy of the spectrum before processing it.
    *
    * @param value	true if to skip creating copy
    */
+  @Override
   public void setNoCopy(boolean value) {
     m_NoCopy = value;
     reset();
   }
 
   /**
-   * Returns whether to skip creating a copy of the spreadsheet before setting value.
+   * Returns whether to skip creating a copy of the spectrum before processing it.
    *
    * @return		true if copying is skipped
    */
+  @Override
   public boolean getNoCopy() {
     return m_NoCopy;
   }
@@ -75,6 +77,7 @@ public abstract class AbstractInPlaceSpectrumTransformer
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
+  @Override
   public String noCopyTipText() {
     return "If enabled, no copy of the spectrum is created before processing it.";
   }
