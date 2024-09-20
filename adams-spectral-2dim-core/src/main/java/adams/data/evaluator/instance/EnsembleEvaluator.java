@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * EnsembleEvaluator.java
- * Copyright (C) 2015 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.evaluator.instance;
@@ -79,7 +79,6 @@ import java.util.Random;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class EnsembleEvaluator
   extends AbstractSerializableEvaluator
@@ -308,7 +307,7 @@ public class EnsembleEvaluator
 	min       = Math.min(min, preds[i]);
 	max       = Math.max(max, preds[i]);
       }
-      result = new Float(max - min);
+      result = (float) (max - min);
     }
     catch (Exception e) {
       LoggingHelper.handleException(this, "Failed to perform evaluation!", e);

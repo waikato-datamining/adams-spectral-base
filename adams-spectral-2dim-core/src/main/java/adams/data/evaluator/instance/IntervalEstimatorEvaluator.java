@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * IntervalEstimatorEvaluator.java
- * Copyright (C) 2015-2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.evaluator.instance;
@@ -79,7 +79,6 @@ import java.util.HashMap;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class IntervalEstimatorEvaluator
   extends AbstractSerializableEvaluator
@@ -316,7 +315,7 @@ public class IntervalEstimatorEvaluator
     try {
       conf = ((IntervalEstimator) m_ActualClassifier).predictIntervals(data, m_ConfidenceLevel);
       conf = postProcess(conf);
-      result = new Float(conf[0][1] - conf[0][0]);
+      result = (float) (conf[0][1] - conf[0][0]);
     }
     catch (Exception e) {
       LoggingHelper.handleException(this, "Failed to perform evaluation!", e);

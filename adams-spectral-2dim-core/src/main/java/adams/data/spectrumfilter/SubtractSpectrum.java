@@ -15,7 +15,7 @@
 
 /*
  * SubtractSpectrum.java
- * Copyright (C) 2008-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -39,13 +39,12 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SubtractSpectrum
   extends AbstractDatabaseConnectionFilter<Spectrum> {
 
-  /** for serialization. */
- 
+  private static final long serialVersionUID = 3414623712198778099L;
+
   /**
    * Returns the default database connection.
    *
@@ -54,10 +53,6 @@ public class SubtractSpectrum
   protected AbstractDatabaseConnection getDefaultDatabaseConnection() {
     return DatabaseConnection.getSingleton();
   }
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 3414623712198778099L;
 
   /** the filter to run. */
   protected Filter<Spectrum> m_Filter;
@@ -126,7 +121,7 @@ public class SubtractSpectrum
     int			i;
    
     Spectrum f1=m_Filter.filter(data);
-    Spectrum sp=SpectrumF.getSingleton(getDatabaseConnection()).load(new Integer(m_id));
+    Spectrum sp=SpectrumF.getSingleton(getDatabaseConnection()).load(m_id);
     Spectrum f2=m_Filter.filter(sp);
    
     result = data.getHeader();
