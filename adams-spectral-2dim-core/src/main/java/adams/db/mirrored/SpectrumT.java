@@ -54,7 +54,7 @@ public class SpectrumT
   protected SpectrumIntf m_DB;
 
   /** object for blocking polling/removal of fully processed. */
-  protected final Long m_Updating;
+  protected final String m_Updating;
 
   /**
    * Initializes the mirroring.
@@ -65,7 +65,7 @@ public class SpectrumT
   protected SpectrumT(AbstractDatabaseConnection dbcon, SpectrumIntf wrapped) {
     super(dbcon, wrapped);
     m_DB       = ((SpectralDbBackend) AbstractSpectralDbBackend.getSingleton()).getNonMirroredBackend().getSpectrum(dbcon);
-    m_Updating = UniqueIDs.nextLong();
+    m_Updating = UniqueIDs.next();
   }
 
   /**

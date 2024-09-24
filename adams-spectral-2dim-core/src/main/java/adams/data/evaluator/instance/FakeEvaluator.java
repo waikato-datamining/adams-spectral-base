@@ -13,13 +13,14 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * FakeEvaluator.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.evaluator.instance;
 
 import adams.core.Randomizable;
+import adams.core.UniqueIDs;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -67,7 +68,6 @@ import java.util.Random;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class FakeEvaluator
   extends AbstractEvaluator
@@ -299,11 +299,11 @@ public class FakeEvaluator
    * @param msec    the time in msec to wait
    */
   protected void wait(int msec) {
-    Long  wait;
+    String  wait;
     int   interval;
     int   current;
 
-    wait     = System.currentTimeMillis();
+    wait     = UniqueIDs.next();
     interval = Math.min(100, msec / 10);
     current  = 0;
     while (current < msec) {

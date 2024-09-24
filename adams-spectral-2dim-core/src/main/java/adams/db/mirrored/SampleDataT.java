@@ -15,7 +15,7 @@
 
 /*
  * SampleDataT.java
- * Copyright (C) 2019-2022 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.db.mirrored;
@@ -56,7 +56,7 @@ public class SampleDataT
   protected SampleDataIntf m_DB;
 
   /** object for blocking polling/removal of fully processed. */
-  protected final Long m_Updating;
+  protected final String m_Updating;
 
   /**
    * Initializes the mirror.
@@ -67,7 +67,7 @@ public class SampleDataT
   protected SampleDataT(AbstractDatabaseConnection dbcon, SampleDataIntf wrapped) {
     super(dbcon, wrapped);
     m_DB       = ((SpectralDbBackend) AbstractSpectralDbBackend.getSingleton()).getNonMirroredBackend().getSampleData(dbcon);
-    m_Updating = UniqueIDs.nextLong();
+    m_Updating = UniqueIDs.next();
   }
 
   /**
