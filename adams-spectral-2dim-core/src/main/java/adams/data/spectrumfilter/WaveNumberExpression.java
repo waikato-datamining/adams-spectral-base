@@ -28,7 +28,7 @@ import adams.parser.MathematicalExpression;
 import adams.parser.MathematicalExpressionText;
 import adams.parser.mathematicalexpression.Parser;
 import adams.parser.mathematicalexpression.Scanner;
-import java_cup.runtime.DefaultSymbolFactory;
+import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.SymbolFactory;
 
 import java.io.ByteArrayInputStream;
@@ -321,7 +321,7 @@ public class WaveNumberExpression
       points = data.toList();
       symbols = new HashMap();
       symbols.put(PLACEHOLDER_SIZE, (double) data.size());
-      sf          = new DefaultSymbolFactory();
+      sf          = new ComplexSymbolFactory();
       parserInput = new ByteArrayInputStream(exp.getBytes());
       for (i = 0; i < points.size(); i++) {
 	parserInput.reset();
