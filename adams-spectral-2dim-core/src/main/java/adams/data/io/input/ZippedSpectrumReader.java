@@ -15,7 +15,7 @@
 
 /*
  * ZippedSpectrumReader.java
- * Copyright (C) 2018-2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -327,7 +327,7 @@ public class ZippedSpectrumReader
 
     try {
       buffer  = new byte[m_BufferSize];
-      archive = new ZipFile(m_Input.getAbsoluteFile());
+      archive = ZipFile.builder().setFile(m_Input.getAbsoluteFile()).get();
       enm     = archive.getEntries();
       while (enm.hasMoreElements()) {
 	entry = enm.nextElement();
@@ -381,7 +381,8 @@ public class ZippedSpectrumReader
 	  m_ReadData.addAll(sublist);
 
 	// delete file again
-	FileUtils.delete(outFile);
+	if (outFile != null)
+	  FileUtils.delete(outFile);
       }
     }
     catch (Exception e) {
