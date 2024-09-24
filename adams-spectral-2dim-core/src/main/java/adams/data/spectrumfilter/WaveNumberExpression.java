@@ -15,7 +15,7 @@
 
 /*
  * WaveNumberExpression.java
- * Copyright (C) 2020 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2020-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -320,15 +320,15 @@ public class WaveNumberExpression
     try {
       points = data.toList();
       symbols = new HashMap();
-      symbols.put(PLACEHOLDER_SIZE, new Double(data.size()));
+      symbols.put(PLACEHOLDER_SIZE, (double) data.size());
       sf          = new DefaultSymbolFactory();
       parserInput = new ByteArrayInputStream(exp.getBytes());
       for (i = 0; i < points.size(); i++) {
 	parserInput.reset();
 	parser = new Parser(new Scanner(parserInput, sf), sf);
-	symbols.put(PLACEHOLDER_INDEX, new Double(i));
-	symbols.put(PLACEHOLDER_WAVENUMBER, new Double(points.get(i).getWaveNumber()));
-	symbols.put(PLACEHOLDER_AMPLITUDE, new Double(points.get(i).getAmplitude()));
+	symbols.put(PLACEHOLDER_INDEX, (double) i);
+	symbols.put(PLACEHOLDER_WAVENUMBER, (double) points.get(i).getWaveNumber());
+	symbols.put(PLACEHOLDER_AMPLITUDE, (double) points.get(i).getAmplitude());
 	parser.setSymbols(symbols);
 	parser.parse();
 	newWave = parser.getResult();

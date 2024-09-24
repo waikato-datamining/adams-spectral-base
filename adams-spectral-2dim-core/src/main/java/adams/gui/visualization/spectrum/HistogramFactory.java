@@ -15,7 +15,7 @@
 
 /*
  * HistogramFactory.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -74,7 +74,7 @@ public class HistogramFactory {
       data   = new Double[c.size()];
       points = c.toList();
       for (i = 0; i < points.size(); i++)
-	data[i] = new Double(points.get(i).getAmplitude());
+	data[i] = (double) points.get(i).getAmplitude();
 
       add(hist, data, name);
     }

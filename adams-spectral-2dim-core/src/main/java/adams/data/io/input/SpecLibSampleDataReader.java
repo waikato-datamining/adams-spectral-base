@@ -15,17 +15,15 @@
 
 /*
  * SpecLibSampleDataReader.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
 
-import adams.core.Constants;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.data.report.DataType;
 import adams.data.report.Field;
-import adams.data.report.Report;
 import adams.data.sampledata.SampleData;
 
 import java.util.ArrayList;
@@ -72,7 +70,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1286 $
  */
 public class SpecLibSampleDataReader
   extends AbstractSampleDataReader {
@@ -124,17 +121,6 @@ public class SpecLibSampleDataReader
   }
 
   /**
-   * Tries to determine the parent ID for the current report.
-   *
-   * @param report	the report to determine the ID for
-   * @return		the parent database ID, -1 if it cannot be determined
-   */
-  @Override
-  protected int determineParentID(Report report) {
-    return Constants.NO_ID;
-  }
-
-  /**
    * Performs the actual reading.
    *
    * @return		the reports that were read
@@ -150,11 +136,11 @@ public class SpecLibSampleDataReader
     
     content = FileUtils.loadFromFile(m_Input);
     sd      = newInstance();
-    result  = new ArrayList<SampleData>();
+    result  = new ArrayList<>();
     result.add(sd);
     
     // accepted fields
-    fields  = new HashSet<String>();
+    fields  = new HashSet<>();
     fields.add("TITLE");
     fields.add("DOCUMENTATION_FORMAT");
     fields.add("SAMPLE_ID");
@@ -189,7 +175,7 @@ public class SpecLibSampleDataReader
 	if (parts.length > 2) {
 	  if (Utils.isDouble(parts[2])) {
 	    sd.addField(new Field(parts[1], DataType.NUMERIC));
-	    sd.setNumericValue(parts[1], new Double(parts[2]));
+	    sd.setNumericValue(parts[1], Double.parseDouble(parts[2]));
 	  }
 	}
       }

@@ -15,7 +15,7 @@
 
 /*
  * SlidingWindow.java
- * Copyright (C) 2008-2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumsmoothing;
@@ -80,7 +80,7 @@ public class SlidingWindow
    * @return		the X-value
    */
   protected Double getValue(DataPoint point) {
-    return new Double(((SpectrumPoint) point).getAmplitude());
+    return (double) ((SpectrumPoint) point).getAmplitude();
   }
 
   /**

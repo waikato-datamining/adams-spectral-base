@@ -15,7 +15,7 @@
 
 /*
  * SpectrumUtils.java
- * Copyright (C) 2008-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrum;
@@ -33,7 +33,6 @@ import java.util.List;
  * Utility class for spectrums.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 11831 $
  */
 public class SpectrumUtils
   extends DataContainerUtils {
@@ -62,7 +61,7 @@ public class SpectrumUtils
   protected static Spectrum getHeader(List<SpectrumPoint> points) {
     Spectrum	result;
 
-    if ((points.size() > 0) && (points.get(0).getParent() != null)) {
+    if (!points.isEmpty() && (points.get(0).getParent() != null)) {
       result = ((Spectrum) points.get(0).getParent()).getHeader();
     }
     else {
@@ -118,7 +117,7 @@ public class SpectrumUtils
 
     result = -1;
 
-    if (points.size() == 0)
+    if (points.isEmpty())
       return result;
 
     index = Collections.binarySearch(points, new SpectrumPoint(waveno, 0), m_Comparator);
@@ -587,13 +586,13 @@ public class SpectrumUtils
     Hashtable<Float,SpectrumPoint>	pool;
     Enumeration<SpectrumPoint>		elements;
 
-    if (list.size() == 0)
+    if (list.isEmpty())
       return null;
     else if (list.size() == 1)
       return list.get(0);
 
     result = list.get(0).getHeader();
-    pool   = new Hashtable<Float,SpectrumPoint>();
+    pool   = new Hashtable<>();
     for (i = 0; i < list.size(); i++) {
       add(pool, list.get(i));
     }
@@ -629,7 +628,7 @@ public class SpectrumUtils
     result = new double[data.size()];
     i      = 0;
     for (SpectrumPoint gcp:data)
-      result[i++] = new Double(gcp.getAmplitude());
+      result[i++] = gcp.getAmplitude();
 
     return result;
   }
@@ -700,7 +699,7 @@ public class SpectrumUtils
 
     while (result.size() < numPoints) {
       points = result.toList();
-      if (points.size() == 0) {
+      if (points.isEmpty()) {
 	wave = 0.0f;
       }
       else {

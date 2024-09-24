@@ -15,13 +15,16 @@
 
 /*
  * SpectrumPoint.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrum;
 
+import adams.core.logging.LoggingHelper;
 import adams.data.container.AbstractDataPoint;
 import adams.data.container.DataPoint;
+
+import java.util.logging.Level;
 
 /**
  * Abstract superclass for sequence points.
@@ -136,9 +139,9 @@ public class SpectrumPoint
 
     other = (SpectrumPoint) o;
 
-    result = new Double(getWaveNumber()).compareTo(new Double(other.getWaveNumber()));
+    result = Double.compare(getWaveNumber(), other.getWaveNumber());
     if (result == 0)
-      result = new Double(getAmplitude()).compareTo(new Double(other.getAmplitude()));
+      result = Double.compare(getAmplitude(), other.getAmplitude());
 
     return result;
   }
@@ -160,8 +163,7 @@ public class SpectrumPoint
       result.setAmplitude(Float.parseFloat(parts[1]));
     }
     catch (Exception e) {
-      System.err.println("Failed to parse spectrum point: " + s);
-      e.printStackTrace();
+      LoggingHelper.global().log(Level.SEVERE, "Failed to parse spectrum point: " + s, e);
       result = null;
     }
 
