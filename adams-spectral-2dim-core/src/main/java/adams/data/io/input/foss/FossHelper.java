@@ -15,7 +15,7 @@
 
 /*
  * FossHelper.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input.foss;
@@ -27,15 +27,15 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper for handling Foss cal files. Info used here is from studying
  * .cal files with hex editor. Has been tested on many .cal files, but
- * no guarantees..
+ * no guarantees.
  *
  * @author dale
- * @version $Revision: 2253 $
  */
 public class FossHelper {
 
@@ -73,7 +73,7 @@ public class FossHelper {
   protected int m_num_points;
 
   /** reference names. */
-  protected Vector<String> m_ref_names;
+  protected List<String> m_ref_names;
 
   /** number of reference values per spectra. */
   protected int m_ref_count;
@@ -94,7 +94,6 @@ public class FossHelper {
    * Stores non-spectral data for a row.
    *
    * @author dale
-   * @version $Revision: 2253 $
    */
   public class FossFields {
     /** ID field. */
@@ -472,14 +471,13 @@ public class FossHelper {
    *
    * @return	reference names
    */
-  public Vector<String> getReferenceNames(){
-    Vector<String> vs=new Vector<String>();
+  public List<String> getReferenceNames(){
+    List<String> vs=new ArrayList<>();
     int from=reference_offset;
     for (int i=0;i<reference_name_num;i++){
       String s=getZeroTerminatedString(from);
-      if (s!=null && !s.equals("")){
+      if (s!=null && !s.isEmpty())
 	vs.add(s);
-      }
       from+=reference_name_width;
     }
     return(vs);

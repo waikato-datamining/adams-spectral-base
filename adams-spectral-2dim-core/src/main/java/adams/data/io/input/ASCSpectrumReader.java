@@ -15,7 +15,7 @@
 
 /*
  * ASCSpectrumReader.java
- * Copyright (C) 2009-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -33,9 +33,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 import java.util.logging.Level;
 
 /**
@@ -76,10 +77,10 @@ public class ASCSpectrumReader
   protected class ParsedFile {
 
     /** Name->Value, String->String. ie "Sample ID" -> "994370" */
-    protected Hashtable<String,String> m_ht = new Hashtable<String,String>();
+    protected Hashtable<String,String> m_ht = new Hashtable<>();
 
     /** vector of 2d double (double[2]) wavenumber,absorbance. */
-    protected Vector m_dp = new Vector();
+    protected List m_dp = new ArrayList();
 
     /** the last error that occurred. */
     protected String lastError = "";
@@ -120,10 +121,9 @@ public class ASCSpectrumReader
      * @return		the number of data points, or null if it can't be parsed
      */
     public Integer getNumDatapoints() {
-      String number = (String) m_ht.get("Nr of data points");
+      String number = m_ht.get("Nr of data points");
       try {
-	int num = Integer.parseInt(number);
-	return num;
+	return Integer.parseInt(number);
       }
       catch (Exception e) {
 	return null;
@@ -136,10 +136,10 @@ public class ASCSpectrumReader
      * @return		the array
      */
     public double[] getWaveNumberArray(){
-      double d[] = new double[m_dp.size()];
+      double[] d = new double[m_dp.size()];
 
       for (int i = 0; i < d.length;i++){
-	double[] db = (double[]) m_dp.elementAt(i);
+	double[] db = (double[]) m_dp.get(i);
 	d[i] = db[0];
       }
 
@@ -152,7 +152,7 @@ public class ASCSpectrumReader
      * @return		the hashtable
      */
     public Hashtable<String,String> getProperties(){
-      return(m_ht);
+      return m_ht;
     }
 
     /**
@@ -161,10 +161,10 @@ public class ASCSpectrumReader
      * @return		the array
      */
     public double[] getNIRArray(){
-      double d[] = new double[m_dp.size()];
+      double[] d = new double[m_dp.size()];
 
       for (int i = 0; i < d.length;i++){
-	double[] db = (double[]) m_dp.elementAt(i);
+	double[] db = (double[]) m_dp.get(i);
 	d[i] = db[1];
       }
 
@@ -189,12 +189,7 @@ public class ASCSpectrumReader
 	return parse(buf.toString());
       }
       catch (Exception e) {
-	try {
-	  br.close();
-	}
-	catch(Exception e2){
-	  // ignored
-	}
+	FileUtils.closeQuietly(br);
 	return false;
       }
     }
@@ -207,14 +202,14 @@ public class ASCSpectrumReader
      */
     public boolean parse(String in) {
       m_ForceCommaToPoint = getLocale().equals(LocaleHelper.getSingleton().getEnUS());
-      String lines[] = in.split("\\n");
+      String[] lines = in.split("\\n");
       boolean processingHeader=true;
       for (int i = 0; i < lines.length; i++){
 	String line = lines[i];
 	if (line.startsWith("##")) {
 	  if (processingHeader) {
 	    line = line.substring(2).trim(); // remove "##"
-	    String vals[] = line.trim().split("=");
+	    String[] vals = line.trim().split("=");
 	    if (vals.length != 2) {
 	      continue;
 	    }
@@ -227,7 +222,7 @@ public class ASCSpectrumReader
 	}
 	else {
 	  processingHeader = false;
-	  String vals[] = line.trim().split("\\s");
+	  String[] vals = line.trim().split("\\s");
 	  double[] d = new double[2];
 	  if (vals.length != 2) {
 	    lastError = "Data line corrupt:" + line + " split into:" + vals.length;
