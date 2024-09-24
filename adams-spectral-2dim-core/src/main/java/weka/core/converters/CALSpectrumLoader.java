@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * CALSpectrumLoader.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2024 University of Waikato, Hamilton, NZ
  */
 
 package weka.core.converters;
@@ -140,7 +140,7 @@ public class CALSpectrumLoader
   /**
    * Gets the current option settings for the OptionHandler.
    *
-   * @return the list of current option settings as an array of strings
+   * @return the array of current option settings as an array of strings
    */
   @Override
   public String[] getOptions() {
@@ -220,7 +220,7 @@ public class CALSpectrumLoader
     CALSpectrumReader		reader;
     List<Spectrum>		spectra;
     FossHelper 			fh;
-    Vector<String> 		refs;
+    List<String> 		refs;
     List<Field>			fields;
     int				i;
     SimpleInstanceGenerator	generator;
@@ -246,14 +246,14 @@ public class CALSpectrumLoader
     generator = new SimpleInstanceGenerator();
     generator.setAddSampleID(true);
     generator.setNoAdditionalFieldsPrefix(true);
-    if (fields.size() > 0) {
+    if (!fields.isEmpty()) {
       generator.setField(fields.get(fields.size() - 1));
       fields.remove(fields.size() - 1);
     }
     else {
       generator.setField(new Field("dummyclass", DataType.NUMERIC));
     }
-    generator.setAdditionalFields(fields.toArray(new Field[fields.size()]));
+    generator.setAdditionalFields(fields.toArray(new Field[0]));
     result = null;
     for (Spectrum sp: spectra) {
       inst = generator.generate(sp);

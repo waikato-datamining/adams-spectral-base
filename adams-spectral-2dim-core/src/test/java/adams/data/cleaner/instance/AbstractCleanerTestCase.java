@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractCleanerTestCase.java
- * Copyright (C) 2010-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.cleaner.instance;
 
@@ -31,13 +31,13 @@ import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
 import java.io.File;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Ancestor for test cases tailored for cleaners.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public abstract class AbstractCleanerTestCase
   extends AbstractSpectralDatabaseTestCase {
@@ -89,12 +89,12 @@ public abstract class AbstractCleanerTestCase
    * @param scheme	the scheme to process the data with
    * @return		the processed data
    */
-  protected Vector<String> process(Instances data, AbstractCleaner scheme) {
-    Vector<String>	result;
+  protected List<String> process(Instances data, AbstractCleaner scheme) {
+    List<String>	result;
     int			i;
     String		check;
 
-    result = new Vector<String>();
+    result = new ArrayList<>();
 
     for (i = 0; i < data.numInstances(); i++) {
       check = scheme.check(data.instance(i));
@@ -111,7 +111,7 @@ public abstract class AbstractCleanerTestCase
    * @param filename	the filename to save to (without path)
    * @return		true if successfully saved
    */
-  protected boolean save(Vector<String> data, String filename) {
+  protected boolean save(List<String> data, String filename) {
     return FileUtils.saveToFile(data, new File(m_TestHelper.getTmpDirectory() + File.separator + filename));
   }
 
@@ -162,7 +162,7 @@ public abstract class AbstractCleanerTestCase
    */
   public void testRegression() {
     Instances		data;
-    Vector<String>	processed;
+    List<String>	processed;
     boolean		ok;
     String		regression;
     int			i;

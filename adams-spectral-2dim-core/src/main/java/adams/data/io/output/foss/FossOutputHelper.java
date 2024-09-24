@@ -15,7 +15,7 @@
 
 /*
  * FossOutputHelper.java
- * Copyright (C) 2009-2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.output.foss;
@@ -26,7 +26,6 @@ import adams.data.spectrum.SpectrumPoint;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Vector;
 
 /**
  * Classes and Methods for creating a byte array of a FOSS .nir or .cal file.
@@ -485,22 +484,6 @@ public class FossOutputHelper {
     return(ret);
   }
 
-  public static void main(String argc[]){
-    byte[] b=new byte[4];
-    putFloatLittleEndian(b,0,400.00f);
-    System.err.println(showBytes(b));
-
-    Spectrum sp=new Spectrum();
-    sp.add(new SpectrumPoint(1,2));
-    sp.add(new SpectrumPoint(2,3));
-    sp.add(new SpectrumPoint(3,4));
-    Vector<Spectrum> vs = new Vector<Spectrum>();
-    vs.add(sp);
-    //byte[] bs=toBytes(vs);
-    //System.err.println(showBytes(bs));
-    //putIntLittleEndian(b,0,1050);
-    //System.err.println(showBytes(b));
-  }
   /**
    * Convert byte to unsigned byte.
    *
@@ -514,6 +497,4 @@ public class FossOutputHelper {
     }
     return(k);
   }
-
-
 }

@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractCleanerTestCase.java
- * Copyright (C) 2010-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.cleaner.spectrum;
 
@@ -30,13 +30,13 @@ import adams.test.SpectralTestHelper;
 import adams.test.TmpFile;
 
 import java.io.File;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Ancestor for test cases tailored for cleaners.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public abstract class AbstractCleanerTestCase
   extends AbstractSpectralDatabaseTestCase {
@@ -148,7 +148,7 @@ public abstract class AbstractCleanerTestCase
     String[][]		input;
     AbstractCleaner[]	setups;
     String[][]		output;
-    Vector<TmpFile>	outputFiles;
+    List<TmpFile> 	outputFiles;
 
     if (m_NoRegressionTest)
       return;
@@ -181,12 +181,12 @@ public abstract class AbstractCleanerTestCase
     }
 
     // test regression
-    outputFiles = new Vector<TmpFile>();
+    outputFiles = new ArrayList<>();
     for (i = 0; i < output.length; i++) {
       for (n = 0; n < output[i].length; n++)
 	outputFiles.add(new TmpFile(output[i][n]));
     }
-    regression = m_Regression.compare(outputFiles.toArray(new TmpFile[outputFiles.size()]));
+    regression = m_Regression.compare(outputFiles.toArray(new TmpFile[0]));
     assertNull("Output differs:\n" + regression, regression);
 
     // remove output, clean up scheme

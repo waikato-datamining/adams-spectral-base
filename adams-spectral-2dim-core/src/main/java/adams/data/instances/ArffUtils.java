@@ -15,7 +15,7 @@
 
 /*
  * ArffUtils.java
- * Copyright (C) 2009-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -24,7 +24,8 @@ import weka.core.Attribute;
 import weka.core.Instances;
 import weka.filters.unsupervised.attribute.Remove;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A helper class for turning spectrum data into ARFF files and vice versa.
@@ -154,12 +155,12 @@ public class ArffUtils
    */
   public static Remove getRemoveFilter(Instances data) {
     Remove		result;
-    Vector<String>	atts;
+    List<String> 	atts;
     Attribute		att;
     int			i;
 
     // check names
-    atts = new Vector<>();
+    atts = new ArrayList<>();
     if ((att = data.attribute(ArffUtils.getDBIDName())) != null)
       atts.add("" +(att.index() + 1));
     if ((att = data.attribute(ArffUtils.getIDName())) != null)
@@ -177,7 +178,7 @@ public class ArffUtils
       }
     }
     
-    if (atts.size() > 0) {
+    if (!atts.isEmpty()) {
       result = new Remove();
       result.setAttributeIndices(adams.core.Utils.flatten(atts, ","));
     }

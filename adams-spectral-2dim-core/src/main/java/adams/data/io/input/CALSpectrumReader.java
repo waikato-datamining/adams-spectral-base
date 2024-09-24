@@ -15,7 +15,7 @@
 
 /*
  * CALSpectrumReader.java
- * Copyright (C) 2009-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -31,7 +31,7 @@ import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.env.Environment;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  <!-- globalinfo-start -->
@@ -293,7 +293,7 @@ public class CALSpectrumReader
     FossHelper fh=new FossHelper(FileUtils.loadFromBinaryFile(m_Input.getAbsoluteFile()));
 
     fh.processHeader();
-    Vector<String> v=fh.getReferenceNames();
+    List<String> v=fh.getReferenceNames();
     int num_deleted=0;
     int act_count=0; // start at 1
     double[] wn=fh.getWavenumbers();
