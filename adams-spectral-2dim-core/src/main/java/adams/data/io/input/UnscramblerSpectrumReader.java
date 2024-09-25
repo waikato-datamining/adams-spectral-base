@@ -15,7 +15,7 @@
 
 /*
  * UnscramblerSpectrumReader.java
- * Copyright (C) 2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2021-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -461,7 +461,7 @@ public class UnscramblerSpectrumReader
     m_Streams = new ArrayList<>();
 
     try {
-      archive  = new ZipFile(m_Input.getAbsolutePath());
+      archive  = ZipFile.builder().setFile(m_Input.getAbsolutePath()).get();
       matrices = new HashMap<>();
 
       // locate project file
