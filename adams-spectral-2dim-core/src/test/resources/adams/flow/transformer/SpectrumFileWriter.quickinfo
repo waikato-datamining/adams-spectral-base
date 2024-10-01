@@ -1,1 +1,1 @@
-SimpleSpectrumWriter
+writer: SimpleSpectrumWriter, output: ${CWD}, name: AUTOMATIC
