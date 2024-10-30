@@ -62,7 +62,7 @@ public class TrinamixSpectrumWriter
 
     m_OptionManager.add(
       "instrumentName", "instrumentName",
-      "P200010208");
+      "");
   }
 
   /**
@@ -100,7 +100,7 @@ public class TrinamixSpectrumWriter
    * 			displaying in the GUI or for listing the options.
    */
   public String instrumentNameTipText() {
-    return "The instrument name to be used.";
+    return "The instrument name to be used; if empty, uses 'Instrument' value in sample data when available.";
   }
 
   /**
@@ -137,7 +137,7 @@ public class TrinamixSpectrumWriter
     Spectrum		sp;
     String		timestamp;
     StringBuilder	buf;
-    int			i;
+    String		instrument;
 
     if (data.isEmpty()) {
       getLogger().severe("No spectra to write to: " + m_Output);
@@ -163,14 +163,19 @@ public class TrinamixSpectrumWriter
     // separator
     lines.add("");
 
+    // instrument
+    instrument = m_InstrumentName;
+    if (instrument.isEmpty() && sp.getReport().hasValue("Instrument"))
+      instrument = sp.getReport().getStringValue("Instrument");
+
     // wavenumbers
-    buf = new StringBuilder(m_InstrumentName).append(" - Wavelength (nm)");
+    buf = new StringBuilder(instrument).append(" - Wavelength (nm)");
     for (SpectrumPoint p: sp.toList())
       buf.append(";").append(p.getWaveNumber());
     lines.add(buf.toString());
 
     // amplitudes
-    buf = new StringBuilder(m_InstrumentName).append(" - Relative absorbance - #0");
+    buf = new StringBuilder(instrument).append(" - Relative absorbance - #0");
     for (SpectrumPoint p: sp.toList())
       buf.append(";").append(p.getAmplitude());
     lines.add(buf.toString());

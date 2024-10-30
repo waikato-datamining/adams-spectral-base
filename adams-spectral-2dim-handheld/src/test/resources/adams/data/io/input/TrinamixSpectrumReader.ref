@@ -4,7 +4,7 @@
 # Format\tDataType=S
 # Insert\ Timestamp=2000-01-01 00\:00\:00
 # Insert\ Timestamp\tDataType=S
-# Instrument=unknown
+# Instrument=P200010208
 # Instrument\tDataType=S
 # Parent\ ID=-1
 # Sample\ ID=372639GW24

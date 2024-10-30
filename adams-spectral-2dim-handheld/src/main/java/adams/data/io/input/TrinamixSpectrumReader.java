@@ -77,6 +77,7 @@ public class TrinamixSpectrumReader
     int			minLines;
     String		sampleID;
     String		timestamp;
+    String		instrument;
     String[]		parts;
     float[]		waveno;
     float[]		absorb;
@@ -107,7 +108,10 @@ public class TrinamixSpectrumReader
       timestamp = lines.get(1).split(";")[1];
 
     // waveno
+    instrument = null;
     if (lines.get(3).contains("Wavelength (nm);")) {
+      if (lines.get(3).contains(" - "))
+	instrument = lines.get(3).split(" - ")[0];
       parts = lines.get(3).split(";");
       waveno = new float[parts.length - 1];
       for (i = 1; i < parts.length; i++)
@@ -136,6 +140,8 @@ public class TrinamixSpectrumReader
       spec.setID(sampleID);
       if (timestamp != null)
 	spec.getReport().setStringValue("Timestamp", timestamp);
+      if (instrument != null)
+	spec.getReport().setStringValue("Instrument", instrument);
       for (i = 0; i < waveno.length; i++)
 	spec.add(new SpectrumPoint(waveno[i], absorb[i]));
       m_ReadData.add(spec);
