@@ -15,7 +15,7 @@
 
 /*
  * SpectrumDbReader.java
- * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -237,7 +237,7 @@ public class SpectrumDbReader
       if (cont == null) {
         if (!m_Lenient)
           result = "No container loaded for sample ID (format=" + m_Format + "): " + m_InputToken;
-        else
+        else if (!m_Silent)
           getLogger().warning("No container loaded for sample ID: " + m_InputToken);
       }
       else {
