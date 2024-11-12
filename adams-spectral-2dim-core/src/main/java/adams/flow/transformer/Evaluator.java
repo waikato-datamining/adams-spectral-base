@@ -22,6 +22,7 @@ package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.core.Stoppable;
 import adams.core.Utils;
 import adams.core.VariableName;
 import adams.core.io.PlaceholderFile;
@@ -228,6 +229,16 @@ public class Evaluator
     @Override
     protected void process() throws Exception {
       m_Evaluator.build(m_Data);
+    }
+
+    /**
+     * Stops the execution.
+     */
+    @Override
+    public void stopExecution() {
+      if (m_Evaluator instanceof Stoppable)
+	((Stoppable) m_Evaluator).stopExecution();
+      super.stopExecution();
     }
 
     /**
@@ -1027,6 +1038,16 @@ public class Evaluator
     }
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_ActualEvaluator instanceof Stoppable)
+      ((Stoppable) m_ActualEvaluator).stopExecution();
+    super.stopExecution();
   }
 
   /**
