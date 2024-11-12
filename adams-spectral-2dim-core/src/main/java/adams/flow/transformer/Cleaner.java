@@ -22,6 +22,7 @@ package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.core.Stoppable;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
@@ -164,7 +165,7 @@ public class Cleaner
     private static final long serialVersionUID = 6406892820872772446L;
 
     /** the cleaner to apply. */
-    protected AbstractCleaner m_Evaluator;
+    protected AbstractCleaner m_Cleaner;
 
     /** the data to clean. */
     protected Instances m_Data;
@@ -180,7 +181,7 @@ public class Cleaner
      */
     public CleanJob(AbstractCleaner cleaner, Instances data) {
       super();
-      m_Evaluator = cleaner;
+      m_Cleaner = cleaner;
       m_Data      = data;
       m_Cleaned   = null;
     }
@@ -201,7 +202,7 @@ public class Cleaner
      */
     @Override
     protected String preProcessCheck() {
-      if (m_Evaluator == null)
+      if (m_Cleaner == null)
 	return "No cleaner to train!";
       if (m_Data == null)
 	return "No training data!";
@@ -215,7 +216,17 @@ public class Cleaner
      */
     @Override
     protected void process() throws Exception {
-      m_Cleaned = m_Evaluator.clean(m_Data);
+      m_Cleaned = m_Cleaner.clean(m_Data);
+    }
+
+    /**
+     * Stops the execution.
+     */
+    @Override
+    public void stopExecution() {
+      if (m_Cleaner instanceof Stoppable)
+	((Stoppable) m_Cleaner).stopExecution();
+      super.stopExecution();
     }
 
     /**
@@ -235,7 +246,7 @@ public class Cleaner
      */
     @Override
     public String toString() {
-      return OptionUtils.getCommandLine(m_Evaluator) + "\n" + m_Data.relationName();
+      return OptionUtils.getCommandLine(m_Cleaner) + "\n" + m_Data.relationName();
     }
 
     /**
@@ -244,7 +255,7 @@ public class Cleaner
      */
     @Override
     public void cleanUp() {
-      m_Evaluator = null;
+      m_Cleaner = null;
       m_Data      = null;
       m_Cleaned   = null;
       super.cleanUp();
@@ -796,6 +807,16 @@ public class Cleaner
     }
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_ActualCleaner instanceof Stoppable)
+      ((Stoppable) m_ActualCleaner).stopExecution();
+    super.stopExecution();
   }
 
   /**
