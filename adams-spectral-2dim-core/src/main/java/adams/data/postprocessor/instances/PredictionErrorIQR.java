@@ -21,6 +21,7 @@
 package adams.data.postprocessor.instances;
 
 import adams.core.Randomizable;
+import adams.core.StoppableWithFeedback;
 import adams.core.base.BaseDouble;
 import adams.core.base.BaseInteger;
 import adams.core.option.OptionUtils;
@@ -35,6 +36,7 @@ import weka.core.Instances;
 
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
@@ -102,7 +104,7 @@ import java.util.Random;
  */
 public class PredictionErrorIQR
   extends AbstractPostProcessor
-  implements Randomizable {
+  implements Randomizable, StoppableWithFeedback {
 
   private static final long serialVersionUID = -3236239648802264362L;
 
@@ -129,6 +131,9 @@ public class PredictionErrorIQR
 
   /** whether to use absolute errors. */
   protected boolean m_UseAbsoluteError;
+
+  /** whether the execution was stopped. */
+  protected boolean m_Stopped;
 
   /**
    * Returns a string describing the object.
@@ -459,6 +464,9 @@ public class PredictionErrorIQR
       eval.setDiscardPredictions(false);
       eval.crossValidateModel(classifier, data, numFolds, new Random(seed));
 
+      if (m_Stopped)
+	return data;
+
       // back to original order
       origIndices = CrossValidationHelper.crossValidationIndices(data, numFolds, new Random(seed), false);
       preds       = CrossValidationHelper.alignPredictions(eval.predictions(), origIndices);
@@ -492,6 +500,7 @@ public class PredictionErrorIQR
       return result;
     }
     catch (Exception e) {
+      getLogger().log(Level.SEVERE, "cleanData: Failed to cross-validate?", e);
       return data;
     }
   }
@@ -518,6 +527,8 @@ public class PredictionErrorIQR
 
     if (numIterations > 0) {
       for (i = 0; i < numIterations; i++) {
+	if (m_Stopped)
+	  return data;
 	if (isLoggingEnabled())
 	  getLogger().info("Iteration #" + (i+1) + ": size before=" + result.numInstances());
 	result = cleanData(result, classifier, numFolds, seed, iqrMultiplier);
@@ -529,6 +540,8 @@ public class PredictionErrorIQR
       i     = 0;
       count = 0;
       while (true) {
+	if (m_Stopped)
+	  return data;
 	if (isLoggingEnabled())
 	  getLogger().info("Iteration #" + (i+1) + ": size before=" + result.numInstances());
 	old    = result;
@@ -569,6 +582,10 @@ public class PredictionErrorIQR
     m_Random = new Random(m_Seed);
 
     for (i = 0; i < m_Classifiers.length; i++) {
+      if (m_Stopped) {
+	getLogger().warning("Execution stopped, exiting!");
+	return data;
+      }
       if (result.numInstances() == 0) {
 	getLogger().warning("No data left, exiting cleaning loop!");
 	break;
@@ -601,6 +618,24 @@ public class PredictionErrorIQR
   protected Instance performPostProcess(Instance data) {
     // only works on datasets, not individual rows
     return data;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    m_Stopped = true;
+  }
+
+  /**
+   * Whether the execution has been stopped.
+   *
+   * @return		true if stopped
+   */
+  @Override
+  public boolean isStopped() {
+    return m_Stopped;
   }
 
   /**
