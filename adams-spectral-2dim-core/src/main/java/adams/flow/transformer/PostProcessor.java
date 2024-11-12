@@ -15,13 +15,14 @@
 
 /*
  * PostProcessor.java
- * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
+import adams.core.Stoppable;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
 import adams.data.instance.WekaInstanceContainer;
@@ -565,6 +566,16 @@ public class PostProcessor
     }
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_ActualPostProcessor instanceof Stoppable)
+      ((Stoppable) m_ActualPostProcessor).stopExecution();
+    super.stopExecution();
   }
 
   /**
