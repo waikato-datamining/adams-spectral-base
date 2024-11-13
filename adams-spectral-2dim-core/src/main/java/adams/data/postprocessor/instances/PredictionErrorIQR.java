@@ -28,7 +28,7 @@ import adams.core.option.OptionUtils;
 import adams.data.statistics.StatUtils;
 import weka.classifiers.Classifier;
 import weka.classifiers.CrossValidationHelper;
-import weka.classifiers.Evaluation;
+import weka.classifiers.StoppableEvaluation;
 import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Instance;
@@ -131,6 +131,9 @@ public class PredictionErrorIQR
 
   /** whether to use absolute errors. */
   protected boolean m_UseAbsoluteError;
+
+  /** the current evaluation. */
+  protected transient StoppableEvaluation m_Evaluation;
 
   /** whether the execution was stopped. */
   protected boolean m_Stopped;
@@ -447,7 +450,6 @@ public class PredictionErrorIQR
    */
   protected Instances cleanData(Instances data, Classifier classifier, int numFolds, long seed, double iqrMultiplier) {
     Instances		result;
-    Evaluation		eval;
     double[]		errors;
     int			i;
     int[]		origIndices;
@@ -460,16 +462,16 @@ public class PredictionErrorIQR
 
     try {
       // cross-validate
-      eval = new Evaluation(data);
-      eval.setDiscardPredictions(false);
-      eval.crossValidateModel(classifier, data, numFolds, new Random(seed));
+      m_Evaluation = new StoppableEvaluation(data);
+      m_Evaluation.setDiscardPredictions(false);
+      m_Evaluation.crossValidateModel(classifier, data, numFolds, new Random(seed));
 
       if (m_Stopped)
 	return data;
 
       // back to original order
       origIndices = CrossValidationHelper.crossValidationIndices(data, numFolds, new Random(seed), false);
-      preds       = CrossValidationHelper.alignPredictions(eval.predictions(), origIndices);
+      preds       = CrossValidationHelper.alignPredictions(m_Evaluation.predictions(), origIndices);
 
       // compute thresholds
       errors = new double[preds.size()];
@@ -502,6 +504,9 @@ public class PredictionErrorIQR
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "cleanData: Failed to cross-validate?", e);
       return data;
+    }
+    finally {
+      m_Evaluation = null;
     }
   }
 
@@ -625,6 +630,8 @@ public class PredictionErrorIQR
    */
   @Override
   public void stopExecution() {
+    if (m_Evaluation != null)
+      m_Evaluation.stopExecution();
     m_Stopped = true;
   }
 

@@ -15,16 +15,18 @@
 
 /*
  * MultiClassifierEvaluator.java
- * Copyright (C) 2016-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.evaluator.instance;
 
 import adams.core.Randomizable;
+import adams.core.StoppableWithFeedback;
 import adams.core.option.OptionUtils;
 import adams.flow.core.EvaluationHelper;
 import adams.flow.core.EvaluationStatistic;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.classifiers.StoppableEvaluation;
 import weka.classifiers.functions.PLSClassifier;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -89,7 +91,7 @@ import java.util.logging.Level;
  */
 public class MultiClassifierEvaluator
   extends AbstractSerializableEvaluator
-  implements Randomizable {
+  implements Randomizable, StoppableWithFeedback {
 
   /** serial uid	 */
   private static final long serialVersionUID = -1524226172394611174L;
@@ -113,7 +115,10 @@ public class MultiClassifierEvaluator
   protected Evaluation m_CrossvalidationResults;
 
   /** Header of instances to process. */
-  private Instances m_Header;
+  protected Instances m_Header;
+
+  /** whether the execution was stopped. */
+  protected boolean m_Stopped;
 
   /**
    * Global info.
@@ -412,14 +417,19 @@ public class MultiClassifierEvaluator
   protected boolean performBuild(Instances data) {
     setData(data);
 
+    m_Stopped = false;
+
     try {
-      m_CrossvalidationResults = new Evaluation(data);
+      m_CrossvalidationResults = new StoppableEvaluation(data);
       m_CrossvalidationResults.crossValidateModel(m_Base, data, m_Folds, new Random(m_Seed));
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to cross-validate classifier: " + OptionUtils.getCommandLine(m_Base), e);
       return false;
     }
+
+    if (m_Stopped)
+      return false;
 
     m_Header = new Instances(m_TrainingData, 0);
 
@@ -444,5 +454,25 @@ public class MultiClassifierEvaluator
   @Override
   public void cleanUp() {
     m_TrainingData = null;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_CrossvalidationResults instanceof StoppableEvaluation)
+      ((StoppableEvaluation) m_CrossvalidationResults).stopExecution();
+    m_Stopped = true;
+  }
+
+  /**
+   * Whether the execution has been stopped.
+   *
+   * @return		true if stopped
+   */
+  @Override
+  public boolean isStopped() {
+    return m_Stopped;
   }
 }

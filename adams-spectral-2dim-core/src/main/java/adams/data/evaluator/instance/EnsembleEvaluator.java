@@ -22,9 +22,10 @@ package adams.data.evaluator.instance;
 
 import adams.core.ObjectCopyHelper;
 import adams.core.Randomizable;
+import adams.core.StoppableWithFeedback;
 import adams.core.logging.LoggingHelper;
 import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
+import weka.classifiers.StoppableEvaluation;
 import weka.classifiers.functions.LinearRegressionJ;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -82,7 +83,7 @@ import java.util.Random;
  */
 public class EnsembleEvaluator
   extends AbstractSerializableEvaluator
-  implements Randomizable {
+  implements Randomizable, StoppableWithFeedback {
 
   private static final long serialVersionUID = -4254958807591488789L;
 
@@ -106,6 +107,12 @@ public class EnsembleEvaluator
 
   /** the header. */
   protected Instances m_Header;
+
+  /** whether the execution was stopped. */
+  protected boolean m_Stopped;
+
+  /** the current evaluation. */
+  protected transient StoppableEvaluation m_Evaluation;
 
   /**
    * Returns a string describing the object.
@@ -254,28 +261,31 @@ public class EnsembleEvaluator
   @Override
   protected boolean performBuild(Instances data) {
     int		i;
-    Evaluation 	eval;
 
     if (data == null)
       return false;
 
+    m_Stopped           = false;
     m_TrainingData      = data;
     m_Header            = new Instances(data, 0);
     m_ActualClassifiers = new Classifier[m_Classifiers.length];
     m_Normalize         = new double[m_Classifiers.length];
     for (i = 0; i < m_Classifiers.length; i++) {
+      if (m_Stopped)
+	return false;
       try {
 	m_ActualClassifiers[i] = ObjectCopyHelper.copyObject(m_Classifiers[i]);
 	m_ActualClassifiers[i].buildClassifier(data);
 	// determine normalization factor
-	eval = new Evaluation(data);
-	eval.crossValidateModel(m_Classifiers[i], data, m_NumFolds, new Random(m_Seed));
-	m_Normalize[i] = eval.meanAbsoluteError();
+	m_Evaluation = new StoppableEvaluation(data);
+	m_Evaluation.crossValidateModel(m_Classifiers[i], data, m_NumFolds, new Random(m_Seed));
+	m_Normalize[i] = m_Evaluation.meanAbsoluteError();
       }
       catch (Exception e) {
 	LoggingHelper.handleException(this, "Failed to train classifier #" + (i+1) + "!", e);
 	return false;
       }
+      m_Evaluation = null;
     }
     m_SerializableObjectHelper.saveSetup();
     return true;
@@ -351,6 +361,26 @@ public class EnsembleEvaluator
     m_ActualClassifiers = (Classifier[]) value[0];
     m_Header            = (Instances) value[1];
     m_Normalize         = (double[]) value[2];
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_Evaluation != null)
+      m_Evaluation.stopExecution();
+    m_Stopped = true;
+  }
+
+  /**
+   * Whether the execution has been stopped.
+   *
+   * @return		true if stopped
+   */
+  @Override
+  public boolean isStopped() {
+    return m_Stopped;
   }
 
   /**

@@ -13,17 +13,18 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * CrossValidatedNeighborHood.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2024 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.evaluator.instance;
 
 import adams.core.Randomizable;
+import adams.core.StoppableWithFeedback;
 import adams.flow.core.EvaluationHelper;
 import adams.flow.core.EvaluationStatistic;
 import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
+import weka.classifiers.StoppableEvaluation;
 import weka.classifiers.functions.LinearRegression;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -98,11 +99,10 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class CrossValidatedNeighborHood
   extends AbstractNearestNeighborBasedEvaluator
-  implements Randomizable, WekaClassifierBasedEvaluator {
+  implements Randomizable, WekaClassifierBasedEvaluator, StoppableWithFeedback {
 
   /** for serialization. */
   private static final long serialVersionUID = -6086808426732510366L;
@@ -121,6 +121,12 @@ public class CrossValidatedNeighborHood
 
   /** the measure to output as evaluation. */
   protected EvaluationStatistic m_Statistic;
+
+  /** whether the execution was stopped. */
+  protected boolean m_Stopped;
+
+  /** the current evaluation. */
+  protected transient StoppableEvaluation m_Evaluation;
 
   /**
    * Returns a string describing the object.
@@ -387,12 +393,11 @@ public class CrossValidatedNeighborHood
    * 			the class value is missing
    */
   protected Float performEvaluate(Instance data) {
-    Float			result;
+    float			result;
     Instances			neighbors;
     int				folds;
-    Evaluation 			eval;
 
-    result = m_MissingEvaluation;
+    m_Stopped = false;
 
     try {
       // get neighborhood
@@ -401,15 +406,39 @@ public class CrossValidatedNeighborHood
 	folds = neighbors.numInstances();
       else
         folds = Math.min(m_Folds, neighbors.numInstances());
-      eval = new Evaluation(neighbors);
-      eval.crossValidateModel(m_Classifier, neighbors, folds, new Random(m_Seed));
-      result = (float) EvaluationHelper.getValue(eval, m_Statistic, 0);
+      m_Evaluation = new StoppableEvaluation(neighbors);
+      m_Evaluation.crossValidateModel(m_Classifier, neighbors, folds, new Random(m_Seed));
+      result = (float) EvaluationHelper.getValue(m_Evaluation, m_Statistic, 0);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to cross-validate neighborhood!", e);
       result = m_MissingEvaluation;
     }
 
+    m_Evaluation = null;
+    if (m_Stopped)
+      result = m_MissingEvaluation;
+
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_Evaluation != null)
+      m_Evaluation.stopExecution();
+    m_Stopped = true;
+  }
+
+  /**
+   * Whether the execution has been stopped.
+   *
+   * @return		true if stopped
+   */
+  @Override
+  public boolean isStopped() {
+    return m_Stopped;
   }
 }

@@ -15,7 +15,7 @@
 
 /*
  * RemoveOutliers.java
- * Copyright (C) 2015-2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.cleaner.instance;
@@ -23,6 +23,8 @@ package adams.data.cleaner.instance;
 import adams.core.MessageCollection;
 import adams.core.Performance;
 import adams.core.Randomizable;
+import adams.core.StoppableWithFeedback;
+import adams.core.StoppedException;
 import adams.core.ThreadLimiter;
 import adams.data.spreadsheet.SpreadSheet;
 import adams.data.spreadsheet.SpreadSheetColumnIndex;
@@ -42,6 +44,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.CrossValidationHelper;
 import weka.classifiers.DefaultCrossValidationFoldGenerator;
 import weka.classifiers.Evaluation;
+import weka.classifiers.StoppableEvaluation;
 import weka.classifiers.functions.LinearRegressionJ;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -105,7 +108,7 @@ import java.util.logging.Level;
  */
 public class RemoveOutliers
   extends AbstractCleaner
-  implements Randomizable, ThreadLimiter {
+  implements Randomizable, ThreadLimiter, StoppableWithFeedback {
 
   private static final long serialVersionUID = -43765084294892078L;
 
@@ -129,6 +132,12 @@ public class RemoveOutliers
 
   /** the runner in use. */
   protected transient JobRunner m_JobRunner;
+
+  /** whether the execution was stopped. */
+  protected boolean m_Stopped;
+
+  /** the current evaluation. */
+  protected transient StoppableEvaluation m_CurrentEvaluation;
 
   /**
    * Returns a string describing the object.
@@ -357,8 +366,8 @@ public class RemoveOutliers
   protected Evaluation crossValidate(Instances data, int folds) throws Exception {
     MessageCollection 			msg;
     int 				numThreads;
-    Evaluation				eval;
     Evaluation				agg;
+    Evaluation				eval;
     AggregateEvaluations 		evalAgg;
     DefaultCrossValidationFoldGenerator generator;
     JobList<WekaCrossValidationJob>	list;
@@ -369,9 +378,13 @@ public class RemoveOutliers
     numThreads = Performance.determineNumThreads(m_NumThreads);
 
     if (numThreads == 1) {
-      eval = new Evaluation(data);
-      eval.setDiscardPredictions(false);
-      eval.crossValidateModel(m_Classifier, data, folds, new Random(m_Seed));
+      m_CurrentEvaluation = new StoppableEvaluation(data);
+      m_CurrentEvaluation.setDiscardPredictions(false);
+      m_CurrentEvaluation.crossValidateModel(m_Classifier, data, folds, new Random(m_Seed));
+      eval                = m_CurrentEvaluation;
+      m_CurrentEvaluation = null;
+      if (m_Stopped)
+	throw new StoppedException();
       return eval;
     }
     else {
@@ -400,6 +413,8 @@ public class RemoveOutliers
       msg     = new MessageCollection();
       evalAgg = new AggregateEvaluations();
       for (i = 0; i < m_JobRunner.getJobs().size(); i++) {
+	if (m_Stopped)
+	  throw new StoppedException();
 	job = (WekaCrossValidationJob) m_JobRunner.getJobs().get(i);
 	if (job.getEvaluation() == null) {
 	  msg.add("Fold #" + (i + 1) + " failed to evaluate" + (!job.hasExecutionError() ? "?" : ":\n" + job.getExecutionError()));
@@ -471,7 +486,7 @@ public class RemoveOutliers
   @Override
   protected Instances performClean(Instances data) {
     Instances		result;
-    Evaluation		eval;
+    Evaluation 		eval;
     SpreadSheet		sheet;
     Set<Integer>	outliers;
     List<Integer>	sorted;
@@ -518,5 +533,27 @@ public class RemoveOutliers
     }
 
     return result;
+  }
+
+  /**
+   * Stops the execution. No message set.
+   */
+  @Override
+  public void stopExecution() {
+    if (m_CurrentEvaluation != null)
+      m_CurrentEvaluation.stopExecution();
+    if (m_JobRunner != null)
+      m_JobRunner.terminate(true);
+    m_Stopped = true;
+  }
+
+  /**
+   * Whether the execution has been stopped.
+   *
+   * @return		true if stopped
+   */
+  @Override
+  public boolean isStopped() {
+    return m_Stopped;
   }
 }
