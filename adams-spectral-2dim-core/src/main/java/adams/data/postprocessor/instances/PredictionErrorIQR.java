@@ -20,15 +20,18 @@
 
 package adams.data.postprocessor.instances;
 
+import adams.core.Performance;
 import adams.core.Randomizable;
 import adams.core.StoppableWithFeedback;
+import adams.core.ThreadLimiter;
 import adams.core.base.BaseDouble;
 import adams.core.base.BaseInteger;
 import adams.core.option.OptionUtils;
 import adams.data.statistics.StatUtils;
+import adams.flow.core.Actor;
+import adams.multiprocess.WekaCrossValidationExecution;
 import weka.classifiers.Classifier;
 import weka.classifiers.CrossValidationHelper;
-import weka.classifiers.StoppableEvaluation;
 import weka.classifiers.evaluation.Prediction;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Instance;
@@ -97,6 +100,15 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: true
  * </pre>
  *
+ * <pre>-num-threads &lt;int&gt; (property: numThreads)
+ * &nbsp;&nbsp;&nbsp;The number of threads to use for parallel execution; &gt; 0: specific number
+ * &nbsp;&nbsp;&nbsp;of cores to use (capped by actual number of cores available, 1 = sequential
+ * &nbsp;&nbsp;&nbsp;execution); = 0: number of cores; &lt; 0: number of free cores (eg -2 means
+ * &nbsp;&nbsp;&nbsp;2 free cores; minimum of one core is used); overrides the value defined
+ * &nbsp;&nbsp;&nbsp;by the fold generator scheme.
+ * &nbsp;&nbsp;&nbsp;default: 1
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
@@ -104,7 +116,7 @@ import java.util.logging.Level;
  */
 public class PredictionErrorIQR
   extends AbstractPostProcessor
-  implements Randomizable, StoppableWithFeedback {
+  implements Randomizable, StoppableWithFeedback, ThreadLimiter {
 
   private static final long serialVersionUID = -3236239648802264362L;
 
@@ -132,11 +144,17 @@ public class PredictionErrorIQR
   /** whether to use absolute errors. */
   protected boolean m_UseAbsoluteError;
 
+  /** the number of threads to use for parallel execution. */
+  protected int m_NumThreads;
+
   /** the current evaluation. */
-  protected transient StoppableEvaluation m_Evaluation;
+  protected transient WekaCrossValidationExecution m_CrossValidation;
 
   /** whether the execution was stopped. */
   protected boolean m_Stopped;
+
+  /** the flow context. */
+  protected transient Actor m_FlowContext;
 
   /**
    * Returns a string describing the object.
@@ -189,6 +207,10 @@ public class PredictionErrorIQR
     m_OptionManager.add(
       "use-absolute-error", "useAbsoluteError",
       true);
+
+    m_OptionManager.add(
+      "num-threads", "numThreads",
+      1);
   }
 
   /**
@@ -410,6 +432,35 @@ public class PredictionErrorIQR
   }
 
   /**
+   * Sets the number of threads to use for cross-validation.
+   *
+   * @param value 	the number of threads: -1 = # of CPUs/cores; 0/1 = sequential execution
+   */
+  public void setNumThreads(int value) {
+    m_NumThreads = value;
+    reset();
+  }
+
+  /**
+   * Returns the number of threads to use for cross-validation.
+   *
+   * @return 		the number of threads: -1 = # of CPUs/cores; 0/1 = sequential execution
+   */
+  public int getNumThreads() {
+    return m_NumThreads;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String numThreadsTipText() {
+    return Performance.getNumThreadsHelp() + "; overrides the value defined by the fold generator scheme.";
+  }
+
+  /**
    * Performs some pre-checks whether the data is actually suitable.
    *
    * @param data	the dataset to check
@@ -450,6 +501,7 @@ public class PredictionErrorIQR
    */
   protected Instances cleanData(Instances data, Classifier classifier, int numFolds, long seed, double iqrMultiplier) {
     Instances		result;
+    String		msg;
     double[]		errors;
     int			i;
     int[]		origIndices;
@@ -462,16 +514,22 @@ public class PredictionErrorIQR
 
     try {
       // cross-validate
-      m_Evaluation = new StoppableEvaluation(data);
-      m_Evaluation.setDiscardPredictions(false);
-      m_Evaluation.crossValidateModel(classifier, data, numFolds, new Random(seed));
+      m_CrossValidation = new WekaCrossValidationExecution();
+      m_CrossValidation.setClassifier(classifier);
+      m_CrossValidation.setData(data);
+      m_CrossValidation.setFolds(numFolds);
+      m_CrossValidation.setSeed(m_Seed);
+      m_CrossValidation.setNumThreads(m_NumThreads);
+      m_CrossValidation.setDiscardPredictions(false);
+      m_CrossValidation.setFlowContext(m_FlowContext);
+      msg = m_CrossValidation.execute();
 
-      if (m_Stopped)
+      if ((msg != null) || m_Stopped)
 	return data;
 
       // back to original order
       origIndices = CrossValidationHelper.crossValidationIndices(data, numFolds, new Random(seed), false);
-      preds       = CrossValidationHelper.alignPredictions(m_Evaluation.predictions(), origIndices);
+      preds       = CrossValidationHelper.alignPredictions(m_CrossValidation.getEvaluation().predictions(), origIndices);
 
       // compute thresholds
       errors = new double[preds.size()];
@@ -506,7 +564,7 @@ public class PredictionErrorIQR
       return data;
     }
     finally {
-      m_Evaluation = null;
+      m_CrossValidation = null;
     }
   }
 
@@ -630,8 +688,8 @@ public class PredictionErrorIQR
    */
   @Override
   public void stopExecution() {
-    if (m_Evaluation != null)
-      m_Evaluation.stopExecution();
+    if (m_CrossValidation != null)
+      m_CrossValidation.stopExecution();
     m_Stopped = true;
   }
 
