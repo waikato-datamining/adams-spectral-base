@@ -27,6 +27,10 @@ import adams.core.ThreadLimiter;
 import adams.core.base.BaseDouble;
 import adams.core.base.BaseInteger;
 import adams.core.option.OptionUtils;
+import adams.data.postprocessor.PostProcessorDetails;
+import adams.data.spreadsheet.DefaultSpreadSheet;
+import adams.data.spreadsheet.Row;
+import adams.data.spreadsheet.SpreadSheet;
 import adams.data.statistics.StatUtils;
 import adams.flow.core.Actor;
 import adams.multiprocess.WekaCrossValidationExecution;
@@ -116,7 +120,7 @@ import java.util.logging.Level;
  */
 public class PredictionErrorIQR
   extends AbstractPostProcessor
-  implements Randomizable, StoppableWithFeedback, ThreadLimiter {
+  implements Randomizable, StoppableWithFeedback, ThreadLimiter, PostProcessorDetails<SpreadSheet> {
 
   private static final long serialVersionUID = -3236239648802264362L;
 
@@ -155,6 +159,12 @@ public class PredictionErrorIQR
 
   /** the flow context. */
   protected transient Actor m_FlowContext;
+
+  /** the count before. */
+  protected int m_CountBefore;
+
+  /** the count after. */
+  protected int m_CountAfter;
 
   /**
    * Returns a string describing the object.
@@ -641,8 +651,10 @@ public class PredictionErrorIQR
     Instances	result;
     int		i;
 
-    result   = data;
-    m_Random = new Random(m_Seed);
+    result        = data;
+    m_Random      = new Random(m_Seed);
+    m_CountBefore = data.numInstances();
+    m_CountAfter  = -1;
 
     for (i = 0; i < m_Classifiers.length; i++) {
       if (m_Stopped) {
@@ -668,6 +680,8 @@ public class PredictionErrorIQR
     if (isLoggingEnabled())
       getLogger().info("# outliers removed: " + (data.numInstances() - result.numInstances()) + " - " + data.relationName());
 
+    m_CountAfter = result.numInstances();
+
     return result;
   }
 
@@ -681,6 +695,34 @@ public class PredictionErrorIQR
   protected Instance performPostProcess(Instance data) {
     // only works on datasets, not individual rows
     return data;
+  }
+
+  /**
+   * Returns details for the cleaner.
+   *
+   * @return		the details
+   */
+  public SpreadSheet getDetails() {
+    SpreadSheet	result;
+    Row		row;
+
+    result = new DefaultSpreadSheet();
+
+    row = result.getHeaderRow();
+    row.addCell("N").setContentAsString("Name");
+    row.addCell("V").setContentAsString("Value");
+
+    row = result.addRow();
+    row.addCell("N").setContentAsString("# instances before");
+    row.addCell("V").setContent(m_CountBefore);
+    row = result.addRow();
+    row.addCell("N").setContentAsString("# instances after");
+    row.addCell("V").setContent(m_CountAfter);
+    row = result.addRow();
+    row.addCell("N").setContentAsString("Outliers removed");
+    row.addCell("V").setContent(m_CountBefore - m_CountAfter);
+
+    return result;
   }
 
   /**

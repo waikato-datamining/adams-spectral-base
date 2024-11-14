@@ -23,9 +23,11 @@ package adams.flow.transformer;
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
 import adams.core.Stoppable;
+import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
 import adams.data.instance.WekaInstanceContainer;
+import adams.data.postprocessor.PostProcessorDetails;
 import adams.data.postprocessor.instances.AbstractPostProcessor;
 import adams.data.report.Report;
 import adams.data.textrenderer.AbstractTextRenderer;
@@ -130,6 +132,9 @@ public class PostProcessor
   /** the model loader. */
   protected PostProcessorModelLoader m_ModelLoader;
 
+  /** the file to save the cleaner details to. */
+  protected PlaceholderFile m_PostProcessorDetailsOutput;
+
   /**
    * Returns a string describing the object.
    *
@@ -138,9 +143,9 @@ public class PostProcessor
   @Override
   public String globalInfo() {
     return
-        "Post-processes the input Instances or, after the post-processor "
-      + "has been initialized with Instances, also input Instance objects.\n"
-      + "The actual post-processor in use gets output when container output enabled.";
+      "Post-processes the input Instances or, after the post-processor "
+	+ "has been initialized with Instances, also input Instance objects.\n"
+	+ "The actual post-processor in use gets output when container output enabled.";
   }
 
   /**
@@ -151,8 +156,8 @@ public class PostProcessor
     super.defineOptions();
 
     m_OptionManager.add(
-	"post-processor", "postProcessor",
-	new adams.data.postprocessor.instances.WekaFilter());
+      "post-processor", "postProcessor",
+      new adams.data.postprocessor.instances.WekaFilter());
 
     m_OptionManager.add(
       "model-loading-type", "modelLoadingType",
@@ -171,8 +176,12 @@ public class PostProcessor
       new StorageName());
 
     m_OptionManager.add(
-	"output-container", "outputContainer",
-	false);
+      "output-container", "outputContainer",
+      false);
+
+    m_OptionManager.add(
+      "post-processor-details-output", "postProcessorDetailsOutput",
+      new PlaceholderFile());
   }
 
   /**
@@ -374,6 +383,38 @@ public class PostProcessor
   }
 
   /**
+   * Sets the file for the post-processor details.
+   *
+   * @param value	the file
+   */
+  public void setPostProcessorDetailsOutput(PlaceholderFile value) {
+    m_PostProcessorDetailsOutput = value;
+    reset();
+  }
+
+  /**
+   * Returns the file for the post-processor details.
+   *
+   * @return		the file
+   */
+  public PlaceholderFile getPostProcessorDetailsOutput() {
+    return m_PostProcessorDetailsOutput;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String postProcessorDetailsOutputTipText() {
+    return
+      "The file to save the post-processor details to after training, in case "
+	+ "the post-processor implements the " + PostProcessorDetails.class.getName()
+	+ " interface; ignored if pointing to a directory.";
+  }
+
+  /**
    * Returns a quick info about the actor, which will be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -511,9 +552,9 @@ public class PostProcessor
 
     if (result == null) {
       try {
-        data   = null;
-        inst   = null;
-        report = null;
+	data   = null;
+	inst   = null;
+	report = null;
 	if (m_InputToken.getPayload() instanceof Instances) {
 	  data = m_InputToken.getPayload(Instances.class);
 	}
@@ -532,8 +573,8 @@ public class PostProcessor
 	    inst = cont.getValue(PostProcessingContainer.VALUE_OUTPUT_INSTANCE, Instance.class);
 	  if (cont.hasValue(PostProcessingContainer.VALUE_REPORT))
 	    report = cont.getValue(PostProcessingContainer.VALUE_REPORT, Report.class);
-        }
-        else {
+	}
+	else {
 	  result = m_InputToken.unhandledData();
 	}
 	if (result == null) {
@@ -543,6 +584,14 @@ public class PostProcessor
 	      m_OutputToken = new Token(new PostProcessingContainer(data, processedData, m_ActualPostProcessor));
 	    else
 	      m_OutputToken = new Token(processedData);
+
+	    if ((m_PostProcessor instanceof PostProcessorDetails) && !m_PostProcessorDetailsOutput.isDirectory()) {
+	      if (!FileUtils.writeToFile(
+		m_PostProcessorDetailsOutput.getAbsolutePath(),
+		((PostProcessorDetails<Object>) m_ActualPostProcessor).getDetails(),
+		false))
+		getLogger().severe("Failed to save post-processor details to '" + m_PostProcessorDetailsOutput + "'!");
+	    }
 	  }
 	  else if (inst != null) {
 	    processedInst = m_ActualPostProcessor.postProcess(inst);
