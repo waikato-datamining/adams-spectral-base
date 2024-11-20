@@ -503,13 +503,15 @@ public class PredictionErrorIQR
    * Cleans the data using the specified classifier and parameters.
    *
    * @param data		the data to clean
+   * @param classifierIndex 	the index of the classifier
+   * @param iteration		the current iteration
    * @param classifier		the classifier to cross-validate and obtain predictions from
    * @param numFolds		the cross-validation folds
    * @param seed		the seed for randomizing the data for cross-validation
    * @param iqrMultiplier	the multiplier for the IQR outliers
    * @return			the cleaned up data
    */
-  protected Instances cleanData(Instances data, Classifier classifier, int numFolds, long seed, double iqrMultiplier) {
+  protected Instances cleanData(Instances data, int classifierIndex, Classifier classifier, int iteration, int numFolds, long seed, double iqrMultiplier) {
     Instances		result;
     String		msg;
     double[]		errors;
@@ -554,10 +556,10 @@ public class PredictionErrorIQR
       p75   = StatUtils.quartile(errors, 0.75);
       iqr   = p75 - p25;
       if (isLoggingEnabled())
-	getLogger().info("p25=" + p25 + ", p75=" + p75 + ", iqr=" + iqr + " - " + data.relationName());
+	getLogger().info("Classifier #"  + (classifierIndex+1) + "/iteration #" + (i+1) + ": p25=" + p25 + ", p75=" + p75 + ", iqr=" + iqr + " - dataset=" + data.relationName());
       upper = p75 + iqr * iqrMultiplier;
       if (isLoggingEnabled())
-	getLogger().info("upper=" + upper + " - " + data.relationName());
+	getLogger().info("Classifier #"  + (classifierIndex+1) + "/iteration #" + (i+1) + ": upper=" + upper + " - dataset=" + data.relationName());
 
       result = new Instances(data, data.numInstances());
       for (i = 0; i < data.numInstances(); i++) {
@@ -570,7 +572,7 @@ public class PredictionErrorIQR
       return result;
     }
     catch (Exception e) {
-      getLogger().log(Level.SEVERE, "cleanData: Failed to cross-validate?" + " - " + data.relationName(), e);
+      getLogger().log(Level.SEVERE, "cleanData: Failed to cross-validate?" + " - dataset=" + data.relationName(), e);
       return data;
     }
     finally {
@@ -582,6 +584,7 @@ public class PredictionErrorIQR
    * Cleans the data using the specified classifier and parameters.
    *
    * @param data			the data to clean
+   * @param classifierIndex 		the index of the classifier
    * @param classifier			the classifier to cross-validate and obtain predictions from
    * @param numFolds			the cross-validation folds
    * @param seed			the seed for randomizing the data for cross-validation
@@ -590,7 +593,7 @@ public class PredictionErrorIQR
    * @param maxNonRemovalIterations	the maximum number of iterations with no outliers being removed before stopping (ignored if 0)
    * @return				the cleaned up data
    */
-  protected Instances iterate(Instances data, Classifier classifier, int numFolds, long seed, double iqrMultiplier, int numIterations, int maxNonRemovalIterations) {
+  protected Instances iterate(Instances data, int classifierIndex, Classifier classifier, int numFolds, long seed, double iqrMultiplier, int numIterations, int maxNonRemovalIterations) {
     Instances	result;
     Instances	old;
     int		i;
@@ -603,10 +606,10 @@ public class PredictionErrorIQR
 	if (m_Stopped)
 	  return data;
 	if (isLoggingEnabled())
-	  getLogger().info("Iteration #" + (i+1) + ": size before=" + result.numInstances() + " - " + data.relationName());
-	result = cleanData(result, classifier, numFolds, seed, iqrMultiplier);
+	  getLogger().info("Classifier #"  + (classifierIndex+1) + "/iteration #" + (i+1) + ": size before=" + result.numInstances() + " - dataset=" + data.relationName());
+	result = cleanData(result, classifierIndex, classifier, i, numFolds, seed, iqrMultiplier);
 	if (isLoggingEnabled())
-	  getLogger().info("Iteration #" + (i+1) + ": size after=" + result.numInstances() + " - " + data.relationName());
+	  getLogger().info("Classifier #"  + (classifierIndex+1) + "/iteration #" + (i+1) + ": size after=" + result.numInstances() + " - dataset=" + data.relationName());
       }
     }
     else {
@@ -616,17 +619,17 @@ public class PredictionErrorIQR
 	if (m_Stopped)
 	  return data;
 	if (isLoggingEnabled())
-	  getLogger().info("Iteration #" + (i+1) + ": size before=" + result.numInstances() + " - " + data.relationName());
+	  getLogger().info("Classifier #"  + (classifierIndex+1) + "/iteration #" + (i+1) + ": size before=" + result.numInstances() + " - dataset=" + data.relationName());
 	old    = result;
-	result = cleanData(old, classifier, numFolds, seed, iqrMultiplier);
+	result = cleanData(old, classifierIndex, classifier, i, numFolds, seed, iqrMultiplier);
 	if (isLoggingEnabled())
-	  getLogger().info("Iteration #" + (i+1) + ": size after=" + result.numInstances() + " - " + data.relationName());
+	  getLogger().info("Classifier #"  + (classifierIndex+1) + "/iteration #" + (i+1) + ": size after=" + result.numInstances() + " - dataset=" + data.relationName());
 
 	if (result.numInstances() == old.numInstances()) {
 	  count++;
 	  if (count >= maxNonRemovalIterations) {
 	    if (isLoggingEnabled())
-	      getLogger().info("Maximum number of iterations with no removals reached (" + maxNonRemovalIterations + "), exiting!" + " - " + data.relationName());
+	      getLogger().info("Classifier #"  + (classifierIndex+1) + "/iteration #" + (i+1) + ": Maximum number of iterations with no removals reached (" + maxNonRemovalIterations + "), exiting!" + " - dataset=" + data.relationName());
 	    break;
 	  }
 	}
@@ -658,17 +661,18 @@ public class PredictionErrorIQR
 
     for (i = 0; i < m_Classifiers.length; i++) {
       if (m_Stopped) {
-	getLogger().warning("Execution stopped, exiting!" + " - " + data.relationName());
+	getLogger().warning("Execution stopped, exiting!" + " - dataset=" + data.relationName());
 	return data;
       }
       if (result.numInstances() == 0) {
-	getLogger().warning("No data left, exiting cleaning loop!" + " - " + data.relationName());
+	getLogger().warning("No data left, exiting cleaning loop!" + " - dataset=" + data.relationName());
 	break;
       }
       if (isLoggingEnabled())
-	getLogger().info("Using classifier #" + (i+1) + ": " + OptionUtils.getCommandLine(m_Classifiers[i]) + " - " + data.relationName());
+	getLogger().info("Using classifier #" + (i+1) + ": " + OptionUtils.getCommandLine(m_Classifiers[i]) + " - dataset=" + data.relationName());
       result = iterate(
 	result,
+	i,
 	m_Classifiers[i],
 	m_NumFolds[i].intValue(),
 	m_Random.nextLong(),
@@ -678,7 +682,7 @@ public class PredictionErrorIQR
     }
 
     if (isLoggingEnabled())
-      getLogger().info("# outliers removed: " + (data.numInstances() - result.numInstances()) + " - " + data.relationName());
+      getLogger().info("# outliers removed: " + (data.numInstances() - result.numInstances()) + " - dataset=" + data.relationName());
 
     m_CountAfter = result.numInstances();
 
