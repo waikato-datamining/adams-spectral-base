@@ -22,7 +22,7 @@ package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Stoppable;
+import adams.core.StoppableUtils;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.core.logging.LoggingLevel;
@@ -622,8 +622,7 @@ public class PostProcessor
    */
   @Override
   public void stopExecution() {
-    if (m_ActualPostProcessor instanceof Stoppable)
-      ((Stoppable) m_ActualPostProcessor).stopExecution();
+    StoppableUtils.stopAnyExecution(m_ActualPostProcessor);
     super.stopExecution();
   }
 

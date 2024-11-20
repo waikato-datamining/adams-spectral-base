@@ -23,7 +23,7 @@ package weka.classifiers.meta;
 
 import adams.data.instances.ArffUtils;
 import weka.classifiers.AbstainingClassifier;
-import weka.classifiers.SingleClassifierEnhancer;
+import weka.classifiers.StoppableSingleClassifierEnhancer;
 import weka.core.BatchPredictor;
 import weka.core.Capabilities;
 import weka.core.Capabilities.Capability;
@@ -80,7 +80,7 @@ import weka.filters.unsupervised.attribute.Remove;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class SpectrumClassifier
-  extends SingleClassifierEnhancer
+  extends StoppableSingleClassifierEnhancer
   implements AbstainingClassifier {
 
   /** for serialization */
@@ -88,7 +88,7 @@ public class SpectrumClassifier
 
   /** The filter for removing sample ID/database ID. */
   protected Remove m_Remove = null;
-  
+
   /** whether the base classifier can abstain. */
   protected boolean m_CanAbstain = false;
 
@@ -100,11 +100,11 @@ public class SpectrumClassifier
    */
   public String globalInfo() {
     return
-        "Automatically removes some IDs from the dataset "
-      + "before training the base classifier: "
-      + ArffUtils.getIDName() + ", "
-      + ArffUtils.getDBIDName() + ", "
-      + ArffUtils.getSampleIDName() + ".";
+      "Automatically removes some IDs from the dataset "
+	+ "before training the base classifier: "
+	+ ArffUtils.getIDName() + ", "
+	+ ArffUtils.getDBIDName() + ", "
+	+ ArffUtils.getSampleIDName() + ".";
   }
 
   /**
@@ -157,7 +157,7 @@ public class SpectrumClassifier
   @Override
   public boolean implementsMoreEfficientBatchPrediction() {
     return (m_Classifier instanceof BatchPredictor)
-      && ((BatchPredictor) m_Classifier).implementsMoreEfficientBatchPrediction();
+	     && ((BatchPredictor) m_Classifier).implementsMoreEfficientBatchPrediction();
   }
 
   /**
@@ -167,6 +167,8 @@ public class SpectrumClassifier
    * @throws Exception 	if the classifier could not be built successfully
    */
   public void buildClassifier(Instances data) throws Exception {
+    m_Stopped = false;
+
     data = new Instances(data);
     data.deleteWithMissingClass();
 
@@ -220,7 +222,7 @@ public class SpectrumClassifier
     else {
       result = new double[insts.numInstances()][];
       for (i = 0; i < insts.numInstances(); i++)
-        result[i] = m_Classifier.distributionForInstance(insts.instance(i));
+	result[i] = m_Classifier.distributionForInstance(insts.instance(i));
     }
 
     return result;
@@ -228,7 +230,7 @@ public class SpectrumClassifier
 
   /**
    * Whether abstaining is possible, e.g., used in meta-classifiers.
-   * 
+   *
    * @return		true if abstaining is possible
    */
   @Override
@@ -238,7 +240,7 @@ public class SpectrumClassifier
 
   /**
    * The prediction that made the classifier abstain.
-   * 
+   *
    * @param inst	the instance to get the prediction for
    * @return		the prediction, {@link Utils#missingValue()} if abstaining is not possible
    * @throws Exception	if fails to make prediction
@@ -251,7 +253,7 @@ public class SpectrumClassifier
 	m_Remove.batchFinished();
 	inst = m_Remove.output();
       }
-      
+
       return ((AbstainingClassifier) m_Classifier).getAbstentionClassification(inst);
     }
     else {
@@ -261,7 +263,7 @@ public class SpectrumClassifier
 
   /**
    * The class distribution that made the classifier abstain.
-   * 
+   *
    * @param inst	the instance to get the prediction for
    * @return		the class distribution, null if abstaining is not possible
    * @throws Exception	if fails to make prediction
@@ -274,7 +276,7 @@ public class SpectrumClassifier
 	m_Remove.batchFinished();
 	inst = m_Remove.output();
       }
-      
+
       return ((AbstainingClassifier) m_Classifier).getAbstentionDistribution(inst);
     }
     else {

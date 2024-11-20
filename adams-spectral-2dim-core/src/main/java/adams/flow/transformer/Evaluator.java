@@ -22,7 +22,7 @@ package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Stoppable;
+import adams.core.StoppableUtils;
 import adams.core.Utils;
 import adams.core.VariableName;
 import adams.core.io.PlaceholderFile;
@@ -236,8 +236,7 @@ public class Evaluator
      */
     @Override
     public void stopExecution() {
-      if (m_Evaluator instanceof Stoppable)
-	((Stoppable) m_Evaluator).stopExecution();
+      StoppableUtils.stopAnyExecution(m_Evaluator);
       super.stopExecution();
     }
 
@@ -1045,8 +1044,7 @@ public class Evaluator
    */
   @Override
   public void stopExecution() {
-    if (m_ActualEvaluator instanceof Stoppable)
-      ((Stoppable) m_ActualEvaluator).stopExecution();
+    StoppableUtils.stopAnyExecution(m_ActualEvaluator);
     super.stopExecution();
   }
 

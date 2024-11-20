@@ -20,6 +20,7 @@
 package adams.data.evaluator.instance;
 
 import adams.core.Randomizable;
+import adams.core.StoppableUtils;
 import adams.core.StoppableWithFeedback;
 import adams.core.option.OptionUtils;
 import adams.flow.core.EvaluationHelper;
@@ -461,8 +462,7 @@ public class MultiClassifierEvaluator
    */
   @Override
   public void stopExecution() {
-    if (m_CrossvalidationResults instanceof StoppableEvaluation)
-      ((StoppableEvaluation) m_CrossvalidationResults).stopExecution();
+    StoppableUtils.stopExecution(m_CrossvalidationResults);
     m_Stopped = true;
   }
 

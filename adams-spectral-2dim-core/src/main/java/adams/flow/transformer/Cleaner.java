@@ -22,7 +22,7 @@ package adams.flow.transformer;
 
 import adams.core.MessageCollection;
 import adams.core.QuickInfoHelper;
-import adams.core.Stoppable;
+import adams.core.StoppableUtils;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
@@ -224,8 +224,7 @@ public class Cleaner
      */
     @Override
     public void stopExecution() {
-      if (m_Cleaner instanceof Stoppable)
-	((Stoppable) m_Cleaner).stopExecution();
+      StoppableUtils.stopAnyExecution(m_Cleaner);
       super.stopExecution();
     }
 
@@ -814,8 +813,7 @@ public class Cleaner
    */
   @Override
   public void stopExecution() {
-    if (m_ActualCleaner instanceof Stoppable)
-      ((Stoppable) m_ActualCleaner).stopExecution();
+    StoppableUtils.stopAnyExecution(m_ActualCleaner);
     super.stopExecution();
   }
 
