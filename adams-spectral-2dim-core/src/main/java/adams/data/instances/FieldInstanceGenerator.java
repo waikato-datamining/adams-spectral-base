@@ -15,7 +15,7 @@
 
 /*
  * SampleDataInstanceGenerator.java
- * Copyright (C) 2011-2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -87,6 +87,9 @@ public class FieldInstanceGenerator
   /** for serialization. */
   private static final long serialVersionUID = 7579845592900079095L;
 
+  /** the prefix to use. */
+  protected String m_Prefix;
+
   /**
    * Returns a string describing the object.
    *
@@ -96,6 +99,46 @@ public class FieldInstanceGenerator
     return
         "A generator for turning fields of the sample data of a spectrum "
       + "into weka.core.Instance objects.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "prefix", "prefix",
+      "");
+  }
+
+  /**
+   * Sets the prefix for the attribute names.
+   *
+   * @param value	the name prefix
+   */
+  public void setPrefix(String value) {
+    m_Prefix = value;
+    reset();
+  }
+
+  /**
+   * Returns the prefix for the attribute names.
+   *
+   * @return		the name prefix
+   */
+  public String getPrefix() {
+    return m_Prefix;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String prefixTipText() {
+    return "The prefix to use for the attributes.";
   }
 
   /**
@@ -114,23 +157,23 @@ public class FieldInstanceGenerator
     name = new StringBuilder();
     for (Field field : m_Fields) {
       if (field.getDataType() == DataType.NUMERIC) {
-	atts.add(new Attribute(ArffUtils.getFieldName(field)));
+	atts.add(new Attribute(m_Prefix + ArffUtils.getFieldName(field)));
       }
       else if (field.getDataType() == DataType.BOOLEAN) {
 	attValues = new ArrayList<>();
 	attValues.add(LABEL_FALSE);
 	attValues.add(LABEL_TRUE);
-	atts.add(new Attribute(ArffUtils.getFieldName(field), attValues));
+	atts.add(new Attribute(m_Prefix + ArffUtils.getFieldName(field), attValues));
       }
       else {
-	atts.add(new Attribute(ArffUtils.getFieldName(field), (List<String>) null));
+	atts.add(new Attribute(m_Prefix + ArffUtils.getFieldName(field), (List<String>) null));
       }
       if (name.length() > 0)
 	name.append(",");
-      name.append(ArffUtils.getFieldName(field));
+      name.append(m_Prefix).append(ArffUtils.getFieldName(field));
     }
 
-    m_OutputHeader = new Instances(getClass().getName() + "-" + name.toString(), atts, 0);
+    m_OutputHeader = new Instances(getClass().getName() + "-" + name, atts, 0);
   }
 
   /**
@@ -152,7 +195,7 @@ public class FieldInstanceGenerator
     // fields
     if (data.hasReport()) {
       for (Field target: m_Fields) {
-	index = m_OutputHeader.attribute(ArffUtils.getFieldName(target)).index();
+	index = m_OutputHeader.attribute(m_Prefix + ArffUtils.getFieldName(target)).index();
 	values[index] = weka.core.Utils.missingValue();
 	if (report.hasValue(target)) {
 	  if (target.getDataType() == DataType.NUMERIC) {
