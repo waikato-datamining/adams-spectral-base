@@ -15,13 +15,15 @@
 
 /*
  * MultiSpectrumRemove.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.QuickInfoHelper;
+import adams.core.annotation.DeprecatedClass;
 import adams.core.base.BaseRegExp;
+import adams.data.multispectrumoperation.Remove;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
@@ -91,8 +93,10 @@ import adams.flow.core.Token;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1286 $
  */
+@DeprecatedClass(
+  useInstead = {MultiSpectrumOperation.class, Remove.class}
+)
 public class MultiSpectrumRemove
   extends AbstractTransformer {
 
@@ -170,7 +174,7 @@ public class MultiSpectrumRemove
   }
 
   /**
-   * Sets the regular expression that the sample Type of a spectrum must match 
+   * Sets the regular expression that the sample type of a spectrum must match
    * in order to get removed.
    *
    * @param value	the regular expression
