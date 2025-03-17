@@ -78,6 +78,14 @@ adams.data.multifilter.AbstractMultiSpectrumFilter=\
 adams.data.multireportfilter.AbstractMultiSpectrumReportFilter=\
   adams.data.multireportfilter
 
+# multi-spectrum operations
+adams.data.multispectrumoperation.AbstractMultiSpectrumOperation=\
+  adams.data.multispectrumoperation
+
+# multi-spectrum outlier removal
+adams.data.multispectrumoperation.outlierremoval.AbstractOutlierRemoval=\
+  adams.data.multispectrumoperation.outlierremoval
+
 # feature generators
 adams.data.spectrum.AbstractSpectrumFeatureGenerator=\
   adams.data.spectrum
