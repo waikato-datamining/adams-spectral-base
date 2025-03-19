@@ -15,11 +15,12 @@
 
 /*
  * GetSampleDataValue.java
- * Copyright (C) 2011-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
+import adams.data.conversion.Conversion;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
@@ -79,13 +80,41 @@ import adams.data.spectrum.Spectrum;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class GetSampleDataValue
   extends AbstractGetReportValue {
 
   /** for serialization. */
   private static final long serialVersionUID = -6237324482439105653L;
+
+  /**
+   * Default constructor.
+   */
+  public GetSampleDataValue() {
+    super();
+  }
+
+  /**
+   * Constructor with field.
+   *
+   * @param field 	the field to use
+   */
+  public GetSampleDataValue(Field field) {
+    super();
+    setField(field);
+  }
+
+  /**
+   * Constructor with field and conversion.
+   *
+   * @param field 	the field to use
+   * @param conversion 	the conversion to use
+   */
+  public GetSampleDataValue(Field field, Conversion conversion) {
+    super();
+    setField(field);
+    setConversion(conversion);
+  }
 
   /**
    * Returns a string describing the object.
