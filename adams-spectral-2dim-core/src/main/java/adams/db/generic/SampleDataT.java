@@ -15,7 +15,7 @@
 
 /*
  * SampleDataT.java
- * Copyright (C) 2008-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2025 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -799,22 +799,22 @@ public abstract class SampleDataT
     Set<DataType>	typesSet;
     Pattern		skipPattern;
     boolean		useSameConnection;
-    Connection		m_Connection;
+    Connection 		connection;
 
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName());
 
-    m_Connection       = null;
+    connection         = null;
     m_BulkStoreStopped = false;
     useSameConnection  = true;
 
     if (newConnection) {
       try {
 	if (getDatabaseConnection().getUser().isEmpty())
-	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getUser());
+	  connection = DriverManager.getConnection(getDatabaseConnection().getUser());
 	else
-	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
-	m_Connection.setAutoCommit(autoCommit);
+	  connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
+	connection.setAutoCommit(autoCommit);
 	useSameConnection = false;
       }
       catch(Exception e) {
@@ -825,8 +825,8 @@ public abstract class SampleDataT
     if (!newConnection || useSameConnection) {
       if (!autoCommit) {
 	try {
-	  m_Connection = getDatabaseConnection().getConnection(false);
-	  m_Connection.setAutoCommit(false);
+	  connection = getDatabaseConnection().getConnection(false);
+	  connection.setAutoCommit(false);
 	}
 	catch (Exception e) {
 	  getLogger().log(Level.WARNING, "Failed to turn off auto-commit!", e);
@@ -834,19 +834,19 @@ public abstract class SampleDataT
       }
     }
 
-    if (m_Connection == null) {
+    if (connection == null) {
       getLogger().warning("Falling back on default connection: " + getDatabaseConnection());
-      m_Connection = getDatabaseConnection().getConnection(false);
+      connection = getDatabaseConnection().getConnection(false);
     }
 
-    if (m_Connection == null) {
+    if (connection == null) {
       getLogger().severe("Cannot insert data, due to failure of obtaining connection from: " + getDatabaseConnection());
       return false;
     }
 
     try {
-      delete = prepareStatement(m_Connection, "DELETE FROM " + getTableName() + " WHERE ID = ? AND NAME = ?", false);
-      insert = prepareStatement(m_Connection, "INSERT INTO " + getTableName() + "(ID, NAME, TYPE, VALUE)  VALUES(?, ?, ?, ?)", false);
+      delete = prepareStatement(connection, "DELETE FROM " + getTableName() + " WHERE ID = ? AND NAME = ?", false);
+      insert = prepareStatement(connection, "INSERT INTO " + getTableName() + "(ID, NAME, TYPE, VALUE)  VALUES(?, ?, ?, ?)", false);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to prepare statements!", e);
@@ -896,7 +896,7 @@ public abstract class SampleDataT
 	    delete.executeBatch();
 	    insert.executeBatch();
 	    if (!autoCommit)
-	      m_Connection.commit();
+	      connection.commit();
 	    delete.clearBatch();
 	    insert.clearBatch();
 	    committed = true;
@@ -914,7 +914,7 @@ public abstract class SampleDataT
 	delete.executeBatch();
 	insert.executeBatch();
 	if (!autoCommit)
-	  m_Connection.commit();
+	  connection.commit();
       }
       delete.clearBatch();
       insert.clearBatch();
@@ -937,7 +937,7 @@ public abstract class SampleDataT
 
     if (!useSameConnection) {
       try {
-	m_Connection.close();
+	connection.close();
       }
       catch (Exception e) {
 	getLogger().log(Level.WARNING, "Failed to close connection!", e);
