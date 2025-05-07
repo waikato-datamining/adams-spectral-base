@@ -15,7 +15,7 @@
 
 /*
  * PostProcessor.java
- * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -424,10 +424,7 @@ public class PostProcessor
     String	result;
 
     result  = QuickInfoHelper.toString(this, "postProcessor", m_PostProcessor);
-    result += QuickInfoHelper.toString(this, "modelLoadingType", getModelLoadingType(), ", type: ");
-    result += QuickInfoHelper.toString(this, "modelFile", getModelFile(), ", model: ");
-    result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
-    result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
+    result += m_ModelLoader.getQuickInfo(this, result);
     result += QuickInfoHelper.toString(this, "outputContainer", (m_OutputContainer ? "output container" : "output processed data"), ", ");
 
     return result;

@@ -15,7 +15,7 @@
 
 /*
  * Evaluator.java
- * Copyright (C) 2011-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -774,10 +774,7 @@ public class Evaluator
     String	result;
 
     result  = QuickInfoHelper.toString(this, "evaluator", m_Evaluator, "evaluator: ");
-    result += QuickInfoHelper.toString(this, "modelLoadingType", getModelLoadingType(), ", type: ");
-    result += QuickInfoHelper.toString(this, "modelFile", getModelFile(), ", model: ");
-    result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
-    result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
+    result += m_ModelLoader.getQuickInfo(this, result);
     result += QuickInfoHelper.toString(this, "evaluatorResetVariable", m_EvaluatorResetVariable, ", reset: ");
     result += QuickInfoHelper.toString(this, "noCopy", (m_NoCopy ? "no copy" : "copy"), ", ");
     result += QuickInfoHelper.toString(this, "cleanAfterBuild", (m_CleanAfterBuild ? "clean" : "keep"), ", ");

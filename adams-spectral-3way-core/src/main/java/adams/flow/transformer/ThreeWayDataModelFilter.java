@@ -15,7 +15,7 @@
 
 /*
  * ThreeWayDataModelFilter.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.transformer;
@@ -351,10 +351,7 @@ public class ThreeWayDataModelFilter
   public String getQuickInfo() {
     String	result;
 
-    result = QuickInfoHelper.toString(this, "modelLoadingType", getModelLoadingType(), "type: ");
-    result += QuickInfoHelper.toString(this, "modelFile", getModelFile(), ", model: ");
-    result += QuickInfoHelper.toString(this, "modelSource", getModelActor(), ", source: ");
-    result += QuickInfoHelper.toString(this, "modelStorage", getModelStorage(), ", storage: ");
+    result  = m_ModelLoader.getQuickInfo(this);
     result += QuickInfoHelper.toString(this, "modelResetVariable", m_ModelResetVariable, ", reset: ");
 
     return result;
