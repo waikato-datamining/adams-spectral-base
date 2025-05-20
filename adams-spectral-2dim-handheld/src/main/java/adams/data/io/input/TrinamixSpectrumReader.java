@@ -170,7 +170,7 @@ public class TrinamixSpectrumReader
       if ((waveno != null) && lines.get(n).contains("Relative absorbance")) {
 	// skip rows with "nan" values
 	if (lines.get(n).contains("nan")) {
-	  getLogger().warning("Skipping line with NaNs: " + lines.get(n));
+	  getLogger().warning("Skipping line with NaNs (" + m_Input + "): " + lines.get(n));
 	  continue;
 	}
 	parts = lines.get(n).split(";");
