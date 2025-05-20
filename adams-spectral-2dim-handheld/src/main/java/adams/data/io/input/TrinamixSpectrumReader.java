@@ -15,7 +15,7 @@
 
 /*
  * TrinamixSpectrumReader.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -54,7 +54,7 @@ public class TrinamixSpectrumReader
    */
   @Override
   public String getFormatDescription() {
-    return "trinamiX CSV";
+    return "TrinamiX CSV";
   }
 
   /**
