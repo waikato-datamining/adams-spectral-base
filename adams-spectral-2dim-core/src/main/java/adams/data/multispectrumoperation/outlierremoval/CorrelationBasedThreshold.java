@@ -29,6 +29,7 @@ import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
 import adams.data.statistics.StatUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -162,6 +163,7 @@ public class CorrelationBasedThreshold
   @Override
   protected MultiSpectrum doRemoveOutliers(MultiSpectrum multi, MessageCollection errors) {
     MultiSpectrum	result;
+    List<Spectrum>	original;
     List<Spectrum> 	spectra;
     double[][]		ampl;
     int			i;
@@ -169,7 +171,8 @@ public class CorrelationBasedThreshold
     double		cc;
     int[]		count;
 
-    spectra = multi.toList();
+    original = multi.toList();
+    spectra  = new ArrayList<>(multi.toList());
 
     // pre-filter?
     if (!(m_PreFilter instanceof PassThrough)) {
@@ -205,7 +208,7 @@ public class CorrelationBasedThreshold
     for (i = 0; i < count.length; i++) {
       // CC not below threshold for all other spectra? -> add
       if (count[i] < spectra.size() - 1) {
-	result.add((Spectrum) spectra.get(i).getClone());
+	result.add((Spectrum) original.get(i).getClone());
 	if (isLoggingEnabled())
 	  getLogger().info((i+1) + ": keep");
       }
