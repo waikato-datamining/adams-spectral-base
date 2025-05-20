@@ -83,7 +83,7 @@ public class TrinamixSpectrumReader
 
     if (waveno.length == absorb.length) {
       spec = new Spectrum();
-      spec.setID(sampleID + "_" + repeat);
+      spec.setID(sampleID + "_" + instrument + "_" + repeat);
       spec.getReport().setStringValue("Base ID", sampleID);
       spec.getReport().setStringValue("Repeat", repeat);
       if (timestamp != null)
