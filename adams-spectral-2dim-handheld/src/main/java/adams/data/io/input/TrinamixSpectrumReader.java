@@ -128,7 +128,14 @@ public class TrinamixSpectrumReader
 
     // sample ID
     if (lines.get(0).contains("sample id;")) {
-      sampleID = lines.get(0).split(";")[1];
+      parts = lines.get(0).split(";");
+      if (parts.length > 1) {
+	sampleID = parts[1];
+      }
+      else {
+	getLogger().warning("No sample ID: " + m_Input);
+	sampleID = FileUtils.replaceExtension(m_Input.getName(), "");
+      }
     }
     else {
       getLogger().severe("Failed to locate sample ID: " + m_Input);
@@ -137,8 +144,11 @@ public class TrinamixSpectrumReader
 
     // timestamp
     timestamp = null;
-    if (lines.get(1).contains("timestamp;"))
-      timestamp = lines.get(1).split(";")[1];
+    if (lines.get(1).contains("timestamp;")) {
+      parts = lines.get(0).split(";");
+      if (parts.length > 1)
+	timestamp = parts[1];
+    }
 
     waveno     = null;
     absorb     = null;
@@ -158,6 +168,11 @@ public class TrinamixSpectrumReader
 
       // relative absorbance
       if ((waveno != null) && lines.get(n).contains("Relative absorbance")) {
+	// skip rows with "nan" values
+	if (lines.get(n).contains("nan")) {
+	  getLogger().warning("Skipping line with NaNs: " + lines.get(n));
+	  continue;
+	}
 	parts = lines.get(n).split(";");
 	repeat = "NA";
 	if (parts[0].contains("#"))
