@@ -68,11 +68,42 @@ public class TrinamixSpectrumReader
   }
 
   /**
+   * Adds the spectrum.
+   *
+   * @param instrument	the instrument
+   * @param sampleID	the sample ID
+   * @param repeat 	the repeat
+   * @param timestamp	the timestamp
+   * @param waveno	the wave numbers
+   * @param absorb	the absorbance amplitudes
+   */
+  protected void add(String instrument, String sampleID, String repeat, String timestamp, float[] waveno, float[] absorb) {
+    Spectrum	spec;
+    int		i;
+
+    if (waveno.length == absorb.length) {
+      spec = new Spectrum();
+      spec.setID(sampleID + "_" + repeat);
+      spec.getReport().setStringValue("Base ID", sampleID);
+      spec.getReport().setStringValue("Repeat", repeat);
+      if (timestamp != null)
+	spec.getReport().setStringValue("Timestamp", timestamp);
+      if (instrument != null)
+	spec.getReport().setStringValue("Instrument", instrument);
+      for (i = 0; i < waveno.length; i++)
+	spec.add(new SpectrumPoint(waveno[i], absorb[i]));
+      m_ReadData.add(spec);
+    }
+    else {
+      getLogger().severe("Differing number of values for wave numbers and relative absorbance: " + waveno.length + " != " + absorb.length);
+    }
+  }
+
+  /**
    * Performs the actual reading.
    */
   @Override
   protected void readData() {
-    Spectrum		spec;
     List<String> 	lines;
     int			minLines;
     String		sampleID;
@@ -80,8 +111,10 @@ public class TrinamixSpectrumReader
     String		instrument;
     String[]		parts;
     float[]		waveno;
-    float[]		absorb;
+    float[] 		absorb;
+    String		repeat;
     int			i;
+    int			n;
 
     // read file
     lines = FileUtils.loadFromFile(m_Input);
@@ -107,47 +140,34 @@ public class TrinamixSpectrumReader
     if (lines.get(1).contains("timestamp;"))
       timestamp = lines.get(1).split(";")[1];
 
-    // waveno
+    waveno     = null;
+    absorb     = null;
     instrument = null;
-    if (lines.get(3).contains("Wavelength (nm);")) {
-      if (lines.get(3).contains(" - "))
-	instrument = lines.get(3).split(" - ")[0];
-      parts = lines.get(3).split(";");
-      waveno = new float[parts.length - 1];
-      for (i = 1; i < parts.length; i++)
-	waveno[i - 1] = Float.parseFloat(parts[i]);
-    }
-    else {
-      getLogger().severe("Failed to locate wavelengths: " + m_Input);
-      return;
-    }
+    for (n = 3; n < lines.size(); n++) {
+      // waveno
+      if (lines.get(n).contains("Wavelength (nm);")) {
+	instrument = null;
+	if (lines.get(n).contains(" - "))
+	  instrument = lines.get(n).split(" - ")[0];
+	parts = lines.get(n).split(";");
+	waveno = new float[parts.length - 1];
+	for (i = 1; i < parts.length; i++)
+	  waveno[i - 1] = Float.parseFloat(parts[i]);
+	continue;
+      }
 
-    // relative absorbance
-    if (lines.get(4).contains("Relative absorbance")) {
-      parts = lines.get(4).split(";");
-      absorb = new float[parts.length - 1];
-      for (i = 1; i < parts.length; i++)
-	absorb[i - 1] = Float.parseFloat(parts[i]);
-    }
-    else {
-      getLogger().severe("Failed to locate relative absorbance: " + m_Input);
-      return;
-    }
-
-    // create spectrum
-    if (waveno.length == absorb.length) {
-      spec = new Spectrum();
-      spec.setID(sampleID);
-      if (timestamp != null)
-	spec.getReport().setStringValue("Timestamp", timestamp);
-      if (instrument != null)
-	spec.getReport().setStringValue("Instrument", instrument);
-      for (i = 0; i < waveno.length; i++)
-	spec.add(new SpectrumPoint(waveno[i], absorb[i]));
-      m_ReadData.add(spec);
-    }
-    else {
-      getLogger().severe("Differing number of values for wave numbers and relative absorbance: " + waveno.length + " != " + absorb.length);
+      // relative absorbance
+      if ((waveno != null) && lines.get(n).contains("Relative absorbance")) {
+	parts = lines.get(n).split(";");
+	repeat = "NA";
+	if (parts[0].contains("#"))
+	  repeat = parts[0].substring(parts[0].indexOf('#') + 1);
+        absorb = new float[parts.length - 1];
+	for (i = 1; i < parts.length; i++)
+	  absorb[i - 1] = Float.parseFloat(parts[i]);
+	// add spectrum
+	add(instrument, sampleID, repeat, timestamp, waveno, absorb);
+      }
     }
   }
 }
