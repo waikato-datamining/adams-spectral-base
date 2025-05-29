@@ -15,7 +15,7 @@
 
 /*
  * DeleteSampleDataPanel.java
- * Copyright (C) 2019-2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2019-2025 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -23,6 +23,7 @@ package adams.gui.tools;
 
 import adams.core.ClassLister;
 import adams.core.Properties;
+import adams.core.Utils;
 import adams.data.report.Field;
 import adams.db.DatabaseConnection;
 import adams.db.SampleDataF;
@@ -363,15 +364,19 @@ public class DeleteSampleDataPanel
     fields = (Field[]) m_PanelFields.getValue();
     worker = new SwingWorker() {
       protected boolean successful;
+      protected int deleted;
       @Override
       protected Object doInBackground() throws Exception {
 	successful = true;
+	deleted = 0;
 	MouseUtils.setWaitCursor(DeleteSampleDataPanel.this);
 	SampleDataF sdt = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
 	for (int i = 0; i < sel.length; i++) {
 	  m_StatusBar.showStatus("Deleting: " + (i+1) + "/" + sel.length + "...");
-	  for (Field field: fields)
-	    sdt.remove(sel[i], field);
+	  for (Field field: fields) {
+	    if (sdt.remove(sel[i], field))
+	      deleted++;
+	  }
 	}
 	return null;
       }
@@ -382,6 +387,10 @@ public class DeleteSampleDataPanel
 	m_StatusBar.clearStatus();
 	if (successful)
 	  updateProperties();
+	String msg = "Selected IDs:\n" + Utils.flatten(sel, ", ") + "\n\n"
+	  + "Fields:\n" + Utils.flatten(fields, "\n") + "\n\n"
+	  + "# deleted: " + deleted;
+	GUIHelper.showInformationMessage(DeleteSampleDataPanel.this, msg, "Delete sample data");
       }
     };
     worker.execute();

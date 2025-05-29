@@ -15,7 +15,7 @@
 
 /*
  * UpdateSampleDataPanel.java
- * Copyright (C) 2016-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2025 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -404,9 +404,11 @@ public class UpdateSampleDataPanel
 
     worker = new SwingWorker() {
       protected boolean successful;
+      protected int updated;
       @Override
       protected Object doInBackground() throws Exception {
 	successful = true;
+	updated = 0;
 	MouseUtils.setWaitCursor(UpdateSampleDataPanel.this);
 	SampleDataF sdt = SampleDataF.getSingleton(DatabaseConnection.getSingleton());
 	for (int i = 0; i < sel.length; i++) {
@@ -419,6 +421,9 @@ public class UpdateSampleDataPanel
 	      GUIHelper.showErrorMessage(
 		UpdateSampleDataPanel.this, "Failed to store sample data for ID " + sel[i] + "!");
 	    }
+	    else {
+	      updated++;
+	    }
 	  }
 	}
 	return null;
@@ -430,6 +435,11 @@ public class UpdateSampleDataPanel
 	m_StatusBar.clearStatus();
 	if (successful)
 	  updateProperties();
+	String msg = "Selected IDs:\n" + Utils.flatten(sel, ", ") + "\n\n"
+		       + "Field:\n" + field + "\n\n"
+		       + "Value:\n" + value + "\n\n"
+		       + "# updated: " + updated;
+	GUIHelper.showInformationMessage(UpdateSampleDataPanel.this, msg, "Update sample data");
       }
     };
     worker.execute();
