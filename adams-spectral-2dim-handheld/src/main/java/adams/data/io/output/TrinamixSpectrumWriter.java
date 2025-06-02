@@ -125,6 +125,16 @@ public class TrinamixSpectrumWriter
   }
 
   /**
+   * Returns whether writing of multiple containers is supported.
+   *
+   * @return 		true if multiple containers are supported
+   */
+  @Override
+  public boolean canWriteMultiple() {
+    return true;
+  }
+
+  /**
    * Performs the actual writing.
    *
    * @param data the data to write
@@ -134,51 +144,57 @@ public class TrinamixSpectrumWriter
   protected boolean writeData(List<Spectrum> data) {
     List<String>	lines;
     String		msg;
-    Spectrum		sp;
     String		timestamp;
     StringBuilder	buf;
     String		instrument;
+    String		sampleID;
 
     if (data.isEmpty()) {
       getLogger().severe("No spectra to write to: " + m_Output);
       return false;
     }
-    if (data.size() > 1)
-      getLogger().warning("Only writing the first spectrum of " + data.size() + " to: " + m_Output);
 
     lines = new ArrayList<>();
-    sp    = data.get(0);
 
     // sample id
-    lines.add("sample id;" + sp.getID());
+    sampleID = data.get(0).getID();
+    lines.add("sample id;" + sampleID);
 
     // timestamp
     timestamp = DateUtils.getTimestampFormatter().format(new Date());
-    if (sp.getReport().hasValue("Timestamp"))
-      timestamp = sp.getReport().getStringValue("Timestamp");
-    else if (sp.getReport().hasValue(SampleData.INSERT_TIMESTAMP))
-      timestamp = sp.getReport().getStringValue(SampleData.INSERT_TIMESTAMP);
+    if (data.get(0).getReport().hasValue("Timestamp"))
+      timestamp = data.get(0).getReport().getStringValue("Timestamp");
+    else if (data.get(0).getReport().hasValue(SampleData.INSERT_TIMESTAMP))
+      timestamp = data.get(0).getReport().getStringValue(SampleData.INSERT_TIMESTAMP);
     lines.add("timestamp;" + timestamp);
 
     // separator
     lines.add("");
 
-    // instrument
-    instrument = m_InstrumentName;
-    if (instrument.isEmpty() && sp.getReport().hasValue("Instrument"))
-      instrument = sp.getReport().getStringValue("Instrument");
+    for (Spectrum sp: data) {
+      // ensure that sample ID is the same
+      if (!sp.getID().equals(sampleID)) {
+	getLogger().warning("Skipping "  + sp.getID() + " as the sample ID differs from first one: " + sampleID);
+	continue;
+      }
 
-    // wavenumbers
-    buf = new StringBuilder(instrument).append(" - Wavelength (nm)");
-    for (SpectrumPoint p: sp.toList())
-      buf.append(";").append(p.getWaveNumber());
-    lines.add(buf.toString());
+      // instrument
+      instrument = m_InstrumentName;
+      if (instrument.isEmpty() && sp.getReport().hasValue("Instrument"))
+	instrument = sp.getReport().getStringValue("Instrument");
 
-    // amplitudes
-    buf = new StringBuilder(instrument).append(" - Relative absorbance - #0");
-    for (SpectrumPoint p: sp.toList())
-      buf.append(";").append(p.getAmplitude());
-    lines.add(buf.toString());
+      // wavenumbers
+      buf = new StringBuilder(instrument).append(" - Wavelength (nm)");
+      for (SpectrumPoint p : sp.toList())
+	buf.append(";").append(p.getWaveNumber());
+      lines.add(buf.toString());
+
+      // amplitudes
+      buf = new StringBuilder(instrument).append(" - Relative absorbance - #0");
+      for (SpectrumPoint p : sp.toList())
+	buf.append(";").append(p.getAmplitude());
+      lines.add(buf.toString());
+    }
 
     msg = FileUtils.saveToFileMsg(lines, m_Output, null);
     if (msg != null)
