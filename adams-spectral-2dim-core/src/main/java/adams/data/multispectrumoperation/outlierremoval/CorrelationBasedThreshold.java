@@ -81,7 +81,7 @@ public class CorrelationBasedThreshold
       0.0, 0.0, 1.0);
 
     m_OptionManager.add(
-      "below-count-threshold", "BelowCountThreshold",
+      "below-count-threshold", "belowCountThreshold",
       -1);
   }
 
