@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Applies the pre-filter and then computes the correlation coefficients
  * between the spectra. Spectra that fall below the specified threshold
- * with all other spectra get removed.
+ * with other spectra get removed.
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
@@ -50,6 +50,9 @@ public class CorrelationBasedThreshold
   /** the threshold. */
   protected double m_Threshold;
 
+  /** the threshold for below CC counts for rejecting spectra. */
+  protected int m_BelowCountThreshold;
+
   /**
    * Returns a string describing the object.
    *
@@ -59,7 +62,7 @@ public class CorrelationBasedThreshold
   public String globalInfo() {
     return "Applies the pre-filter and then computes the correlation coefficients "
 	     + "between the spectra. Spectra that fall below the specified threshold "
-	     + "with all other spectra get removed.";
+	     + "with other spectra too many times get removed (see 'belowCountThreshold').";
   }
 
   /**
@@ -76,6 +79,10 @@ public class CorrelationBasedThreshold
     m_OptionManager.add(
       "threshold", "threshold",
       0.0, 0.0, 1.0);
+
+    m_OptionManager.add(
+      "below-count-threshold", "BelowCountThreshold",
+      -1);
   }
 
   /**
@@ -139,6 +146,41 @@ public class CorrelationBasedThreshold
   }
 
   /**
+   * Sets the number of spectra below threshold that trigger rejection of the spectrum.
+   * If &lt;= 0, the number gets subtracted from the number of incoming spectra to determine the actual count.
+   *
+   * @param value	the count
+   */
+  public void setBelowCountThreshold(int value) {
+    if (getOptionManager().isValid("belowCountThreshold", value)) {
+      m_BelowCountThreshold = value;
+      reset();
+    }
+  }
+
+  /**
+   * Returns the number of spectra below threshold that trigger rejection of the spectrum.
+   * If &lt;= 0, the number gets subtracted from the number of incoming spectra to determine the actual count.
+   *
+   * @return 		the count
+   */
+  public int getBelowCountThreshold() {
+    return m_BelowCountThreshold;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String belowCountThresholdTipText() {
+    return "For each spectrum the number of times it falls below the CC threshold is counted and this threshold "
+	     + "determines whether a spectrum gets rejected (count >= threshold) or not (< threshold); "
+	     + "if <= 0 this number gets subtracted from the incoming number of spectra to determine the actual count threshold.";
+  }
+
+  /**
    * Returns a quick info about the object, which can be displayed in the GUI.
    *
    * @return		null if no info available, otherwise short string
@@ -149,6 +191,7 @@ public class CorrelationBasedThreshold
 
     result = QuickInfoHelper.toString(this, "preFilter", m_PreFilter, "pre: ");
     result += QuickInfoHelper.toString(this, "threshold", m_Threshold, ", threshold: ");
+    result += QuickInfoHelper.toString(this, "belowCountThreshold", m_BelowCountThreshold, ", below: ");
 
     return result;
   }
@@ -170,9 +213,15 @@ public class CorrelationBasedThreshold
     int			n;
     double		cc;
     int[]		count;
+    int 		countThreshold;
 
     original = multi.toList();
     spectra  = new ArrayList<>(multi.toList());
+
+    if (m_BelowCountThreshold <= 0)
+      countThreshold = spectra.size() + m_BelowCountThreshold;
+    else
+      countThreshold = m_BelowCountThreshold;
 
     // pre-filter?
     if (!(m_PreFilter instanceof PassThrough)) {
@@ -202,12 +251,12 @@ public class CorrelationBasedThreshold
       }
     }
     if (isLoggingEnabled())
-      getLogger().info("Below threshold counts (#spectra=" + spectra.size() + "): " + Utils.arrayToString(count));
+      getLogger().info("Below threshold counts (#spectra=" + spectra.size() + ", count threshold=" + countThreshold + "): " + Utils.arrayToString(count));
 
     result = (MultiSpectrum) multi.getHeader();
     for (i = 0; i < count.length; i++) {
       // CC not below threshold for all other spectra? -> add
-      if (count[i] < spectra.size() - 1) {
+      if (count[i] < countThreshold) {
 	result.add((Spectrum) original.get(i).getClone());
 	if (isLoggingEnabled())
 	  getLogger().info((i+1) + ": keep");
