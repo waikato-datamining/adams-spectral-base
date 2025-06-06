@@ -27,7 +27,8 @@ import adams.data.spectrum.SpectrumPoint;
 import java.util.List;
 
 /**
- * Reader for the trinamiX (https://trinamixsensing.com/) CSV format.
+ * Reader for the trinamiX (<a href="https://trinamixsensing.com/">https://trinamixsensing.com/</a>)
+ * CSV format.
  *
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
