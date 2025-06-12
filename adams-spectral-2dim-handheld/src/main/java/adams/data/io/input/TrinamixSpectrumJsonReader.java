@@ -101,7 +101,9 @@ public class TrinamixSpectrumJsonReader
       freader  = new FileReader(m_Input.getAbsoluteFile());
       breader  = new BufferedReader(freader);
       obj      = (JsonObject) JsonParser.parseReader(breader);
-      configID = obj.get("deviceConfigIdentity").getAsString();
+      configID = null;
+      if (obj.has("deviceConfigIdentity"))
+	configID = obj.get("deviceConfigIdentity").getAsString();
       sampleID = obj.get("sampleIdentifier").getAsString();
       useCase  = obj.get("useCaseIdentity").getAsString();
       spectraList = obj.getAsJsonArray("spectraList");
@@ -114,7 +116,8 @@ public class TrinamixSpectrumJsonReader
 	yLabel = spObj.get("ylabel").getAsString();
 	spec = new Spectrum();
 	spec.setID(sampleID);
-	spec.getReport().setStringValue("DeviceConfigIdentity", configID);
+	if (configID != null)
+	  spec.getReport().setStringValue("DeviceConfigIdentity", configID);
 	spec.getReport().setStringValue("UseCaseIdentity", useCase);
 	spec.getReport().setStringValue("Device", device);
 	spec.getReport().setStringValue("x-label", xLabel);
