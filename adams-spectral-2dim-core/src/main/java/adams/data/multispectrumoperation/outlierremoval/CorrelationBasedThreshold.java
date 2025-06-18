@@ -218,6 +218,11 @@ public class CorrelationBasedThreshold
     original = multi.toList();
     spectra  = new ArrayList<>(multi.toList());
 
+    if (spectra.isEmpty()) {
+      getLogger().warning("No spectra to perform outlier removal on!");
+      return multi;
+    }
+
     if (m_BelowCountThreshold <= 0)
       countThreshold = spectra.size() + m_BelowCountThreshold;
     else
