@@ -247,7 +247,7 @@ public class CorrelationBasedThreshold
 	if (cc < m_Threshold)
 	  count[i]++;
 	if (isLoggingEnabled())
-	  getLogger().info(i + " vs " + n + ": cc/" + cc + " < treshold/" + m_Threshold + " = " + (cc < m_Threshold));
+	  getLogger().info(i + " vs " + n + ": cc/" + cc + " < threshold/" + m_Threshold + " = " + (cc < m_Threshold));
       }
     }
     if (isLoggingEnabled())
