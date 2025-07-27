@@ -247,8 +247,7 @@ public class PredictionCheck
     try {
       if (!m_NoCopy)
         cont = (EvaluationContainer) cont.getClone();
-      if (FlowContextUtils.isHandler(m_Check))
-	FlowContextUtils.update(m_Check, this);
+      FlowContextUtils.update(m_Check, this);
       newCont = m_Check.checkPrediction(cont);
       m_OutputToken = new Token(newCont);
     }
