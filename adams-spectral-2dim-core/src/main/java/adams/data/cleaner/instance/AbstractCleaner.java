@@ -15,7 +15,7 @@
 
 /*
  * AbstractCleaner.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.cleaner.instance;
@@ -23,6 +23,7 @@ package adams.data.cleaner.instance;
 import adams.core.ClassLister;
 import adams.core.ObjectCopyHelper;
 import adams.core.ShallowCopySupporter;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.AbstractOptionConsumer;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.ArrayConsumer;
@@ -34,6 +35,8 @@ import weka.core.Instances;
 import weka.filters.AllFilter;
 import weka.filters.Filter;
 
+import java.util.logging.Level;
+
 /**
  * Abstract base class for cleaners handling <code>weka.core.Instance</code>
  * objects.
@@ -43,7 +46,6 @@ import weka.filters.Filter;
  * algorithms internal state, e.g., after setting options.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2355 $
  */
 public abstract class AbstractCleaner
   extends AbstractOptionHandler
@@ -135,7 +137,7 @@ public abstract class AbstractCleaner
   }
 
   /**
-   * Performs the some pre-checks whether the data is actually suitable.
+   * Performs the pre-checks whether the data is actually suitable.
    *
    * @param data	the instance to check
    */
@@ -339,7 +341,7 @@ public abstract class AbstractCleaner
       result = (AbstractCleaner) OptionUtils.forName(AbstractCleaner.class, classname, options);
     }
     catch (Exception e) {
-      e.printStackTrace();
+      LoggingHelper.global().log(Level.SEVERE, "Failed to instantiate cleaner from: " + classname + " and " + OptionUtils.joinOptions(options), e);
       result = null;
     }
 
