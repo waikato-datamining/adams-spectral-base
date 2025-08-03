@@ -32,6 +32,7 @@ import adams.flow.control.StorageName;
 import adams.flow.core.AbstractModelLoader.ModelLoadingType;
 import adams.flow.core.CallableActorReference;
 import adams.flow.core.ModelLoaderSupporter;
+import adams.flow.core.OptionalModelResetWithVariable;
 import adams.flow.core.ThreeWayDataModelFilterLoader;
 import adams.flow.core.Token;
 import nz.ac.waikato.cms.adams.multiway.algorithm.api.AbstractAlgorithm;
@@ -54,7 +55,7 @@ import java.util.Hashtable;
  */
 public class ThreeWayDataModelFilter
   extends AbstractTransformer
-  implements ModelLoaderSupporter {
+  implements ModelLoaderSupporter, OptionalModelResetWithVariable {
 
   private static final long serialVersionUID = -2363530100534716943L;
 
