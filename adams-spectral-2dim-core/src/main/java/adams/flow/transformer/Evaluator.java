@@ -584,7 +584,7 @@ public class Evaluator
   }
 
   /**
-   * Sets the whether to use a variable to monitor for changes in order
+   * Sets whether to use a variable to monitor for changes in order
    * to reset the evaluator.
    *
    * @param value	true if to use monitor variable
@@ -595,7 +595,7 @@ public class Evaluator
   }
 
   /**
-   * Returns the whether to use a variable to monitor for changes in order
+   * Returns whether to use a variable to monitor for changes in order
    * to reset the evaluator.
    *
    * @return		true if to use monitor variable
