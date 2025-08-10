@@ -488,7 +488,6 @@ public abstract class SampleDataT
     BaseDouble[]		maxValues;
     Field[]			fields;
     Field[]			required;
-    String			regexp;
     String			sort;
 
     if (dbids)
@@ -497,7 +496,6 @@ public abstract class SampleDataT
       result = new ArrayList<String>();
     where      = new ArrayList<>();
     conditions = (AbstractSpectrumConditions) cond;
-    regexp     = m_Queries.regexpKeyword();
 
     // fix conditions
     conditions.check();
@@ -578,13 +576,13 @@ public abstract class SampleDataT
       }
 
       if (hasSampleID)
-	where.add("sp.SAMPLEID " + regexp + " " + SQLUtils.backquote(conditions.getSampleIDRegExp()));
+	where.add(m_Queries.regexp("sp.SAMPLEID", conditions.getSampleIDRegExp()));
 
       if (hasSampleType)
-	where.add("sp.SAMPLETYPE " + regexp + " " + SQLUtils.backquote(conditions.getSampleTypeRegExp()));
+	where.add(m_Queries.regexp("sp.SAMPLETYPE", conditions.getSampleTypeRegExp()));
 
       if (hasFormat)
-	where.add("sp.FORMAT " + regexp + " " + SQLUtils.backquote(conditions.getFormat()));
+	where.add(m_Queries.regexp("sp.FORMAT", conditions.getFormat()));
 
       if (!conditions.getStartDate().isInfinity()) {
 	where.add("sd_start" + ".ID = sp.SAMPLEID");
@@ -601,7 +599,7 @@ public abstract class SampleDataT
       if (hasInstrument) {
 	where.add("sd_instrument" + ".ID = sp.SAMPLEID");
 	where.add("sd_instrument" + ".NAME = " + SQLUtils.backquote(SampleData.INSTRUMENT));
-	where.add("sd_instrument" + ".VALUE " + regexp + " " + SQLUtils.backquote(conditions.getInstrument()));
+	where.add(m_Queries.regexp("sd_instrument" + ".VALUE", conditions.getInstrument()));
       }
 
       if (conditions.getExcludeDummies() || conditions.getOnlyDummies()) {

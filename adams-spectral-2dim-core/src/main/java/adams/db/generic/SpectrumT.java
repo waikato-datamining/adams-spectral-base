@@ -268,19 +268,17 @@ public abstract class SpectrumT
   public Spectrum loadFromDB(int auto_id, String rlike, boolean raw) {
     Spectrum	result;
     ResultSet 	rs;
-    String	regexp;
 
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id + ", rlike=" + rlike + ", raw=" + raw);
 
     result = null;
     rs     = null;
-    regexp = m_Queries.regexpKeyword();
     try {
       if (rlike.isEmpty())
 	rs = select("*", "AUTO_ID=" + auto_id);
       else
-	rs = select("*", "AUTO_ID=" + auto_id + " AND SAMPLEID " + regexp + " " + SQLUtils.backquote(rlike));
+	rs = select("*", "AUTO_ID=" + auto_id + " AND " + m_Queries.regexp("SAMPLEID", rlike));
 
       result = resultsetToSpectrum(rs, raw);
     }
@@ -417,14 +415,12 @@ public abstract class SpectrumT
     boolean		hasSampleID;
     boolean		hasSampleType;
     boolean		hasFormat;
-    String		regexp;
 
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", tables=" + tables + ", where=" + where + ", cond=" + cond);
 
     result = new ArrayList<>();
     rs     = null;
-    regexp = m_Queries.regexpKeyword();
     if (where == null)
       where = "";
 
@@ -436,21 +432,21 @@ public abstract class SpectrumT
     if (hasSampleID) {
       if (!where.isEmpty())
 	where += " AND";
-      where += " SAMPLEID " + regexp + " " + SQLUtils.backquote(cond.getSampleIDRegExp());
+      where += " " + m_Queries.regexp("SAMPLEID", cond.getSampleIDRegExp());
     }
 
     // sample type
     if (hasSampleType) {
       if (!where.isEmpty())
 	where += " AND";
-      where += " SAMPLETYPE " + regexp + " " + SQLUtils.backquote(cond.getSampleTypeRegExp());
+      where += " " + m_Queries.regexp("SAMPLETYPE", cond.getSampleTypeRegExp());
     }
 
     // data format
     if (hasFormat) {
       if (!where.isEmpty())
 	where += " AND";
-      where += " FORMAT " + regexp + " " + SQLUtils.backquote(cond.getFormat());
+      where += " " + m_Queries.regexp("FORMAT", cond.getFormat());
     }
 
     // limit
