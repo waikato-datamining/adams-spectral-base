@@ -15,7 +15,7 @@
 
 /*
  * SpectrumTMySQL.java
- * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.db.mysql;
@@ -96,23 +96,23 @@ public class SpectrumT
 
     // sample name
     if (hasSampleID) {
-      if (where.length() > 0)
+      if (!where.isEmpty())
 	where += " AND";
-      where += " SAMPLEID RLIKE " + SQLUtils.backquote(cond.getSampleIDRegExp());
+      where += " " + m_Queries.regexp("SAMPLEID", cond.getSampleIDRegExp());
     }
 
     // data format
     if (hasFormat) {
-      if (where.length() > 0)
+      if (!where.isEmpty())
 	where += " AND";
-      where += " FORMAT RLIKE " + SQLUtils.backquote(cond.getFormat());
+      where += " " + m_Queries.regexp("FORMAT", cond.getFormat());
     }
 
     // limit
     if (cond.getLimit() > -1)
       where += " LIMIT " + cond.getLimit();
 
-    if (where.length() == 0)
+    if (where.isEmpty())
       where = null;
     else
       where = where.trim();
