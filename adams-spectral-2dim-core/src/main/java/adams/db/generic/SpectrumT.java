@@ -15,7 +15,7 @@
 
 /*
  * SpectrumT.java
- * Copyright (C) 2008-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2025 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -32,7 +32,6 @@ import adams.data.spectrum.SpectrumPoint;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.AbstractIndexedTable;
 import adams.db.ColumnMapping;
-import adams.db.JDBC;
 import adams.db.SQLUtils;
 import adams.db.SampleDataF;
 import adams.db.SpectrumIDConditions;
@@ -276,7 +275,7 @@ public abstract class SpectrumT
 
     result = null;
     rs     = null;
-    regexp = JDBC.regexpKeyword(getDatabaseConnection());
+    regexp = m_Queries.regexpKeyword();
     try {
       if (rlike.isEmpty())
 	rs = select("*", "AUTO_ID=" + auto_id);
@@ -425,7 +424,7 @@ public abstract class SpectrumT
 
     result = new ArrayList<>();
     rs     = null;
-    regexp = JDBC.regexpKeyword(getDatabaseConnection());
+    regexp = m_Queries.regexpKeyword();
     if (where == null)
       where = "";
 

@@ -34,7 +34,6 @@ import adams.db.AbstractConditions;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.AbstractSpectrumConditions;
 import adams.db.ColumnMapping;
-import adams.db.JDBC;
 import adams.db.OrphanedSampleDataConditions;
 import adams.db.ReportTableByID;
 import adams.db.SQLUtils;
@@ -498,7 +497,7 @@ public abstract class SampleDataT
       result = new ArrayList<String>();
     where      = new ArrayList<>();
     conditions = (AbstractSpectrumConditions) cond;
-    regexp     = JDBC.regexpKeyword(getDatabaseConnection());
+    regexp     = m_Queries.regexpKeyword();
 
     // fix conditions
     conditions.check();
