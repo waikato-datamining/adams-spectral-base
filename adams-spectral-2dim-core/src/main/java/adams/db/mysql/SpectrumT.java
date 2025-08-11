@@ -20,19 +20,10 @@
 
 package adams.db.mysql;
 
-import adams.core.Utils;
-import adams.core.logging.LoggingHelper;
 import adams.db.AbstractDatabaseConnection;
-import adams.db.SQLUtils;
 import adams.db.SampleDataIntf;
-import adams.db.SpectrumIDConditions;
 import adams.db.SpectrumIntf;
 import adams.db.TableManager;
-
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
 
 /**
  * MySQL implementation.
@@ -63,89 +54,6 @@ public class SpectrumT
    */
   public SampleDataIntf getSampleDataHandler() {
     return SampleDataT.getSingleton(getDatabaseConnection());
-  }
-
-  /**
-   * returns all the specified fields in the database, separated by TABs.
-   *
-   * @param fields	the field names
-   * @param tables 	the involved tables
-   * @param where	the where clause, can be null
-   * @param cond	the conditions for the retrieval
-   * @return		list of tab-separated values
-   */
-  public List<String> getValues(String[] fields, String tables, String where, SpectrumIDConditions cond) {
-    ResultSet 		rs;
-    List<String>	result;
-    String		sql;
-    int			i;
-    String		line;
-    boolean		hasSampleID;
-    boolean		hasFormat;
-
-    if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", tables=" + tables + ", where=" + where + ", cond=" + cond);
-
-    result = new ArrayList<>();
-    rs     = null;
-    if (where == null)
-      where = "";
-
-    hasSampleID = !cond.getSampleIDRegExp().isEmpty() && !cond.getSampleIDRegExp().isMatchAll();
-    hasFormat   = !cond.getFormat().isEmpty() && !cond.getFormat().isMatchAll();
-
-    // sample name
-    if (hasSampleID) {
-      if (!where.isEmpty())
-	where += " AND";
-      where += " " + m_Queries.regexp("SAMPLEID", cond.getSampleIDRegExp());
-    }
-
-    // data format
-    if (hasFormat) {
-      if (!where.isEmpty())
-	where += " AND";
-      where += " " + m_Queries.regexp("FORMAT", cond.getFormat());
-    }
-
-    // limit
-    if (cond.getLimit() > -1)
-      where += " " + m_Queries.limit(cond.getLimit());
-
-    if (where.isEmpty())
-      where = null;
-    else
-      where = where.trim();
-
-    try {
-      sql = "";
-      for (i = 0; i < fields.length; i++) {
-	if (i > 0)
-	  sql += ", ";
-	sql += fields[i];
-      }
-      rs = select(sql, tables, where);
-      if (rs == null)
-	return result;
-
-      while (rs.next()) {
-	line = "";
-	for (i = 0; i < fields.length; i++) {
-	  if (i > 0)
-	    line += "\t";
-	  line += rs.getObject(fields[i]);
-	}
-	result.add(line);
-      }
-    }
-    catch (Exception e) {
-      getLogger().log(Level.SEVERE, "Failed to get values", e);
-    }
-    finally{
-      SQLUtils.closeAll(rs);
-    }
-
-    return result;
   }
 
   /**
