@@ -646,7 +646,7 @@ public abstract class SampleDataT
 
       // limit
       if (conditions.getLimit() > 0)
-	sql += " LIMIT " + conditions.getLimit();
+	sql += " " + m_Queries.limit(conditions.getLimit());
 
       // query database
       ResultSet rs = select(select, tables, sql);
@@ -713,7 +713,7 @@ public abstract class SampleDataT
     else
       where += " ORDER BY sd.value ASC";
     if (conditions.getLimit() > -1)
-      where += " LIMIT " + conditions.getLimit();
+      where += " " + m_Queries.limit(conditions.getLimit());
 
     rs = null;
     try {

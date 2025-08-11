@@ -110,7 +110,7 @@ public class SpectrumT
 
     // limit
     if (cond.getLimit() > -1)
-      where += " LIMIT " + cond.getLimit();
+      where += " " + m_Queries.limit(cond.getLimit());
 
     if (where.isEmpty())
       where = null;
