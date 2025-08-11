@@ -15,10 +15,10 @@
 
 /*
  * SpectralDbBackend.java
- * Copyright (C) 2019-2025 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2025 University of Waikato, Hamilton, NZ
  */
 
-package adams.db.autodetect;
+package adams.db.h2;
 
 import adams.db.AbstractDatabaseConnection;
 import adams.db.AbstractSpectralDbBackend;
@@ -27,8 +27,7 @@ import adams.db.SampleDataIntf;
 import adams.db.SpectrumIntf;
 
 /**
- * Auto-detect Spectral backend. Detects: H2, MSSQL, MySQL, PostgreSQL, SQLite.
- * Otherwise uses generic SpectrumT/SampleDataT.
+ * H2 Spectral backend.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
@@ -39,9 +38,7 @@ public class SpectralDbBackend
 
   @Override
   public String globalInfo() {
-    return "Auto-detect Spectral backend.\n"
-      + "Detects: H2, MSSQL, MySQL, PostgreSQL, SQLite.\n"
-      + "Otherwise uses generic SpectrumT/SampleDataT.";
+    return "H2 Spectral backend.";
   }
 
   /**
@@ -52,18 +49,9 @@ public class SpectralDbBackend
    */
   @Override
   public SpectrumIntf getSpectrum(AbstractDatabaseConnection conn) {
-    if (JDBC.isMySQL(conn))
-      return adams.db.mysql.SpectrumT.getSingleton(conn);
-    else if (JDBC.isPostgreSQL(conn))
-      return adams.db.postgresql.SpectrumT.getSingleton(conn);
-    else if (JDBC.isSQLite(conn))
-      return adams.db.sqlite.SpectrumT.getSingleton(conn);
-    else if (JDBC.isH2(conn))
-      return adams.db.h2.SpectrumT.getSingleton(conn);
-    else if (JDBC.isMSSQL(conn))
-      return adams.db.mssql.SpectrumT.getSingleton(conn);
-    else
-      return adams.db.generic.SpectrumT.getSingleton(conn);
+    if (!JDBC.isH2(conn))
+      throw new IllegalStateException("Not an H2 JDBC URL: " + conn.getURL());
+    return SpectrumT.getSingleton(conn);
   }
 
   /**
@@ -74,17 +62,8 @@ public class SpectralDbBackend
    */
   @Override
   public SampleDataIntf getSampleData(AbstractDatabaseConnection conn) {
-    if (JDBC.isMySQL(conn))
-      return adams.db.mysql.SampleDataT.getSingleton(conn);
-    else if (JDBC.isPostgreSQL(conn))
-      return adams.db.postgresql.SampleDataT.getSingleton(conn);
-    else if (JDBC.isSQLite(conn))
-      return adams.db.sqlite.SampleDataT.getSingleton(conn);
-    else if (JDBC.isH2(conn))
-      return adams.db.h2.SampleDataT.getSingleton(conn);
-    else if (JDBC.isMSSQL(conn))
-      return adams.db.mssql.SampleDataT.getSingleton(conn);
-    else
-      return adams.db.generic.SampleDataT.getSingleton(conn);
+    if (!JDBC.isH2(conn))
+      throw new IllegalStateException("Not an H2 JDBC URL: " + conn.getURL());
+    return SampleDataT.getSingleton(conn);
   }
 }

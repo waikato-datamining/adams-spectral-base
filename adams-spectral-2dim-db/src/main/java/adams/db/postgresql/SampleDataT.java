@@ -14,7 +14,7 @@
  */
 
 /*
- * SampleDataTPostgreSQL.java
+ * SampleDataT.java
  * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 
@@ -26,7 +26,7 @@ import adams.db.SpectrumIntf;
 import adams.db.TableManager;
 
 /**
- * MySQL implementation.
+ * PostgreSQL implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */

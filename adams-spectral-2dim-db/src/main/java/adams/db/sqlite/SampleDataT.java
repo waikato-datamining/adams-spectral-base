@@ -14,7 +14,7 @@
  */
 
 /*
- * SampleDataTSQLite.java
+ * SampleDataT.java
  * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
  */
 

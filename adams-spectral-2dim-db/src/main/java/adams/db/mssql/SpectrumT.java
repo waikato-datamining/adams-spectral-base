@@ -15,10 +15,10 @@
 
 /*
  * SpectrumT.java
- * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2025 University of Waikato, Hamilton, NZ
  */
 
-package adams.db.postgresql;
+package adams.db.mssql;
 
 import adams.db.AbstractDatabaseConnection;
 import adams.db.SampleDataIntf;
@@ -26,7 +26,7 @@ import adams.db.SpectrumIntf;
 import adams.db.TableManager;
 
 /**
- * PostgreSQL implementation.
+ * H2 implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */

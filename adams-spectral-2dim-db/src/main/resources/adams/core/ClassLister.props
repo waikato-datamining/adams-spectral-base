@@ -8,5 +8,7 @@
 
 # the spectral DB backends
 adams.db.SpectralDbBackend=\
+  adams.db.h2,\
+  adams.db.mssql,\
   adams.db.postgresql,\
   adams.db.sqlite

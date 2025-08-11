@@ -14,11 +14,11 @@
  */
 
 /*
- * SpectrumT.java
- * Copyright (C) 2016-2019 University of Waikato, Hamilton, NZ
+ * SampleDataT.java
+ * Copyright (C) 2025 University of Waikato, Hamilton, NZ
  */
 
-package adams.db.postgresql;
+package adams.db.mssql;
 
 import adams.db.AbstractDatabaseConnection;
 import adams.db.SampleDataIntf;
@@ -26,34 +26,34 @@ import adams.db.SpectrumIntf;
 import adams.db.TableManager;
 
 /**
- * PostgreSQL implementation.
+ * H2 implementation.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
-public class SpectrumT
-  extends adams.db.generic.SpectrumT {
+public class SampleDataT
+  extends adams.db.generic.SampleDataT {
 
-  private static final long serialVersionUID = 7003479237078308491L;
+  private static final long serialVersionUID = 5345945766136653603L;
 
   /** the table manager. */
-  protected static TableManager<SpectrumT> m_TableManager;
+  protected static TableManager<SampleDataT> m_TableManager;
 
   /**
-   * Constructor - initalise with database connection.
+   * Constructor.
    *
    * @param dbcon the database context this table is used in
    */
-  public SpectrumT(AbstractDatabaseConnection dbcon) {
+  public SampleDataT(AbstractDatabaseConnection dbcon) {
     super(dbcon);
   }
 
   /**
-   * Returns the corresponding SampleData handler.
+   * Returns the corresponding Spectrum handler.
    *
    * @return		the corresponding handler
    */
-  public SampleDataIntf getSampleDataHandler() {
-    return SampleDataT.getSingleton(getDatabaseConnection());
+  public SpectrumIntf getSpectrumHandler() {
+    return SpectrumT.getSingleton(getDatabaseConnection());
   }
 
   /**
@@ -71,11 +71,11 @@ public class SpectrumT
    * @param dbcon	the database connection to get the singleton for
    * @return		the singleton
    */
-  public static synchronized SpectrumIntf getSingleton(AbstractDatabaseConnection dbcon) {
+  public static synchronized SampleDataIntf getSingleton(AbstractDatabaseConnection dbcon) {
     if (m_TableManager == null)
       m_TableManager = new TableManager<>(TABLE_NAME, dbcon.getOwner());
     if (!m_TableManager.has(dbcon))
-      m_TableManager.add(dbcon, new SpectrumT(dbcon));
+      m_TableManager.add(dbcon, new SampleDataT(dbcon));
 
     return m_TableManager.get(dbcon);
   }
