@@ -639,22 +639,22 @@ public abstract class SpectrumT
     int			i;
     int			n;
     boolean		useSameConnection;
-    Connection 		m_Connection;
+    Connection 		connection;
 
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName());
 
-    m_Connection       = null;
-    m_BulkAddStopped = false;
-    useSameConnection  = true;
+    connection        = null;
+    m_BulkAddStopped  = false;
+    useSameConnection = true;
 
     if (newConnection) {
       try {
 	if (getDatabaseConnection().getUser().isEmpty())
-	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getURL());
+	  connection = DriverManager.getConnection(getDatabaseConnection().getURL());
 	else
-	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
-	m_Connection.setAutoCommit(autoCommit);
+	  connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
+	connection.setAutoCommit(autoCommit);
 	useSameConnection = false;
       }
       catch(Exception e) {
@@ -665,8 +665,8 @@ public abstract class SpectrumT
     if (!newConnection || useSameConnection) {
       if (!autoCommit) {
 	try {
-	  m_Connection = getDatabaseConnection().getConnection(false);
-	  m_Connection.setAutoCommit(false);
+	  connection = getDatabaseConnection().getConnection(false);
+	  connection.setAutoCommit(false);
 	}
 	catch (Exception e) {
 	  getLogger().log(Level.WARNING, "Failed to turn off auto-commit!", e);
@@ -674,19 +674,19 @@ public abstract class SpectrumT
       }
     }
 
-    if (m_Connection == null) {
+    if (connection == null) {
       getLogger().warning("Falling back on default connection: " + getDatabaseConnection());
-      m_Connection = getDatabaseConnection().getConnection(false);
+      connection = getDatabaseConnection().getConnection(false);
     }
 
-    if (m_Connection == null) {
+    if (connection == null) {
       getLogger().severe("Cannot insert data, due to failure of obtaining connection from: " + getDatabaseConnection());
       return false;
     }
 
     try {
-      delete = prepareStatement(m_Connection, "DELETE FROM " + getTableName() + " WHERE SAMPLEID = ? AND FORMAT = ?", false);
-      insert = prepareStatement(m_Connection, "INSERT INTO " + getTableName() + "(SAMPLEID, SAMPLETYPE, FORMAT, POINTS) VALUES(?, ?, ?, ?)", false);
+      delete = prepareStatement(connection, "DELETE FROM " + getTableName() + " WHERE SAMPLEID = ? AND FORMAT = ?", false);
+      insert = prepareStatement(connection, "INSERT INTO " + getTableName() + "(SAMPLEID, SAMPLETYPE, FORMAT, POINTS) VALUES(?, ?, ?, ?)", false);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to prepare statements!", e);
@@ -722,7 +722,7 @@ public abstract class SpectrumT
 	  delete.executeBatch();
 	  insert.executeBatch();
 	  if (!autoCommit)
-	    m_Connection.commit();
+	    connection.commit();
 	  delete.clearBatch();
 	  insert.clearBatch();
 	  committed = true;
@@ -739,7 +739,7 @@ public abstract class SpectrumT
 	delete.executeBatch();
 	insert.executeBatch();
 	if (!autoCommit)
-	  m_Connection.commit();
+	  connection.commit();
       }
       delete.clearBatch();
       insert.clearBatch();
@@ -762,7 +762,7 @@ public abstract class SpectrumT
 
     if (!useSameConnection) {
       try {
-	m_Connection.close();
+	connection.close();
       }
       catch (Exception e) {
 	getLogger().log(Level.WARNING, "Failed to close connection!", e);
