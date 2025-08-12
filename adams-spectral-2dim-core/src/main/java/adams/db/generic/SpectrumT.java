@@ -651,7 +651,7 @@ public abstract class SpectrumT
     if (newConnection) {
       try {
 	if (getDatabaseConnection().getUser().isEmpty())
-	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getUser());
+	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getURL());
 	else
 	  m_Connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
 	m_Connection.setAutoCommit(autoCommit);

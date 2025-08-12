@@ -808,7 +808,7 @@ public abstract class SampleDataT
     if (newConnection) {
       try {
 	if (getDatabaseConnection().getUser().isEmpty())
-	  connection = DriverManager.getConnection(getDatabaseConnection().getUser());
+	  connection = DriverManager.getConnection(getDatabaseConnection().getURL());
 	else
 	  connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
 	connection.setAutoCommit(autoCommit);
