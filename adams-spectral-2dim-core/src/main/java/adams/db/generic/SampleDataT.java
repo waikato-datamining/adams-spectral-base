@@ -102,7 +102,6 @@ public abstract class SampleDataT
     List<String>	whereParts;
     String		where;
     String		tables;
-    int			i;
     DataType[]		dtypes;
 
     if (isLoggingEnabled())
@@ -126,14 +125,8 @@ public abstract class SampleDataT
 	if (dtype != null)
 	  whereParts.add("sd.TYPE = " + SQLUtils.backquote(dtype.toString()));
 
-	if (!whereParts.isEmpty()) {
-	  where = "";
-	  for (i = 0; i < whereParts.size(); i++) {
-	    if (i > 0)
-	      where += " AND ";
-	    where += whereParts.get(i);
-	  }
-	}
+	if (!whereParts.isEmpty())
+	  where = Utils.flatten(whereParts, " AND ");
 
 	// get data
 	rs = selectDistinct("sd.NAME", tables, where);
@@ -473,12 +466,12 @@ public abstract class SampleDataT
    */
   protected List getIDs(String[] columns, AbstractConditions cond, boolean dbids) {
     List	 		result;
-    String			sql;
+    StringBuilder		sql;
     List<String>		where;
     int				i;
-    String			tables;
+    StringBuilder		tables;
     String			select;
-    String			line;
+    StringBuilder		line;
     boolean			hasInstrument;
     boolean			hasSampleID;
     boolean			hasFormat;
@@ -523,40 +516,35 @@ public abstract class SampleDataT
     getLogger().severe("Looking for: " + conditions);
     try {
       // SELECT
-      select = "";
-      for (i = 0; i < columns.length; i++) {
-	if (i > 0)
-	  select += ", ";
-	select += columns[i];
-      }
+      select = Utils.flatten(columns, ", ");
 
       // FROM
-      tables = getSpectrumHandler().getTableName() + " sp";
+      tables = new StringBuilder(getSpectrumHandler().getTableName() + " sp");
       if (conditions.getSortOnInsertTimestamp())
-	tables += ", " + getTableName() + " sd";
+	tables.append(", ").append(getTableName()).append(" sd");
       if (fields.length > 0) {
 	for (i = 0; i < fields.length; i++) {
 	  if (!fields[i].getName().isEmpty())
-	    tables += ", " + getTableName() + " sd" + i;
+	    tables.append(", ").append(getTableName()).append(" sd").append(i);
 	}
       }
       if (!conditions.getStartDate().isInfinity())
-	tables += ", " + getTableName() + " sd_start";
+	tables.append(", ").append(getTableName()).append(" sd_start");
       if (!conditions.getEndDate().isInfinity())
-	tables += ", " + getTableName() + " sd_end";
+	tables.append(", ").append(getTableName()).append(" sd_end");
       if (hasInstrument)
-	tables += ", " + getTableName() + " sd_instrument";
+	tables.append(", ").append(getTableName()).append(" sd_instrument");
       if (conditions.getExcludeDummies() || conditions.getOnlyDummies())
-	tables += ", " + getTableName() + " sd_dummies";
+	tables.append(", ").append(getTableName()).append(" sd_dummies");
       if (required.length > 0) {
 	for (i = 0; i < required.length; i++) {
 	  if (!required[i].getName().isEmpty())
-	    tables += ", " + getTableName() + " sd_req" + i;
+	    tables.append(", ").append(getTableName()).append(" sd_req").append(i);
 	}
       }
       // for sorting by date
       if (conditions.getSortOnInsertTimestamp())
-	tables += ", " + getTableName() + " sd_sort_by_date";
+	tables.append(", ").append(getTableName()).append(" sd_sort_by_date");
 
       // WHERE
       if (fields.length > 0) {
@@ -625,12 +613,7 @@ public abstract class SampleDataT
       }
 
       // generate SQL
-      sql = "";
-      for (i = 0; i < where.size(); i++) {
-	if (i > 0)
-	  sql += " AND ";
-	sql += where.get(i);
-      }
+      sql = new StringBuilder(Utils.flatten(where, " AND "));
 
       // ordering
       if (conditions.getLatest())
@@ -638,18 +621,18 @@ public abstract class SampleDataT
       else
 	sort = " ASC";
       if (conditions.getSortOnInsertTimestamp())
-	sql += " ORDER BY sd_sort_by_date.VALUE" + sort;
+	sql.append(" ORDER BY sd_sort_by_date.VALUE").append(sort);
       else if (conditions.getSortOnSampleID())
-	sql += " ORDER BY sp.SAMPLEID" + sort;
+	sql.append(" ORDER BY sp.SAMPLEID").append(sort);
       else
-	sql += " ORDER BY sp.AUTO_ID" + sort;
+	sql.append(" ORDER BY sp.AUTO_ID").append(sort);
 
       // limit
       if (conditions.getLimit() > 0)
-	sql += " " + m_Queries.limit(conditions.getLimit());
+	sql.append(" ").append(m_Queries.limit(conditions.getLimit()));
 
       // query database
-      ResultSet rs = select(select, tables, sql);
+      ResultSet rs = select(select, tables.toString(), sql.toString());
 
       while (rs.next()) {
 	if (dbids) {
@@ -660,13 +643,13 @@ public abstract class SampleDataT
 	    result.add(rs.getString(1));
 	  }
 	  else {
-	    line = "";
+	    line = new StringBuilder();
 	    for (i = 0; i < columns.length; i++) {
 	      if (i > 0)
-		line += "\t";
-	      line += rs.getString(i + 1);
+		line.append("\t");
+	      line.append(rs.getString(i + 1));
 	    }
-	    result.add(line);
+	    result.add(line.toString());
 	  }
 	}
       }

@@ -99,10 +99,7 @@ public abstract class SpectrumT
         return false;
     }
 
-    if (!getSampleDataHandler().init())
-      return false;
-
-    return true;
+    return getSampleDataHandler().init();
   }
 
   /**
@@ -409,9 +406,9 @@ public abstract class SpectrumT
   public List<String> getValues(String[] fields, String tables, String where, SpectrumIDConditions cond) {
     ResultSet 		rs;
     List<String>	result;
-    String		sql;
     int			i;
-    String		line;
+    StringBuilder	line;
+    List<String>	whereParts;
     boolean		hasSampleID;
     boolean		hasSampleType;
     boolean		hasFormat;
@@ -421,62 +418,48 @@ public abstract class SpectrumT
 
     result = new ArrayList<>();
     rs     = null;
-    if (where == null)
-      where = "";
+    whereParts = new ArrayList<>();
+    if ((where != null) && !where.isEmpty())
+      whereParts.add(where);
 
     hasSampleID   = !cond.getSampleIDRegExp().isEmpty() && !cond.getSampleIDRegExp().isMatchAll();
     hasSampleType = !cond.getSampleTypeRegExp().isEmpty() && !cond.getSampleTypeRegExp().isMatchAll();
     hasFormat     = !cond.getFormat().isEmpty() && !cond.getFormat().isMatchAll();
 
     // sample name
-    if (hasSampleID) {
-      if (!where.isEmpty())
-	where += " AND";
-      where += " " + m_Queries.regexp("SAMPLEID", cond.getSampleIDRegExp());
-    }
+    if (hasSampleID)
+      whereParts.add(m_Queries.regexp("SAMPLEID", cond.getSampleIDRegExp()));
 
     // sample type
-    if (hasSampleType) {
-      if (!where.isEmpty())
-	where += " AND";
-      where += " " + m_Queries.regexp("SAMPLETYPE", cond.getSampleTypeRegExp());
-    }
+    if (hasSampleType)
+      whereParts.add(m_Queries.regexp("SAMPLETYPE", cond.getSampleTypeRegExp()));
 
     // data format
-    if (hasFormat) {
-      if (!where.isEmpty())
-	where += " AND";
-      where += " " + m_Queries.regexp("FORMAT", cond.getFormat());
-    }
+    if (hasFormat)
+      whereParts.add(m_Queries.regexp("FORMAT", cond.getFormat()));
+
+    where = Utils.flatten(whereParts, " AND ");
+
+    // sorting
+    where += " ORDER BY AUTO_ID";
 
     // limit
     if (cond.getLimit() > -1)
       where += " " + m_Queries.limit(cond.getLimit());
 
-    if (where.isEmpty())
-      where = null;
-    else
-      where = where.trim();
-
     try {
-      sql = "";
-      for (i = 0; i < fields.length; i++) {
-	if (i > 0)
-	  sql += ", ";
-	sql += fields[i];
-      }
-      rs = select(sql, tables, where);
+      rs = select(Utils.flatten(fields, ", "), tables, where);
       if (rs == null)
 	return result;
 
       while (rs.next()) {
-	line = "";
+	line = new StringBuilder();
 	for (i = 0; i < fields.length; i++) {
 	  if (i > 0)
-	    line += "\t";
-	  line += rs.getObject(fields[i]);
+	    line.append("\t");
+	  line.append(rs.getObject(fields[i]));
 	}
-	result.add(line);
+	result.add(line.toString());
       }
     }
     catch (Exception e) {
@@ -526,7 +509,7 @@ public abstract class SpectrumT
     StringBuilder 	q;
 
     q = new StringBuilder();
-    q.append("INSERT INTO " + getTableName() + " (SAMPLEID, SAMPLETYPE, FORMAT, POINTS) VALUES (");
+    q.append("INSERT INTO ").append(getTableName()).append(" (SAMPLEID, SAMPLETYPE, FORMAT, POINTS) VALUES (");
 
     // sample ID
     q.append(SQLUtils.backquote(sp.getID()));
