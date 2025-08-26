@@ -102,26 +102,38 @@ public class TrinamixSpectrumJsonReader
       breader  = new BufferedReader(freader);
       obj      = (JsonObject) JsonParser.parseReader(breader);
       configID = null;
-      if (obj.has("deviceConfigIdentity"))
+      if (obj.has("deviceConfigIdentity") && !obj.get("deviceConfigIdentity").isJsonNull())
 	configID = obj.get("deviceConfigIdentity").getAsString();
       sampleID = obj.get("sampleIdentifier").getAsString();
-      useCase  = obj.get("useCaseIdentity").getAsString();
+      useCase = null;
+      if (obj.has("useCaseIdentity") && !obj.get("useCaseIdentity").isJsonNull())
+	useCase = obj.get("useCaseIdentity").getAsString();
       spectraList = obj.getAsJsonArray("spectraList");
       for (s = 0; s < spectraList.size(); s++) {
 	spObj  = spectraList.get(s).getAsJsonObject();
-	device = spObj.get("device").getAsString();
+	device = null;
+	if (spObj.has("device") && !spObj.get("device").isJsonNull())
+	  device = spObj.get("device").getAsString();
 	x      = spObj.getAsJsonArray("x");
-	xLabel = spObj.get("xlabel").getAsString();
+	xLabel = null;
+	if (spObj.has("xlabel") && !spObj.get("xlabel").isJsonNull())
+	  xLabel = spObj.get("xlabel").getAsString();
 	y      = spObj.getAsJsonArray("y");
-	yLabel = spObj.get("ylabel").getAsString();
+	yLabel = null;
+	if (spObj.has("ylabel") && !spObj.get("ylabel").isJsonNull())
+	  yLabel = spObj.get("ylabel").getAsString();
 	spec = new Spectrum();
 	spec.setID(sampleID);
 	if (configID != null)
 	  spec.getReport().setStringValue("DeviceConfigIdentity", configID);
-	spec.getReport().setStringValue("UseCaseIdentity", useCase);
-	spec.getReport().setStringValue("Device", device);
-	spec.getReport().setStringValue("x-label", xLabel);
-	spec.getReport().setStringValue("y-label", yLabel);
+	if (useCase != null)
+	  spec.getReport().setStringValue("UseCaseIdentity", useCase);
+	if (device != null)
+	  spec.getReport().setStringValue("Device", device);
+	if (xLabel != null)
+	  spec.getReport().setStringValue("x-label", xLabel);
+	if (yLabel != null)
+	  spec.getReport().setStringValue("y-label", yLabel);
 	for (i = 0; i < x.size(); i++)
 	  spec.add(new SpectrumPoint(x.get(i).getAsFloat(), y.get(i).getAsFloat()));
 	m_ReadData.add(spec);
