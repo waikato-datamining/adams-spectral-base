@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SimpleSpectrumWriterTest.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -59,8 +59,8 @@ public class SimpleSpectrumWriterTest
    *
    * @return		the setups
    */
-  protected AbstractDataContainerWriter[] getRegressionSetups() {
-    return new AbstractDataContainerWriter[]{
+  protected DataContainerWriter[] getRegressionSetups() {
+    return new DataContainerWriter[]{
 	new SimpleSpectrumWriter()
     };
   }

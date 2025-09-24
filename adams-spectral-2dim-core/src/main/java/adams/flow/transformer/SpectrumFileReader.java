@@ -15,14 +15,14 @@
 
 /*
  * SpectrumFileReader.java
- * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
 import adams.core.ObjectCopyHelper;
 import adams.data.conversion.SpectraToMultiSpectrum;
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.input.SimpleSpectrumReader;
 import adams.data.spectrum.AbstractSpectrumComparator;
 import adams.data.spectrum.MultiSpectrum;
@@ -72,7 +72,7 @@ import adams.data.spectrum.SpectrumComparator;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-reader &lt;adams.data.io.input.AbstractDataContainerReader&gt; (property: reader)
+ * <pre>-reader &lt;adams.data.io.input.DataContainerReader&gt; (property: reader)
  * &nbsp;&nbsp;&nbsp;The reader to use for importing the data.
  * &nbsp;&nbsp;&nbsp;default: knir.data.input.SimpleSpectrumReader
  * </pre>
@@ -140,7 +140,7 @@ public class SpectrumFileReader
    * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerReader getDefaultReader() {
+  protected DataContainerReader getDefaultReader() {
     return new SimpleSpectrumReader();
   }
 

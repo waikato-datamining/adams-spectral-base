@@ -15,12 +15,12 @@
 
 /*
  * ThreeWayDataFileReader.java
- * Copyright (C) 2018-2023 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.input.SimpleEEMReader;
 import adams.data.threeway.ThreeWayData;
 
@@ -60,7 +60,7 @@ public class ThreeWayDataFileReader
    * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerReader getDefaultReader() {
+  protected DataContainerReader getDefaultReader() {
     return new SimpleEEMReader();
   }
 

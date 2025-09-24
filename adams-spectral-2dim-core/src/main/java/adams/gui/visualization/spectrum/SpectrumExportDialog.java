@@ -13,13 +13,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectrumExportDialog.java
- * Copyright (C) 2013-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.spectrum;
 
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SimpleSpectrumWriter;
 import adams.gui.core.BaseCheckBox;
 import adams.gui.dialog.AbstractDirectoryExportDialog;
@@ -32,10 +32,9 @@ import java.awt.Frame;
  * Export dialog for spectra.
  * 
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2019 $
  */
 public class SpectrumExportDialog
-  extends AbstractDirectoryExportDialog<AbstractDataContainerWriter> {
+  extends AbstractDirectoryExportDialog<DataContainerWriter> {
 
   /** for serialization. */
   private static final long serialVersionUID = 6635283474671937011L;
@@ -108,7 +107,7 @@ public class SpectrumExportDialog
    */
   @Override
   protected GenericObjectEditorPanel createGOE() {
-    return new GenericObjectEditorPanel(AbstractDataContainerWriter.class, new SimpleSpectrumWriter(), true);
+    return new GenericObjectEditorPanel(DataContainerWriter.class, new SimpleSpectrumWriter(), true);
   }
 
   /**

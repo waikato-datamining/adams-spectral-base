@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * DPTSpectrumWriterTest.java
- * Copyright (C) 2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -28,7 +28,6 @@ import junit.framework.TestSuite;
  * java adams.data.io.output.DPTSpectrumWriterTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class DPTSpectrumWriterTest
   extends AbstractSpectrumWriterTestCase {
@@ -61,8 +60,8 @@ public class DPTSpectrumWriterTest
    * @return		the setups
    */
   @Override
-  protected AbstractDataContainerWriter[] getRegressionSetups() {
-    return new AbstractDataContainerWriter[]{
+  protected DataContainerWriter[] getRegressionSetups() {
+    return new DataContainerWriter[]{
 	new DPTSpectrumWriter()
     };
   }

@@ -15,7 +15,7 @@
 
 /*
  * SpectrumPanel.java
- * Copyright (C) 2008-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -26,7 +26,7 @@ import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.OptionUtils;
 import adams.data.instances.AbstractInstanceGenerator;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.MetaFileWriter;
 import adams.data.report.AbstractField;
 import adams.data.report.DataType;
@@ -465,7 +465,7 @@ public class SpectrumPanel
    * Saves the visible spectra to a directory.
    */
   public void saveVisibleSpectra() {
-    AbstractDataContainerWriter 	writer;
+    DataContainerWriter 	writer;
     String 				filename;
     String[] 				ext;
     List<Spectrum> 			data;

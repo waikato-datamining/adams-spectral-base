@@ -15,13 +15,14 @@
 
 /*
  * WriteSpectrum.java
- * Copyright (C) 2009-2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.scripting;
 
 import adams.core.io.PlaceholderFile;
 import adams.core.option.OptionUtils;
 import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SimpleSpectrumWriter;
 import adams.data.spectrum.Spectrum;
 
@@ -91,7 +92,7 @@ public class WriteSpectrum
     String			filename;
     boolean			ok;
     Spectrum 			sp;
-    AbstractDataContainerWriter	writer;
+    DataContainerWriter	writer;
 
     result   = null;
     list     = OptionUtils.splitOptions(options);

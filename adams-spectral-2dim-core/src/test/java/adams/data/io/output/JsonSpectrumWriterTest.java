@@ -15,7 +15,7 @@
 
 /*
  * JsonSpectrumWriterTest.java
- * Copyright (C) 2016-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -61,7 +61,7 @@ public class JsonSpectrumWriterTest
    *
    * @return		the setups
    */
-  protected AbstractDataContainerWriter[] getRegressionSetups() {
+  protected DataContainerWriter[] getRegressionSetups() {
     JsonSpectrumWriter[] 	result;
 
     result = new JsonSpectrumWriter[2];

@@ -15,7 +15,7 @@
 
 /*
  * SimpleXYZWriter.java
- * Copyright (C) 2018 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.output;
@@ -71,7 +71,7 @@ import java.util.logging.Level;
  */
 public class SimpleXYZWriter
   extends AbstractThreeWayDataWriter
-  implements CompressionSupporter {
+  implements CompressionSupporter<ThreeWayData> {
 
   private static final long serialVersionUID = 5576166671141967708L;
 

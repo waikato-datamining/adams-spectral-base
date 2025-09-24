@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractSpectrumReaderTest.java
- * Copyright (C) 2010-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.input;
 
@@ -33,11 +33,10 @@ import java.util.List;
  * Abstract test class for the spectrum readers.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2241 $
  * @param <A> the type of reader
  * @param <D> the type of data container
  */
-public abstract class AbstractSpectrumReaderTestCase<A extends AbstractDataContainerReader, D extends Spectrum>
+public abstract class AbstractSpectrumReaderTestCase<A extends DataContainerReader, D extends Spectrum>
   extends AbstractDataContainerReaderTestCase<A, D> {
 
   /**

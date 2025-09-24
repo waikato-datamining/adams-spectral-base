@@ -15,16 +15,16 @@
 
 /*
  * ThreeWayDataFileChooser.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.chooser;
 
-import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.io.input.AbstractThreeWayDataReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.input.SimpleEEMReader;
-import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.io.output.AbstractThreeWayDataWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SimpleEEMWriter;
 import adams.data.threeway.ThreeWayData;
 
@@ -37,7 +37,7 @@ import java.io.File;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class ThreeWayDataFileChooser
-  extends AbstractDataContainerFileChooser<ThreeWayData, AbstractDataContainerReader<ThreeWayData>, AbstractDataContainerWriter<ThreeWayData>> {
+  extends AbstractDataContainerFileChooser<ThreeWayData, DataContainerReader<ThreeWayData>, DataContainerWriter<ThreeWayData>> {
 
   /** for serialization. */
   private static final long serialVersionUID = -5373058011025481738L;
@@ -73,7 +73,7 @@ public class ThreeWayDataFileChooser
    * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerReader<ThreeWayData> getDefaultReader() {
+  protected DataContainerReader<ThreeWayData> getDefaultReader() {
     return new SimpleEEMReader();
   }
 
@@ -83,7 +83,7 @@ public class ThreeWayDataFileChooser
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter<ThreeWayData> getDefaultWriter() {
+  protected DataContainerWriter<ThreeWayData> getDefaultWriter() {
     return new SimpleEEMWriter();
   }
 

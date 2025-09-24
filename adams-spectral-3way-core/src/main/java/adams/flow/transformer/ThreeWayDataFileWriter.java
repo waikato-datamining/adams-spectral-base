@@ -15,12 +15,12 @@
 
 /*
  * ThreeWayDataFileWriter.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SimpleEEMWriter;
 import adams.data.threeway.ThreeWayData;
 
@@ -63,7 +63,7 @@ public class ThreeWayDataFileWriter
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter<ThreeWayData> getDefaultWriter() {
+  protected DataContainerWriter<ThreeWayData> getDefaultWriter() {
     return new SimpleEEMWriter();
   }
 

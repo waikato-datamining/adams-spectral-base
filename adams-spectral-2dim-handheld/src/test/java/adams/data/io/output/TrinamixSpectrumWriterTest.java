@@ -15,7 +15,7 @@
 
 /*
  * TrinamixSpectrumWriterTest.java
- * Copyright (C) 2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -59,7 +59,7 @@ public class TrinamixSpectrumWriterTest
    *
    * @return		the setups
    */
-  protected AbstractDataContainerWriter[] getRegressionSetups() {
+  protected DataContainerWriter[] getRegressionSetups() {
     TrinamixSpectrumWriter[]	result;
 
     result    = new TrinamixSpectrumWriter[2];

@@ -15,7 +15,7 @@
 
 /*
  * ThreeWayDataHeatmapViewerPanel.java
- * Copyright (C) 2018-2022 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.gui.visualization.threewaydata.heatmapviewer;
 
@@ -25,7 +25,7 @@ import adams.core.StatusMessageHandler;
 import adams.core.io.PlaceholderFile;
 import adams.data.filter.Filter;
 import adams.data.io.input.AbstractThreeWayDataReader;
-import adams.data.io.output.AbstractDataContainerWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.threeway.ThreeWayData;
 import adams.data.threewayfilter.DownSample;
 import adams.gui.chooser.BaseColorChooser;
@@ -485,7 +485,7 @@ public class ThreeWayDataHeatmapViewerPanel
 	else
 	  menuitem = new JMenuItem(zooms[i] + "%");
 	submenu.add(menuitem);
-	if (shortcuts[i].length() > 0)
+	if (!shortcuts[i].isEmpty())
 	  menuitem.setAccelerator(GUIHelper.getKeyStroke(shortcuts[i]));
 	menuitem.addActionListener(new ActionListener() {
 	  public void actionPerformed(ActionEvent e) {
@@ -624,7 +624,7 @@ public class ThreeWayDataHeatmapViewerPanel
     for (i = 0; i < m_MultiPagePane.getPageCount(); i++)
       result.add(getPanelAt(i));
 
-    return result.toArray(new ThreeWayDataHeatmapPanel[result.size()]);
+    return result.toArray(new ThreeWayDataHeatmapPanel[0]);
   }
 
   /**
@@ -717,7 +717,7 @@ public class ThreeWayDataHeatmapViewerPanel
 	  showStatus("Loading file: " + file);
 	  reader.setInput(new PlaceholderFile(file));
 	  List<ThreeWayData> data = reader.read();
-	  if (data.size() == 0) {
+	  if (data.isEmpty()) {
 	    GUIHelper.showErrorMessage(ThreeWayDataHeatmapViewerPanel.this, "Failed to read data from:\n" + reader.getInput());
 	    showStatus("");
 	    return null;
@@ -762,7 +762,7 @@ public class ThreeWayDataHeatmapViewerPanel
     int				retVal;
     ThreeWayData 		data;
     PlaceholderFile		file;
-    AbstractDataContainerWriter	writer;
+    DataContainerWriter		writer;
 
     retVal = m_FileChooser.showSaveDialog(this);
     if (retVal != HeatmapFileChooser.APPROVE_OPTION)
@@ -840,7 +840,6 @@ public class ThreeWayDataHeatmapViewerPanel
 	public void run() {
 	  Filter<ThreeWayData> filter = e.getFilter().shallowCopy();
 	  ThreeWayDataHeatmapPanel panel = getPanelAt(index);
-	  File current = panel.getCurrentFile();
 	  ThreeWayData filtered = filter.filter(panel.getData());
 	  filter.cleanUp();
 	  if (e.getOverlayOriginalData()) {

@@ -15,13 +15,13 @@
 
 /*
  * SpectrumFileWriter.java
- * Copyright (C) 2009-2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
 
-import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.conversion.MultiSpectrumToSpectra;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SimpleSpectrumWriter;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
@@ -74,7 +74,7 @@ import java.lang.reflect.Array;
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  * 
- * <pre>-writer &lt;adams.data.io.output.AbstractDataContainerWriter&gt; (property: writer)
+ * <pre>-writer &lt;adams.data.io.output.DataContainerWriter&gt; (property: writer)
  * &nbsp;&nbsp;&nbsp;The writer to use for saving the data.
  * &nbsp;&nbsp;&nbsp;default: knir.data.output.SimpleSpectrumWriter
  * </pre>
@@ -165,7 +165,7 @@ public class SpectrumFileWriter
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter<Spectrum> getDefaultWriter() {
+  protected DataContainerWriter<Spectrum> getDefaultWriter() {
     return new SimpleSpectrumWriter();
   }
 

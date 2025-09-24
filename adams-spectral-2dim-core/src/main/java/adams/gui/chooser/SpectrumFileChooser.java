@@ -15,16 +15,16 @@
 
 /*
  * SpectrumFileChooser.java
- * Copyright (C) 2009-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.chooser;
 
-import adams.data.io.input.AbstractDataContainerReader;
 import adams.data.io.input.AbstractSpectrumReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.input.SimpleSpectrumReader;
-import adams.data.io.output.AbstractDataContainerWriter;
 import adams.data.io.output.AbstractSpectrumWriter;
+import adams.data.io.output.DataContainerWriter;
 import adams.data.io.output.SimpleSpectrumWriter;
 import adams.data.spectrum.Spectrum;
 
@@ -41,7 +41,7 @@ import java.io.File;
  * @see	    weka.gui.ConverterFileChooser
  */
 public class SpectrumFileChooser
-  extends AbstractDataContainerFileChooser<Spectrum, AbstractDataContainerReader<Spectrum>, AbstractDataContainerWriter<Spectrum>> {
+  extends AbstractDataContainerFileChooser<Spectrum, DataContainerReader<Spectrum>, DataContainerWriter<Spectrum>> {
 
   /** for serialization. */
   private static final long serialVersionUID = -5373058011025481738L;
@@ -77,7 +77,7 @@ public class SpectrumFileChooser
    * @return		the default reader
    */
   @Override
-  protected AbstractDataContainerReader<Spectrum> getDefaultReader() {
+  protected DataContainerReader<Spectrum> getDefaultReader() {
     return new SimpleSpectrumReader();
   }
 
@@ -87,7 +87,7 @@ public class SpectrumFileChooser
    * @return		the default writer
    */
   @Override
-  protected AbstractDataContainerWriter<Spectrum> getDefaultWriter() {
+  protected DataContainerWriter<Spectrum> getDefaultWriter() {
     return new SimpleSpectrumWriter();
   }
 

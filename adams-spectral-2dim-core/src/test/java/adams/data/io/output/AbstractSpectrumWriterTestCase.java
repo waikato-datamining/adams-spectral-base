@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * AbstractSpectrumWriterTest.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -27,11 +27,10 @@ import adams.test.SpectralTestHelper;
  * Abstract test class for the spectrum readers.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1286 $
  * @param <A> the type of reader
  * @param <D> the type of data container
  */
-public abstract class AbstractSpectrumWriterTestCase<A extends AbstractDataContainerWriter, D extends Spectrum>
+public abstract class AbstractSpectrumWriterTestCase<A extends DataContainerWriter, D extends Spectrum>
   extends AbstractDataContainerWriterTestCase<A, D> {
 
   /**

@@ -15,7 +15,7 @@
 
 /*
  * SpreadSheetSpectrumWriterTest.java
- * Copyright (C) 2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -59,8 +59,8 @@ public class SpreadSheetSpectrumWriterTest
    *
    * @return		the setups
    */
-  protected AbstractDataContainerWriter[] getRegressionSetups() {
-    return new AbstractDataContainerWriter[]{
+  protected DataContainerWriter[] getRegressionSetups() {
+    return new DataContainerWriter[]{
 	new SpreadSheetSpectrumWriter()
     };
   }

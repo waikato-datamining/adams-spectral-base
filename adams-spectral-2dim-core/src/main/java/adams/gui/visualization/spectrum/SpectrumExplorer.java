@@ -15,7 +15,7 @@
 
 /*
  * SpectrumExplorer.java
- * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.gui.visualization.spectrum;
@@ -27,7 +27,7 @@ import adams.core.Utils;
 import adams.core.io.PlaceholderFile;
 import adams.core.option.OptionUtils;
 import adams.data.filter.PassThrough;
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.data.spectrum.SpectrumUtils;
@@ -119,7 +119,6 @@ import static adams.gui.flow.FlowEditorPanel.getPropertiesEditor;
  * A panel for exploring Spectrums, manipulating them with filters, etc.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2246 $
  */
 public class SpectrumExplorer
   extends UndoPanel
@@ -380,7 +379,7 @@ public class SpectrumExplorer
 	  for (int i = 0; i < getContainerManager().count(); i++) {
 	    if (getContainerManager().isVisible(i)) {
 	      List<SpectrumPoint> points = getContainerManager().get(i).getData().toList();
-	      if (points.size() > 0) {
+	      if (!points.isEmpty()) {
 		point = points.get(points.size() / 2);
 		getSpectrumPanel().getSelectedWaveNumberPaintlet().setPoint(point);
 		break;
@@ -598,7 +597,7 @@ public class SpectrumExplorer
     m_MenuScripts.addSeparator();
 
     // add scripts
-    if (scripts.size() > 0) {
+    if (!scripts.isEmpty()) {
       for (i = 0; i < scripts.size(); i++) {
 	final File file = new File(scripts.get(i));
 	name = file.getName().replaceAll("_", " ");
@@ -716,14 +715,14 @@ public class SpectrumExplorer
       menu.add(submenu);
       m_RecentFilesHandler = new RecentFilesHandlerWithCommandline<>(
 	  SESSION_FILE, getPropertiesEditor().getInteger("MaxRecentFlows", 5), submenu);
-      m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<JMenu,Setup>() {
+      m_RecentFilesHandler.addRecentItemListener(new RecentItemListener<>() {
 	@Override
 	public void recentItemAdded(RecentItemEvent<JMenu, Setup> e) {
 	  // ignored
 	}
 	@Override
 	public void recentItemSelected(RecentItemEvent<JMenu, Setup> e) {
-	  AbstractDataContainerReader reader = (AbstractDataContainerReader) e.getItem().getHandler();
+	  DataContainerReader reader = (DataContainerReader) e.getItem().getHandler();
 	  reader.setInput(new PlaceholderFile(e.getItem().getFile()));
 	  getScriptingEngine().setDatabaseConnection(getDatabaseConnection());
 	  getScriptingEngine().add(SpectrumExplorer.this, AddDataFile.ACTION + " " + OptionUtils.getCommandLine(reader));
@@ -1004,7 +1003,7 @@ public class SpectrumExplorer
     int				i;
     PlaceholderFile[]		files;
     List<String>		opts;
-    AbstractDataContainerReader	reader;
+    DataContainerReader	reader;
 
     retVal = m_SpectrumFileChooser.showOpenDialog(this);
     if (retVal != SpectrumFileChooser.APPROVE_OPTION)
@@ -1025,7 +1024,7 @@ public class SpectrumExplorer
       for (i = 0; i < files.length; i++)
 	opts.add(files[i].toString());
       getScriptingEngine().setDatabaseConnection(getDatabaseConnection());
-      getScriptingEngine().add(this, AddDataFiles.ACTION + " " + OptionUtils.joinOptions(opts.toArray(new String[opts.size()])));
+      getScriptingEngine().add(this, AddDataFiles.ACTION + " " + OptionUtils.joinOptions(opts.toArray(new String[0])));
       if (m_RecentFilesHandler != null) {
 	for (i = 0; i < files.length; i++)
 	  m_RecentFilesHandler.addRecentItem(new Setup(files[i], reader));

@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * JCampDX2SpectrumWriterTest.java
- * Copyright (C) 2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -28,7 +28,6 @@ import junit.framework.TestSuite;
  * java adams.data.io.output.JCampDX2SpectrumWriterTest
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class JCampDX2SpectrumWriterTest
   extends AbstractSpectrumWriterTestCase {
@@ -61,8 +60,8 @@ public class JCampDX2SpectrumWriterTest
    * @return		the setups
    */
   @Override
-  protected AbstractDataContainerWriter[] getRegressionSetups() {
-    return new AbstractDataContainerWriter[]{
+  protected DataContainerWriter[] getRegressionSetups() {
+    return new DataContainerWriter[]{
 	new JCampDX2SpectrumWriter()
     };
   }

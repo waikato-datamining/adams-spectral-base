@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * NIRSpectrumWriterTest.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.io.output;
 
@@ -60,7 +60,7 @@ public class NIRSpectrumWriterTest
    *
    * @return		the setups
    */
-  protected AbstractDataContainerWriter[] getRegressionSetups() {
+  protected DataContainerWriter[] getRegressionSetups() {
     NIRSpectrumWriter[]	result;
 
     result = new NIRSpectrumWriter[1];

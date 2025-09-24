@@ -13,13 +13,13 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SpectrumFileChecker.java
- * Copyright (C) 2010-2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.flow.control;
 
-import adams.data.io.input.AbstractDataContainerReader;
+import adams.data.io.input.DataContainerReader;
 import adams.data.io.input.SimpleSpectrumReader;
 import adams.data.spectrum.Spectrum;
 
@@ -83,7 +83,7 @@ import adams.data.spectrum.Spectrum;
  * &nbsp;&nbsp;&nbsp;default: adams.flow.sink.Null
  * </pre>
  *
- * <pre>-reader &lt;adams.data.io.input.AbstractDataContainerReader [options]&gt; (property: reader)
+ * <pre>-reader &lt;adams.data.io.input.DataContainerReader [options]&gt; (property: reader)
  * &nbsp;&nbsp;&nbsp;The reader to use for reading the files being passed through.
  * &nbsp;&nbsp;&nbsp;default: knir.data.input.SimpleSpectrumReader
  * </pre>
@@ -110,7 +110,6 @@ import adams.data.spectrum.Spectrum;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SpectrumFileChecker
   extends AbstractDataContainerFileChecker<Spectrum> {
@@ -134,7 +133,7 @@ public class SpectrumFileChecker
    *
    * @return		the default reader
    */
-  protected AbstractDataContainerReader<Spectrum> getDefaultReader() {
+  protected DataContainerReader<Spectrum> getDefaultReader() {
     return new SimpleSpectrumReader();
   }
 }

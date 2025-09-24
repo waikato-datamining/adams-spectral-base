@@ -15,7 +15,7 @@
 
 /*
  * SimpleSpectrumWriter.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.output;
@@ -54,11 +54,10 @@ import java.util.zip.GZIPOutputStream;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SimpleSpectrumWriter
   extends AbstractSpectrumWriter 
-  implements CompressionSupporter {
+  implements CompressionSupporter<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = 5290679698357490093L;
