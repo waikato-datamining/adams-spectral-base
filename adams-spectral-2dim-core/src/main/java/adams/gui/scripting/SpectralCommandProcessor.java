@@ -128,6 +128,7 @@ public class SpectralCommandProcessor
    */
   protected void setupScriptlet(AbstractScriptlet scriptlet) {
     super.setupScriptlet(scriptlet);
-    scriptlet.setDataProvider(SpectrumF.getSingleton(getDatabaseConnection()));
+    if (scriptlet.requiresDataProvider())
+      scriptlet.setDataProvider(SpectrumF.getSingleton(getDatabaseConnection()));
   }
 }
