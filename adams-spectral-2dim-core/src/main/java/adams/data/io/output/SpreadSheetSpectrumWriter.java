@@ -15,7 +15,7 @@
 
 /*
  * SpreadSheetSpectrumWriter.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.output;
@@ -168,9 +168,9 @@ public class SpreadSheetSpectrumWriter
     for (Spectrum sp: data)
       sheets.add(sp.toSpreadSheet());
 
-    if (sheets.size() > 0) {
+    if (!sheets.isEmpty()) {
       if (canWriteMultiple())
-	result = ((MultiSheetSpreadSheetWriter) m_Writer).write(sheets.toArray(new SpreadSheet[sheets.size()]), m_Output);
+	result = ((MultiSheetSpreadSheetWriter) m_Writer).write(sheets.toArray(new SpreadSheet[0]), m_Output);
       else
 	result = m_Writer.write(sheets.get(0), m_Output);
     }
