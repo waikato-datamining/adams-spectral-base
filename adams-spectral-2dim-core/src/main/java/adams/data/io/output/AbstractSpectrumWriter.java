@@ -15,7 +15,7 @@
 
 /*
  * AbstractSpectrumWriter.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.output;
@@ -28,7 +28,6 @@ import adams.data.spectrum.Spectrum;
  * formats.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1968 $
  */
 public abstract class AbstractSpectrumWriter
   extends AbstractDataContainerWriter<Spectrum> {
@@ -44,6 +43,27 @@ public abstract class AbstractSpectrumWriter
   @Override
   public boolean canWriteMultiple() {
     return false;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return tip text for this property suitable for displaying in the GUI or
+   *         for listing the options.
+   */
+  @Override
+  public String outputTipText() {
+    String	s;
+
+    if (canWriteMultiple())
+      s = "spectra";
+    else
+      s = "spectrum";
+
+    if (m_OutputIsFile)
+      return "The file to write the " + s + " to.";
+    else
+      return "The directory to write the " + s + " to.";
   }
 
   /**
