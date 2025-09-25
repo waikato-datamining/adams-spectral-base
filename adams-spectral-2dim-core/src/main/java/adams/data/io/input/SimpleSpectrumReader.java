@@ -256,6 +256,7 @@ public class SimpleSpectrumReader
     finally {
       FileUtils.closeQuietly(reader);
     }
+    m_ReadData.clear();
 
     return result;
   }
