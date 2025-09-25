@@ -15,7 +15,7 @@
 
 /*
  * DPTSpectrumReader.java
- * Copyright (C) 2009-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -82,7 +82,7 @@ import java.util.logging.Level;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class DPTSpectrumReader
-  extends AbstractSpectrumReader
+  extends AbstractTextBasedSpectrumReader
   implements LocaleSupporter {
 
   /** for serialization. */
@@ -226,15 +226,17 @@ public class DPTSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param content 	the content to read from
    */
   @Override
-  protected void readData() {
+  protected void readData(List<String> content) {
     Spectrum	sp;
     ParsedFile 	pf;
 
     sp = new Spectrum();
     pf = new ParsedFile();
-    pf.parse(FileUtils.loadFromFile(m_Input));
+    pf.parse(content);
     for (float[] d: pf.getPoints())
       sp.add(new SpectrumPoint(d[0], d[1]));
     sp.setID(FileUtils.replaceExtension(m_Input.getName(), ""));

@@ -15,7 +15,7 @@
 
 /*
  * JCampDX2SpectrumReader.java
- * Copyright (C) 2013-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2013-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -109,7 +109,8 @@ import java.util.logging.Level;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class JCampDX2SpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractTextBasedSpectrumReader
+  implements StreamableDataContainerReader<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = 3095955240781741734L;
@@ -314,13 +315,14 @@ public class JCampDX2SpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param content 	the content to read from
    */
   @Override
-  protected void readData() {
+  protected void readData(List<String> content) {
     Spectrum			sp;
     SpectrumPoint 		point;
     SampleData 			sd;
-    List<String>		content;
     JCAMPBlock 			block;
     String[]			parts;
     int				i;
@@ -336,8 +338,6 @@ public class JCampDX2SpectrumReader
     Iterator			iter;
     Note			note;
 
-    content = FileUtils.loadFromFile(m_Input);
-    
     try {
       // read DX data
       block = new JCAMPBlock(Utils.flatten(content, "\n"), new ErrorHandlerAdapter());
@@ -355,7 +355,7 @@ public class JCampDX2SpectrumReader
           if (m_UseFilenameAsID)
             sp.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
           else
-            sp.setID("" + spec.getTitle() + ": " + (pos+1));
+            sp.setID(spec.getTitle() + ": " + (pos+1));
 	  sp.getReport().setNumericValue("Page", (pos+1));
 	  for (i = 0; i < xArray.getLength(); i++) {
 	    x     = xArray.pointAt(i);
@@ -373,7 +373,7 @@ public class JCampDX2SpectrumReader
           if (m_UseFilenameAsID)
             sp.setID(FileUtils.replaceExtension(m_Input.getName(), ""));
           else
-	    sp.setID("" + spec.getTitle());
+	    sp.setID(spec.getTitle());
 	  m_ReadData.add(sp);
 	  for (i = 0; i < sp1d.getXData().getLength(); i++) {
 	    x     = sp1d.getXData().pointAt(i);
@@ -406,7 +406,7 @@ public class JCampDX2SpectrumReader
     }
     
     // failed to read?
-    if (m_ReadData.size() == 0)
+    if (m_ReadData.isEmpty())
       return;
     
     // raw meta-data
@@ -434,7 +434,6 @@ public class JCampDX2SpectrumReader
 	break;
       }
     }
-    content = null;
   }
 
   /**

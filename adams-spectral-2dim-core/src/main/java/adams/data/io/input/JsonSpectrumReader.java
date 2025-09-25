@@ -20,6 +20,7 @@
 
 package adams.data.io.input;
 
+import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumJsonUtils;
@@ -30,7 +31,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.StringReader;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -112,7 +114,7 @@ import java.util.logging.Level;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class JsonSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractTextBasedSpectrumReader {
 
   /** for serialization. */
   private static final long serialVersionUID = -27209265703137172L;
@@ -156,22 +158,21 @@ public class JsonSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param content 	the content to read from
    */
   @Override
-  protected void readData() {
+  protected void readData(List<String> content) {
     Spectrum		spec;
-    FileReader		freader;
     BufferedReader	breader;
     JsonElement		je;
     JsonObject		jobj;
     JsonArray		array;
 
-    freader = null;
     breader = null;
 
     try {
-      freader = new FileReader(m_Input.getAbsolutePath());
-      breader = new BufferedReader(freader);
+      breader = new BufferedReader(new StringReader(Utils.flatten(content, "\n")));
       je = JsonParser.parseReader(breader);
 
       jobj = je.getAsJsonObject();
@@ -192,7 +193,6 @@ public class JsonSpectrumReader
     }
     finally {
       FileUtils.closeQuietly(breader);
-      FileUtils.closeQuietly(freader);
     }
   }
 

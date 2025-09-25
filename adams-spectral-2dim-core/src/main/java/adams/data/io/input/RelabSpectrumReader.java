@@ -15,12 +15,11 @@
 
 /*
  * RelabSpectrumReader.java
- * Copyright (C) 2014-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
 
-import adams.core.io.FileUtils;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
@@ -76,7 +75,7 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class RelabSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractTextBasedSpectrumReader {
 
   /** for serialization. */
   private static final long serialVersionUID = 3095955240781741734L;
@@ -160,12 +159,12 @@ public class RelabSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param content 	the content to read from
    */
-  @Override
-  protected void readData() {
+  protected void readData(List<String> content) {
     Spectrum		sp;
-    SampleData sd;
-    List<String>	content;
+    SampleData 		sd;
     int			numData;
     int			i;
     String		line;
@@ -176,7 +175,6 @@ public class RelabSpectrumReader
     StringBuilder	comments;
     String		id;
     
-    content = FileUtils.loadFromFile(m_Input);
     sp      = new Spectrum();
     sd      = new SampleData();
     sp.setReport(sd);

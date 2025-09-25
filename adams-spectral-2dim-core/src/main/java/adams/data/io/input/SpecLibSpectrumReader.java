@@ -20,7 +20,6 @@
 
 package adams.data.io.input;
 
-import adams.core.io.FileUtils;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
@@ -90,7 +89,7 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class SpecLibSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractTextBasedSpectrumReader {
 
   /** for serialization. */
   private static final long serialVersionUID = 3095955240781741734L;
@@ -282,12 +281,13 @@ public class SpecLibSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param content 	the content to read from
    */
   @Override
-  protected void readData() {
+  protected void readData(List<String> content) {
     Spectrum		sp;
-    SampleData sd;
-    List<String>	content;
+    SampleData 		sd;
     String[]		parts;
     boolean		data;
     boolean		title;
@@ -295,7 +295,6 @@ public class SpecLibSpectrumReader
     float		wave;
     float		ampl;
     
-    content = FileUtils.loadFromFile(m_Input);
     data    = false;
     title   = false;
     title2  = false;

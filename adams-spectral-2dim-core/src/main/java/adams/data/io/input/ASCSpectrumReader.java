@@ -15,7 +15,7 @@
 
 /*
  * ASCSpectrumReader.java
- * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -62,8 +62,8 @@ import java.util.logging.Level;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class ASCSpectrumReader
-  extends AbstractSpectrumReader
-  implements LocaleSupporter {
+  extends AbstractTextBasedSpectrumReader
+  implements LocaleSupporter, StreamableDataContainerReader<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = -27209265703137172L;
@@ -348,9 +348,11 @@ public class ASCSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param content 	the content to read from
    */
   @Override
-  protected void readData() {
+  protected void readData(List<String> content) {
     Spectrum	sp;
     ParsedFile 	pf;
     double[] 	nir;
@@ -359,7 +361,7 @@ public class ASCSpectrumReader
 
     sp = new Spectrum();
     pf = new ParsedFile();
-    pf.parse(Utils.flatten(FileUtils.loadFromFile(m_Input), "\n"));
+    pf.parse(Utils.flatten(content, "\n"));
 
     // NIR array
     nir = pf.getNIRArray();

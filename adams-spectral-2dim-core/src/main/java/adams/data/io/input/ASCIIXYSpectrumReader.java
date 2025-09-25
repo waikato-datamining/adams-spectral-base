@@ -15,12 +15,11 @@
 
 /*
  * ASCIIXYSpectrumReader.java
- * Copyright (C) 2016-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
 
-import adams.core.io.FileUtils;
 import adams.data.io.input.sampleidextraction.Filename;
 import adams.data.io.input.sampleidextraction.SampleIDExtraction;
 import adams.data.spectrum.Spectrum;
@@ -97,7 +96,7 @@ import java.util.logging.Level;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class ASCIIXYSpectrumReader
-  extends AbstractSpectrumReader
+  extends AbstractTextBasedSpectrumReader
   implements SpectrumReaderWithSampleIDExtraction {
 
   /** for serialization. */
@@ -217,13 +216,14 @@ public class ASCIIXYSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param content 	the content to read from
    */
   @Override
-  protected void readData() {
+  protected void readData(List<String> content) {
     Spectrum		sp;
     SpectrumPoint	point;
     String		line;
-    List<String>	content;
     String[]		parts;
 
     try {
@@ -231,14 +231,11 @@ public class ASCIIXYSpectrumReader
       sp.setID(m_SampleIDExtraction.extract(m_Input, sp));
       m_ReadData.add(sp);
 
-      // read data
-      content = FileUtils.loadFromFile(m_Input);
-
       // data points
-      while (content.size() > 0) {
+      while (!content.isEmpty()) {
 	line = content.get(0).trim();
 	content.remove(0);
-	if (line.length() == 0)
+	if (line.isEmpty())
 	  continue;
 	parts = line.split(m_Separator);
 	if (parts.length == 2) {
