@@ -28,14 +28,16 @@ import adams.data.spectrum.Spectrum;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
 /**
  <!-- globalinfo-start -->
- * Writer that stores spectrums in the simple CSV format.
+ * Writer that stores spectra in the simple CSV format.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -57,7 +59,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public class SimpleSpectrumWriter
   extends AbstractSpectrumWriter 
-  implements CompressionSupporter<Spectrum> {
+  implements CompressionSupporter<Spectrum>, StreamableDataContainerWriter<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = 5290679698357490093L;
@@ -75,7 +77,7 @@ public class SimpleSpectrumWriter
    */
   @Override
   public String globalInfo() {
-    return "Writer that stores spectrums in the simple CSV format.";
+    return "Writer that stores spectra in the simple CSV format.";
   }
 
   /**
@@ -282,5 +284,43 @@ public class SimpleSpectrumWriter
       getLogger().severe("Error writing data to '" + m_Output.getAbsolutePath() + "'!");
 
     return result;
+  }
+
+  /**
+   * Performs checks and writes the data to the stream.
+   *
+   * @param stream the stream to write to
+   * @param data   the data to write
+   * @return true if successfully written
+   * @see                #write(OutputStream stream, List)
+   */
+  @Override
+  public boolean write(OutputStream stream, Spectrum data) {
+    return write(stream, Collections.singletonList(data));
+  }
+
+  /**
+   * Performs checks and writes the data to the stream.
+   *
+   * @param stream the stream to write to
+   * @param data   the data to write
+   * @return true if successfully written
+   */
+  @Override
+  public boolean write(OutputStream stream, List<Spectrum> data) {
+    BufferedWriter	writer;
+
+    writer = null;
+    try {
+      writer = new BufferedWriter(new OutputStreamWriter(stream));
+      return write(data, writer, m_OutputSampleData);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to write spectra to output stream!", e);
+      return false;
+    }
+    finally {
+      FileUtils.closeQuietly(writer);
+    }
   }
 }

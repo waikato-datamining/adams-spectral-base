@@ -34,6 +34,7 @@ import adams.env.Environment;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,8 @@ import java.util.zip.GZIPInputStream;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class SimpleSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractSpectrumReader
+  implements StreamableDataContainerReader<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = -2903357410192470809L;
@@ -227,6 +229,35 @@ public class SimpleSpectrumReader
   @Override
   protected void readData() {
     read(m_Input.getAbsolutePath());
+  }
+
+  /**
+   * Returns the data containers generated from the input stream.
+   *
+   * @param input the stream to read from
+   * @return the data generated from the stream
+   */
+  @Override
+  public List<Spectrum> read(InputStream input) {
+    List<Spectrum>	result;
+    BufferedReader	reader;
+
+    m_ReadData.clear();
+    result = new ArrayList<>();
+    reader = null;
+    try {
+      reader = new BufferedReader(new InputStreamReader(input));
+      if (read(reader))
+	result.addAll(m_ReadData);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to read from input stream!", e);
+    }
+    finally {
+      FileUtils.closeQuietly(reader);
+    }
+
+    return result;
   }
 
   /**
