@@ -20,14 +20,15 @@
 
 package adams.data.io.output;
 
-import adams.core.io.FileUtils;
 import adams.data.io.input.ASCIIXYSpectrumReader;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
@@ -56,7 +57,7 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class ASCIIXYSpectrumWriter
-  extends AbstractSpectrumWriter {
+  extends AbstractTextBasedSpectrumWriter {
 
   /** for serialization. */
   private static final long serialVersionUID = 5290679698357490093L;
@@ -149,23 +150,29 @@ public class ASCIIXYSpectrumWriter
    * Performs the actual writing.
    *
    * @param data	the data to write
+   * @param writer 	the writer to write the spectra to
    * @return		true if successfully written
    */
   @Override
-  protected boolean writeData(List<Spectrum> data) {
+  protected boolean writeData(List<Spectrum> data, Writer writer) {
     Spectrum		sp;
     List<String>	lines;
-    String		msg;
 
     sp    = data.get(0);
     lines = new ArrayList<>();
     for (SpectrumPoint point: sp)
       lines.add(point.getWaveNumber() + m_Separator + point.getAmplitude());
     Collections.reverse(lines);
-    msg = FileUtils.saveToFileMsg(lines, m_Output, null);
-    if (msg != null)
-      getLogger().severe("Error writing data to '" + m_Output.getAbsolutePath() + "'!");
-
-    return (msg == null);
+    try {
+      for (String line : lines) {
+	writer.write(line);
+	writer.write("\n");
+      }
+      return true;
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to write spectrum with writer!", e);
+      return false;
+    }
   }
 }

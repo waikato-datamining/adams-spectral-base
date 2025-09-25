@@ -21,14 +21,15 @@
 package adams.data.io.output;
 
 import adams.core.DateUtils;
-import adams.core.io.FileUtils;
 import adams.data.sampledata.SampleData;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Writer for the trinamiX (https://trinamixsensing.com/) CSV format.
@@ -36,7 +37,7 @@ import java.util.List;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class TrinamixSpectrumWriter 
-  extends AbstractSpectrumWriter {
+  extends AbstractTextBasedSpectrumWriter {
 
   private static final long serialVersionUID = -1056141700225189830L;
 
@@ -138,12 +139,12 @@ public class TrinamixSpectrumWriter
    * Performs the actual writing.
    *
    * @param data the data to write
+   * @param writer 	the writer to write the spectra to
    * @return true if successfully written
    */
   @Override
-  protected boolean writeData(List<Spectrum> data) {
+  protected boolean writeData(List<Spectrum> data, Writer writer) {
     List<String>	lines;
-    String		msg;
     String		timestamp;
     StringBuilder	buf;
     String		instrument;
@@ -196,10 +197,16 @@ public class TrinamixSpectrumWriter
       lines.add(buf.toString());
     }
 
-    msg = FileUtils.saveToFileMsg(lines, m_Output, null);
-    if (msg != null)
-      getLogger().severe("Failed to write spectra to " + m_Output + ": " + msg);
-
-    return (msg == null);
+    try {
+      for (String line: lines) {
+	writer.write(line);
+	writer.write("\n");
+      }
+      return true;
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to write spectra with writer!", e);
+      return false;
+    }
   }
 }

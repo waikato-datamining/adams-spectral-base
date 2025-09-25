@@ -80,7 +80,7 @@ public class CALSpectrumWriter
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
-  public String constituentsFieldsTipText() {
+  public String constituentsTipText() {
     return "Constituents (modeling targets).";
   }
 

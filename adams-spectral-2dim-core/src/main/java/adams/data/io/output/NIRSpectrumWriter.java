@@ -15,7 +15,7 @@
 
 /*
  * NIRSpectrumWriter.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.output;
@@ -38,10 +38,14 @@ import adams.data.spectrum.Spectrum;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.logging.Level;
 
 /**
 <!-- globalinfo-start -->
@@ -152,10 +156,10 @@ import java.util.TimeZone;
 <!-- options-end -->
  *
  * @author  dale (dale at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class NIRSpectrumWriter
-  extends AbstractSpectrumWriter {
+  extends AbstractSpectrumWriter
+  implements StreamableDataContainerWriter<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = -95463122424931621L;
@@ -935,8 +939,7 @@ public class NIRSpectrumWriter
   public SampleInfo getSampleInfo(Spectrum sp,int pos){
     SampleInfo si=new SampleInfo();
     si.m_deleted=false;
-    String id=sp.getID().replace("'", "");
-    si.m_sample_id=id;
+    si.m_sample_id= sp.getID().replace("'", "");
     si.m_sequence=pos;
     return(si);
   }
@@ -1005,7 +1008,7 @@ public class NIRSpectrumWriter
     Calendar nowny = Calendar.getInstance(TimeZone.getTimeZone("GMT-4:00"));
     nowhere.setTime(m_Timestamp.dateValue());
     nowny.setTime(m_Timestamp.dateValue());
-    String ids[] = TimeZone.getAvailableIDs();
+    String[] ids = TimeZone.getAvailableIDs();
     int millsdiff1=nowhere.get(Calendar.ZONE_OFFSET);
     int millsdiff2=nowny.get(Calendar.ZONE_OFFSET);
 
@@ -1084,7 +1087,7 @@ public class NIRSpectrumWriter
       outStream.write(si.getBytes());
       return(outStream.toByteArray());
     }catch(Exception e){
-      e.printStackTrace();
+      getLogger().log(Level.SEVERE, "Failed to write data!", e);
       return(null);
     }
   }
@@ -1109,23 +1112,54 @@ public class NIRSpectrumWriter
   protected boolean writeData(List<Spectrum> data) {
     BufferedOutputStream writer = null;
     FileOutputStream fos = null;
-    // TODO process multiple spectra
     try {
       byte[] bytes=genByteArray(data);
       if (bytes != null){
         fos = new FileOutputStream(m_Output.getAbsolutePath());
 	writer = new BufferedOutputStream(fos);
 	writer.write(bytes);
-	return(true);
+	return true;
       }
       return(false);
     }catch (Exception e) {
-      e.printStackTrace();
-      return(false);
+      getLogger().log(Level.SEVERE, "Failed to write data to: " + m_Output, e);
+      return false;
     }
     finally {
       FileUtils.closeQuietly(writer);
       FileUtils.closeQuietly(fos);
+    }
+  }
+
+  /**
+   * Performs checks and writes the data to the stream.
+   *
+   * @param stream the stream to write to
+   * @param data   the data to write
+   * @return true if successfully written
+   * @see                #write(OutputStream stream, List)
+   */
+  @Override
+  public boolean write(OutputStream stream, Spectrum data) {
+    return write(stream, new ArrayList<>(Collections.singletonList(data)));
+  }
+
+  /**
+   * Performs checks and writes the data to the stream.
+   *
+   * @param stream the stream to write to
+   * @param data   the data to write
+   * @return true if successfully written
+   */
+  @Override
+  public boolean write(OutputStream stream, List<Spectrum> data) {
+    try {
+      stream.write(genByteArray(data));
+      return true;
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to write data to stream!", e);
+      return false;
     }
   }
 }

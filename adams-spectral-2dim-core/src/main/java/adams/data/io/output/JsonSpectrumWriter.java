@@ -20,7 +20,6 @@
 
 package adams.data.io.output;
 
-import adams.core.io.FileUtils;
 import adams.core.io.PrettyPrintingSupporter;
 import adams.data.report.Field;
 import adams.data.spectrum.Spectrum;
@@ -30,7 +29,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.io.Writer;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
 <!-- globalinfo-start -->
@@ -104,7 +105,7 @@ import java.util.List;
 * @author FracPete (fracpete at waikato dot ac dot nz)
 */
 public class JsonSpectrumWriter
-  extends AbstractSpectrumWriter
+  extends AbstractTextBasedSpectrumWriter
   implements PrettyPrintingSupporter {
 
   /** for serialization. */
@@ -322,10 +323,12 @@ public class JsonSpectrumWriter
    * Performs the actual writing.
    *
    * @param data	the data to write
+   * @param writer 	the writer to write the spectra to
    * @return		true if successfully written
    */
   @Override
-  protected boolean writeData(List<Spectrum> data) {
+  protected boolean writeData(List<Spectrum> data, Writer writer) {
+    boolean		result;
     JsonObject		jspec;
     JsonArray		jspecs;
     JsonObject		jcont;
@@ -350,10 +353,15 @@ public class JsonSpectrumWriter
     gson    = builder.create();
     content = gson.toJson(jcont);
 
-    msg = FileUtils.writeToFileMsg(getOutput().getAbsolutePath(), content, false, null);
-    if (msg != null)
-      getLogger().severe(msg);
+    try {
+      writer.write(content);
+      result = true;
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to write spectra with writer!", e);
+      result = false;
+    }
 
-    return (msg == null);
+    return result;
   }
 }

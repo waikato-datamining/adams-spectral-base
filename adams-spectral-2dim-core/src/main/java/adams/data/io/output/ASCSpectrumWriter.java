@@ -15,7 +15,7 @@
 
 /*
  * ASCSpectrumWriter.java
- * Copyright (C) 2010-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.output;
@@ -29,11 +29,11 @@ import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.data.spectrum.SpectrumPointComparator;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.Writer;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 
 /**
 <!-- globalinfo-start -->
@@ -94,10 +94,9 @@ import java.util.Locale;
 <!-- options-end -->
 *
 * @author  dale (dale at waikato dot ac dot nz)
-* @version $Revision: 2242 $
 */
 public class ASCSpectrumWriter
-  extends AbstractSpectrumWriter
+  extends AbstractTextBasedSpectrumWriter
   implements OptionHandlingLocaleSupporter {
 
   /** for serialization. */
@@ -555,27 +554,24 @@ public class ASCSpectrumWriter
    * Performs the actual writing.
    *
    * @param data	the data to write
+   * @param writer 	the writer to write the spectra to
    * @return		true if successfully written
    */
   @Override
-  protected boolean writeData(List<Spectrum> data) {
+  protected boolean writeData(List<Spectrum> data, Writer writer) {
     boolean		result;
     String 		asc;
-    BufferedWriter	writer;
 
     result = false;
 
     asc = genASCString(data.get(0));
     if (asc != null){
       try {
-	writer = new BufferedWriter(new FileWriter(m_Output.getAbsolutePath()));
 	writer.write(asc);
-	writer.close();
 	result = true;
       }
       catch (Exception e) {
-	e.printStackTrace();
-	result = false;
+	getLogger().log(Level.SEVERE, "Failed to write spectrum with writer!", e);
       }
     }
 

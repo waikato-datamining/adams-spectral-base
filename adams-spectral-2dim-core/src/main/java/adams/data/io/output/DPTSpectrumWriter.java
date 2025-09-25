@@ -15,7 +15,7 @@
 
 /*
  * DPTSpectrumWriter.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.output;
@@ -27,8 +27,7 @@ import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.data.spectrum.SpectrumPointComparator;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.Writer;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -63,10 +62,9 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class DPTSpectrumWriter
-  extends AbstractSpectrumWriter
+  extends AbstractTextBasedSpectrumWriter
   implements LocaleSupporter {
 
   /** for serialization. */
@@ -210,14 +208,14 @@ public class DPTSpectrumWriter
    * Performs the actual writing.
    *
    * @param data	the data to write
+   * @param writer 	the writer to write the spectra to
    * @return		true if successfully written
    */
   @Override
-  protected boolean writeData(List<Spectrum> data) {
+  protected boolean writeData(List<Spectrum> data, Writer writer) {
     try {
       Spectrum spec = data.get(0);
       List<SpectrumPoint> points = spec.toList(new SpectrumPointComparator(false, !getDescending()));
-      BufferedWriter writer = new BufferedWriter(new FileWriter(m_Output.getAbsolutePath()));
       int count = 0;
       for (SpectrumPoint sp:points) {
 	count++;
@@ -233,7 +231,7 @@ public class DPTSpectrumWriter
       return true;
     }
     catch (Exception e) {
-      getLogger().log(Level.SEVERE, "Failed to write data to " + m_Output, e);
+      getLogger().log(Level.SEVERE, "Failed to write spectra with writer!", e);
       return false;
     }
   }
