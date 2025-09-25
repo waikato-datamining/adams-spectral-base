@@ -15,7 +15,7 @@
 
 /*
  * OpusSpectrumReaderExt.java
- * Copyright (C) 2016-2021 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -23,7 +23,6 @@ package adams.data.io.input;
 import adams.core.IEEE754;
 import adams.core.MessageCollection;
 import adams.core.Utils;
-import adams.core.io.FileUtils;
 import adams.data.io.input.opus.OpusBlockHelper;
 import adams.data.io.input.opus.OpusBlockHelper.Block;
 import adams.data.io.input.opus.OpusBlockHelper.BlockDefinition;
@@ -122,7 +121,7 @@ import java.util.logging.Level;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class OpusSpectrumReaderExt
-  extends AbstractSpectrumReader {
+  extends AbstractByteBasedSpectrumReader {
 
   public static final String FIELD_OPUS_FIRST_X = "Opus.FirstX";
 
@@ -596,23 +595,19 @@ public class OpusSpectrumReaderExt
 
   /**
    * Performs the actual reading.
+   *
+   * @param data 	the content to read from
    */
-  @Override
-  protected void readData() {
-    byte[] 			buf;
+  protected void readData(byte[] data) {
     List<BlockDefinition>	defs;
     List<Block>			blocks;
     MessageCollection		errors;
     int				i;
 
     try {
-      buf = FileUtils.loadFromBinaryFile(m_Input);
-      if (buf == null)
-	throw new IllegalStateException("Failed to read data from: " + m_Input);
-
       // definitions
       errors = new MessageCollection();
-      defs = OpusBlockHelper.readDefinitions(buf, errors);
+      defs = OpusBlockHelper.readDefinitions(data, errors);
       if (!errors.isEmpty())
 	throw new IllegalStateException("Failed to obtain block definitions:\n" + errors);
       if (isLoggingEnabled()) {
@@ -621,14 +616,14 @@ public class OpusSpectrumReaderExt
       }
 
       // read blocks
-      blocks = OpusBlockHelper.readBlocks(buf, defs);
+      blocks = OpusBlockHelper.readBlocks(data, defs);
       if (isLoggingEnabled()) {
 	for (i = 0; i < blocks.size(); i++)
 	  getLogger().info("Block #" + i + ": " + blocks.get(i));
       }
 
       // read spectra
-      findSpectra(buf, blocks);
+      findSpectra(data, blocks);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to read '" + m_Input + "'!", e);

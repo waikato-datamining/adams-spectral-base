@@ -15,7 +15,7 @@
 
 /*
  * SPASpectrumReader.java
- * Copyright (C) 2017-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2017-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -24,7 +24,6 @@ import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.LittleEndian;
 import adams.core.Utils;
-import adams.core.io.FileUtils;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.env.Environment;
@@ -79,7 +78,7 @@ import adams.env.Environment;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class SPASpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractByteBasedSpectrumReader {
 
   /** for serialization. */
   private static final long serialVersionUID = 7690015355854851867L;
@@ -174,10 +173,10 @@ public class SPASpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param data 	the content to read from
    */
-  @Override
-  protected void readData() {
-    byte[] 		data;
+  protected void readData(byte[] data) {
     Spectrum		sp;
     String[]		comments;
     DateFormat		dfcomm;
@@ -200,9 +199,6 @@ public class SPASpectrumReader
     SpectrumPoint	point;
 
     sp = new Spectrum();
-
-    // read data
-    data = FileUtils.loadFromBinaryFile(m_Input);
 
     // ID
     sp.setID(readString(data, 30));

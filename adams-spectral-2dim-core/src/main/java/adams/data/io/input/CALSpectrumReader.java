@@ -15,13 +15,12 @@
 
 /*
  * CALSpectrumReader.java
- * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
 
 import adams.core.IEEE754;
-import adams.core.io.FileUtils;
 import adams.data.io.input.foss.FossHelper;
 import adams.data.io.input.foss.FossHelper.FossFields;
 import adams.data.report.DataType;
@@ -56,7 +55,7 @@ import java.util.List;
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
 public class CALSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractByteBasedSpectrumReader {
 
   /** for serialization. */
   private static final long serialVersionUID = -1173018986741833982L;
@@ -287,10 +286,11 @@ public class CALSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param data 	the content to read from
    */
-  protected void readData() {
-
-    FossHelper fh=new FossHelper(FileUtils.loadFromBinaryFile(m_Input.getAbsoluteFile()));
+  protected void readData(byte[] data) {
+    FossHelper fh=new FossHelper(data);
 
     fh.processHeader();
     List<String> v=fh.getReferenceNames();

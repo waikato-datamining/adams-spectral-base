@@ -15,7 +15,7 @@
 
 /*
  * SPCSpectrumReader.java
- * Copyright (C) 2015-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -85,7 +85,7 @@ import java.util.List;
 * @author  fracpete (fracpete at waikato dot ac dot nz)
 */
 public class SPCSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractByteBasedSpectrumReader {
 
   /** for serialization. */
   private static final long serialVersionUID = 7690015355854851867L;
@@ -1123,14 +1123,13 @@ public class SPCSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param data 	the content to read from
    */
-  @Override
-  protected void readData() {
-    byte[] 	data;
+  protected void readData(byte[] data) {
     FileParser parser;
     String	msg;
 
-    data   = FileUtils.loadFromBinaryFile(m_Input);
     parser = new FileParser(FileUtils.replaceExtension(m_Input.getName(), ""), data);
     msg    = parser.parse();
     if (msg == null)

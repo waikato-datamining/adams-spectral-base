@@ -15,7 +15,7 @@
 
 /*
  * MPSSpectrumReader.java
- * Copyright (C) 2017-2022 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -23,7 +23,6 @@ package adams.data.io.input;
 import adams.core.DateFormat;
 import adams.core.DateUtils;
 import adams.core.Utils;
-import adams.core.io.FileUtils;
 import adams.data.DateFormatString;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -95,7 +94,7 @@ import java.util.List;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class MPSSpectrumReader
-    extends AbstractSpectrumReader {
+    extends AbstractTextBasedSpectrumReader {
 
   private static final long serialVersionUID = -5193326571132442647L;
 
@@ -227,10 +226,11 @@ public class MPSSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param lines 	the content to read from
    */
   @Override
-  protected void readData() {
-    List<String>	lines;
+  protected void readData(List<String> lines) {
     SampleData		sd;
     Spectrum		sp;
     String[]		parts;
@@ -243,7 +243,6 @@ public class MPSSpectrumReader
     double		liveTime;
     int			index;
 
-    lines    = FileUtils.loadFromFile(m_Input);
     dfMPS    = m_DateFormat.toDateFormat();
     df       = DateUtils.getTimestampFormatter();
     sp       = new Spectrum();

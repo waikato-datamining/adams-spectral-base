@@ -15,14 +15,13 @@
 
 /*
  * OpusSpectrumReader.java
- * Copyright (C) 2015-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2015-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
 
 import adams.core.IEEE754;
 import adams.core.Utils;
-import adams.core.io.FileUtils;
 import adams.data.report.DataType;
 import adams.data.report.Field;
 import adams.data.sampledata.SampleData;
@@ -110,7 +109,7 @@ import java.util.logging.Level;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class OpusSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractByteBasedSpectrumReader {
 
   /** for serialization. */
   private static final long serialVersionUID = 5668937806981601061L;
@@ -731,23 +730,21 @@ public class OpusSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param data 	the content to read from
    */
-  @Override
-  protected void readData() {
+  protected void readData(byte[] data) {
     try {
       m_Trace = new HashMap<>();
-      byte[] buf = FileUtils.loadFromBinaryFile(m_Input);
-      if (buf == null)
-	throw new IllegalStateException("Failed to read data from: " + m_Input);
-      int datastart = getABDataOffset(buf);
+      int datastart = getABDataOffset(data);
       if (isLoggingEnabled())
 	getLogger().info("datastart=" + datastart);
-      double[] nir = IEEE754.toDoubleArray(getNirArray(buf));
-      double[] wn = getWaveNumbers(buf);
-      int nump = getABCount(buf);
+      double[] nir = IEEE754.toDoubleArray(getNirArray(data));
+      double[] wn = getWaveNumbers(data);
+      int nump = getABCount(data);
       if (isLoggingEnabled())
 	getLogger().info("points=" + nump);
-      String id = getValueFor(getSampleID(), buf);
+      String id = getValueFor(getSampleID(), data);
       if (id == null) {
 	if (isLoggingEnabled())
 	  getLogger().info(getSampleID() + "=null");
@@ -759,7 +756,7 @@ public class OpusSpectrumReader
       }
       Spectrum sp = new Spectrum();
       SampleData sd = new SampleData();
-      HashMap<String,Object> meta = getMetaData(buf);
+      HashMap<String,Object> meta = getMetaData(data);
       for (String key: meta.keySet()) {
 	Object val = meta.get(key);
 	if (val instanceof Double) {
