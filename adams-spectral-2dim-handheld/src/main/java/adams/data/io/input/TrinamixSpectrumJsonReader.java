@@ -20,6 +20,7 @@
 
 package adams.data.io.input;
 
+import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
@@ -28,7 +29,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.StringReader;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -38,7 +40,7 @@ import java.util.logging.Level;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class TrinamixSpectrumJsonReader
-  extends AbstractSpectrumReader {
+  extends AbstractTextBasedSpectrumReader {
 
   private static final long serialVersionUID = -4783711375310420549L;
 
@@ -75,10 +77,11 @@ public class TrinamixSpectrumJsonReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param content 	the content to read from
    */
   @Override
-  protected void readData() {
-    FileReader		freader;
+  protected void readData(List<String> content) {
     BufferedReader	breader;
     JsonObject 		obj;
     Spectrum		spec;
@@ -95,11 +98,9 @@ public class TrinamixSpectrumJsonReader
     JsonArray		y;
     String		yLabel;
 
-    freader = null;
     breader = null;
     try {
-      freader  = new FileReader(m_Input.getAbsoluteFile());
-      breader  = new BufferedReader(freader);
+      breader  = new BufferedReader(new StringReader(Utils.flatten(content, "\n")));
       obj      = (JsonObject) JsonParser.parseReader(breader);
       configID = null;
       if (obj.has("deviceConfigIdentity") && !obj.get("deviceConfigIdentity").isJsonNull())
@@ -144,7 +145,6 @@ public class TrinamixSpectrumJsonReader
     }
     finally {
       FileUtils.closeQuietly(breader);
-      FileUtils.closeQuietly(freader);
     }
   }
 }

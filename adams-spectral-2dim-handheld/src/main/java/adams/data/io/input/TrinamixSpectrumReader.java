@@ -33,7 +33,7 @@ import java.util.List;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class TrinamixSpectrumReader
-  extends AbstractSpectrumReader {
+  extends AbstractTextBasedSpectrumReader {
 
   private static final long serialVersionUID = -4783711375310420549L;
 
@@ -102,10 +102,11 @@ public class TrinamixSpectrumReader
 
   /**
    * Performs the actual reading.
+   *
+   * @param lines 	the content to read from
    */
   @Override
-  protected void readData() {
-    List<String> 	lines;
+  protected void readData(List<String> lines) {
     int			minLines;
     String		sampleID;
     String		timestamp;
@@ -116,9 +117,6 @@ public class TrinamixSpectrumReader
     String		repeat;
     int			i;
     int			n;
-
-    // read file
-    lines = FileUtils.loadFromFile(m_Input);
 
     // sufficient lines?
     minLines = 5;
