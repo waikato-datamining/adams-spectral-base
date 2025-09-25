@@ -14,27 +14,20 @@
  */
 
 /*
- * SimpleSpectrumWriter.java
- * Copyright (C) 2009-2015 University of Waikato, Hamilton, New Zealand
+ * ASCIIXYSpectrumWriter.java
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.output;
 
 import adams.core.io.FileUtils;
-import adams.core.io.PlaceholderFile;
 import adams.data.io.input.ASCIIXYSpectrumReader;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.zip.GZIPOutputStream;
 
 /**
  <!-- globalinfo-start -->
@@ -61,7 +54,6 @@ import java.util.zip.GZIPOutputStream;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class ASCIIXYSpectrumWriter
   extends AbstractSpectrumWriter {
@@ -151,81 +143,6 @@ public class ASCIIXYSpectrumWriter
     super.initialize();
 
     m_OutputIsFile = true;
-  }
-
-  /**
-   * Writes its content with the given writer.
-   *
-   * @param data	the spectra to write
-   * @param writer	the writer to use
-   * @param report	whether to output the report as well
-   * @return		true if successfully written
-   */
-  protected boolean write(List<Spectrum> data, BufferedWriter writer, boolean report) {
-    boolean		result;
-    int			i;
-
-    result = true;
-    
-    try {
-      for (i = 0; i < data.size(); i++) {
-	// multiple 
-	if (i > 0) {
-	  writer.write(Spectrum.SEPARATOR);
-	  writer.write("\n");
-	}
-	
-	data.get(i).write(writer, report);
-      }
-    }
-    catch (Exception e) {
-      result = false;
-      getLogger().log(Level.SEVERE, "Failed to write spectra to writer!", e);
-    }
-
-    return result;
-  }
-
-  /**
-   * Writes its content to the given file.
-   *
-   * @param data	the spectra to write
-   * @param filename	the file to write to
-   * @param report	whether to output the report as well
-   * @return		true if successfully written
-   */
-  protected boolean write(List<Spectrum> data, String filename, boolean report) {
-    boolean		result;
-    BufferedWriter	writer;
-    FileOutputStream    fos;
-    FileWriter		fw;
-
-    filename = new PlaceholderFile(filename).getAbsolutePath();
-    writer   = null;
-    fw       = null;
-    fos      = null;
-    try {
-      if (filename.endsWith(".gz")) {
-	fos    = new FileOutputStream(filename);
-	writer = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(fos)));
-      }
-      else {
-	fw     = new FileWriter(filename);
-	writer = new BufferedWriter(fw);
-      }
-      result = write(data, writer, report);
-    }
-    catch (Exception e) {
-      result = false;
-      getLogger().log(Level.SEVERE, "Failed to write spectra to '" + filename + "'!", e);
-    }
-    finally {
-      FileUtils.closeQuietly(writer);
-      FileUtils.closeQuietly(fw);
-      FileUtils.closeQuietly(fos);
-    }
-
-    return result;
   }
 
   /**
