@@ -20,6 +20,7 @@
 
 package adams.data.io.input;
 
+import adams.core.ObjectCopyHelper;
 import adams.core.base.BaseRegExp;
 import adams.core.io.FileUtils;
 import adams.core.io.PlaceholderFile;
@@ -309,6 +310,97 @@ public class ZippedSpectrumReader
   }
 
   /**
+   * Performs the actual reading using readers that do not support streaming.
+   *
+   * @param archive	the archive to read from
+   * @param entry 	the entry to read
+   */
+  protected void readDataFromFile(ZipFile archive, ZipArchiveEntry entry) {
+    File 			outFile;
+    byte[]			buffer;
+    BufferedInputStream		in;
+    BufferedOutputStream	out;
+    FileOutputStream		fos;
+    int				len;
+    long			read;
+    AbstractSpectrumReader	reader;
+    List<Spectrum>		sublist;
+
+    in      = null;
+    out     = null;
+    fos     = null;
+    outFile = null;
+    buffer  = new byte[m_BufferSize];
+    try {
+      // assemble output name
+      outFile = TempUtils.createTempFile(FileUtils.replaceExtension(entry.getName(), ""), "." + FileUtils.getExtension(entry.getName()));
+
+      // extract data
+      in = new BufferedInputStream(archive.getInputStream(entry));
+      fos = new FileOutputStream(outFile.getAbsolutePath());
+      out = new BufferedOutputStream(fos, m_BufferSize);
+      read = 0;
+      while (read < entry.getSize()) {
+	len = in.read(buffer);
+	read += len;
+	out.write(buffer, 0, len);
+      }
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Error extracting '" + entry.getName() + "' to '" + outFile + "'!", e);
+    }
+    finally {
+      FileUtils.closeQuietly(in);
+      FileUtils.closeQuietly(out);
+      FileUtils.closeQuietly(fos);
+    }
+
+    // read file
+    reader = ObjectCopyHelper.copyObject(m_Reader);
+    reader.setInput(new PlaceholderFile(outFile));
+    sublist = reader.read();
+    if (sublist != null)
+      m_ReadData.addAll(sublist);
+    reader.cleanUp();
+
+    // delete file again
+    if (outFile != null)
+      FileUtils.delete(outFile);
+  }
+
+  /**
+   * Performs the actual reading using readers that do not support streaming.
+   *
+   * @param archive	the archive to read from
+   * @param entry 	the entry to read
+   */
+  protected void readDataFromStream(ZipFile archive, ZipArchiveEntry entry) {
+    BufferedInputStream		in;
+    AbstractSpectrumReader	reader;
+    List<Spectrum>		sublist;
+
+    in      = null;
+    sublist = null;
+    reader  = ObjectCopyHelper.copyObject(m_Reader);
+    try {
+      // extract data
+      in      = new BufferedInputStream(archive.getInputStream(entry));
+      sublist = ((StreamableDataContainerReader) reader).read(in);
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Error reader from '" + entry.getName() + "' using an input stream!!", e);
+    }
+    finally {
+      FileUtils.closeQuietly(in);
+    }
+    reader.cleanUp();
+
+    // read file
+    if (sublist != null)
+      m_ReadData.addAll(sublist);
+  }
+
+  /**
    * Performs the actual reading.
    */
   @Override
@@ -316,17 +408,10 @@ public class ZippedSpectrumReader
     ZipFile				archive;
     Enumeration<ZipArchiveEntry> 	enm;
     ZipArchiveEntry			entry;
-    File 				outFile;
-    BufferedInputStream			in;
-    BufferedOutputStream		out;
-    FileOutputStream			fos;
-    int					len;
-    long				read;
-    byte[]				buffer;
-    List<Spectrum>			sublist;
+
+    m_ReadData.clear();
 
     try {
-      buffer  = new byte[m_BufferSize];
       archive = ZipFile.builder().setFile(m_Input.getAbsoluteFile()).get();
       enm     = archive.getEntries();
       while (enm.hasMoreElements()) {
@@ -346,43 +431,10 @@ public class ZippedSpectrumReader
 	if (isLoggingEnabled())
 	  getLogger().info("Reading: " + entry.getName());
 
-	in      = null;
-	out     = null;
-	fos     = null;
-	outFile = null;
-	try {
-	  // assemble output name
-	  outFile = TempUtils.createTempFile(FileUtils.replaceExtension(entry.getName(), ""), "." + FileUtils.getExtension(entry.getName()));
-
-	  // extract data
-	  in   = new BufferedInputStream(archive.getInputStream(entry));
-	  fos  = new FileOutputStream(outFile.getAbsolutePath());
-	  out  = new BufferedOutputStream(fos, m_BufferSize);
-	  read = 0;
-	  while (read < entry.getSize()) {
-	    len   = in.read(buffer);
-	    read += len;
-	    out.write(buffer, 0, len);
-	  }
-	}
-	catch (Exception e) {
-	  getLogger().log(Level.SEVERE, "Error extracting '" + entry.getName() + "' to '" + outFile + "'!", e);
-	}
-	finally {
-	  FileUtils.closeQuietly(in);
-	  FileUtils.closeQuietly(out);
-	  FileUtils.closeQuietly(fos);
-	}
-
-	// read file
-	m_Reader.setInput(new PlaceholderFile(outFile));
-	sublist = m_Reader.read();
-	if (sublist != null)
-	  m_ReadData.addAll(sublist);
-
-	// delete file again
-	if (outFile != null)
-	  FileUtils.delete(outFile);
+	if (m_Reader instanceof StreamableDataContainerReader)
+	  readDataFromStream(archive, entry);
+	else
+	  readDataFromFile(archive, entry);
       }
     }
     catch (Exception e) {
