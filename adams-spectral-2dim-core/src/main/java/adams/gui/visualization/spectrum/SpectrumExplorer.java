@@ -341,7 +341,7 @@ public class SpectrumExplorer
       }
     });
 
-    // the spectrums
+    // the spectra
     m_PanelSpectrum = new SpectrumPanel();
     m_PanelSpectrum.setDatabaseConnection(getDatabaseConnection());
     m_PanelSpectrum.getContainerManager().addDataChangeListener(this);
@@ -445,7 +445,7 @@ public class SpectrumExplorer
   }
 
   /**
-   * Returns the panel for painting the spectrums.
+   * Returns the panel for painting the spectra.
    *
    * @return		the panel
    */

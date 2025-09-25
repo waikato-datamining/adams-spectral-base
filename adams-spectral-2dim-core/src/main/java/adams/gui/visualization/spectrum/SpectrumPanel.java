@@ -332,7 +332,7 @@ public class SpectrumPanel
   }
 
   /**
-   * Returns whether the display is adjusted to only the visible spectrums
+   * Returns whether the display is adjusted to only the visible spectra
    * or all of them.
    *
    * @return		true if the plot is adjusted to only the visible data
@@ -668,9 +668,9 @@ public class SpectrumPanel
   }
 
   /**
-   * Displays the histograms for the given spectrums.
+   * Displays the histograms for the given spectra.
    *
-   * @param data	the spectrums to display
+   * @param data	the spectra to display
    */
   public void showHistogram(List<SpectrumContainer> data) {
     HistogramFactory.Dialog	dialog;
@@ -728,7 +728,7 @@ public class SpectrumPanel
   /**
    * Displays a dialog with the given sample data.
    *
-   * @param data	the spectrums to display the sample data for
+   * @param data	the spectra to display the sample data for
    */
   public void showSampleData(List<SpectrumContainer> data) {
     ReportFactory.Dialog	dialog;

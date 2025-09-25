@@ -39,7 +39,7 @@ import javax.swing.SwingUtilities;
 import java.util.List;
 
 /**
- * A panel that lists all the spectrums currently in the database.
+ * A panel that lists all the spectra currently in the database.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */

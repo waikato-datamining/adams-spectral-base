@@ -42,7 +42,7 @@ import java.util.logging.Level;
 
 /**
  * Abstract ancestor for readers that read files in various formats and
- * turn them into spectrums.
+ * turn them into spectra.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */

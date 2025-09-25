@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Utility class for spectrums.
+ * Utility class for spectra.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  */
@@ -329,7 +329,7 @@ public class SpectrumUtils
   }
 
   /**
-   * Returns the union of the two spectrums "a" and "b". All spectrum points
+   * Returns the union of the two spectra "a" and "b". All spectrum points
    * from "a" are used, plus the ones from "b" that are not in "a".
    *
    * @param a		the first spectrum
@@ -556,7 +556,7 @@ public class SpectrumUtils
   }
 
   /**
-   * Merges the two spectrums. The header of the first one is used for the
+   * Merges the two spectra. The header of the first one is used for the
    * output.
    *
    * @param s1		the first spectrum
@@ -574,10 +574,10 @@ public class SpectrumUtils
   }
 
   /**
-   * Merges the given spectrums. THe header of the first one is used for
+   * Merges the given spectra. THe header of the first one is used for
    * the output.
    *
-   * @param list	the spectrums to merge
+   * @param list	the spectra to merge
    * @return		the merged spectrum
    */
   public static Spectrum merge(List<Spectrum> list) {

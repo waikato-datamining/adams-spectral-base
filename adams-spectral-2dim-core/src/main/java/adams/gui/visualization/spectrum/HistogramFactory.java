@@ -114,7 +114,7 @@ public class HistogramFactory {
   }
 
   /**
-   * Dialog for displaying histograms generated from spectrums.
+   * Dialog for displaying histograms generated from spectra.
    *
    * @author  fracpete (fracpete at waikato dot ac dot nz)
    * @version $Revision: 1286 $

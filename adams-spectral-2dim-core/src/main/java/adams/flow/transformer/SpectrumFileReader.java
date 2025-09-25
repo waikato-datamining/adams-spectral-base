@@ -31,7 +31,7 @@ import adams.data.spectrum.SpectrumComparator;
 
 /**
  <!-- globalinfo-start -->
- * Loads a file&#47;directory containing spectrums from disk with a specified reader and passes them on.
+ * Loads a file&#47;directory containing spectra from disk with a specified reader and passes them on.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -110,7 +110,7 @@ public class SpectrumFileReader
   @Override
   public String globalInfo() {
     return
-        "Loads a file/directory containing spectrums from disk with a "
+        "Loads a file/directory containing spectra from disk with a "
       + "specified reader and passes them on.";
   }
 

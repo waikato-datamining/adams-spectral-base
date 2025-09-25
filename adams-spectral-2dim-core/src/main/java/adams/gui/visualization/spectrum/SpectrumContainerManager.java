@@ -59,7 +59,7 @@ public class SpectrumContainerManager
   /** the owning panel. */
   protected SpectrumPanel m_Owner;
 
-  /** whether the spectrums can be reloaded from the database (fake ones
+  /** whether the spectra can be reloaded from the database (fake ones
    * can't be reloaded!). */
   protected boolean m_Reloadable;
 
@@ -112,18 +112,18 @@ public class SpectrumContainerManager
   }
 
   /**
-   * Sets whether the spectrums are reloadable (from the database) or not.
+   * Sets whether the spectra are reloadable (from the database) or not.
    *
-   * @param value	true if the spectrums can be reloaded
+   * @param value	true if the spectra can be reloaded
    */
   public void setReloadable(boolean value) {
     m_Reloadable = value;
   }
 
   /**
-   * Returns whether the spectrums can be reloaded from the database or not.
+   * Returns whether the spectra can be reloaded from the database or not.
    *
-   * @return		true if the spectrums can be reloaded
+   * @return		true if the spectra can be reloaded
    */
   public boolean isReloadable() {
     return m_Reloadable;

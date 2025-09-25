@@ -43,7 +43,7 @@ import java.util.zip.GZIPInputStream;
 
 /**
  <!-- globalinfo-start -->
- * Reads spectrums in the internal CSV format.
+ * Reads spectra in the internal CSV format.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -77,7 +77,7 @@ public class SimpleSpectrumReader
    */
   @Override
   public String globalInfo() {
-    return "Reads spectrums in the internal CSV format.";
+    return "Reads spectra in the internal CSV format.";
   }
 
   /**

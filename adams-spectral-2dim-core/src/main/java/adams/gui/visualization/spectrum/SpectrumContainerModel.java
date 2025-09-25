@@ -24,7 +24,7 @@ import adams.gui.visualization.container.ContainerListManager;
 import adams.gui.visualization.container.ContainerModel;
 
 /**
- * A model for displaying the currently loaded spectrums.
+ * A model for displaying the currently loaded spectra.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 1286 $

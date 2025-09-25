@@ -93,7 +93,7 @@ public class SpectrumContainer
 
   /**
    * Returns an ID to be used in the GUI (the DB ID with added single quotes
-   * to make it unique among the spectrums in the container manager).
+   * to make it unique among the spectra in the container manager).
    *
    * @return		a short ID for the GUI
    */
@@ -130,7 +130,7 @@ public class SpectrumContainer
   }
 
   /**
-   * Sets the spectrums visibility.
+   * Sets the spectra visibility.
    *
    * @param value	if true then the spectrum will be visible
    */

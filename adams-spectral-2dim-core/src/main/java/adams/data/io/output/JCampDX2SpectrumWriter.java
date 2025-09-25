@@ -37,7 +37,7 @@ import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
- * Writer that stores spectrums in the simple CSV format.
+ * Writer that stores spectra in the simple CSV format.
  * <br><br>
  <!-- globalinfo-end -->
  *
@@ -84,7 +84,7 @@ public class JCampDX2SpectrumWriter
    */
   @Override
   public String globalInfo() {
-    return "Writer that stores spectrums in the simple CSV format.";
+    return "Writer that stores spectra in the simple CSV format.";
   }
 
   /**

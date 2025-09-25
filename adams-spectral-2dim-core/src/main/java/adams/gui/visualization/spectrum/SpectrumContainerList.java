@@ -24,7 +24,7 @@ import adams.gui.visualization.container.AbstractContainerList;
 import adams.gui.visualization.container.ContainerTable;
 
 /**
- * A class encapsulating containers tailored for spectrums.
+ * A class encapsulating containers tailored for spectra.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
  * @version $Revision: 2001 $

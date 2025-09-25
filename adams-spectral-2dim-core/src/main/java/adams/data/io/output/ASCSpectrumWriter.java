@@ -37,7 +37,7 @@ import java.util.Locale;
 
 /**
 <!-- globalinfo-start -->
-* Writer that stores spectrums in the BLGG ASC format.
+* Writer that stores spectra in the BLGG ASC format.
 * <br><br>
 <!-- globalinfo-end -->
 *
@@ -439,7 +439,7 @@ public class ASCSpectrumWriter
    */
   @Override
   public String globalInfo() {
-    return "Writer that stores spectrums in the BLGG ASC format.";
+    return "Writer that stores spectra in the BLGG ASC format.";
   }
 
 

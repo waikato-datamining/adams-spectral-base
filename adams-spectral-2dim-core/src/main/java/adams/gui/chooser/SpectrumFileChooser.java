@@ -32,7 +32,7 @@ import java.io.File;
 
 /**
  * A specialized JFileChooser that lists all available file Readers and Writers
- * for spectrums.
+ * for spectra.
  * <br><br>
  * Based on <code>weka.gui.ConverterFileChooser</code>
  *

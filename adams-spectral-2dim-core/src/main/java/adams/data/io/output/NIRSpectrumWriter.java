@@ -45,7 +45,7 @@ import java.util.TimeZone;
 
 /**
 <!-- globalinfo-start -->
-* Writer that stores spectrums in the FOSS .nir Format.
+* Writer that stores spectra in the FOSS .nir Format.
 * <br><br>
 <!-- globalinfo-end -->
  *
@@ -757,7 +757,7 @@ public class NIRSpectrumWriter
    */
   @Override
   public String globalInfo() {
-    return "Writer that stores spectrums in the FOSS .nir Format.";
+    return "Writer that stores spectra in the FOSS .nir Format.";
   }
 
 
