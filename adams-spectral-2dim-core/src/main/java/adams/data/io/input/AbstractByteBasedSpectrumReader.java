@@ -34,7 +34,7 @@ import java.util.List;
  */
 public abstract class AbstractByteBasedSpectrumReader
   extends AbstractSpectrumReader
-  implements StreamableDataContainerReader<Spectrum> {
+  implements StreamableBinaryDataContainerReader<Spectrum> {
 
   private static final long serialVersionUID = -6607630529928750008L;
 
@@ -77,7 +77,7 @@ public abstract class AbstractByteBasedSpectrumReader
       getLogger().severe("Failed to read binary data from stream!");
       return null;
     }
-    readData();
+    readData(data);
     result = new ArrayList<>(m_ReadData);
     m_ReadData.clear();
     return result;
