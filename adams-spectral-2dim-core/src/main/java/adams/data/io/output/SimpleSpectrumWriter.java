@@ -59,7 +59,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public class SimpleSpectrumWriter
   extends AbstractSpectrumWriter 
-  implements CompressionSupporter<Spectrum>, StreamableDataContainerWriter<Spectrum> {
+  implements CompressionSupporter<Spectrum>, StreamableTextBasedDataContainerWriter<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = 5290679698357490093L;

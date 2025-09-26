@@ -63,7 +63,7 @@ import java.util.logging.Level;
  */
 public class ASCSpectrumReader
   extends AbstractTextBasedSpectrumReader
-  implements LocaleSupporter, StreamableDataContainerReader<Spectrum> {
+  implements LocaleSupporter, StreamableTextBasedDataContainerReader<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = -27209265703137172L;

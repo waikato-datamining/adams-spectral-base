@@ -110,7 +110,7 @@ import java.util.logging.Level;
  */
 public class JCampDX2SpectrumReader
   extends AbstractTextBasedSpectrumReader
-  implements StreamableDataContainerReader<Spectrum> {
+  implements StreamableTextBasedDataContainerReader<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = 3095955240781741734L;

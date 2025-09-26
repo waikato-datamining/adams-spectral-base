@@ -40,7 +40,7 @@ import java.util.logging.Level;
  */
 public abstract class AbstractTextBasedSpectrumWriter
   extends AbstractSpectrumWriter
-  implements StreamableDataContainerWriter<Spectrum> {
+  implements StreamableTextBasedDataContainerWriter<Spectrum> {
 
   private static final long serialVersionUID = -6803837346254765883L;
 

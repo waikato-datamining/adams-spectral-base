@@ -65,7 +65,7 @@ import java.util.zip.GZIPInputStream;
  */
 public class SimpleSpectrumReader
   extends AbstractSpectrumReader
-  implements StreamableDataContainerReader<Spectrum> {
+  implements StreamableTextBasedDataContainerReader<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = -2903357410192470809L;

@@ -34,7 +34,7 @@ import java.util.List;
  */
 public abstract class AbstractTextBasedSpectrumReader
   extends AbstractSpectrumReader
-  implements StreamableDataContainerReader<Spectrum> {
+  implements StreamableTextBasedDataContainerReader<Spectrum> {
 
   private static final long serialVersionUID = -6607630529928750008L;
 

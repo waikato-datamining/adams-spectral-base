@@ -159,7 +159,7 @@ import java.util.logging.Level;
  */
 public class NIRSpectrumWriter
   extends AbstractSpectrumWriter
-  implements StreamableDataContainerWriter<Spectrum> {
+  implements StreamableBinaryDataContainerWriter<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = -95463122424931621L;
