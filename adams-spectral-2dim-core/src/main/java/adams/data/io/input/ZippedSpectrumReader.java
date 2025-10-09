@@ -35,7 +35,9 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -132,7 +134,8 @@ public class ZippedSpectrumReader
    */
   @Override
   public String globalInfo() {
-    return "Reads spectra from the zip file using the specified base reader.";
+    return "Reads spectra from the zip file using the specified base reader.\n"
+      + "If a .txt file with the same name is present, it is interpreted as a list of sample IDs to ignore.";
   }
 
   /**
@@ -314,8 +317,9 @@ public class ZippedSpectrumReader
    *
    * @param archive	the archive to read from
    * @param entry 	the entry to read
+   * @param ignored 	the sample IDs to ignore
    */
-  protected void readDataFromFile(ZipFile archive, ZipArchiveEntry entry) {
+  protected void readDataFromFile(ZipFile archive, ZipArchiveEntry entry, Set<String> ignored) {
     File 			outFile;
     byte[]			buffer;
     BufferedInputStream		in;
@@ -359,8 +363,13 @@ public class ZippedSpectrumReader
     reader = ObjectCopyHelper.copyObject(m_Reader);
     reader.setInput(new PlaceholderFile(outFile));
     sublist = reader.read();
-    if (sublist != null)
-      m_ReadData.addAll(sublist);
+    if (sublist != null) {
+      for (Spectrum sp: sublist) {
+	if (ignored.contains(sp.getID()))
+	  continue;
+	m_ReadData.add(sp);
+      }
+    }
     reader.cleanUp();
 
     // delete file again
@@ -373,8 +382,9 @@ public class ZippedSpectrumReader
    *
    * @param archive	the archive to read from
    * @param entry 	the entry to read
+   * @param ignored 	the sample IDs to ignore
    */
-  protected void readDataFromStream(ZipFile archive, ZipArchiveEntry entry) {
+  protected void readDataFromStream(ZipFile archive, ZipArchiveEntry entry, Set<String> ignored) {
     BufferedInputStream		in;
     AbstractSpectrumReader	reader;
     List<Spectrum>		sublist;
@@ -396,8 +406,13 @@ public class ZippedSpectrumReader
     reader.cleanUp();
 
     // read file
-    if (sublist != null)
-      m_ReadData.addAll(sublist);
+    if (sublist != null) {
+      for (Spectrum sp: sublist) {
+	if (ignored.contains(sp.getID()))
+	  continue;
+	m_ReadData.add(sp);
+      }
+    }
   }
 
   /**
@@ -408,8 +423,20 @@ public class ZippedSpectrumReader
     ZipFile				archive;
     Enumeration<ZipArchiveEntry> 	enm;
     ZipArchiveEntry			entry;
+    Set<String>				ignored;
+    File				ignoredFile;
+    List<String>			lines;
 
     m_ReadData.clear();
+
+    // any sample IDs to ignore?
+    ignored     = new HashSet<>();
+    ignoredFile = FileUtils.replaceExtension(m_Input, ".txt");
+    if (ignoredFile.exists()) {
+      lines = FileUtils.loadFromFile(ignoredFile);
+      if (lines != null)
+	ignored.addAll(lines);
+    }
 
     try {
       archive = ZipFile.builder().setFile(m_Input.getAbsoluteFile()).get();
@@ -432,9 +459,9 @@ public class ZippedSpectrumReader
 	  getLogger().info("Reading: " + entry.getName());
 
 	if (m_Reader instanceof StreamableDataContainerReader)
-	  readDataFromStream(archive, entry);
+	  readDataFromStream(archive, entry, ignored);
 	else
-	  readDataFromFile(archive, entry);
+	  readDataFromFile(archive, entry, ignored);
       }
     }
     catch (Exception e) {
