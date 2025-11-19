@@ -15,7 +15,7 @@
 
 /*
  * MinMax.java
- * Copyright (C) 2008-2013 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumoutlier;
@@ -64,7 +64,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  Dale (dale at cs dot waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class MinMax
   extends AbstractOutlierDetector<DataContainer> {
@@ -72,14 +71,20 @@ public class MinMax
   /** for serialization. */
   private static final long serialVersionUID = 8061387654170301948L;
 
-  /** the quant field.*/
-  protected Field m_field;
+  /** the report field.*/
+  protected Field m_Field;
 
   /** min. */
-  protected double m_min;
+  protected double m_Min;
+
+  /** whether to check the lower bound. */
+  protected boolean m_CheckMin;
 
   /** max. */
-  protected double m_max;
+  protected double m_Max;
+
+  /** whether to check the upper bound. */
+  protected boolean m_CheckMax;
 
   /**
    * Returns a string describing the object.
@@ -99,16 +104,53 @@ public class MinMax
     super.defineOptions();
 
     m_OptionManager.add(
-	    "min", "min",
-	    25.0);
+      "field", "field",
+      new Field("CAN1", DataType.NUMERIC));
 
     m_OptionManager.add(
-	    "max", "max",
-	    40.0);
+      "min", "min",
+      25.0);
 
     m_OptionManager.add(
-	    "field", "field",
-	    new Field("CAN1", DataType.NUMERIC));
+      "check-min", "checkMin",
+      true);
+
+    m_OptionManager.add(
+      "max", "max",
+      40.0);
+
+    m_OptionManager.add(
+      "check-max", "checkMax",
+      true);
+  }
+
+  /**
+   * Sets the field.
+   *
+   * @param value	the field
+   */
+  public void setField(Field value) {
+    m_Field = value;
+    reset();
+  }
+
+  /**
+   * Returns the field.
+   *
+   * @return 		the field
+   */
+  public Field getField() {
+    return m_Field;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return         tip text for this property suitable for
+   *             displaying in the GUI or for listing the options.
+   */
+  public String fieldTipText() {
+    return "Field in report.";
   }
 
   /**
@@ -117,7 +159,7 @@ public class MinMax
    * @param value	min
    */
   public void setMin(double value) {
-    m_min = value;
+    m_Min = value;
     reset();
   }
 
@@ -127,7 +169,7 @@ public class MinMax
    * @return 		the minimum
    */
   public double getMin() {
-    return m_min;
+    return m_Min;
   }
 
   /**
@@ -141,12 +183,41 @@ public class MinMax
   }
 
   /**
+   * Sets whether to check the lower bound.
+   *
+   * @param value	true if to check
+   */
+  public void setCheckMin(boolean value) {
+    m_CheckMin = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to check the lower bound.
+   *
+   * @return 		true if to check
+   */
+  public boolean getCheckMin() {
+    return m_CheckMin;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return         tip text for this property suitable for
+   *             displaying in the GUI or for listing the options.
+   */
+  public String checkMinTipText() {
+    return "If enabled, the lower bound (= min) will be checked.";
+  }
+
+  /**
    * Sets the max.
    *
    * @param value	min
    */
   public void setMax(double value) {
-    m_max = value;
+    m_Max = value;
     reset();
   }
 
@@ -156,7 +227,7 @@ public class MinMax
    * @return 		the max
    */
   public double getMax() {
-    return m_max;
+    return m_Max;
   }
 
   /**
@@ -170,22 +241,22 @@ public class MinMax
   }
 
   /**
-   * Sets the field.
+   * Sets whether to check the upper bound.
    *
-   * @param value	the field
+   * @param value	true if to check
    */
-  public void setField(Field value) {
-    m_field = value;
+  public void setCheckMax(boolean value) {
+    m_CheckMax = value;
     reset();
   }
 
   /**
-   * Returns the field.
+   * Returns whether to check the upper bound.
    *
-   * @return 		the field
+   * @return 		true if to check
    */
-  public Field getField() {
-    return m_field;
+  public boolean getCheckMax() {
+    return m_CheckMax;
   }
 
   /**
@@ -194,8 +265,8 @@ public class MinMax
    * @return         tip text for this property suitable for
    *             displaying in the GUI or for listing the options.
    */
-  public String fieldTipText() {
-    return "Field in report.";
+  public String checkMaxTipText() {
+    return "If enabled, the upper bound (= max) will be checked.";
   }
 
   /**
@@ -211,7 +282,7 @@ public class MinMax
     Report 		report;
     Double 		value;
 
-    result = new ArrayList<String>();
+    result = new ArrayList<>();
     msg    = "";
     report = null;
     if (data instanceof ReportHandler)
@@ -222,19 +293,23 @@ public class MinMax
       result.add(msg);
     }
     else {
-      value = report.getDoubleValue(m_field);
+      value = report.getDoubleValue(m_Field);
       if (value == null) {
-	msg = "Field '" + m_field + "' not found";
+	msg = "Field '" + m_Field + "' not found";
 	result.add(msg);
       }
       else {
-	if (value < m_min ) {
-	  msg = m_field + " too small (< " + m_min + ") : " + value;
-	  result.add(msg);
+	if (m_CheckMin) {
+	  if (value < m_Min) {
+	    msg = m_Field + " too small (< " + m_Min + ") : " + value;
+	    result.add(msg);
+	  }
 	}
-	else if (value > m_max) {
-	  msg = m_field + " too big (> " + m_max + "): " + value;
-	  result.add(msg);
+	if (m_CheckMax) {
+	  if (value > m_Max) {
+	    msg = m_Field + " too big (> " + m_Max + "): " + value;
+	    result.add(msg);
+	  }
 	}
       }
     }

@@ -13,10 +13,11 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * MinMaxTest.java
- * Copyright (C) 2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2010-2025 University of Waikato, Hamilton, New Zealand
  */
+
 package adams.data.spectrumoutlier;
 
 import adams.data.outlier.AbstractOutlierDetector;
@@ -28,8 +29,7 @@ import junit.framework.TestSuite;
  * Test class for the MinMax outlier detector. Run from the command line with: <br><br>
  * java adams.data.spectrumoutlier.MinMaxTest
  *
- * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
+ * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class MinMaxTest
   extends AbstractSpectrumOutlierDetectorTestCase {
@@ -37,7 +37,7 @@ public class MinMaxTest
   /**
    * Constructs the test case. Called by subclasses.
    *
-   * @param name 	the name of the test
+   * @param name the name of the test
    */
   public MinMaxTest(String name) {
     super(name);
@@ -47,24 +47,26 @@ public class MinMaxTest
    * Returns the filenames (without path) of the input data files to use
    * in the regression test.
    *
-   * @return		the filenames
+   * @return the filenames
    */
   protected String[] getRegressionInputFiles() {
     return new String[]{
-	"872280-nir.spec",
-	"872280-nir.spec"
+      "872280-nir.spec",
+      "872280-nir.spec",
+      "872280-nir.spec",
+      "872280-nir.spec",
     };
   }
 
   /**
    * Returns the setups to use in the regression test.
    *
-   * @return		the setups
+   * @return the setups
    */
   protected AbstractOutlierDetector[] getRegressionSetups() {
-    MinMax[]	result;
+    MinMax[] result;
 
-    result = new MinMax[2];
+    result = new MinMax[4];
 
     result[0] = new MinMax();
 
@@ -72,13 +74,19 @@ public class MinMaxTest
     result[1].setMin(0.0);
     result[1].setMax(100);
 
+    result[2] = new MinMax();
+    result[2].setCheckMin(false);
+
+    result[3] = new MinMax();
+    result[3].setCheckMax(false);
+
     return result;
   }
 
   /**
    * Returns the test suite.
    *
-   * @return		the suite
+   * @return the suite
    */
   public static Test suite() {
     return new TestSuite(MinMaxTest.class);
@@ -87,7 +95,7 @@ public class MinMaxTest
   /**
    * Runs the test from commandline.
    *
-   * @param args	ignored
+   * @param args ignored
    */
   public static void main(String[] args) {
     Environment.setEnvironmentClass(Environment.class);
