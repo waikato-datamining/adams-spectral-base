@@ -15,11 +15,12 @@
 
 /*
  * WekaFilter.java
- * Copyright (C) 2011-2020 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.postprocessor.instances;
 
 import adams.core.ObjectCopyHelper;
+import adams.core.QuickInfoHelper;
 import adams.core.Utils;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -174,6 +175,21 @@ public class WekaFilter
    */
   public String wrapTipText() {
     return "Whether to wrap the filter in a " + Utils.classToString(SpectrumFilter.class) + ".";
+  }
+
+  /**
+   * Returns a quick info about the actor, which will be displayed in the GUI.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    String	result;
+
+    result = QuickInfoHelper.toString(this, "filter", m_Filter);
+    result += QuickInfoHelper.toString(this, "wrap", m_Wrap, "wrap", ", ");
+
+    return result;
   }
 
   /**

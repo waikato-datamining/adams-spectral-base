@@ -22,6 +22,7 @@ package adams.data.postprocessor.instances;
 
 import adams.core.ClassLister;
 import adams.core.CleanUpHandler;
+import adams.core.QuickInfoSupporter;
 import adams.core.option.AbstractOptionConsumer;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.ArrayConsumer;
@@ -40,7 +41,7 @@ import weka.core.Instances;
  */
 public abstract class AbstractPostProcessor
   extends AbstractOptionHandler
-  implements Comparable, CleanUpHandler, FlowContextHandler {
+  implements Comparable, CleanUpHandler, FlowContextHandler, QuickInfoSupporter {
 
   /** for serialization. */
   private static final long serialVersionUID = -582592424411578426L;
@@ -64,6 +65,18 @@ public abstract class AbstractPostProcessor
    */
   public Actor getFlowContext() {
     return m_FlowContext;
+  }
+
+  /**
+   * Returns a quick info about the object, which can be displayed in the GUI.
+   * <br>
+   * Default implementation returns null.
+   *
+   * @return		null if no info available, otherwise short string
+   */
+  @Override
+  public String getQuickInfo() {
+    return null;
   }
 
   /**
