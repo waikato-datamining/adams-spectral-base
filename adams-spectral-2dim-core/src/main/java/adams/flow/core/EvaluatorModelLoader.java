@@ -15,12 +15,14 @@
 
 /*
  * EvaluatorModelLoader.java
- * Copyright (C) 2017 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2017-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.flow.core;
 
+import adams.core.LenientModeSupporter;
 import adams.core.MessageCollection;
+import adams.core.SerializableObject;
 import adams.core.Utils;
 import adams.data.evaluator.instance.AbstractEvaluator;
 import adams.data.io.input.SerializableObjectReader;
@@ -33,9 +35,13 @@ import adams.flow.container.EvaluationContainer;
  * @author FracPete (fracpete at waikato dot ac dot nz)
  */
 public class EvaluatorModelLoader
-  extends AbstractModelLoader<AbstractEvaluator> {
+  extends AbstractModelLoader<AbstractEvaluator>
+  implements LenientModeSupporter {
 
   private static final long serialVersionUID = -2495972217256957904L;
+
+  /** whether to be lenient. */
+  protected boolean m_Lenient;
 
   /**
    * Returns a string describing the object.
@@ -45,6 +51,50 @@ public class EvaluatorModelLoader
   @Override
   public String globalInfo() {
     return "Manages " + Utils.classToString(AbstractEvaluator.class) + " objects.";
+  }
+
+  /**
+   * Adds options to the internal list of options.
+   */
+  public void defineOptions() {
+    super.defineOptions();
+
+    m_OptionManager.add(
+      "lenient", "lenient",
+      false);
+  }
+
+  /**
+   * Sets whether lenient, ie first tries to load the object as {@link SerializableObject}
+   * and if that fails just deserializes it.
+   *
+   * @param value	true if lenient
+   */
+  public void setLenient(boolean value) {
+    m_Lenient = value;
+    reset();
+  }
+
+  /**
+   * Returns whether lenient, ie first tries to load the object as {@link SerializableObject}
+   * and if that fails just deserializes it.
+   *
+   * @return		true if lenient
+   */
+  public boolean getLenient() {
+    return m_Lenient;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String lenientTipText() {
+    return "If enabled, first tries to load the object as "
+	     + Utils.classToString(SerializableObject.class) +
+	     " and if that fails just deserializes it.";
   }
 
   /**
@@ -58,6 +108,7 @@ public class EvaluatorModelLoader
     SerializableObjectReader	reader;
 
     reader = new SerializableObjectReader();
+    reader.setLenient(m_Lenient);
     return reader.read(m_ModelFile);
   }
 
