@@ -15,7 +15,7 @@
 
 /*
  * SubRange.java
- * Copyright (C) 2009-2010 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -56,7 +56,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SubRange
   extends AbstractFilter<Spectrum> {
@@ -215,11 +214,11 @@ public class SubRange
     for (SpectrumPoint p: points) {
       if (m_Invert) {
 	if ((p.getWaveNumber() < min) || (p.getWaveNumber() > max))
-	  result.add((SpectrumPoint) p.getClone());
+	  result.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
       }
       else {
 	if ((p.getWaveNumber() >= min) && (p.getWaveNumber() <= max))
-	  result.add((SpectrumPoint) p.getClone());
+	  result.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
       }
     }
 
