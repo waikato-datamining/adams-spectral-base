@@ -648,7 +648,7 @@ public abstract class SpectrumT
     if (!newConnection || useSameConnection) {
       if (!autoCommit) {
 	try {
-	  connection = getDatabaseConnection().getConnection(false);
+	  connection = getConnection(false);
 	  connection.setAutoCommit(false);
 	}
 	catch (Exception e) {
@@ -659,7 +659,7 @@ public abstract class SpectrumT
 
     if (connection == null) {
       getLogger().warning("Falling back on default connection: " + getDatabaseConnection());
-      connection = getDatabaseConnection().getConnection(false);
+      connection = getConnection(false);
     }
 
     if (connection == null) {
@@ -736,7 +736,7 @@ public abstract class SpectrumT
 
     if (!autoCommit && useSameConnection) {
       try {
-	getDatabaseConnection().getConnection(false).setAutoCommit(true);
+	getConnection(false).setAutoCommit(true);
       }
       catch (Exception e) {
 	getLogger().log(Level.WARNING, "Failed to turn on auto-commit!", e);
