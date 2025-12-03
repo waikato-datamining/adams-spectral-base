@@ -390,7 +390,6 @@ public class CrossValidatedPrediction
       m_ActualSearch,
       m_Header,
       m_ClassStats,
-      m_MissingEvaluation,
     };
   }
 
@@ -405,10 +404,6 @@ public class CrossValidatedPrediction
     m_ActualSearch = (NearestNeighbourSearch) value[0];
     m_Header       = (Instances) value[1];
     m_ClassStats   = (AttributeStats) value[2];
-    if (value.length > 3)
-      m_MissingEvaluation = (float) value[3];
-    else
-      getLogger().warning("'missingEvaluation' value not stored, using default!");
   }
 
   /**

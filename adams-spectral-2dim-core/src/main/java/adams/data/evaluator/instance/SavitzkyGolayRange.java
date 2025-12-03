@@ -605,7 +605,6 @@ public class SavitzkyGolayRange
       m_ActualClassifierFirst,
       m_ActualClassifierSecond,
       m_Normalize,
-      m_MissingEvaluation,
     };
   }
 
@@ -626,10 +625,6 @@ public class SavitzkyGolayRange
       m_Normalize = (Boolean) value[5];
     else
       getLogger().warning("'normalize' flag missing from serialization setup, using default!");
-    if (value.length > 6)
-      m_MissingEvaluation = (float) value[6];
-    else
-      getLogger().warning("'missingEvaluation' value not stored, using default!");
   }
 
   /**
