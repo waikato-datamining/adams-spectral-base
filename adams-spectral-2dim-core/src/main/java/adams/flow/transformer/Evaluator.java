@@ -166,7 +166,7 @@ import java.util.Map;
  * </pre>
  *
  * <pre>-clean-after-build &lt;boolean&gt; (property: cleanAfterBuild)
- * &nbsp;&nbsp;&nbsp;If enabled, the internnaly built evaluator gets discarded again.
+ * &nbsp;&nbsp;&nbsp;If enabled, the internally built evaluator gets discarded again.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
  *
@@ -731,7 +731,7 @@ public class Evaluator
    * 			displaying in the GUI or for listing the options.
    */
   public String cleanAfterBuildTipText() {
-    return "If enabled, the internnaly built evaluator gets discarded again.";
+    return "If enabled, the internally built evaluator gets discarded again.";
   }
 
   /**
