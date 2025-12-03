@@ -15,7 +15,7 @@
 
 /*
  * AbstractMultiSpectrumFilter.java
- * Copyright (C) 2014 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.multifilter;
@@ -28,6 +28,7 @@ import adams.core.option.AbstractOptionHandler;
 import adams.core.option.ArrayConsumer;
 import adams.core.option.OptionUtils;
 import adams.data.NotesHandler;
+import adams.data.filter.OptionalProcessingInfoUpdate;
 import adams.data.id.IDHandler;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
@@ -41,18 +42,20 @@ import adams.data.spectrum.Spectrum;
  * the previously generated data.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 7774 $
  */
 public abstract class AbstractMultiSpectrumFilter
   extends AbstractOptionHandler
-  implements Comparable, CleanUpHandler, ShallowCopySupporter<AbstractMultiSpectrumFilter> {
+  implements Comparable, CleanUpHandler, ShallowCopySupporter<AbstractMultiSpectrumFilter>, OptionalProcessingInfoUpdate {
 
   /** for serialization. */
   private static final long serialVersionUID = 3610605513320220903L;
 
   /** whether to suppress updating of ID. */
   protected boolean m_DontUpdateID;
-  
+
+  /** whether to suppress updating of processing information. */
+  protected boolean m_DontUpdateProcessingInfo;
+
   /**
    * Adds options to the internal list of options.
    */
@@ -61,8 +64,12 @@ public abstract class AbstractMultiSpectrumFilter
     super.defineOptions();
 
     m_OptionManager.add(
-	"no-id-update", "dontUpdateID",
-	false);
+      "no-id-update", "dontUpdateID",
+      false);
+
+    m_OptionManager.add(
+      "no-processing-info-update", "dontUpdateProcessingInfo",
+      false);
   }
 
   /**
@@ -92,6 +99,38 @@ public abstract class AbstractMultiSpectrumFilter
    */
   public String dontUpdateIDTipText() {
     return "If enabled, suppresses updating the ID of " + IDHandler.class.getName() + " data containers.";
+  }
+
+  /**
+   * Sets whether processing information update is suppressed.
+   *
+   * @param value 	true if to suppress
+   */
+  @Override
+  public void setDontUpdateProcessingInfo(boolean value) {
+    m_DontUpdateProcessingInfo = value;
+    reset();
+  }
+
+  /**
+   * Returns whether processing information update is suppressed.
+   *
+   * @return 		true if suppressed
+   */
+  @Override
+  public boolean getDontUpdateProcessingInfo() {
+    return m_DontUpdateProcessingInfo;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String dontUpdateProcessingInfoTipText() {
+    return "If enabled, suppresses updating the processing information of " + NotesHandler.class.getName() + " data containers.";
   }
 
   /**
@@ -135,12 +174,10 @@ public abstract class AbstractMultiSpectrumFilter
     checkData(data);
     result = processData(data);
 
-    if (!m_DontUpdateID) {
-      if (result instanceof IDHandler)
-	result.setID(result.getID() + "'");
-    }
+    if (!m_DontUpdateID)
+      result.setID(result.getID() + "'");
 
-    if (result instanceof NotesHandler)
+    if (!m_DontUpdateProcessingInfo)
       ((NotesHandler) result).getNotes().addProcessInformation(this);
 
     return result;
