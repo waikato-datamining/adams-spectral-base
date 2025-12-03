@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * SavitzkyGolayRange.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.evaluator.instance;
 
@@ -47,68 +47,67 @@ import weka.filters.unsupervised.attribute.SavitzkyGolay;
  * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
  * &nbsp;&nbsp;&nbsp;default: WARNING
  * </pre>
- * 
+ *
  * <pre>-missing-evaluation &lt;float&gt; (property: missingEvaluation)
  * &nbsp;&nbsp;&nbsp;The value to use as replacement for missing evaluations.
  * &nbsp;&nbsp;&nbsp;default: NaN
  * </pre>
- * 
+ *
  * <pre>-serialization-file &lt;adams.core.io.PlaceholderFile&gt; (property: serializationFile)
  * &nbsp;&nbsp;&nbsp;The file to serialize the generated internal model to.
  * &nbsp;&nbsp;&nbsp;default: ${CWD}
  * </pre>
- * 
+ *
  * <pre>-override-serialized-file &lt;boolean&gt; (property: overrideSerializedFile)
  * &nbsp;&nbsp;&nbsp;If set to true, then any serialized file will be ignored and the setup for 
  * &nbsp;&nbsp;&nbsp;serialization will be regenerated.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  * <pre>-classifier-none &lt;weka.classifiers.Classifier&gt; (property: classifierNone)
  * &nbsp;&nbsp;&nbsp;The classifier to be used in conjunction with Savitzky-Golay filter with 
  * &nbsp;&nbsp;&nbsp;no derivative.
  * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.GPD -G 0.01 -L 0.01 -N 0
  * </pre>
- * 
+ *
  * <pre>-window-size-none &lt;int&gt; (property: windowSizeNone)
  * &nbsp;&nbsp;&nbsp;The window size for the Savitzky-Golay filter with no derivative.
  * &nbsp;&nbsp;&nbsp;default: 7
  * &nbsp;&nbsp;&nbsp;minimum: 3
  * </pre>
- * 
+ *
  * <pre>-classifier-first &lt;weka.classifiers.Classifier&gt; (property: classifierFirst)
  * &nbsp;&nbsp;&nbsp;The classifier to be used in conjunction with Savitzky-Golay filter with 
  * &nbsp;&nbsp;&nbsp;first derivative.
  * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.GPD -G 0.01 -L 0.01 -N 0
  * </pre>
- * 
+ *
  * <pre>-window-size-first &lt;int&gt; (property: windowSizeFirst)
  * &nbsp;&nbsp;&nbsp;The window size for the Savitzky-Golay filter with first derivative.
  * &nbsp;&nbsp;&nbsp;default: 7
  * &nbsp;&nbsp;&nbsp;minimum: 3
  * </pre>
- * 
+ *
  * <pre>-classifier-second &lt;weka.classifiers.Classifier&gt; (property: classifierSecond)
  * &nbsp;&nbsp;&nbsp;The classifier to be used in conjunction with Savitzky-Golay filter with 
  * &nbsp;&nbsp;&nbsp;second derivative.
  * &nbsp;&nbsp;&nbsp;default: weka.classifiers.functions.GPD -G 0.01 -L 0.01 -N 0
  * </pre>
- * 
+ *
  * <pre>-window-size-second &lt;int&gt; (property: windowSizeSecond)
  * &nbsp;&nbsp;&nbsp;The window size for the Savitzky-Golay filter with second derivative.
  * &nbsp;&nbsp;&nbsp;default: 7
  * &nbsp;&nbsp;&nbsp;minimum: 3
  * </pre>
- * 
+ *
  * <pre>-normalize &lt;boolean&gt; (property: normalize)
  * &nbsp;&nbsp;&nbsp;If enabled, the predictions get normalized to the range of the class attribute.
  * &nbsp;&nbsp;&nbsp;default: false
  * </pre>
- * 
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class SavitzkyGolayRange
   extends AbstractSerializableEvaluator {
@@ -164,12 +163,12 @@ public class SavitzkyGolayRange
   public String globalInfo() {
     return
       "This evaluator builds three classifiers:\n"
-      + "- on Savitzky-Golay filtered data with no derivative\n"
-      + "- on Savitzky-Golay filtered data with first derivative\n"
-      + "- on Savitzky-Golay filtered data with second derivative\n"
-      + "Each instance under evaluation will be pushed through the three "
-      + "classifiers separately and the range of the three predictions is "
-      + "then output as evaluation result.";
+	+ "- on Savitzky-Golay filtered data with no derivative\n"
+	+ "- on Savitzky-Golay filtered data with first derivative\n"
+	+ "- on Savitzky-Golay filtered data with second derivative\n"
+	+ "Each instance under evaluation will be pushed through the three "
+	+ "classifiers separately and the range of the three predictions is "
+	+ "then output as evaluation result.";
   }
 
   /**
@@ -181,40 +180,39 @@ public class SavitzkyGolayRange
 
     m_OptionManager.add(
       "classifier-none", "classifierNone",
-      getDefaultClassifier(0));
+      getDefaultClassifier());
 
     m_OptionManager.add(
-	"window-size-none", "windowSizeNone",
-	7, 3, null);
+      "window-size-none", "windowSizeNone",
+      7, 3, null);
 
     m_OptionManager.add(
       "classifier-first", "classifierFirst",
-      getDefaultClassifier(0));
+      getDefaultClassifier());
 
     m_OptionManager.add(
-	"window-size-first", "windowSizeFirst",
-	7, 3, null);
+      "window-size-first", "windowSizeFirst",
+      7, 3, null);
 
     m_OptionManager.add(
       "classifier-second", "classifierSecond",
-      getDefaultClassifier(0));
+      getDefaultClassifier());
 
     m_OptionManager.add(
-	"window-size-second", "windowSizeSecond",
-	7, 3, null);
+      "window-size-second", "windowSizeSecond",
+      7, 3, null);
 
     m_OptionManager.add(
-	"normalize", "normalize",
-	false);
+      "normalize", "normalize",
+      false);
   }
 
   /**
    * Returns the default classifier for the specified derivative.
    *
-   * @param derivative	the derivative
    * @return		the classifier setup
    */
-  protected Classifier getDefaultClassifier(int derivative) {
+  protected Classifier getDefaultClassifier() {
     GPD result;
 
     result = new GPD();
@@ -456,7 +454,7 @@ public class SavitzkyGolayRange
 
   /**
    * Returns the default value in case of missing evaluations.
-   * 
+   *
    * @return		the default value
    */
   @Override
@@ -606,6 +604,7 @@ public class SavitzkyGolayRange
       m_ActualClassifierNone,
       m_ActualClassifierFirst,
       m_ActualClassifierSecond,
+      m_Normalize,
     };
   }
 
@@ -622,10 +621,14 @@ public class SavitzkyGolayRange
     m_ActualClassifierNone   = (SpectrumClassifier) value[2];
     m_ActualClassifierFirst  = (SpectrumClassifier) value[3];
     m_ActualClassifierSecond = (SpectrumClassifier) value[4];
+    if (value.length > 5)
+      m_Normalize = (Boolean) value[5];
+    else
+      getLogger().warning("'normalize' flag missing from serialization setup, using default!");
   }
 
   /**
-   * Cleans up data structures, frees up memory.
+   * Cleans up data structures, frees up memo' flag was not stored in serialized setup, using default value!ry.
    */
   @Override
   public void cleanUp() {
