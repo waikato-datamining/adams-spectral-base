@@ -198,31 +198,24 @@ public class SubRange
     Spectrum		result;
     List<SpectrumPoint>	points;
     List<SpectrumPoint>	pointsNew;
-    double		min;
-    double		max;
+    double		wave;
+    boolean		add;
 
     result = data.getHeader();
-
-    if (m_MinWaveNumber == -1)
-      min = data.getMinWaveNumber().getWaveNumber();
-    else
-      min = m_MinWaveNumber;
-    if (m_MaxWaveNumber == -1)
-      max = data.getMaxWaveNumber().getWaveNumber();
-    else
-      max = m_MaxWaveNumber;
 
     points    = data.toList();
     pointsNew = new ArrayList<>();
     for (SpectrumPoint p: points) {
-      if (m_Invert) {
-	if ((p.getWaveNumber() < min) || (p.getWaveNumber() > max))
-	  pointsNew.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
-      }
-      else {
-	if ((p.getWaveNumber() >= min) && (p.getWaveNumber() <= max))
-	  pointsNew.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
-      }
+      wave = p.getWaveNumber();
+      add  = true;
+      if ((m_MinWaveNumber > -1) && (wave < m_MinWaveNumber))
+	add = false;
+      if (add && (m_MaxWaveNumber > -1) && (wave > m_MaxWaveNumber))
+	add = false;
+      if (m_Invert)
+	add = !add;
+      if (add)
+	pointsNew.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
     }
     result.addAll(pointsNew);
 
