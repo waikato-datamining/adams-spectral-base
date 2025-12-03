@@ -15,7 +15,7 @@
 
 /*
  * EnsembleEvaluator.java
- * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.evaluator.instance;
@@ -346,7 +346,8 @@ public class EnsembleEvaluator
     return new Object[]{
       m_ActualClassifiers,
       m_Header,
-      m_Normalize
+      m_Normalize,
+      m_MissingEvaluation,
     };
   }
 
@@ -361,6 +362,10 @@ public class EnsembleEvaluator
     m_ActualClassifiers = (Classifier[]) value[0];
     m_Header            = (Instances) value[1];
     m_Normalize         = (double[]) value[2];
+    if (value.length > 3)
+      m_MissingEvaluation = (float) value[3];
+    else
+      getLogger().warning("'missingEvaluation' value not stored, using default!");
   }
 
   /**

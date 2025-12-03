@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * CrossValidatedPrediction.java
- * Copyright (C) 2016 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.evaluator.instance;
 
@@ -111,7 +111,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 2242 $
  */
 public class CrossValidatedPrediction
   extends AbstractNearestNeighborBasedEvaluator
@@ -391,6 +390,7 @@ public class CrossValidatedPrediction
       m_ActualSearch,
       m_Header,
       m_ClassStats,
+      m_MissingEvaluation,
     };
   }
 
@@ -405,6 +405,10 @@ public class CrossValidatedPrediction
     m_ActualSearch = (NearestNeighbourSearch) value[0];
     m_Header       = (Instances) value[1];
     m_ClassStats   = (AttributeStats) value[2];
+    if (value.length > 3)
+      m_MissingEvaluation = (float) value[3];
+    else
+      getLogger().warning("'missingEvaluation' value not stored, using default!");
   }
 
   /**
@@ -433,7 +437,7 @@ public class CrossValidatedPrediction
    * 			the class value is missing
    */
   protected Float performEvaluate(Instance data) {
-    Float				result;
+    float				result;
     Instances				neighbors;
     int					folds;
     DefaultCrossValidationFoldGenerator generator;

@@ -15,7 +15,7 @@
 
 /*
  * IntervalEstimatorEvaluator.java
- * Copyright (C) 2015-2024 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2015-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.evaluator.instance;
@@ -375,7 +375,8 @@ public class IntervalEstimatorEvaluator
       m_Header,
       m_ConfidenceLevel,
       m_Normalize,
-      m_ClassRange
+      m_ClassRange,
+      m_MissingEvaluation,
     };
   }
 
@@ -392,6 +393,10 @@ public class IntervalEstimatorEvaluator
     m_ConfidenceLevel  = (Double) value[2];
     m_Normalize        = (Boolean) value[3];
     m_ClassRange       = (double[]) value[4];
+    if (value.length > 5)
+      m_MissingEvaluation = (float) value[5];
+    else
+      getLogger().warning("'missingEvaluation' value not stored, using default!");
   }
 
   /**

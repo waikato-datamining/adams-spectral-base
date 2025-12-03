@@ -15,7 +15,7 @@
 
 /*
  * CrossValidatedNeighborHood.java
- * Copyright (C) 2016-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2016-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.evaluator.instance;
 
@@ -354,6 +354,7 @@ public class CrossValidatedNeighborHood
     return new Object[]{
       m_ActualSearch,
       m_Header,
+      m_MissingEvaluation,
     };
   }
 
@@ -367,6 +368,10 @@ public class CrossValidatedNeighborHood
   public void setSerializationSetup(Object[] value) {
     m_ActualSearch = (NearestNeighbourSearch) value[0];
     m_Header       = (Instances) value[1];
+    if (value.length > 2)
+      m_MissingEvaluation = (float) value[2];
+    else
+      getLogger().warning("'missingEvaluation' value not stored, using default!");
   }
 
   /**

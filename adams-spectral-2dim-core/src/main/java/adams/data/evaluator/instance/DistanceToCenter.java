@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * DistanceToCenter.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.evaluator.instance;
@@ -80,7 +80,6 @@ import java.util.logging.Level;
  <!-- options-end -->
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class DistanceToCenter
   extends AbstractNearestNeighborBasedEvaluator {
@@ -237,6 +236,7 @@ public class DistanceToCenter
       m_ActualSearch,
       m_Header,
       m_ActualFilter,
+      m_MissingEvaluation,
     };
   }
 
@@ -251,6 +251,10 @@ public class DistanceToCenter
     m_ActualSearch = (NearestNeighbourSearch) value[0];
     m_Header       = (Instances) value[1];
     m_ActualFilter = (Filter) value[2];
+    if (value.length > 3)
+      m_MissingEvaluation = (float) value[3];
+    else
+      getLogger().warning("'missingEvaluation' value not stored, using default!");
   }
 
   /**
@@ -270,15 +274,13 @@ public class DistanceToCenter
    * 			the class value is missing
    */
   protected Float performEvaluate(Instance data) {
-    Float			result;
+    float			result;
     Instances			neighbors;
     Instance			center;
     Instances			centerDataset;
     int				i;
     double[]			values;
     DistanceFunction		distance;
-
-    result = m_MissingEvaluation;
 
     try {
       // filter instance
