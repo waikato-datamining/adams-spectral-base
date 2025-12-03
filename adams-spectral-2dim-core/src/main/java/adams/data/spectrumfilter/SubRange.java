@@ -24,6 +24,7 @@ import adams.data.filter.AbstractFilter;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -196,6 +197,7 @@ public class SubRange
   protected Spectrum processData(Spectrum data) {
     Spectrum		result;
     List<SpectrumPoint>	points;
+    List<SpectrumPoint>	pointsNew;
     double		min;
     double		max;
 
@@ -210,17 +212,19 @@ public class SubRange
     else
       max = m_MaxWaveNumber;
 
-    points = data.toList();
+    points    = data.toList();
+    pointsNew = new ArrayList<>();
     for (SpectrumPoint p: points) {
       if (m_Invert) {
 	if ((p.getWaveNumber() < min) || (p.getWaveNumber() > max))
-	  result.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
+	  pointsNew.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
       }
       else {
 	if ((p.getWaveNumber() >= min) && (p.getWaveNumber() <= max))
-	  result.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
+	  pointsNew.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
       }
     }
+    result.addAll(pointsNew);
 
     return result;
   }

@@ -15,7 +15,7 @@
 
 /*
  * Rebase.java
- * Copyright (C) 2012-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2012-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -24,6 +24,7 @@ import adams.data.filter.AbstractFilter;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -207,17 +208,19 @@ public class Rebase
   protected Spectrum processData(Spectrum data) {
     Spectrum		result;
     List<SpectrumPoint>	points;
+    List<SpectrumPoint> pointsNew;
     int			i;
     float		diff;
     SpectrumPoint	point;
 
-    result = data.getHeader();
-    points = data.toList();
-    if (points.size() > 0) {
+    result    = data.getHeader();
+    points    = data.toList();
+    pointsNew = new ArrayList<>();
+    if (!points.isEmpty()) {
       if (m_UpdateWaveNumbers) {
 	for (i = 0; i < points.size(); i++) {
 	  point = points.get(i);
-	  result.add(
+	  pointsNew.add(
 	    new SpectrumPoint(
 	      m_Start + i * m_WaveStep,
 	      point.getAmplitude()));
@@ -229,13 +232,14 @@ public class Rebase
 	  getLogger().info("Difference: " + diff + " (= shifting " + ((diff < 0) ? "left" : "right") + ")");
 	for (i = 0; i < points.size(); i++) {
 	  point = points.get(i);
-	  result.add(
+	  pointsNew.add(
 	    new SpectrumPoint(
 	      point.getWaveNumber() + diff,
 	      point.getAmplitude()));
 	}
       }
     }
+    result.addAll(pointsNew);
 
     return result;
   }
