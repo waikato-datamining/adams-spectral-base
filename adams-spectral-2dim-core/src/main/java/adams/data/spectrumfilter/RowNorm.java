@@ -21,10 +21,11 @@
 package adams.data.spectrumfilter;
 
 import adams.data.filter.AbstractFilter;
-import adams.data.statistics.StatUtils;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.data.statistics.StatUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,18 +77,21 @@ public class RowNorm
   protected Spectrum processData(Spectrum data) {
     Spectrum		result;
     List<SpectrumPoint>	points;
+    List<SpectrumPoint>	pointsNew;
     double[]		x;
     double[]		norm;
     int			i;
 
-    result = data.getHeader();
-    points = data.toList();
-    x      = new double[points.size()];
+    result    = data.getHeader();
+    points    = data.toList();
+    pointsNew = new ArrayList<>();
+    x         = new double[points.size()];
     for (i = 0; i < points.size(); i++)
       x[i] = points.get(i).getAmplitude();
     norm   = StatUtils.rowNorm(x);
     for (i = 0; i < points.size(); i++)
-      result.add(new SpectrumPoint(points.get(i).getWaveNumber(), (float) norm[i]));
+      pointsNew.add(new SpectrumPoint(points.get(i).getWaveNumber(), (float) norm[i]));
+    result.replaceAll(pointsNew, true);
 
     return result;
   }

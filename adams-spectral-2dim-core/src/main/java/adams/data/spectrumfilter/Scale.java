@@ -24,6 +24,7 @@ import adams.data.filter.AbstractFilter;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -160,6 +161,7 @@ public class Scale
   protected Spectrum processData(Spectrum data) {
     Spectrum		result;
     List<SpectrumPoint>	list;
+    List<SpectrumPoint>	listNew;
     double		min;
     double		max;
     double		scale;
@@ -170,7 +172,8 @@ public class Scale
     if (m_MinAmplitude > m_MaxAmplitude)
       throw new IllegalStateException("min amplitude > max amplitude!");
 
-    list = data.toList();
+    list    = data.toList();
+    listNew = new ArrayList<>();
 
     // determine range
     min = Double.MAX_VALUE;
@@ -197,8 +200,9 @@ public class Scale
 	  		(float) ((point.getAmplitude() - min) * scale + m_MinAmplitude));
 
       // add to output
-      result.add(pointNew);
+      listNew.add(pointNew);
     }
+    result.replaceAll(listNew, true);
 
     return result;
   }

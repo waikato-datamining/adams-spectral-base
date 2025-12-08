@@ -217,7 +217,7 @@ public class SubRange
       if (add)
 	pointsNew.add(new SpectrumPoint(p.getWaveNumber(), p.getAmplitude()));
     }
-    result.addAll(pointsNew);
+    result.replaceAll(pointsNew, true);
 
     return result;
   }

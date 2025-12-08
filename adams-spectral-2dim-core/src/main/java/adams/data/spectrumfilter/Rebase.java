@@ -239,7 +239,7 @@ public class Rebase
 	}
       }
     }
-    result.addAll(pointsNew);
+    result.replaceAll(pointsNew, true);
 
     return result;
   }

@@ -15,7 +15,7 @@
 
 /*
  * Remove.java
- * Copyright (C) 2011 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -25,6 +25,7 @@ import adams.data.filter.AbstractFilter;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -176,6 +177,7 @@ public class Remove
   protected Spectrum processData(Spectrum data) {
     Spectrum		result;
     List<SpectrumPoint>	points;
+    List<SpectrumPoint>	pointsNew;
     Range		range;
     int			i;
 
@@ -185,11 +187,13 @@ public class Remove
     range.setInverted(m_Invert);
     range.setMax(data.size());
 
-    points = data.toList();
+    points    = data.toList();
+    pointsNew = new ArrayList<>();
     for (i = 0; i < points.size(); i++) {
       if (!range.isInRange(i))
-	result.add((SpectrumPoint) points.get(i).getClone());
+	pointsNew.add((SpectrumPoint) points.get(i).getClone());
     }
+    result.replaceAll(pointsNew, true);
 
     return result;
   }

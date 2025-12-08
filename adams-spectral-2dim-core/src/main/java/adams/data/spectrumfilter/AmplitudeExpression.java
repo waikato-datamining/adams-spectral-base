@@ -32,6 +32,7 @@ import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.SymbolFactory;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
@@ -306,6 +307,7 @@ public class AmplitudeExpression
     Spectrum			result;
     String			exp;
     List<SpectrumPoint>		points;
+    List<SpectrumPoint>		pointsNew;
     int				i;
     HashMap 			symbols;
     SymbolFactory 		sf;
@@ -318,8 +320,9 @@ public class AmplitudeExpression
     exp = m_Expression.getValue();
     exp = getOptionManager().getVariables().expand(exp);
     try {
-      points = data.toList();
-      symbols = new HashMap();
+      points    = data.toList();
+      pointsNew = new ArrayList<>();
+      symbols   = new HashMap();
       symbols.put(PLACEHOLDER_SIZE, (double) data.size());
       sf          = new ComplexSymbolFactory();
       parserInput = new ByteArrayInputStream(exp.getBytes());
@@ -333,8 +336,9 @@ public class AmplitudeExpression
 	parser.parse();
 	newAmp = parser.getResult();
 	if (newAmp != null)
-	  result.add(new SpectrumPoint(points.get(i).getWaveNumber(), newAmp.floatValue()));
+	  pointsNew.add(new SpectrumPoint(points.get(i).getWaveNumber(), newAmp.floatValue()));
       }
+      result.replaceAll(pointsNew, true);
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to apply expression: " + exp);
