@@ -124,6 +124,10 @@ adams.db.SpectralDbBackend=\
   adams.db.mirrored,\
   adams.db.mysql
 
+# the spectrum conditions
+adams.db.AbstractSpectrumConditions=\
+  adams.db
+
 # the ID provider panels
 adams.gui.tools.idprovider.AbstractIDProviderPanel=\
   adams.gui.tools.idprovider
