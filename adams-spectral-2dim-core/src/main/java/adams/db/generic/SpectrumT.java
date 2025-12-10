@@ -23,6 +23,7 @@ package adams.db.generic;
 
 import adams.core.Constants;
 import adams.core.Utils;
+import adams.core.base.BaseDouble;
 import adams.core.logging.LoggingHelper;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -31,11 +32,16 @@ import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 import adams.db.AbstractDatabaseConnection;
 import adams.db.AbstractIndexedTable;
+import adams.db.AbstractSpectrumConditions;
 import adams.db.ColumnMapping;
 import adams.db.SQLUtils;
 import adams.db.SampleDataF;
+import adams.db.SpectrumConditionsMulti;
+import adams.db.SpectrumConditionsSingle;
 import adams.db.SpectrumIDConditions;
 import adams.db.SpectrumIntf;
+import adams.db.SpectrumIterator;
+import adams.db.SpectrumUtils;
 import adams.db.TableManager;
 import adams.db.indices.Index;
 import adams.db.indices.IndexColumn;
@@ -47,6 +53,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -183,7 +190,7 @@ public abstract class SpectrumT
    * Load a data container with given auto_id, without passing it through
    * the global filter.
    *
-   * @param auto_id	the databae ID
+   * @param auto_id	the database ID
    * @return 		the data container, or null if not found
    */
   public Spectrum loadRaw(int auto_id) {
@@ -207,56 +214,9 @@ public abstract class SpectrumT
   }
 
   /**
-   * Turns a ResultSet into a spectrum.
-   *
-   * @param rs		the ResultSet to use
-   * @param raw		whether to return the raw spectrum or filter through
-   * 			the global container filter
-   * @return		the spectrum, null in case of an error
-   * @throws Exception	if something goes wrong
-   */
-  protected Spectrum resultsetToSpectrum(ResultSet rs, boolean raw) throws Exception {
-    Spectrum			result;
-    int				auto_id;
-    String[]			points;
-    String[]			point;
-    int				i;
-    SpectrumPoint		sp;
-    ArrayList<SpectrumPoint>	list;
-
-    result = null;
-
-    if ((rs != null) && (rs.next())) {
-      result = new Spectrum();
-      result.setID(rs.getString("SAMPLEID"));
-      auto_id = rs.getInt("AUTO_ID");
-      result.setDatabaseID(auto_id);
-      points = rs.getString("POINTS").split(",");
-      list   = new ArrayList<>(points.length + 1);
-      for (i = 0; i < points.length; i++) {
-        if (points[i].indexOf(':') == -1) {
-	  sp = new SpectrumPoint(i, Float.parseFloat(points[i]));
-	}
-	else {
-	  point = points[i].split(":");
-	  sp = new SpectrumPoint(Float.parseFloat(point[0]), Float.parseFloat(point[1]));
-	}
-        list.add(sp);
-      }
-      result.addAll(list);
-      list.clear();
-      result.setReport(getSampleDataHandler().load(result.getID()));
-      result.setType(rs.getString("SAMPLETYPE"));
-      result.setFormat(rs.getString("FORMAT"));
-    }
-
-    return result;
-  }
-
-  /**
    * Load a spectrum from DB with given auto_id.
    *
-   * @param auto_id	the databae ID
+   * @param auto_id	the database ID
    * @param rlike 	regex for spectrum ID
    * @param raw		whether to return the raw spectrum or filter it
    * 			through the global container filter
@@ -277,7 +237,7 @@ public abstract class SpectrumT
       else
 	rs = select("*", "AUTO_ID=" + auto_id + " AND " + m_Queries.regexp("SAMPLEID", rlike));
 
-      result = resultsetToSpectrum(rs, raw);
+      result = SpectrumUtils.resultsetToSpectrum(rs, getSampleDataHandler());
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to process DB ID " + auto_id, e);
@@ -309,7 +269,7 @@ public abstract class SpectrumT
     rs     = null;
     try {
       rs     = select("*", "SAMPLEID = " + SQLUtils.backquote(sample_id) + " AND FORMAT = " + SQLUtils.backquote(format));
-      result = resultsetToSpectrum(rs, raw);
+      result = SpectrumUtils.resultsetToSpectrum(rs, getSampleDataHandler());
     }
     catch (Exception e) {
       getLogger().log(Level.SEVERE, "Failed to process Sample ID " + sample_id, e);
@@ -900,6 +860,199 @@ public abstract class SpectrumT
       result = SampleDataF.getSingleton(getDatabaseConnection()).remove(sp.getID());
 
     return result;
+  }
+
+  /**
+   * Returns an iterator over the spectra that were identified by the conditions.
+   *
+   * @param conditions		the conditions to use
+   * @param newConnection 	whether to use a separate connection
+   * @return			the iterator, null if failed to instantiate
+   */
+  @Override
+  public SpectrumIterator iterate(AbstractSpectrumConditions conditions, boolean newConnection) {
+    String			select;
+    StringBuilder		sql;
+    List<String>		where;
+    int				i;
+    StringBuilder		tables;
+    boolean			hasInstrument;
+    boolean			hasSampleID;
+    boolean			hasFormat;
+    boolean			hasSampleType;
+    BaseDouble[]		minValues;
+    BaseDouble[]		maxValues;
+    Field[]			fields;
+    Field[]			required;
+    String			sort;
+    Connection 			connection;
+    Statement			stmt;
+    ResultSet			rs;
+    StringBuilder		query;
+
+    where = new ArrayList<>();
+
+    // fix conditions
+    conditions.check();
+    hasInstrument = !conditions.getInstrument().isEmpty() && !conditions.getInstrument().isMatchAll();
+    hasSampleID   = !conditions.getSampleIDRegExp().isEmpty() && !conditions.getSampleIDRegExp().isMatchAll();
+    hasFormat     = !conditions.getFormat().isEmpty() && !conditions.getFormat().isMatchAll();
+    hasSampleType = !conditions.getSampleTypeRegExp().isEmpty() && !conditions.getSampleTypeRegExp().isMatchAll();
+
+    if (conditions instanceof SpectrumConditionsSingle) {
+      minValues = new BaseDouble[]{((SpectrumConditionsSingle) conditions).getMinimumValue()};
+      maxValues = new BaseDouble[]{((SpectrumConditionsSingle) conditions).getMaximumValue()};
+      fields    = new Field[]{((SpectrumConditionsSingle) conditions).getField()};
+      required  = new Field[]{((SpectrumConditionsSingle) conditions).getRequiredField()};
+    }
+    else if (conditions instanceof SpectrumConditionsMulti) {
+      minValues = ((SpectrumConditionsMulti) conditions).getMinimumValues();
+      maxValues = ((SpectrumConditionsMulti) conditions).getMaximumValues();
+      fields    = ((SpectrumConditionsMulti) conditions).getFields();
+      required  = ((SpectrumConditionsMulti) conditions).getRequiredFields();
+    }
+    else {
+      throw new IllegalArgumentException("Unhandled conditions class: " + conditions.getClass().getName());
+    }
+
+    getLogger().severe("Looking for: " + conditions);
+    try {
+      // SELECT
+      select = "AUTO_ID, SAMPLEID, SAMPLETYPE, FORMAT, POINTS";
+
+      // FROM
+      tables = new StringBuilder(getTableName() + " sp");
+      if (conditions.getSortOnInsertTimestamp())
+	tables.append(", ").append(getSampleDataHandler().getTableName()).append(" sd");
+      if (fields.length > 0) {
+	for (i = 0; i < fields.length; i++) {
+	  if (!fields[i].getName().isEmpty())
+	    tables.append(", ").append(getSampleDataHandler().getTableName()).append(" sd").append(i);
+	}
+      }
+      if (!conditions.getStartDate().isInfinity())
+	tables.append(", ").append(getSampleDataHandler().getTableName()).append(" sd_start");
+      if (!conditions.getEndDate().isInfinity())
+	tables.append(", ").append(getSampleDataHandler().getTableName()).append(" sd_end");
+      if (hasInstrument)
+	tables.append(", ").append(getSampleDataHandler().getTableName()).append(" sd_instrument");
+      if (conditions.getExcludeDummies() || conditions.getOnlyDummies())
+	tables.append(", ").append(getSampleDataHandler().getTableName()).append(" sd_dummies");
+      if (required.length > 0) {
+	for (i = 0; i < required.length; i++) {
+	  if (!required[i].getName().isEmpty())
+	    tables.append(", ").append(getSampleDataHandler().getTableName()).append(" sd_req").append(i);
+	}
+      }
+      // for sorting by date
+      if (conditions.getSortOnInsertTimestamp())
+	tables.append(", ").append(getSampleDataHandler().getTableName()).append(" sd_sort_by_date");
+
+      // WHERE
+      if (fields.length > 0) {
+	for (i = 0; i < fields.length; i++) {
+	  if (!fields[i].getName().isEmpty()) {
+	    where.add("sd" + i + ".ID = sp.SAMPLEID");
+	    where.add("sd" + i + ".NAME = " + SQLUtils.backquote(fields[i].getName()));
+	  }
+	}
+      }
+
+      for (i = 0; i < minValues.length; i++) {
+	if (minValues[i].doubleValue() > -1)
+	  where.add("sd" + i + ".VALUE >= " + minValues[i]);
+	if (maxValues[i].doubleValue() > -1)
+	  where.add("sd" + i + ".VALUE <= " + maxValues[i]);
+      }
+
+      if (hasSampleID)
+	where.add(m_Queries.regexp("sp.SAMPLEID", conditions.getSampleIDRegExp()));
+
+      if (hasSampleType)
+	where.add(m_Queries.regexp("sp.SAMPLETYPE", conditions.getSampleTypeRegExp()));
+
+      if (hasFormat)
+	where.add(m_Queries.regexp("sp.FORMAT", conditions.getFormat()));
+
+      if (!conditions.getStartDate().isInfinity()) {
+	where.add("sd_start" + ".ID = sp.SAMPLEID");
+	where.add("sd_start" + ".NAME = " + SQLUtils.backquote(SampleData.INSERT_TIMESTAMP));
+	where.add("sd_start" + ".VALUE >= " + SQLUtils.backquote(conditions.getStartDate().stringValue()));
+      }
+
+      if (!conditions.getEndDate().isInfinity()) {
+	where.add("sd_end" + ".ID = sp.SAMPLEID");
+	where.add("sd_end" + ".NAME = " + SQLUtils.backquote(SampleData.INSERT_TIMESTAMP));
+	where.add("sd_end" + ".VALUE <= " + SQLUtils.backquote(conditions.getEndDate().stringValue()));
+      }
+
+      if (hasInstrument) {
+	where.add("sd_instrument" + ".ID = sp.SAMPLEID");
+	where.add("sd_instrument" + ".NAME = " + SQLUtils.backquote(SampleData.INSTRUMENT));
+	where.add(m_Queries.regexp("sd_instrument" + ".VALUE", conditions.getInstrument()));
+      }
+
+      if (conditions.getExcludeDummies() || conditions.getOnlyDummies()) {
+	where.add("sd_dummies.ID = sp.SAMPLEID");
+	where.add("sd_dummies.NAME = " + SQLUtils.backquote(SampleData.FIELD_DUMMYREPORT));
+	where.add("sd_dummies.VALUE = " + SQLUtils.backquote("" + conditions.getOnlyDummies()));
+      }
+
+      if (required.length > 0) {
+	for (i = 0; i < required.length; i++) {
+	  if (!required[i].getName().isEmpty()) {
+	    where.add("sd_req" + i + ".ID = sp.SAMPLEID");
+	    where.add("sd_req" + i + ".NAME = " + SQLUtils.backquote(required[i].getName()));
+	  }
+	}
+      }
+
+      if (conditions.getSortOnInsertTimestamp()) {
+	where.add("sd.ID = " + "sp.SAMPLEID");
+	where.add("sd.NAME = " + SQLUtils.backquote(SampleData.INSERT_TIMESTAMP));
+	where.add("sd_sort_by_date" + ".ID = sp.SAMPLEID");
+	where.add("sd_sort_by_date" + ".NAME = " + SQLUtils.backquote(SampleData.INSERT_TIMESTAMP));
+      }
+
+      // generate SQL
+      sql = new StringBuilder(Utils.flatten(where, " AND "));
+
+      // ordering
+      if (conditions.getLatest())
+	sort = " DESC";
+      else
+	sort = " ASC";
+      if (conditions.getSortOnInsertTimestamp())
+	sql.append(" ORDER BY sd_sort_by_date.VALUE").append(sort);
+      else if (conditions.getSortOnSampleID())
+	sql.append(" ORDER BY sp.SAMPLEID").append(sort);
+      else
+	sql.append(" ORDER BY sp.AUTO_ID").append(sort);
+
+      // limit
+      if (conditions.getLimit() > 0)
+	sql.append(" ").append(m_Queries.limit(conditions.getLimit()));
+
+      // query database
+      query = new StringBuilder("SELECT ").append(select)
+		.append(" FROM ").append(tables)
+		.append(" WHERE ").append(sql);
+      if (newConnection) {
+	connection = getDatabaseConnection().newConnection(false);
+	stmt       = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+	rs         = stmt.executeQuery(query.toString());
+	return new SpectrumIterator(this, getSampleDataHandler(), rs, connection);
+      }
+      else {
+	rs = select(select, tables.toString(), sql.toString());
+	return new SpectrumIterator(this, getSampleDataHandler(), rs, null);
+      }
+    }
+    catch (Exception e) {
+      getLogger().log(Level.SEVERE, "Failed to get IDs: " + conditions, e);
+    }
+
+    return null;
   }
 
   /**

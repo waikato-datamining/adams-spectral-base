@@ -15,7 +15,7 @@
 
 /*
  * SpectrumF.java
- * Copyright (C) 2019-2024 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2019-2025 University of Waikato, Hamilton, NZ
  */
 
 package adams.db;
@@ -398,6 +398,20 @@ public class SpectrumF
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", keepReport=" + keepReport);
     return m_DB.remove(id, keepReport);
+  }
+
+  /**
+   * Returns an iterator over the spectra that were identified by the conditions.
+   *
+   * @param conditions		the conditions to use
+   * @param newConnection 	whether to use a separate connection
+   * @return			the iterator, null if failed to instantiate
+   */
+  @Override
+  public SpectrumIterator iterate(AbstractSpectrumConditions conditions, boolean newConnection) {
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": conditions=" + conditions);
+    return m_DB.iterate(conditions, newConnection);
   }
 
   /**

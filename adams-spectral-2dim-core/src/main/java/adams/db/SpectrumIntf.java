@@ -15,7 +15,7 @@
 
 /*
  * SpectrumIntf.java
- * Copyright (C) 2019-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2019-2025 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -262,4 +262,13 @@ public interface SpectrumIntf
    * @return		true if no error
    */
   public boolean remove(int id, boolean keepReport);
+
+  /**
+   * Returns an iterator over the spectra that were identified by the conditions.
+   *
+   * @param conditions		the conditions to use
+   * @param newConnection 	whether to use a separate connection
+   * @return			the iterator, null if failed to instantiate
+   */
+  public SpectrumIterator iterate(AbstractSpectrumConditions conditions, boolean newConnection);
 }
