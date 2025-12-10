@@ -48,7 +48,6 @@ import adams.db.indices.Indices;
 import adams.db.types.ColumnType;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
@@ -789,17 +788,8 @@ public abstract class SampleDataT
     useSameConnection  = true;
 
     if (newConnection) {
-      try {
-	if (getDatabaseConnection().getUser().isEmpty())
-	  connection = DriverManager.getConnection(getDatabaseConnection().getURL());
-	else
-	  connection = DriverManager.getConnection(getDatabaseConnection().getURL(), getDatabaseConnection().getUser(), getDatabaseConnection().getPassword().getValue());
-	connection.setAutoCommit(autoCommit);
-	useSameConnection = false;
-      }
-      catch(Exception e) {
-        getLogger().warning("Failed to open separate connection to " + getDatabaseConnection().getURL() + ", re-using existing one.");
-      }
+      connection        = getDatabaseConnection().newConnection(autoCommit);
+      useSameConnection = (connection == null);
     }
 
     if (!newConnection || useSameConnection) {
