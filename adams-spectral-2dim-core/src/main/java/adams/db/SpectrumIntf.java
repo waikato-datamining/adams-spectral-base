@@ -108,58 +108,7 @@ public interface SpectrumIntf
   public Spectrum load(String sample_id, String format);
 
   /**
-   * Load a data container with given auto_id, without passing it through
-   * the global filter.
-   *
-   * @param auto_id	the databae ID
-   * @return 		the data container, or null if not found
-   */
-  public Spectrum loadRaw(int auto_id);
-
-  /**
-   * Load a spectrum with given sample ID and type, without filtering through
-   * the global container filter.
-   *
-   * @param sample_id	the sample ID
-   * @param format	the format
-   * @return 		Spectrum, or null if not found
-   */
-  public Spectrum loadRaw(String sample_id, String format);
-
-  /**
-   * Load a spectrum from DB with given auto_id.
-   *
-   * @param auto_id	the databae ID
-   * @param rlike 	regex for chrom name
-   * @param raw		whether to return the raw spectrum or filter it
-   * 			through the global container filter
-   * @return 		Spectrum, or null if not found
-   */
-  public Spectrum loadFromDB(int auto_id, String rlike, boolean raw);
-
-  /**
-   * Load a spectrum from DB with given sample_id and format.
-   *
-   * @param sample_id	the sample ID
-   * @param format 	the format
-   * @param raw		whether to return the raw spectrum or filter it
-   * 			through the global container filter
-   * @return 		Spectrum, or null if not found
-   */
-  public Spectrum loadFromDB(String sample_id, String format, boolean raw);
-
-  /**
-   * Returns the database ID for given spectrum ID. Get from cache if available
-   * Uses {@link SampleData#DEFAULT_FORMAT} as format.
-   *
-   * @param id		the ID
-   * @return 		Spectrum, or null if not found
-   * @see		#load(String, String)
-   */
-  public int getDatabaseID(String id);
-
-  /**
-   * Returns the database ID for given sample ID and type. Get from cache if available
+   * Returns the database ID for given sample ID and type.
    *
    * @param sample_id	the sample ID
    * @param format	the format

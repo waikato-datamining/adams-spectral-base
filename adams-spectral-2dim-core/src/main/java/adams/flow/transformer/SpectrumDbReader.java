@@ -15,7 +15,7 @@
 
 /*
  * SpectrumDbReader.java
- * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -72,11 +72,6 @@ import adams.flow.core.Token;
  * &nbsp;&nbsp;&nbsp;as it is.
  * </pre>
  *
- * <pre>-raw (property: raw)
- * &nbsp;&nbsp;&nbsp;If set to true, then the raw data is returned instead of being filtered
- * &nbsp;&nbsp;&nbsp;through the global data container filter.
- * </pre>
- *
  * <pre>-store (property: useStoreTable)
  * &nbsp;&nbsp;&nbsp;If set to true, then the data will get read from the store table, otherwise
  * &nbsp;&nbsp;&nbsp;the active one.
@@ -120,8 +115,8 @@ public class SpectrumDbReader
     super.defineOptions();
 
     m_OptionManager.add(
-	    "format", "format",
-	    SampleData.DEFAULT_FORMAT);
+      "format", "format",
+      SampleData.DEFAULT_FORMAT);
   }
 
   /**
@@ -209,9 +204,9 @@ public class SpectrumDbReader
   @Override
   protected AbstractDatabaseConnection getDatabaseConnection() {
     return ActorUtils.getDatabaseConnection(
-	  this,
-	  adams.flow.standalone.DatabaseConnectionProvider.class,
-	  getDefaultDatabaseConnection());
+      this,
+      adams.flow.standalone.DatabaseConnectionProvider.class,
+      getDefaultDatabaseConnection());
   }
 
   /**
@@ -230,18 +225,15 @@ public class SpectrumDbReader
     useSampleID = (m_InputToken.getPayload() instanceof String);
 
     if (useSampleID) {
-      if (m_Raw)
-	cont = ((SpectrumIntf) getDataProvider()).loadRaw((String) m_InputToken.getPayload(), m_Format);
-      else
-	cont = ((SpectrumIntf) getDataProvider()).load((String) m_InputToken.getPayload(), m_Format);
+      cont = ((SpectrumIntf) getDataProvider()).load((String) m_InputToken.getPayload(), m_Format);
       if (cont == null) {
-        if (!m_Lenient)
-          result = "No container loaded for sample ID (format=" + m_Format + "): " + m_InputToken;
-        else if (!m_Silent)
-          getLogger().warning("No container loaded for sample ID: " + m_InputToken);
+	if (!m_Lenient)
+	  result = "No container loaded for sample ID (format=" + m_Format + "): " + m_InputToken;
+	else if (!m_Silent)
+	  getLogger().warning("No container loaded for sample ID: " + m_InputToken);
       }
       else {
-        m_OutputToken = new Token(m_PostProcessor.postProcess(cont));
+	m_OutputToken = new Token(m_PostProcessor.postProcess(cont));
       }
     }
     else {

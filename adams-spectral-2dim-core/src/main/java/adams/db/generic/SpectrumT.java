@@ -115,6 +115,7 @@ public abstract class SpectrumT
    * @param id		the database ID of the data container
    * @return		true if the container exists
    */
+  @Override
   public boolean exists(int id) {
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
@@ -129,6 +130,7 @@ public abstract class SpectrumT
    * @return		true if the container exists
    * @see		#exists(String, String)
    */
+  @Override
   public boolean exists(String id) {
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
@@ -141,6 +143,7 @@ public abstract class SpectrumT
    * @param id		the ID of the data container
    * @return		true if the container exists
    */
+  @Override
   public boolean exists(String id, String format) {
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": id=" + id + ", format=" + format);
@@ -153,90 +156,18 @@ public abstract class SpectrumT
    * @param auto_id	the database ID
    * @return 		Spectrum, or null if not found
    */
+  @Override
   public synchronized Spectrum load(int auto_id){
-    if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id);
-    return loadFromDB(auto_id, "", true);
-  }
-
-  /**
-   * Load a spectrum with given ID. Get from cache if available
-   * Uses {@link SampleData#DEFAULT_FORMAT} as format.
-   *
-   * @param id		the ID
-   * @return 		Spectrum, or null if not found
-   * @see		#load(String, String)
-   */
-  public synchronized Spectrum load(String id){
-    if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
-    return load(id, SampleData.DEFAULT_FORMAT);
-  }
-
-  /**
-   * Load a spectrum with given sample ID and type. Get from cache if available
-   *
-   * @param sample_id	the sample ID
-   * @param format	the format
-   * @return 		Spectrum, or null if not found
-   */
-  public synchronized Spectrum load(String sample_id, String format){
-    if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName() + ": sample_id" + sample_id + ", format=" + format);
-    return loadFromDB(sample_id, format, true);
-  }
-
-  /**
-   * Load a data container with given auto_id, without passing it through
-   * the global filter.
-   *
-   * @param auto_id	the database ID
-   * @return 		the data container, or null if not found
-   */
-  public Spectrum loadRaw(int auto_id) {
-    if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id);
-    return loadFromDB(auto_id, "", true);
-  }
-
-  /**
-   * Load a spectrum with given sample ID and type, without filtering through
-   * the global container filter.
-   *
-   * @param sample_id	the sample ID
-   * @param format	the format
-   * @return 		Spectrum, or null if not found
-   */
-  public Spectrum loadRaw(String sample_id, String format) {
-    if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format);
-    return loadFromDB(sample_id, format, true);
-  }
-
-  /**
-   * Load a spectrum from DB with given auto_id.
-   *
-   * @param auto_id	the database ID
-   * @param rlike 	regex for spectrum ID
-   * @param raw		whether to return the raw spectrum or filter it
-   * 			through the global container filter
-   * @return 		Spectrum, or null if not found
-   */
-  public Spectrum loadFromDB(int auto_id, String rlike, boolean raw) {
     Spectrum	result;
     ResultSet 	rs;
 
     if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id + ", rlike=" + rlike + ", raw=" + raw);
+      getLogger().info(LoggingHelper.getMethodName() + ": auto_id=" + auto_id);
 
     result = null;
     rs     = null;
     try {
-      if (rlike.isEmpty())
-	rs = select("*", "AUTO_ID=" + auto_id);
-      else
-	rs = select("*", "AUTO_ID=" + auto_id + " AND " + m_Queries.regexp("SAMPLEID", rlike));
-
+      rs = select("*", "AUTO_ID=" + auto_id);
       result = SpectrumUtils.resultsetToSpectrum(rs, getSampleDataHandler());
     }
     catch (Exception e) {
@@ -250,20 +181,34 @@ public abstract class SpectrumT
   }
 
   /**
-   * Load a spectrum from DB with given sample_id and format.
+   * Load a spectrum with given ID. Get from cache if available
+   * Uses {@link SampleData#DEFAULT_FORMAT} as format.
+   *
+   * @param id		the ID
+   * @return 		Spectrum, or null if not found
+   * @see		#load(String, String)
+   */
+  @Override
+  public synchronized Spectrum load(String id){
+    if (isLoggingEnabled())
+      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
+    return load(id, SampleData.DEFAULT_FORMAT);
+  }
+
+  /**
+   * Load a spectrum with given sample ID and type. Get from cache if available
    *
    * @param sample_id	the sample ID
-   * @param format 	the format
-   * @param raw		whether to return the raw spectrum or filter it
-   * 			through the global container filter
+   * @param format	the format
    * @return 		Spectrum, or null if not found
    */
-  public Spectrum loadFromDB(String sample_id, String format, boolean raw) {
+  @Override
+  public synchronized Spectrum load(String sample_id, String format){
     Spectrum	result;
     ResultSet 	rs;
 
     if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format + ", raw=" + raw);
+      getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", format=" + format);
 
     result = null;
     rs     = null;
@@ -282,26 +227,13 @@ public abstract class SpectrumT
   }
 
   /**
-   * Returns the database ID for given spectrum ID. Get from cache if available
-   * Uses {@link SampleData#DEFAULT_FORMAT} as format.
-   *
-   * @param id		the ID
-   * @return 		Spectrum, or null if not found
-   * @see		#load(String, String)
-   */
-  public synchronized int getDatabaseID(String id){
-    if (isLoggingEnabled())
-      getLogger().info(LoggingHelper.getMethodName() + ": id=" + id);
-    return getDatabaseID(id, SampleData.DEFAULT_FORMAT);
-  }
-
-  /**
    * Returns the database ID for given sample ID and type. Get from cache if available
    *
    * @param sample_id	the sample ID
    * @param format	the format
    * @return 		the database ID, {@link Constants#NO_ID}
    */
+  @Override
   public synchronized int getDatabaseID(String sample_id, String format){
     int         result;
     ResultSet   rs;
@@ -334,6 +266,7 @@ public abstract class SpectrumT
    * @param cond	the conditions for the retrieval
    * @return		list of tab-separated values
    */
+  @Override
   public List<String> getValues(String[] fields, SpectrumIDConditions cond) {
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", cond=" + cond);
@@ -348,6 +281,7 @@ public abstract class SpectrumT
    * @param cond	the conditions for the retrieval
    * @return		list of tab-separated values
    */
+  @Override
   public List<String> getValues(String[] fields, String where, SpectrumIDConditions cond) {
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": fields=" + Utils.arrayToString(fields) + ", where=" + where + ", cond=" + cond);
@@ -363,6 +297,7 @@ public abstract class SpectrumT
    * @param cond	the conditions for the retrieval
    * @return		list of tab-separated values
    */
+  @Override
   public List<String> getValues(String[] fields, String tables, String where, SpectrumIDConditions cond) {
     ResultSet 		rs;
     List<String>	result;
@@ -499,6 +434,7 @@ public abstract class SpectrumT
    * @param sp  	spectrum Header
    * @return  	new ID, or null if fail
    */
+  @Override
   public synchronized Integer add(Spectrum sp) {
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": sp=" + sp);
@@ -513,6 +449,7 @@ public abstract class SpectrumT
    * @param storeWaveNo	whether to store the wave numbers as well
    * @return  		new ID, or null if fail
    */
+  @Override
   public Integer add(Spectrum sp, boolean storeWaveNo) {
     Integer 		result;
     StringBuilder 	q;
@@ -787,6 +724,7 @@ public abstract class SpectrumT
    * @return		true if no error
    * @see		#remove(String, String, boolean)
    */
+  @Override
   public boolean remove(String sample_id, boolean keepReport) {
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName() + ": sample_id=" + sample_id + ", keepReport=" + keepReport);
@@ -801,6 +739,7 @@ public abstract class SpectrumT
    * @param keepReport	if true does not delete associated report
    * @return		true if no error
    */
+  @Override
   public synchronized boolean remove(String sample_id, String format, boolean keepReport) {
     ResultSet	rs;
 
@@ -834,6 +773,7 @@ public abstract class SpectrumT
    * @param keepReport	if true does not delete associated report
    * @return		true if no error
    */
+  @Override
   public synchronized boolean remove(int id, boolean keepReport) {
     boolean	result;
     String	sql;
