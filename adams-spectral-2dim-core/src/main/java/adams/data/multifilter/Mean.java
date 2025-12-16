@@ -15,7 +15,7 @@
 
 /*
  * Mean.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.multifilter;
 
@@ -123,6 +123,7 @@ public class Mean
     int			i;
     int			n;
     double[]		values;
+    List<SpectrumPoint>	points;
     
     result = null;
 
@@ -147,14 +148,16 @@ public class Mean
       result.setID(data.getID());
       result.setFormat(m_NewFormat);
       values = new double[spectra.size()];
+      points = new ArrayList<>();
       for (i = 0; i < spectra.get(0).size(); i++) {
 	for (n = 0; n < spectra.size(); n++)
 	  values[n] = spectra.get(n).toList().get(i).getAmplitude();
-	result.add(
+	points.add(
 	    new SpectrumPoint(
 		spectra.get(0).toList().get(i).getWaveNumber(), 
 		(float) StatUtils.mean(values)));
       }
+      result.replaceAll(points, true);
     }
     else if (spectra.size() == 1) {
       result = spectra.get(0);

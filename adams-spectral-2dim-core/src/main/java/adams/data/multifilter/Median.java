@@ -15,7 +15,7 @@
 
 /*
  * Median.java
- * Copyright (C) 2019 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2019-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.multifilter;
 
@@ -123,7 +123,8 @@ public class Median
     int			i;
     int			n;
     double[]		values;
-    
+    List<SpectrumPoint>	points;
+
     result = null;
 
     // get spectra to average
@@ -147,14 +148,16 @@ public class Median
       result.setID(data.getID());
       result.setFormat(m_NewFormat);
       values = new double[spectra.size()];
+      points = new ArrayList<>();
       for (i = 0; i < spectra.get(0).size(); i++) {
 	for (n = 0; n < spectra.size(); n++)
 	  values[n] = spectra.get(n).toList().get(i).getAmplitude();
-	result.add(
+	points.add(
 	    new SpectrumPoint(
 		spectra.get(0).toList().get(i).getWaveNumber(), 
 		(float) StatUtils.median(values)));
       }
+      result.replaceAll(points, true);
     }
     else if (spectra.size() == 1) {
       result = spectra.get(0);

@@ -13,17 +13,17 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Average.java
- * Copyright (C) 2014-2015 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2014-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.multifilter;
 
 import adams.core.base.BaseString;
-import adams.data.spectrumfilter.StandardiseByInterpolation;
 import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
+import adams.data.spectrumfilter.StandardiseByInterpolation;
 import org.apache.commons.math3.stat.StatUtils;
 
 import java.util.ArrayList;
@@ -66,7 +66,6 @@ import java.util.List;
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public class Average
   extends AbstractFormatsBasedMultiSpectrumFilter {
@@ -178,13 +177,14 @@ public class Average
     int			i;
     int			n;
     double[]		values;
-    
+    List<SpectrumPoint>	points;
+
     result = null;
 
     // get spectra to average
-    spectra = new ArrayList<Spectrum>();
+    spectra = new ArrayList<>();
     if (m_Formats.length > 0) {
-      formats = new HashSet<String>();
+      formats = new HashSet<>();
       for (BaseString format: m_Formats)
 	formats.add(format.getValue());
       for (Spectrum sp: data) {
@@ -207,14 +207,16 @@ public class Average
       result.setID(data.getID());
       result.setFormat(m_NewFormat);
       values = new double[spectra.size()];
+      points = new ArrayList<>();
       for (i = 0; i < spectra.get(0).size(); i++) {
 	for (n = 0; n < spectra.size(); n++)
 	  values[n] = spectra.get(n).toList().get(i).getAmplitude();
-	result.add(
+	points.add(
 	    new SpectrumPoint(
 		spectra.get(0).toList().get(i).getWaveNumber(), 
 		(float) StatUtils.mean(values)));
       }
+      result.replaceAll(points, true);
     }
     else if (spectra.size() == 1) {
       result = spectra.get(0);

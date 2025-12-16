@@ -15,7 +15,7 @@
 
 /*
  * Subtract.java
- * Copyright (C) 2018 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2018-2025 University of Waikato, Hamilton, New Zealand
  */
 package adams.data.multifilter;
 
@@ -23,6 +23,7 @@ import adams.data.spectrum.MultiSpectrum;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -114,6 +115,7 @@ public class Subtract
     int			i;
     SpectrumPoint	point0;
     SpectrumPoint	point1;
+    List<SpectrumPoint>	points;
 
     // same size?
     if (spectra.get(0).size() != spectra.get(1).size())
@@ -124,13 +126,15 @@ public class Subtract
     result = spectra.get(0).getHeader();
     result.setID(data.getID());
     result.setFormat(m_NewFormat);
+    points = new ArrayList<>();
     for (i = 0; i < spectra.get(0).size(); i++) {
       point0 = spectra.get(0).toList().get(i);
       point1 = spectra.get(1).toList().get(i);
-      result.add(
+      points.add(
 	new SpectrumPoint(
 	  point0.getWaveNumber(), point0.getAmplitude() - point1.getAmplitude()));
     }
+    result.replaceAll(points, true);
 
     return result;
   }
