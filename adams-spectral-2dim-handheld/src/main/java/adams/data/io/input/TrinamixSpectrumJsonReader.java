@@ -20,6 +20,7 @@
 
 package adams.data.io.input;
 
+import adams.core.UniqueIDs;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
 import adams.data.spectrum.Spectrum;
@@ -105,7 +106,13 @@ public class TrinamixSpectrumJsonReader
       configID = null;
       if (obj.has("deviceConfigIdentity") && !obj.get("deviceConfigIdentity").isJsonNull())
 	configID = obj.get("deviceConfigIdentity").getAsString();
-      sampleID = obj.get("sampleIdentifier").getAsString();
+      if (obj.has("sampleIdentifier") && !obj.get("sampleIdentifier").isJsonNull()) {
+	sampleID = obj.get("sampleIdentifier").getAsString();
+      }
+      else {
+	sampleID = "NA-" + UniqueIDs.nextLong();
+	getLogger().warning("Sample ID is null, using dummy one: " + sampleID);
+      }
       useCase = null;
       if (obj.has("useCaseIdentity") && !obj.get("useCaseIdentity").isJsonNull())
 	useCase = obj.get("useCaseIdentity").getAsString();
