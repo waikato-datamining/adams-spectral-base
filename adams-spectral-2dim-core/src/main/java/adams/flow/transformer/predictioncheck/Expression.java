@@ -34,7 +34,7 @@ import java.util.logging.Level;
 
 /**
  <!-- globalinfo-start -->
- * Evaluates the specified boolean expression. The expression makes all numeric evaluation values available as symbols for the calculation.<br>
+ * Evaluates the specified boolean expression. The expression makes all numeric&#47;boolean&#47;string evaluation values available as symbols for the calculation. The symbol names of evaluation values must be surrounded by curly brackets ('{...}').<br>
  * Adds a new boolean evaluation with suffix .passed to the container with the result of the expression and one with the suffix .expression with the expanded expression, using the specified evaluation name.
  * <br><br>
  <!-- globalinfo-end -->
@@ -85,7 +85,8 @@ public class Expression
   @Override
   public String globalInfo() {
     return
-      "Evaluates the specified boolean expression. The expression makes all numeric evaluation values available as symbols for the calculation.\n"
+      "Evaluates the specified boolean expression. The expression makes all numeric/boolean/string evaluation values available as symbols for the calculation. "
+	+ "The symbol names of evaluation values must be surrounded by curly brackets ('{...}').\n"
 	+ "Adds a new boolean evaluation with suffix " + SUFFIX_PASSED + " to the container with the result of the expression and one with the suffix "
 	+ SUFFIX_EXPRESSION + " with the expanded expression, using the specified evaluation name.";
   }
@@ -211,19 +212,13 @@ public class Expression
     Map<String,Object> 		evals;
     BooleanExpression		parser;
     List<BaseString> 		symbols;
-    String			expanded;
 
     evals = (Map<String,Object>) cont.getValue(EvaluationContainer.VALUE_EVALUATIONS);
     if (evals != null) {
-      expanded = m_Expression.getValue();
       symbols  = new ArrayList<>();
-      for (String key: evals.keySet()) {
-	if (Utils.isDouble("" + evals.get(key))) {
-	  symbols.add(new BaseString(key + "=" + evals.get(key)));
-	  expanded = expanded.replace(key, "" + evals.get(key));
-	}
-      }
-      evals.put(m_Evaluation + SUFFIX_EXPRESSION, expanded);
+      for (String key: evals.keySet())
+	symbols.add(new BaseString(key + "=" + evals.get(key)));
+      evals.put(m_Evaluation + SUFFIX_EXPRESSION, m_Expression.getValue());
       parser = new BooleanExpression();
       parser.setExpression(m_Expression.getValue());
       parser.setSymbols(symbols.toArray(new BaseString[0]));
