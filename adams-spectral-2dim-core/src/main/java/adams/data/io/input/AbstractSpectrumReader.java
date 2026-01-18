@@ -355,7 +355,7 @@ public abstract class AbstractSpectrumReader
     SimpleSpectrumWriter	writer;
 
     Environment.setEnvironmentClass(env);
-    LoggingHelper.useHandlerFromOptions(args);
+    LoggingHelper.useHandler(args);
 
     try {
       if (OptionUtils.helpRequested(args)) {
