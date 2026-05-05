@@ -70,6 +70,7 @@ public class PassThrough
    * Return original Instances.
    *
    * @param data	Instances
+   * @return 		the cleaned data, null in case of error
    */
   protected Instances performClean(Instances data) {
     return data;

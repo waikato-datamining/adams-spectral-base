@@ -239,6 +239,7 @@ extends AbstractCleaner {
    * Clean Instances.
    *
    * @param instances	Instances
+   * @return 		the cleaned data, null in case of error
    */
   @Override
   protected Instances performClean(Instances instances) {
@@ -249,7 +250,7 @@ extends AbstractCleaner {
     Instance 	data;
 
     result = new Instances(instances,0);
-    if (m_AttributeName.length() == 0) {
+    if (m_AttributeName.isEmpty()) {
       att = instances.attribute(instances.numAttributes() - 1);
     }
     else {

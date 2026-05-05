@@ -168,7 +168,7 @@ public abstract class AbstractCleaner
    * Performs the actual check.
    *
    * @param data	the instance to check
-   * @return		null if ok, otherwise error message
+   * @return 		the cleaned data, null in case of error
    */
   protected abstract Instances performClean(Instances data);
 

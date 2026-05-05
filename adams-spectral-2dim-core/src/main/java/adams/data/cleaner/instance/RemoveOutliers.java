@@ -481,7 +481,7 @@ public class RemoveOutliers
    * Performs the actual check.
    *
    * @param data	the instance to check
-   * @return		null if ok, otherwise error message
+   * @return 		the cleaned data, null in case of error
    */
   @Override
   protected Instances performClean(Instances data) {

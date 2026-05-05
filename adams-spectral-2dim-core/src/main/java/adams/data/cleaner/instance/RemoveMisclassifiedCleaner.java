@@ -376,6 +376,7 @@ public class RemoveMisclassifiedCleaner
    * Clean Instances.
    *
    * @param instances	Instances
+   * @return 		the cleaned data, null in case of error
    */
   @Override
   protected Instances performClean(Instances instances) {
