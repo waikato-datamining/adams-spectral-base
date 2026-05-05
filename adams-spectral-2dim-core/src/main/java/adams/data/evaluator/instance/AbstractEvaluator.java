@@ -103,7 +103,7 @@ public abstract class AbstractEvaluator
   }
 
   /**
-   * Performs the some pre-checks whether the data is actually suitable.
+   * Performs some pre-checks whether the data is actually suitable.
    * Data needs to be non-null and a class attribute defined.
    *
    * @param data	the instance to check
@@ -116,7 +116,7 @@ public abstract class AbstractEvaluator
   }
 
   /**
-   * Performs the some pre-checks whether the data is actually suitable.
+   * Performs some pre-checks whether the data is actually suitable.
    *
    * @param data	the instance to check
    */

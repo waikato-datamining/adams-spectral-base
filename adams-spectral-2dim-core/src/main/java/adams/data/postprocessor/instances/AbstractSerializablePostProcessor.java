@@ -169,7 +169,7 @@ public abstract class AbstractSerializablePostProcessor
   }
 
   /**
-   * Performs the some pre-checks whether the data is actually suitable.
+   * Performs some pre-checks whether the data is actually suitable.
    * Also loads the serialized models on demand.
    *
    * @param data	the dataset to check

@@ -172,7 +172,7 @@ public abstract class AbstractSerializableEvaluator
   }
 
   /**
-   * Performs the some pre-checks whether the data is actually suitable.
+   * Performs some pre-checks whether the data is actually suitable.
    * Also loads the serialized data on demand.
    *
    * @param data	the instance to check

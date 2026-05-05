@@ -164,7 +164,7 @@ public abstract class AbstractSerializableCleaner
   }
 
   /**
-   * Performs the some pre-checks whether the data is actually suitable.
+   * Performs some pre-checks whether the data is actually suitable.
    * Also loads the serialized data on demand.
    *
    * @param data	the spectrum to check

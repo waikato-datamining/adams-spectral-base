@@ -169,7 +169,7 @@ public abstract class AbstractSerializableCleaner
   }
 
   /**
-   * Performs the some pre-checks whether the data is actually suitable.
+   * Performs some pre-checks whether the data is actually suitable.
    * Also loads the serialized data on demand.
    *
    * @param data	the instance to check
@@ -187,7 +187,7 @@ public abstract class AbstractSerializableCleaner
   }
 
   /**
-   * Performs the some pre-checks whether the data is actually suitable.
+   * Performs some pre-checks whether the data is actually suitable.
    *
    * @param data	the instances to clean
    */
