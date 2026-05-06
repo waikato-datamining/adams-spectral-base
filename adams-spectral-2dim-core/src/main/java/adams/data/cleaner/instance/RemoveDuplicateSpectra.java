@@ -20,6 +20,7 @@
 
 package adams.data.cleaner.instance;
 
+import adams.core.Randomizable;
 import adams.data.instances.ArffUtils;
 import adams.data.instances.InstanceComparator;
 import gnu.trove.list.TIntList;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Removes duplicate spectra from the dataset.
@@ -40,7 +42,8 @@ import java.util.Map;
  * @author fracpete (fracpete at waikato dot ac dot nz)
  */
 public class RemoveDuplicateSpectra
-  extends AbstractCleaner {
+  extends AbstractCleaner
+  implements Randomizable {
 
   private static final long serialVersionUID = -2381335210666399384L;
 
@@ -52,8 +55,24 @@ public class RemoveDuplicateSpectra
     ACCURATE,
   }
 
+  /**
+   * Post-removal operation.
+   */
+  public enum PostProcessing {
+    NOTHING,
+    RANDOMIZE,
+    SORT,
+    SORT_AND_RANDOMIZE,
+  }
+
   /** how the duplicates are removed. */
   protected Mode m_Mode;
+
+  /** what to do after dataset has been processed. */
+  protected PostProcessing m_PostProcessing;
+
+  /** the seed value. */
+  protected long m_Seed;
 
   /**
    * Returns a string describing the object.
@@ -74,7 +93,15 @@ public class RemoveDuplicateSpectra
 
     m_OptionManager.add(
       "mode", "mode",
-      Mode.FAST);
+      Mode.ACCURATE);
+
+    m_OptionManager.add(
+      "post-processing", "postProcessing",
+      PostProcessing.NOTHING);
+
+    m_OptionManager.add(
+      "seed", "seed",
+      1L);
   }
 
   /**
@@ -104,6 +131,66 @@ public class RemoveDuplicateSpectra
    */
   public String modeTipText() {
     return "How the duplicate spectra are removed.";
+  }
+
+  /**
+   * Sets the post-processing to apply after duplicates may have been removed.
+   *
+   * @param value	the type of post-processing
+   */
+  public void setPostProcessing(PostProcessing value) {
+    m_PostProcessing = value;
+    reset();
+  }
+
+  /**
+   * Returns the post-processing to apply after duplicates may have been removed.
+   *
+   * @return  		the type of post-processing
+   */
+  public PostProcessing getPostProcessing() {
+    return m_PostProcessing;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String postProcessingTipText() {
+    return "The post-processing to apply after duplicates may have been removed.";
+  }
+
+  /**
+   * Sets the seed value.
+   *
+   * @param value	the seed
+   */
+  @Override
+  public void setSeed(long value) {
+    m_Seed = value;
+  }
+
+  /**
+   * Returns the seed value.
+   *
+   * @return  		the seed
+   */
+  @Override
+  public long getSeed() {
+    return m_Seed;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  @Override
+  public String seedTipText() {
+    return "The seed value for the randomization.";
   }
 
   /**
@@ -248,9 +335,37 @@ public class RemoveDuplicateSpectra
     if (isLoggingEnabled()) {
       getLogger().info("Dataset: " + data.relationName());
       getLogger().info("Mode: " + m_Mode);
-      getLogger().info("Time to remove: " + duration + " msec");
+      getLogger().info("Duration: " + duration + " msec");
       getLogger().info("Rows in dataset: " + data.numInstances());
       getLogger().info("# rows removed: " + (data.numInstances() - result.numInstances()));
+    }
+
+    start = System.currentTimeMillis();
+    switch (m_PostProcessing) {
+      case NOTHING:
+	// nothing to do
+	break;
+
+      case SORT:
+	result.sort(new InstanceComparator(ArffUtils.amplitudes(result, false)));
+	break;
+
+      case RANDOMIZE:
+	result.randomize(new Random(m_Seed));
+	break;
+
+      case SORT_AND_RANDOMIZE:
+	result.sort(new InstanceComparator(ArffUtils.amplitudes(result, false)));
+	result.randomize(new Random(m_Seed));
+	break;
+
+      default:
+	throw new IllegalStateException("Unhandled post-processing: " + m_PostProcessing);
+    }
+    duration = System.currentTimeMillis() - start;
+    if (isLoggingEnabled()) {
+      getLogger().info("Post-processing: " + m_PostProcessing);
+      getLogger().info("Duration: " + duration + " msec");
     }
 
     return result;
