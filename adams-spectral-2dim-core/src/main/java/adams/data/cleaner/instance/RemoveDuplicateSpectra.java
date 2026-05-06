@@ -20,7 +20,6 @@
 
 package adams.data.cleaner.instance;
 
-import adams.core.Utils;
 import adams.data.instances.ArffUtils;
 import adams.data.instances.InstanceComparator;
 import gnu.trove.list.TIntList;
@@ -31,7 +30,6 @@ import weka.core.Instance;
 import weka.core.Instances;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -120,12 +118,34 @@ public class RemoveDuplicateSpectra
   }
 
   /**
+   * Removes the specified rows from the data.
+   *
+   * @param data	the data to process
+   * @param indices	the rows to remove
+   * @return		the reduced dataset (copy)
+   */
+  protected Instances remove(Instances data, int[] indices) {
+    Instances		result;
+    TIntSet		remove;
+    int			i;
+
+    remove = new TIntHashSet(indices);
+    result = new Instances(data, data.numInstances() - indices.length);
+    for (i = 0; i < data.numInstances(); i++) {
+      if (!remove.contains(i))
+	result.add((Instance) data.instance(i).copy());
+    }
+
+    return result;
+  }
+
+  /**
    * Performs a fast identification of duplicates.
    *
    * @param data 	the data to check
-   * @return 		the indices of the duplicate rows
+   * @return 		the (potentially) updated dataset
    */
-  protected int[] fast(Instances data) {
+  protected Instances fast(Instances data) {
     int[]			indices;
     Map<Double, List<Integer>>	counts;
     Instance			inst;
@@ -153,23 +173,19 @@ public class RemoveDuplicateSpectra
       }
     }
 
-    if (remove.isEmpty()) {
-      return new int[0];
-    }
-    else {
-      indices = remove.toArray();
-      Arrays.sort(indices);
-      return indices;
-    }
+    if (remove.isEmpty())
+      return data;
+    else
+      return remove(data, remove.toArray());
   }
 
   /**
    * Performs an accurate identification of duplicates.
    *
    * @param data 	the data to check
-   * @return 		the indices of the duplicate rows
+   * @return 		the (potentially) updated dataset
    */
-  protected int[] accurate(Instances data) {
+  protected Instances accurate(Instances data) {
     int[]		ampls;
     InstanceComparator	comp;
     TIntList		remove;
@@ -200,7 +216,7 @@ public class RemoveDuplicateSpectra
       }
     }
 
-    return remove.toArray();
+    return remove(data, remove.toArray());
   }
 
   /**
@@ -212,21 +228,17 @@ public class RemoveDuplicateSpectra
   @Override
   protected Instances performClean(Instances data) {
     Instances	result;
-    int[]	indices;
-    TIntSet	remove;
-    int		i;
     long	start;
     long	duration;
 
-    // determine duplicate rows
     start = System.currentTimeMillis();
     switch (m_Mode) {
       case FAST:
-	indices = fast(data);
+	result = fast(data);
 	break;
 
       case ACCURATE:
-	indices = accurate(data);
+	result = accurate(data);
 	break;
 
       default:
@@ -234,23 +246,11 @@ public class RemoveDuplicateSpectra
     }
     duration = System.currentTimeMillis() - start;
     if (isLoggingEnabled()) {
+      getLogger().info("Dataset: " + data.relationName());
+      getLogger().info("Mode: " + m_Mode);
       getLogger().info("Time to remove: " + duration + " msec");
       getLogger().info("Rows in dataset: " + data.numInstances());
-      getLogger().info("# rows to remove: " + indices.length);
-      if (indices.length > 0)
-	getLogger().info("Remove rows: " + Utils.arrayToString(indices));
-    }
-
-    // anything to remove?
-    if (indices.length == 0)
-      return data;
-
-    // remove rows
-    remove = new TIntHashSet(indices);
-    result = new Instances(data, data.numInstances() - indices.length);
-    for (i = 0; i < data.numInstances(); i++) {
-      if (!remove.contains(i))
-	result.add((Instance) data.instance(i).copy());
+      getLogger().info("# rows removed: " + (data.numInstances() - result.numInstances()));
     }
 
     return result;
