@@ -97,7 +97,7 @@ public class RemoveDuplicateSpectra
 
     m_OptionManager.add(
       "post-processing", "postProcessing",
-      PostProcessing.NOTHING);
+      PostProcessing.SORT_AND_RANDOMIZE);
 
     m_OptionManager.add(
       "seed", "seed",
