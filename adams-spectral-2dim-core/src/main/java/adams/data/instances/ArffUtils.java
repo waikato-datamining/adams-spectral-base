@@ -15,17 +15,22 @@
 
 /*
  * ArffUtils.java
- * Copyright (C) 2009-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2026 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
 
+import adams.core.Utils;
+import adams.data.statistics.StatUtils;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import weka.core.Attribute;
 import weka.core.Instances;
 import weka.filters.unsupervised.attribute.Remove;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * A helper class for turning spectrum data into ARFF files and vice versa.
@@ -146,41 +151,83 @@ public class ArffUtils
   }
 
   /**
+   * Returns the indices of the amplitudes in the dataset.
+   *
+   * @param data	the dataset to analyze
+   * @param oneBased 	whether to return 1-based or 0-based indices
+   * @return		the indices
+   */
+  public static int[] amplitudes(Instances data, boolean oneBased) {
+    int[]	result;
+    TIntList 	atts;
+    int		i;
+
+    atts = new TIntArrayList();
+    for (i = 0; i < data.numAttributes(); i++) {
+      if (data.attribute(i).name().startsWith(PREFIX_AMPLITUDE))
+	atts.add(i);
+    }
+
+    result = atts.toArray();
+    if (oneBased)
+      result = Utils.toOneBasedIndices(result);
+
+    return result;
+  }
+
+  /**
+   * Returns the indices of the attributes to remove, i.e.,
+   * ID attributes and string attributes. Class attribute is never listed.
+   *
+   * @param data	the data to analyze
+   * @param oneBased 	whether to return 1-based or 0-based indices
+   * @return		the indices to remove
+   */
+  public static int[] toRemove(Instances data, boolean oneBased) {
+    int[]	result;
+    TIntSet	atts;
+    Attribute	att;
+    int		i;
+
+    atts = new TIntHashSet();
+    if ((att = data.attribute(ArffUtils.getDBIDName())) != null)
+      atts.add(att.index());
+    if ((att = data.attribute(ArffUtils.getIDName())) != null)
+      atts.add(att.index());
+    if ((att = data.attribute(ArffUtils.getSampleIDName())) != null)
+      atts.add(att.index());
+    for (i = 0; i < data.numAttributes(); i++) {
+      if (i == data.classIndex())
+	continue;
+      if (data.attribute(i).isString())
+	atts.add(i);
+    }
+
+    result = atts.toArray();
+    Arrays.sort(result);
+
+    if (oneBased)
+      result = Utils.toOneBasedIndices(result);
+
+    return result;
+  }
+
+  /**
    * Initializes the Remove filter for removing all IDs (and string attributes) 
    * from the dataset.
    *
    * @param data	the data to use for the analysis
    * @return		the configured filter, null if no filtering required
-   * @throws Exception	if filter setup fails
    */
   public static Remove getRemoveFilter(Instances data) {
     Remove		result;
-    List<String> 	atts;
-    Attribute		att;
-    int			i;
+    int[]		indices;
 
-    // check names
-    atts = new ArrayList<>();
-    if ((att = data.attribute(ArffUtils.getDBIDName())) != null)
-      atts.add("" +(att.index() + 1));
-    if ((att = data.attribute(ArffUtils.getIDName())) != null)
-      atts.add("" + (att.index() + 1));
-    if ((att = data.attribute(ArffUtils.getSampleIDName())) != null)
-      atts.add("" + (att.index() + 1));
-    
-    // check string attributes
-    for (i = 0; i < data.numAttributes(); i++) {
-      if (i == data.classIndex())
-	continue;
-      if (data.attribute(i).isString()) {
-	if (!atts.contains("" + (i+1)))
-	  atts.add("" + (i+1));
-      }
-    }
-    
-    if (!atts.isEmpty()) {
+    indices = toRemove(data, true);
+
+    if (indices.length > 0) {
       result = new Remove();
-      result.setAttributeIndices(adams.core.Utils.flatten(atts, ","));
+      result.setAttributeIndices(adams.core.Utils.flatten(StatUtils.toNumberArray(indices), ","));
     }
     else {
       result = null;
