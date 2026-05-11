@@ -239,6 +239,8 @@ public class RemoveDuplicateSpectra
     int				i;
     double			sum;
     TIntSet			remove;
+    int[]			ampls;
+    InstanceComparator		comp;
 
     indices = ArffUtils.amplitudes(data, false);
     counts  = new HashMap<>();
@@ -253,10 +255,14 @@ public class RemoveDuplicateSpectra
     }
 
     remove = new TIntHashSet();
+    ampls  = ArffUtils.amplitudes(data, false);
+    comp   = new InstanceComparator(ampls);
     for (List<Integer> count: counts.values()) {
       if (count.size() > 1) {
-	for (i = 1; i < count.size(); i++)
-	  remove.add(count.get(i));
+	for (i = 1; i < count.size(); i++) {
+	  if (comp.compare(data.instance(count.get(0)), data.instance(count.get(i))) == 0)
+	    remove.add(count.get(i));
+	}
       }
     }
 
