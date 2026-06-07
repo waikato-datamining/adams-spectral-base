@@ -15,7 +15,7 @@
 
 /*
  * Evaluator.java
- * Copyright (C) 2011-2025 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2011-2026 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.flow.transformer;
@@ -1022,7 +1022,7 @@ public class Evaluator
       }
       catch (Exception e) {
 	m_OutputToken = null;
-	result = handleException("Failed to evaluate: " + m_InputToken.getPayload(), e);
+	result = handleException("Failed to evaluate:\n" + m_Evaluator.toString(m_InputToken.getPayload()), e);
       }
     }
 

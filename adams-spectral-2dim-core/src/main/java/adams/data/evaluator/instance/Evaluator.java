@@ -13,9 +13,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
+/*
  * Evaluator.java
- * Copyright (C) 2016 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2016-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.evaluator.instance;
@@ -33,7 +33,6 @@ import java.util.HashMap;
  * Interface for evaluators.
  *
  * @author FracPete (fracpete at waikato dot ac dot nz)
- * @version $Revision$
  */
 public interface Evaluator
   extends OptionHandler, Serializable, Comparable, CleanUpHandler,
@@ -78,4 +77,11 @@ public interface Evaluator
    */
   public HashMap<String,Float> evaluate(Instance data);
 
+  /**
+   * Turns the data into a string for the error output.
+   *
+   * @param data	the object to turn into a string
+   * @return		the generated string
+   */
+  public String toString(Object data);
 }

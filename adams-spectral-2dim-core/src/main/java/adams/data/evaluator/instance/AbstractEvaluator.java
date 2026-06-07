@@ -21,6 +21,8 @@
 package adams.data.evaluator.instance;
 
 import adams.core.ClassLister;
+import adams.core.Utils;
+import adams.core.logging.LoggingHelper;
 import adams.core.option.AbstractOptionConsumer;
 import adams.core.option.AbstractOptionHandler;
 import adams.core.option.ArrayConsumer;
@@ -78,6 +80,7 @@ public abstract class AbstractEvaluator
    *
    * @param value	the replacement
    */
+  @Override
   public void setMissingEvaluation(float value) {
     m_MissingEvaluation = value;
     reset();
@@ -98,6 +101,7 @@ public abstract class AbstractEvaluator
    * @return 		tip text for this property suitable for
    * 			displaying in the GUI or for listing the options.
    */
+  @Override
   public String missingEvaluationTipText() {
     return "The value to use as replacement for missing evaluations.";
   }
@@ -167,6 +171,7 @@ public abstract class AbstractEvaluator
    * @return		evaluation metrics, {@link #m_MissingEvaluation} in case
    * 			the class value is missing
    */
+  @Override
   public HashMap<String,Float> evaluate(Instance data) {
     HashMap<String,Float>   result;
     float                   eval;
@@ -196,9 +201,42 @@ public abstract class AbstractEvaluator
    * @param data	the instances to check
    * @return	evaluation metric
    */
+  @Override
   public boolean build(Instances data) {
     preCheck(data);
     return performBuild(data);
+  }
+
+  /**
+   * Turns the data into a string for the error output.
+   *
+   * @param data	the object to turn into a string
+   * @return		the generated string
+   */
+  @Override
+  public String toString(Object data) {
+    StringBuilder	result;
+    Instance		inst;
+    int			i;
+
+    if (data instanceof Instances) {
+      return data.toString();
+    }
+    else if (data instanceof Instance) {
+      result = new StringBuilder();
+      inst   = (Instance) data;
+      for (i = 0; i < inst.numAttributes(); i++) {
+	if (i > 0)
+	  result.append(",");
+	result.append(inst.attribute(i).name());
+      }
+      result.append("\n");
+      result.append(data);
+      return result.toString();
+    }
+    else {
+      return data.toString();
+    }
   }
 
   /**
@@ -280,7 +318,7 @@ public abstract class AbstractEvaluator
       result = (AbstractEvaluator) OptionUtils.forName(AbstractEvaluator.class, classname, options);
     }
     catch (Exception e) {
-      e.printStackTrace();
+      LoggingHelper.global().severe("Failed to instantiate evaluator: " + classname + " / " + Utils.arrayToString(options), e);
       result = null;
     }
 
