@@ -15,7 +15,7 @@
 
 /*
  * ASCSpectrumReader.java
- * Copyright (C) 2009-2025 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2026 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -358,6 +358,7 @@ public class ASCSpectrumReader
     double[] 	nir;
     double[] 	wave;
     int 	i;
+    Integer	numPoints;
 
     sp = new Spectrum();
     pf = new ParsedFile();
@@ -365,13 +366,15 @@ public class ASCSpectrumReader
 
     // NIR array
     nir = pf.getNIRArray();
-    if (nir == null || nir.length==0){
+    if ((nir == null) || (nir.length == 0))
       throw new IllegalStateException("No spectral data loaded from file.");
 
-    }
-    if (pf.getNumDatapoints() != nir.length){
-      throw new IllegalStateException("Mismatched wavenumber length. Expected "+pf.getNumDatapoints()+ ", read "+nir.length);
-    }
+    numPoints = pf.getNumDatapoints();
+    if (numPoints == null)
+      throw new IllegalStateException("# of data points not avilable. Failed to read data?");
+    if (numPoints != nir.length)
+      throw new IllegalStateException("Mismatched wavenumber length. Expected "+pf.getNumDatapoints()+ ", read " + nir.length);
+
     // wave numbers
     wave = pf.getWaveNumberArray();
 
