@@ -15,7 +15,7 @@
 
 /*
  * TrinamixSpectrumReader.java
- * Copyright (C) 2024-2025 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2024-2026 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -144,7 +144,7 @@ public class TrinamixSpectrumReader
     // timestamp
     timestamp = null;
     if (lines.get(1).contains("timestamp;")) {
-      parts = lines.get(0).split(";");
+      parts = lines.get(1).split(";");
       if (parts.length > 1)
 	timestamp = parts[1];
     }
