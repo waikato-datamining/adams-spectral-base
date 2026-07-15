@@ -15,7 +15,7 @@
 
 /*
  * RowWiseSpreadSheetSampleDataReader.java
- * Copyright (C) 2018-2024 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2018-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
@@ -88,6 +88,11 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: Value
  * </pre>
  *
+ * <pre>-sample-type &lt;java.lang.String&gt; (property: sampleType)
+ * &nbsp;&nbsp;&nbsp;The manual sample type to use if no column specified for sample type.
+ * &nbsp;&nbsp;&nbsp;default:
+ * </pre>
+ *
  * <pre>-row-finder &lt;adams.data.spreadsheet.rowfinder.RowFinder&gt; (property: rowFinder)
  * &nbsp;&nbsp;&nbsp;The row finder to use for locating the rows to import.
  * &nbsp;&nbsp;&nbsp;default: adams.data.spreadsheet.rowfinder.AllFinder
@@ -117,6 +122,9 @@ public class RowWiseSpreadSheetSampleDataReader
 
   /** the column name that stores the reference value. */
   protected String m_ColumnMeasurementValue;
+
+  /** the manual sample type. */
+  protected String m_SampleType;
 
   /** for locating the rows to import. */
   protected RowFinder m_RowFinder;
@@ -157,6 +165,10 @@ public class RowWiseSpreadSheetSampleDataReader
     m_OptionManager.add(
       "col-value", "columnMeasurementValue",
       "Value");
+
+    m_OptionManager.add(
+      "sample-type", "sampleType",
+      "");
 
     m_OptionManager.add(
       "row-finder", "rowFinder",
@@ -330,6 +342,35 @@ public class RowWiseSpreadSheetSampleDataReader
   }
 
   /**
+   * Sets the manual sample type to use if no column specified for sample type.
+   *
+   * @param value 	the sample type
+   */
+  public void setSampleType(String value) {
+    m_SampleType = value;
+    reset();
+  }
+
+  /**
+   * Returns the manual sample type to use if no column specified for sample type.
+   *
+   * @return 		the sample type
+   */
+  public String getSampleType() {
+    return m_SampleType;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String sampleTypeTipText() {
+    return "The manual sample type to use if no column specified for sample type.";
+  }
+
+  /**
    * Sets the row finder to use for locating the rows to import.
    *
    * @param value 	the finder
@@ -426,6 +467,7 @@ public class RowWiseSpreadSheetSampleDataReader
     Field			field;
     String			sampleKey;
     String			sampleKeyNew;
+    String			sampleType;
 
     result = new ArrayList<>();
 
@@ -434,7 +476,7 @@ public class RowWiseSpreadSheetSampleDataReader
 
     // locate columns
     keySampleID         = locateColumn(sheet, m_ColumnSampleID, true);
-    keySampleType       = locateColumn(sheet, m_ColumnSampleType, true);
+    keySampleType       = locateColumn(sheet, m_ColumnSampleType, m_SampleType.trim().isEmpty());
     keyMeasurementName  = locateColumn(sheet, m_ColumnMeasurementName, true);
     keyMeasurementValue = locateColumn(sheet, m_ColumnMeasurementValue, true);
 
@@ -458,12 +500,16 @@ public class RowWiseSpreadSheetSampleDataReader
       if (row.getCell(0).getContent().trim().equals("="))
 	continue;
 
-      sampleKeyNew = row.getCell(keySampleID).getContent().trim() + "\t" + row.getCell(keySampleType).getContent().trim();
+      if (keySampleType == null)
+	sampleType = m_SampleType.trim();
+      else
+	sampleType = row.getCell(keySampleType).getContent().trim();
+      sampleKeyNew = row.getCell(keySampleID).getContent().trim() + "\t" + sampleType;
       if ((sampleKey == null) || !sampleKey.equals(sampleKeyNew)) {
 	sampleKey = sampleKeyNew;
 	sd        = newInstance();
 	sd.addParameter(SampleData.SAMPLE_ID, row.getCell(keySampleID).getContent().trim());
-	sd.addParameter(SampleData.SAMPLE_TYPE, row.getCell(keySampleType).getContent().trim());
+	sd.addParameter(SampleData.SAMPLE_TYPE, sampleType);
 	result.add(sd);
       }
 
