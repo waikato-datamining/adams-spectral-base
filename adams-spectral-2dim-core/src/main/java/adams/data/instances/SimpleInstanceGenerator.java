@@ -15,7 +15,7 @@
 
 /*
  * SimpleInstanceGenerator.java
- * Copyright (C) 2009-2017 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2026 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.instances;
@@ -296,6 +296,7 @@ public class SimpleInstanceGenerator
     int			i;
     double[]		values;
     List<SpectrumPoint>	points;
+    SpectrumPoint	point;
     int			index;
     SampleData		report;
     float		waveno;
@@ -306,14 +307,15 @@ public class SimpleInstanceGenerator
 
     // spectrum
     points = data.toList();
-    for (i = 0; i < data.size(); i++) {
-      waveno = data.toList().get(i).getWaveNumber();
+    for (i = 0; i < points.size(); i++) {
+      point  = points.get(i);
+      waveno = point.getWaveNumber();
       if (m_AddWaveNumber) {
 	index         = m_OutputHeader.attribute(m_WaveNumberAsSuffix ? ArffUtils.getWaveNumberName(m_WaveNumberPrefix, waveno) : ArffUtils.getWaveNumberName(m_WaveNumberPrefix, i)).index();
-	values[index] = points.get(i).getWaveNumber();
+	values[index] = point.getWaveNumber();
       }
       index         = m_OutputHeader.attribute(m_WaveNumberAsSuffix ? ArffUtils.getAmplitudeName(m_AmplitudePrefix, waveno) : ArffUtils.getAmplitudeName(m_AmplitudePrefix, i)).index();
-      values[index] = points.get(i).getAmplitude();
+      values[index] = point.getAmplitude();
     }
 
     // field
