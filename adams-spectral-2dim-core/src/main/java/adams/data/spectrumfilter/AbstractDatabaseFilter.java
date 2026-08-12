@@ -15,7 +15,7 @@
 
 /*
  * AbstractDatabaseFilter.java
- * Copyright (C) 2009 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2026 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -31,27 +31,12 @@ import adams.db.SpectrumF;
  * Abstract superclass for filters that operate on the database.
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
- * @version $Revision: 1286 $
  */
 public abstract class AbstractDatabaseFilter
   extends AbstractDatabaseConnectionFilter<Spectrum> {
 
   /** for serialization. */
   private static final long serialVersionUID = 1733701959783280281L;
-
-  /** whether to load the sample data if missing. */
-  protected boolean m_UseStoreTable;
-
-  /**
-   * Adds options to the internal list of options.
-   */
-  public void defineOptions() {
-    super.defineOptions();
-
-    m_OptionManager.add(
-	    "store", "useStoreTable",
-	    false);
-  }
 
   /**
    * Returns the default database connection.
@@ -61,32 +46,6 @@ public abstract class AbstractDatabaseFilter
   protected AbstractDatabaseConnection getDefaultDatabaseConnection() {
     return DatabaseConnection.getSingleton();
   }
-
-  /**
-   * Sets whether to read from the active or store table.
-   *
-   * @param value	if true then the store table will be used
-   */
-  public void setUseStoreTable(boolean value) {
-    m_UseStoreTable = value;
-  }
-
-  /**
-   * Returns whether to read from the active or store table.
-   *
-   * @return		true if the store table is used
-   */
-  public boolean getUseStoreTable() {
-    return m_UseStoreTable;
-  }
-
-  /**
-   * Returns the tip text for this property.
-   *
-   * @return 		tip text for this property suitable for
-   * 			displaying in the GUI or for listing the options.
-   */
-  public abstract String useStoreTableTipText();
 
   /**
    * Returns the correct table object based on the filter's setup.
