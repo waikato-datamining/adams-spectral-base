@@ -88,6 +88,11 @@ import java.util.logging.Level;
  * &nbsp;&nbsp;&nbsp;default: Value
  * </pre>
  *
+ * <pre>-case-sensitive-column-matching &lt;boolean&gt; (property: caseSensitiveColumnMatching)
+ * &nbsp;&nbsp;&nbsp;If enabled, column names must be exact matches.
+ * &nbsp;&nbsp;&nbsp;default: true
+ * </pre>
+ *
  * <pre>-sample-type &lt;java.lang.String&gt; (property: sampleType)
  * &nbsp;&nbsp;&nbsp;The manual sample type to use if no column specified for sample type.
  * &nbsp;&nbsp;&nbsp;default:
@@ -122,6 +127,9 @@ public class RowWiseSpreadSheetSampleDataReader
 
   /** the column name that stores the reference value. */
   protected String m_ColumnMeasurementValue;
+
+  /** whether to allow case-insensitive column name matches. */
+  protected boolean m_CaseSensitiveColumnMatching;
 
   /** the manual sample type. */
   protected String m_SampleType;
@@ -165,6 +173,10 @@ public class RowWiseSpreadSheetSampleDataReader
     m_OptionManager.add(
       "col-value", "columnMeasurementValue",
       "Value");
+
+    m_OptionManager.add(
+      "case-sensitive-column-matching", "caseSensitiveColumnMatching",
+      true);
 
     m_OptionManager.add(
       "sample-type", "sampleType",
@@ -342,6 +354,35 @@ public class RowWiseSpreadSheetSampleDataReader
   }
 
   /**
+   * Sets whether to column names are matched case-sensitive or not.
+   *
+   * @param value 	true if case-sensitive
+   */
+  public void setCaseSensitiveColumnMatching(boolean value) {
+    m_CaseSensitiveColumnMatching = value;
+    reset();
+  }
+
+  /**
+   * Returns whether to column names are matched case-sensitive or not.
+   *
+   * @return 		true if case-sensitive
+   */
+  public boolean getCaseSensitiveColumnMatching() {
+    return m_CaseSensitiveColumnMatching;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String caseSensitiveColumnMatchingTipText() {
+    return "If enabled, column names must be exact matches.";
+  }
+
+  /**
    * Sets the manual sample type to use if no column specified for sample type.
    *
    * @param value 	the sample type
@@ -424,16 +465,25 @@ public class RowWiseSpreadSheetSampleDataReader
     Cell		cell;
     String		msg;
 
-    result = null;
     if ((sheet.getColumnCount() == 0) || column.isEmpty())
-      return result;
+      return null;
+
+    result = null;
 
     row = sheet.getHeaderRow();
     for (String key: row.cellKeys()) {
       cell = row.getCell(key);
-      if (cell.getContent().trim().equals(column)) {
-	result = key;
-	break;
+      if (m_CaseSensitiveColumnMatching) {
+	if (cell.getContent().trim().equals(column)) {
+	  result = key;
+	  break;
+	}
+      }
+      else {
+	if (cell.getContent().trim().equalsIgnoreCase(column)) {
+	  result = key;
+	  break;
+	}
       }
     }
 
@@ -458,7 +508,6 @@ public class RowWiseSpreadSheetSampleDataReader
     List<SampleData> 		result;
     SpreadSheet			sheet;
     List<Row>			rows;
-    int				i;
     String			keySampleID;
     String			keySampleType;
     String			keyMeasurementName;
