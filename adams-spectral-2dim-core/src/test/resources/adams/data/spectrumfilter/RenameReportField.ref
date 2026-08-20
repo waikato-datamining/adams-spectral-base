@@ -909,8 +909,6 @@ waveno,amplitude
 # KALU\tDataType=N
 # LUT2=576.51
 # LUT2\tDataType=N
-# MAGU=73.01
-# MAGU\tDataType=N
 # MANU=0.19
 # MANU\tDataType=N
 # N-total=3.92
@@ -933,6 +931,8 @@ waveno,amplitude
 # Sample\ ID\tDataType=S
 # Source=872280-nir.spec
 # Source\tDataType=S
+# _MAGU_=73.01
+# _MAGU_\tDataType=N
 # jaar=2008.0
 # jaar\tDataType=N
 # mnd=10b

@@ -175,7 +175,7 @@ public class RenameReportField
     Object	value;
 
     result   = (Spectrum) data.getClone();
-    sd       = data.getReport();
+    sd       = result.getReport();
 
     for (i = 0; i < m_FieldsOld.length; i++) {
       if (sd.hasValue(m_FieldsOld[i])) {
