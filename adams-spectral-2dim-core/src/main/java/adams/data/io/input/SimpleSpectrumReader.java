@@ -15,7 +15,7 @@
 
 /*
  * SimpleSpectrumReader.java
- * Copyright (C) 2009-2021 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2009-2026 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.io.input;
@@ -23,6 +23,7 @@ package adams.data.io.input;
 import adams.core.Properties;
 import adams.core.Utils;
 import adams.core.io.FileUtils;
+import adams.core.io.GzipUtils;
 import adams.core.io.PlaceholderFile;
 import adams.data.report.DataType;
 import adams.data.report.Field;
@@ -202,7 +203,7 @@ public class SimpleSpectrumReader
     try {
       if (filename.endsWith(".gz")) {
 	fis    = new FileInputStream(filename);
-	reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(fis)));
+	reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(fis, GzipUtils.BUFFER_SIZE_GZIPSTREAMS)));
       }
       else {
 	fr     = new FileReader(filename);
