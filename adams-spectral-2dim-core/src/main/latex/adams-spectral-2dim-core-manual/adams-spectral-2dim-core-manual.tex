@@ -42,7 +42,7 @@
 \center
 \begin{table}[b]
 	\begin{tabular}{c l l}
-		\parbox[c][2cm]{2cm}{\copyright 2017-2025} &
+		\parbox[c][2cm]{2cm}{\copyright 2017-2026} &
 		\parbox[c][2cm]{5cm}{\includegraphics[width=5cm]{images/coat_of_arms.pdf}} \\
 	\end{tabular}
 	\includegraphics[width=12cm]{images/cc.png} \\
@@ -65,11 +65,13 @@ instruments.
 \chapter{Flow}
 The following conversions are available:
 \begin{tight_itemize}
+  \item \textit{GetSpectrumToFormat} -- extracts and forwards the format of a spectrum.
   \item \textit{MultiSpectrumToSpectra} -- turns a single multi-spectrum
   into an array of regular spectra.
   \item \textit{ReportToSampleData} -- converts a simple report into
   a sample data object.
   \item \textit{SampleDataArrayToMap} -- converts a sample data array to a map, using the sample ID as key.
+  \item \textit{SetSpectrumToFormat} -- updates the format of spectra passing through.
   \item \textit{SpectraToMultiSpectrum} -- turns an array of spectra
   into a single multi-spectrum.
   \item \textit{SpectrumToArray} -- turns a spectrum into a float array
