@@ -15,13 +15,14 @@
 
 /*
  * UnscramblerSpectrumReader.java
- * Copyright (C) 2021-2024 University of Waikato, Hamilton, NZ
+ * Copyright (C) 2021-2026 University of Waikato, Hamilton, NZ
  */
 
 package adams.data.io.input;
 
 import adams.core.Range;
 import adams.core.Utils;
+import adams.core.XMLUtils;
 import adams.core.io.FileUtils;
 import adams.data.spectrum.Spectrum;
 import adams.data.spectrum.SpectrumPoint;
@@ -118,10 +119,9 @@ public class UnscramblerSpectrumReader
     factory = DocumentBuilderFactory.newInstance();
     factory.setValidating(false);
     factory.setNamespaceAware(false);
-    factory.setXIncludeAware(false);
-    factory.setExpandEntityReferences(false);
     factory.setIgnoringComments(false);
     factory.setIgnoringElementContentWhitespace(false);
+    XMLUtils.secureFactory(factory);
     builder = factory.newDocumentBuilder();
     in      = new BufferedInputStream(archive.getInputStream(file));
     m_Streams.add(in);
