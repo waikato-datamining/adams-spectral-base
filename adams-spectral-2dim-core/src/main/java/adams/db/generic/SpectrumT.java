@@ -15,7 +15,7 @@
 
 /*
  * SpectrumT.java
- * Copyright (C) 2008-2025 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2026 University of Waikato, Hamilton, New Zealand
  *
  */
 
@@ -56,7 +56,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -520,6 +522,8 @@ public abstract class SpectrumT
     int			n;
     boolean		useSameConnection;
     Connection 		connection;
+    String		key;
+    Set<String>		sampleids;
 
     if (isLoggingEnabled())
       getLogger().info(LoggingHelper.getMethodName());
@@ -527,6 +531,7 @@ public abstract class SpectrumT
     connection        = null;
     m_BulkAddStopped  = false;
     useSameConnection = true;
+    sampleids         = new HashSet<>();
 
     if (newConnection) {
       try {
@@ -581,6 +586,13 @@ public abstract class SpectrumT
       if (m_BulkAddStopped)
 	break;
 
+      // already added in this batch?
+      key = sp[i].getID() + "\t" + sp[i].getFormat();
+      if (sampleids.contains(key)) {
+	getLogger().warning("Duplicate spectrum in batch, skipping: " + sp[i].getID() + "/" + sp[i].getFormat());
+	continue;
+      }
+
       try {
 	// delete
 	delete.setString(1, sp[i].getID());
@@ -593,6 +605,9 @@ public abstract class SpectrumT
 	insert.setString(3, sp[i].getFormat());
 	insert.setString(4, pointsToString(sp[i], storeWaveNo));
 	insert.addBatch();
+
+	// record key
+	sampleids.add(key);
 
 	n++;
 	committed = false;
