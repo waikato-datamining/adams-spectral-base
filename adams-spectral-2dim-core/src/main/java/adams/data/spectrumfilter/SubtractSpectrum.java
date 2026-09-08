@@ -15,7 +15,7 @@
 
 /*
  * SubtractSpectrum.java
- * Copyright (C) 2008-2024 University of Waikato, Hamilton, New Zealand
+ * Copyright (C) 2008-2026 University of Waikato, Hamilton, New Zealand
  */
 
 package adams.data.spectrumfilter;
@@ -33,9 +33,38 @@ import java.util.List;
 
 /**
  <!-- globalinfo-start -->
+ * Subtract a spectrum, after filtering.
+ * <br><br>
  <!-- globalinfo-end -->
  *
  <!-- options-start -->
+ * <pre>-logging-level &lt;OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST&gt; (property: loggingLevel)
+ * &nbsp;&nbsp;&nbsp;The logging level for outputting errors and debugging output.
+ * &nbsp;&nbsp;&nbsp;default: WARNING
+ * &nbsp;&nbsp;&nbsp;min-user-mode: Expert
+ * </pre>
+ *
+ * <pre>-no-id-update &lt;boolean&gt; (property: dontUpdateID)
+ * &nbsp;&nbsp;&nbsp;If enabled, suppresses updating the ID of adams.data.id.IDHandler data containers.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-no-processing-info-update &lt;boolean&gt; (property: dontUpdateProcessingInfo)
+ * &nbsp;&nbsp;&nbsp;If enabled, suppresses updating the processing information of adams.data.NotesHandler
+ * &nbsp;&nbsp;&nbsp;data containers.
+ * &nbsp;&nbsp;&nbsp;default: false
+ * </pre>
+ *
+ * <pre>-filter &lt;adams.data.filter.Filter&gt; (property: filter)
+ * &nbsp;&nbsp;&nbsp;The filter to use.
+ * &nbsp;&nbsp;&nbsp;default: adams.data.filter.PassThrough
+ * </pre>
+ *
+ * <pre>-database-id &lt;int&gt; (property: databaseID)
+ * &nbsp;&nbsp;&nbsp;The database ID of the spectrum to load.
+ * &nbsp;&nbsp;&nbsp;default: 69052
+ * </pre>
+ *
  <!-- options-end -->
  *
  * @author  fracpete (fracpete at waikato dot ac dot nz)
@@ -56,8 +85,9 @@ public class SubtractSpectrum
 
   /** the filter to run. */
   protected Filter<Spectrum> m_Filter;
-  
-  protected int m_id=69052;
+
+  /** the DB ID of the spectrum to load and subtract. */
+  protected int m_DatabaseID;
 
   /**
    * Returns a string describing the object.
@@ -74,8 +104,12 @@ public class SubtractSpectrum
     super.defineOptions();
 
     m_OptionManager.add(
-	"filter", "filter",
-	new PassThrough());
+      "filter", "filter",
+      new PassThrough());
+
+    m_OptionManager.add(
+      "database-id", "databaseID",
+      69052);
   }
 
   /**
@@ -85,6 +119,7 @@ public class SubtractSpectrum
    */
   public void setFilter(Filter value) {
     m_Filter = value;
+    reset();
   }
 
   /**
@@ -105,10 +140,35 @@ public class SubtractSpectrum
   public String filterTipText() {
     return "The filter to use.";
   }
-  
 
+  /**
+   * Sets the database ID of the spectrum to load.
+   *
+   * @param value 	the ID
+   */
+  public void setDatabaseID(int value) {
+    m_DatabaseID = value;
+    reset();
+  }
 
-  
+  /**
+   * Returns the database ID of the spectrum to load.
+   *
+   * @return 		the ID
+   */
+  public int getDatabaseID() {
+    return m_DatabaseID;
+  }
+
+  /**
+   * Returns the tip text for this property.
+   *
+   * @return 		tip text for this property suitable for
+   * 			displaying in the GUI or for listing the options.
+   */
+  public String databaseIDTipText() {
+    return "The database ID of the spectrum to load.";
+  }
 
   /**
    * Performs the actual filtering.
@@ -119,23 +179,23 @@ public class SubtractSpectrum
   protected Spectrum processData(Spectrum data) {
     Spectrum		result;
     int			i;
-   
-    Spectrum f1=m_Filter.filter(data);
-    Spectrum sp=SpectrumF.getSingleton(getDatabaseConnection()).load(m_id);
-    Spectrum f2=m_Filter.filter(sp);
-   
+
+    Spectrum f1 = m_Filter.filter(data);
+    Spectrum sp = SpectrumF.getSingleton(getDatabaseConnection()).load(m_DatabaseID);
+    Spectrum f2 = m_Filter.filter(sp);
+
     result = data.getHeader();
     List<SpectrumPoint> list1 = f1.toList();
     List<SpectrumPoint> list2 = f2.toList();
 
     for (i = 0; i < list1.size(); i++) {
       // scale point
-      SpectrumPoint point1    = list1.get(i);
-      SpectrumPoint point2    = list2.get(i);
-     
+      SpectrumPoint point1 = list1.get(i);
+      SpectrumPoint point2 = list2.get(i);
+
       SpectrumPoint pointNew = new SpectrumPoint(
-	  		point1.getWaveNumber(),
-	  		(float) ((point1.getAmplitude() -point2.getAmplitude())));
+	point1.getWaveNumber(),
+	(point1.getAmplitude() - point2.getAmplitude()));
 
       // add to output
       result.add(pointNew);
